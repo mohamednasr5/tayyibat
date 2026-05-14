@@ -1287,7 +1287,7 @@ body{
           </div>
         </div>
         <p style="font-size:.76rem;color:var(--txt2);line-height:1.75;margin-bottom:8px;">
-          الدكتور <strong style="color:var(--gold2);">ضياء الدين العوضي</strong> — طبيب وباحث كويتي متخصص في التغذية والطب الوقائي، صاحب نظام <strong style="color:var(--gold2);">الطيبات</strong> الغذائي الشهير الذي أحدث ثورةً في مفاهيم التغذية في العالم العربي. كرّس حياته لتعليم الناس الفرق بين "الطيبات" التي تبني الجسم و"الخبائث" التي تهدمه، ونشر مبادئ الصيام المتقطع والأكل الصحي عبر محاضرات وفيديوهات وصلت لملايين المشاهدين.
+          الدكتور <strong style="color:var(--gold2);">ضياء الدين العوضي</strong> — طبيب وباحث مصري متخصص في التغذية والطب الوقائي، صاحب نظام <strong style="color:var(--gold2);">الطيبات</strong> الغذائي الشهير الذي أحدث ثورةً في مفاهيم التغذية في العالم العربي. كرّس حياته لتعليم الناس الفرق بين "الطيبات" التي تبني الجسم و"الخبائث" التي تهدمه، ونشر مبادئ الصيام المتقطع والأكل الصحي عبر محاضرات وفيديوهات وصلت لملايين المشاهدين.
         </p>
         <div style="background:rgba(160,21,21,.15);border:1px solid rgba(229,57,53,.3);border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;">
           <span style="font-size:1.1rem;flex-shrink:0;">🕊️</span>
@@ -1614,7 +1614,7 @@ body{
         <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👨‍⚕️</div>
         <div>
           <div style="font-family:'Amiri',serif;font-size:.95rem;color:var(--gold2);font-weight:700;">د. ضياء الدين العوضي</div>
-          <div style="font-size:.7rem;color:var(--txt3);">طبيب وباحث كويتي • مؤسس نظام الطيبات</div>
+          <div style="font-size:.7rem;color:var(--txt3);">طبيب وباحث مصري • مؤسس نظام الطيبات</div>
         </div>
       </div>
       <p style="font-size:.76rem;color:var(--txt2);line-height:1.75;margin-bottom:10px;">
@@ -2985,6 +2985,39 @@ function showToast(msg){
 function hideLoader(){document.getElementById('loader').style.display='none';}
 
 function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+/* ═══════════════════════════════════════
+   SHARE FUNCTIONS
+═══════════════════════════════════════ */
+function shareWhatsApp(){
+  const url='https://mohamednasr5.github.io/tayyibat/';
+  const text=`🌿 *نظام الطيبات* — للدكتور ضياء العوضي رحمه الله\n\nتطبيق شامل يشرح نظام الطيبات الغذائي مع:\n✅ قائمة الأطعمة المسموحة والممنوعة\n⏱️ عداد الصيام المتقطع\n💡 نصائح طبية مخصصة لحالتك\n\n${url}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+function copyLink(){
+  const url='https://mohamednasr5.github.io/tayyibat/';
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>{
+      showToast('✅ تم نسخ الرابط!');
+    }).catch(()=>{
+      _fallbackCopy(url);
+    });
+  } else {
+    _fallbackCopy(url);
+  }
+}
+
+function _fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.focus();ta.select();
+  try{document.execCommand('copy');showToast('✅ تم نسخ الرابط!');}
+  catch(e){showToast('❌ تعذّر النسخ، انسخ الرابط يدوياً');}
+  document.body.removeChild(ta);
+}
 
 /* ═══════════════════════════════════════
    PWA / NOTIFICATIONS
