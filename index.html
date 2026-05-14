@@ -1277,6 +1277,26 @@ body{
         <div class="logo-sub">للدكتور ضياء العوضي رحمه الله</div>
       </div>
 
+      <!-- Doctor Bio Card -->
+      <div style="background:linear-gradient(145deg,rgba(200,150,12,.08),rgba(200,150,12,.04));border:1px solid rgba(200,150,12,.3);border-radius:16px;padding:16px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;box-shadow:0 0 16px rgba(200,150,12,.4);">👨‍⚕️</div>
+          <div>
+            <div style="font-family:'Amiri',serif;font-size:1.05rem;background:linear-gradient(135deg,var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;">د. ضياء العوضي</div>
+            <div style="font-size:.7rem;color:var(--txt2);">مؤسس نظام الطيبات الغذائي</div>
+          </div>
+        </div>
+        <p style="font-size:.76rem;color:var(--txt2);line-height:1.75;margin-bottom:8px;">
+          الدكتور <strong style="color:var(--gold2);">ضياء الدين العوضي</strong> — طبيب وباحث كويتي متخصص في التغذية والطب الوقائي، صاحب نظام <strong style="color:var(--gold2);">الطيبات</strong> الغذائي الشهير الذي أحدث ثورةً في مفاهيم التغذية في العالم العربي. كرّس حياته لتعليم الناس الفرق بين "الطيبات" التي تبني الجسم و"الخبائث" التي تهدمه، ونشر مبادئ الصيام المتقطع والأكل الصحي عبر محاضرات وفيديوهات وصلت لملايين المشاهدين.
+        </p>
+        <div style="background:rgba(160,21,21,.15);border:1px solid rgba(229,57,53,.3);border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;">
+          <span style="font-size:1.1rem;flex-shrink:0;">🕊️</span>
+          <p style="font-size:.73rem;color:#ef9a9a;line-height:1.7;margin:0;">
+            <strong>رحمه الله</strong> — انتقل الدكتور ضياء العوضي إلى رحمة الله في <strong>الإمارات العربية المتحدة</strong> إثر حادث غامض أثار حزن محبيه في العالم العربي. تركت وفاته فراغاً كبيراً في عالم التغذية والصحة، ويبقى نظامه الغذائي إرثاً علمياً ينتفع به الملايين.
+          </p>
+        </div>
+      </div>
+
       <!-- Disclaimer -->
       <div class="disclaimer">
         <div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنويه هام</div>
@@ -1587,6 +1607,27 @@ body{
       <div class="prof-row"><span class="prof-key">أفضل نوع صيام</span><span class="prof-val" id="pp-best">-</span></div>
     </div>
 
+    <!-- Doctor Bio Card in Profile -->
+    <div class="prof-card" style="border-color:rgba(200,150,12,.3);">
+      <div class="prof-card-title"><i class="fas fa-user-md" style="color:var(--gold)"></i> عن صاحب النظام</div>
+      <div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(30,53,96,.5);margin-bottom:10px;">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👨‍⚕️</div>
+        <div>
+          <div style="font-family:'Amiri',serif;font-size:.95rem;color:var(--gold2);font-weight:700;">د. ضياء الدين العوضي</div>
+          <div style="font-size:.7rem;color:var(--txt3);">طبيب وباحث كويتي • مؤسس نظام الطيبات</div>
+        </div>
+      </div>
+      <p style="font-size:.76rem;color:var(--txt2);line-height:1.75;margin-bottom:10px;">
+        باحث ومحاضر في التغذية الصحية، قدّم نظاماً غذائياً متكاملاً يعتمد على التمييز بين الأطعمة "الطيبة" الداعمة للجسم والأطعمة الضارة، مع تكامل الصيام المتقطع لتحقيق الصحة المثلى. أثّرت محاضراته في حياة الملايين عبر العالم العربي.
+      </p>
+      <div style="background:rgba(160,21,21,.1);border:1px solid rgba(229,57,53,.25);border-radius:10px;padding:9px 12px;display:flex;align-items:flex-start;gap:7px;">
+        <span style="font-size:1rem;flex-shrink:0;">🕊️</span>
+        <p style="font-size:.72rem;color:#ef9a9a;line-height:1.65;margin:0;">
+          رحمه الله — وافته المنية في <strong>الإمارات العربية المتحدة</strong> إثر حادث غامض. اللهم ارحمه وأسكنه فسيح جناتك.
+        </p>
+      </div>
+    </div>
+
     <!-- Share Card -->
     <div class="share-card">
       <div class="share-card-title"><i class="fas fa-share-alt"></i> شارك التطبيق مع أصدقائك</div>
@@ -1686,6 +1727,221 @@ body{
 </div>
 
 <script>
+/* ═══════════════════════════════════════
+   PERSONALIZED MEDICAL TIPS ENGINE
+═══════════════════════════════════════ */
+
+function getPersonalizedTips(user) {
+  const tips = [];
+  const bmi = user && user.bmi ? user.bmi : null;
+  const gender = user && user.gender ? user.gender : null;
+  const diseases = user && user.diseases ? user.diseases : [];
+  const weight = user && user.weight ? user.weight : null;
+  const age = user && user.dob ? calcAge(user.dob) : null;
+  const bmiCat = bmi ? getBMICategory(bmi) : null;
+
+  // ── General tips (always shown) ──
+  tips.push({
+    icon:'🌿', iconBg:'rgba(27,122,46,.2)', iconColor:'#2ec951',
+    category:'نظام الطيبات',
+    title:'أكل فقط عند الجوع الحقيقي',
+    body:'لا تأكل إلا حين تشعر بالجوع الحقيقي في معدتك، ليس جوع العين أو الملل. هذه الركيزة الأولى لنظام الطيبات.'
+  });
+
+  // ── Gender-specific tips ──
+  if(gender === 'female') {
+    tips.push({
+      icon:'👩', iconBg:'rgba(233,30,99,.15)', iconColor:'#f48fb1',
+      category:'نصيحة للمرأة',
+      title:'الصيام في أيام الدورة',
+      body:'يُفضَّل تخفيف الصيام أو إيقافه في أيام الدورة الشهرية. جسمك يحتاج طاقة إضافية. ركّزي على التغذية الجيدة بالحديد والبروتين.'
+    });
+    if(age && age > 40) {
+      tips.push({
+        icon:'🦴', iconBg:'rgba(33,150,243,.15)', iconColor:'#90caf9',
+        category:'نصيحة للمرأة فوق الـ ٤٠',
+        title:'الكالسيوم وصحة العظام',
+        body:'مع التقدم في العمر تحتاجين الانتباه لصحة العظام. الجبن الطازج وزيت السمك واللبن مفيدة. الصيام المتقطع المتوازن لا يضر العظام.'
+      });
+    }
+  } else if(gender === 'male') {
+    tips.push({
+      icon:'💪', iconBg:'rgba(33,150,243,.15)', iconColor:'#90caf9',
+      category:'نصيحة للرجل',
+      title:'البروتين وبناء العضلات',
+      body:'الرجل يحتاج بروتيناً أكثر. لحم الضاني والأسماك يومياً تقريباً ضروري إذا كنت تمارس الرياضة. وجبة البروتين تأتي بعد التمرين مباشرة للاستفادة القصوى.'
+    });
+  }
+
+  // ── BMI-based tips ──
+  if(bmiCat) {
+    if(bmiCat.cat === 'نقص_الوزن') {
+      tips.push({
+        icon:'📈', iconBg:'rgba(33,150,243,.15)', iconColor:'#64b5f6',
+        category:'نقص الوزن — BMI ' + bmi.toFixed(1),
+        title:'تحتاج سعرات أكثر',
+        body:`وزنك ${weight||'-'} كجم ومؤشر كتلة جسمك ${bmi.toFixed(1)} — أقل من الطبيعي. ركّز على وجبات أكثر دسامةً: زيت زيتون، جبن، مكسرات، تمر، عسل. لا تبالغ في الصيام المتقطع الطويل حتى تصل لوزن مناسب.`
+      });
+    } else if(bmiCat.cat === 'مثالي') {
+      tips.push({
+        icon:'✅', iconBg:'rgba(46,201,81,.15)', iconColor:'#2ec951',
+        category:'وزن مثالي — BMI ' + bmi.toFixed(1),
+        title:'حافظ على وزنك الصحي',
+        body:`ممتاز! BMI ${bmi.toFixed(1)} في النطاق المثالي. نظام الطيبات سيساعدك على الحفاظ على هذا الوزن. الصيام 16:8 مثالي لك للحفاظ على التوازن الهرموني وصحة الجهاز الهضمي.`
+      });
+    } else if(bmiCat.cat === 'زيادة_الوزن') {
+      tips.push({
+        icon:'⚠️', iconBg:'rgba(255,160,0,.15)', iconColor:'#ffa726',
+        category:'زيادة وزن — BMI ' + bmi.toFixed(1),
+        title:'ابدأ بالتغيير التدريجي',
+        body:`وزنك ${weight||'-'} كجم ومؤشرك ${bmi.toFixed(1)}. ابدأ بصيام 12:12 أسبوعين، ثم انتقل لـ16:8. قلّل الكربوهيدرات (أرز وخبز) وزد البروتين والخضار المطبوخة. ${gender==='female'?'المرأة تفقد الوزن بشكل أبطأ وهذا طبيعي، الصبر مطلوب.':''}`
+      });
+    } else {
+      tips.push({
+        icon:'🚨', iconBg:'rgba(229,57,53,.15)', iconColor:'#ef5350',
+        category:'سمنة — BMI ' + bmi.toFixed(1),
+        title:'خطة مكثفة ضرورية',
+        body:`BMI ${bmi.toFixed(1)} يستدعي تغييراً جوهرياً. ابدأ بصيام 16:8 فوراً، تخلَّ تماماً عن الكربوهيدرات المكررة والدقيق الأبيض والزيوت النباتية. ركّز على السمك واللحم الضاني والخضار المطبوخة فقط. ${gender==='female'?'استشيري طبيبتك لمتابعة هرمونات الغدة الدرقية مع تغيير النظام.':'استشر طبيبك قبل الصيام المكثف إن كنت تعاني من أمراض.'}`
+      });
+    }
+  }
+
+  // ── Disease-specific tips ──
+  if(diseases.includes('sugar')) {
+    tips.push({
+      icon:'🩸', iconBg:'rgba(229,57,53,.15)', iconColor:'#ef5350',
+      category:'مرض السكري',
+      title:'الصيام وإدارة السكري',
+      body:`${gender==='female'?'السيدة المصابة بالسكري':'مريض السكري'} يستفيد كثيراً من الصيام المتقطع لتحسين حساسية الإنسولين. ابدأ بـ12:12 تحت إشراف الطبيب. تجنّب تماماً: العسل، الأرز الكثير، البطاطس، كل ما يرفع السكر. الأسماك واللحم الضاني وزيت الزيتون هي أفضل أصدقائك.`
+    });
+    tips.push({
+      icon:'⏰', iconBg:'rgba(200,150,12,.12)', iconColor:'var(--gold2)',
+      category:'مرض السكري — تحذير',
+      title:'مواعيد الدواء مع الصيام',
+      body:'لا تُعدّل جرعة الإنسولين أو دواء السكري وحدك أبداً عند تغيير نظامك الغذائي. تحدث مع طبيبك أولاً لأن الصيام قد يغيّر احتياجك للدواء.'
+    });
+  }
+
+  if(diseases.includes('pressure')) {
+    tips.push({
+      icon:'💉', iconBg:'rgba(33,150,243,.15)', iconColor:'#64b5f6',
+      category:'ارتفاع الضغط',
+      title:'الأملاح والضغط',
+      body:`${gender==='female'?'مرضى ارتفاع الضغط من النساء':'مرضى ارتفاع الضغط'} يجب تقليل الأملاح: ابتعد عن الأجبان المملحة والأطعمة المعلبة. زيت الزيتون والأسماك يساعدان في خفض الضغط طبيعياً. الصيام المتقطع يحسن ضغط الدم تدريجياً.`
+    });
+  }
+
+  if(diseases.includes('heart')) {
+    tips.push({
+      icon:'❤️', iconBg:'rgba(229,57,53,.1)', iconColor:'#ef5350',
+      category:'أمراض القلب',
+      title:'حماية القلب بالنظام',
+      body:`${gender==='female'?'المرأة':'الرجل'} بعد الـ40 مع أمراض القلب — الأسماك الدهنية (سلمون، سردين) هي الغذاء الأمثل. زيت الزيتون يومياً. ابتعد عن الدهون المهدرجة والوجبات السريعة تماماً. الصيام المتقطع الخفيف (12:12) تحت إشراف الطبيب مفيد جداً.`
+    });
+  }
+
+  // ── Age-specific tips ──
+  if(age) {
+    if(age < 25) {
+      tips.push({
+        icon:'🌱', iconBg:'rgba(46,201,81,.12)', iconColor:'#2ec951',
+        category:'نصيحة للشباب',
+        title:'الآن هو أفضل وقت',
+        body:'جسمك في أفضل حالاته للتكيف مع النظام الصحي. الصيام المتقطع في سنك يبني عادات مدى الحياة. ابدأ بـ16:8 فوراً قبل تكوّن العادات الضارة.'
+      });
+    } else if(age >= 50) {
+      tips.push({
+        icon:'🧓', iconBg:'rgba(200,150,12,.12)', iconColor:'var(--gold2)',
+        category:'نصيحة لفوق الخمسين',
+        title:'التدرج ضرورة لا خيار',
+        body:`فوق الـ50 الجسم يحتاج وقتاً أطول للتكيف. ابدأ بـ12:12 لأربعة أسابيع ثم 16:8. البروتين ضروري جداً لحماية كتلة العضلات. ${gender==='female'?'المرأة بعد انقطاع الطمث تحتاج انتباهاً خاصاً للكالسيوم وفيتامين D.':''}`
+      });
+    }
+  }
+
+  // ── Fasting-window tip based on BMI ──
+  if(bmiCat) {
+    let fastRec, fastWhy;
+    if(bmiCat.cat === 'نقص_الوزن')      { fastRec='12:12'; fastWhy='يحافظ على وزنك ويريح الجهاز الهضمي دون فقدان سعرات إضافية'; }
+    else if(bmiCat.cat === 'مثالي')      { fastRec='16:8';  fastWhy='الأمثل للحفاظ على الوزن المثالي وتحسين حساسية الإنسولين'; }
+    else if(bmiCat.cat === 'زيادة_الوزن'){ fastRec='16:8';  fastWhy='يبدأ حرق الدهون بعد 12-14 ساعة صيام، 16:8 يحافظ عليك في هذه المنطقة'; }
+    else                                  { fastRec='18:6';  fastWhy='مع السمنة تحتاج فترة صيام أطول للدخول في مرحلة حرق الدهون الفعّال والالتهام الخلوي'; }
+    tips.push({
+      icon:'⏱️', iconBg:'rgba(200,150,12,.12)', iconColor:'var(--gold2)',
+      category:'توصية الصيام لحالتك',
+      title:`الأنسب لك: صيام ${fastRec}`,
+      body:fastWhy + (gender==='female'?' (مع أخذ استراحة في أيام الدورة).':'.')
+    });
+  }
+
+  return tips;
+}
+
+// Build and render the tip carousel
+function buildTipCarousel(user) {
+  const tips = getPersonalizedTips(user);
+  const carousel = document.getElementById('tip-carousel');
+  const dotsEl = document.getElementById('tip-dots');
+  if(!carousel || !dotsEl) return;
+
+  // Remove old slides (keep dots element)
+  carousel.querySelectorAll('.tip-slide').forEach(s=>s.remove());
+
+  // Insert slides
+  tips.forEach((tip, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'tip-slide' + (i===0?' active':'');
+    slide.innerHTML = `
+      <div class="tip-top">
+        <div class="tip-icon-wrap" style="background:${tip.iconBg}">
+          <span style="font-size:1.3rem">${tip.icon}</span>
+        </div>
+        <div>
+          <div class="tip-category" style="color:${tip.iconColor}">${tip.category}</div>
+          <div class="tip-title">${tip.title}</div>
+        </div>
+      </div>
+      <div class="tip-body">${tip.body}</div>`;
+    carousel.insertBefore(slide, dotsEl);
+  });
+
+  // Build dots
+  dotsEl.innerHTML = tips.map((_,i)=>`<div class="tip-dot${i===0?' on':''}"></div>`).join('');
+
+  // Store state
+  carousel._tips = tips;
+  carousel._current = 0;
+
+  // Set minimum height based on content
+  carousel.style.minHeight = '130px';
+}
+
+let _tipAutoInterval = null;
+
+function nextTip() {
+  const carousel = document.getElementById('tip-carousel');
+  if(!carousel || !carousel._tips) return;
+  const slides = carousel.querySelectorAll('.tip-slide');
+  const dots = document.getElementById('tip-dots').querySelectorAll('.tip-dot');
+  const n = carousel._tips.length;
+  const prev = carousel._current;
+  const next = (prev + 1) % n;
+
+  slides[prev].classList.remove('active');
+  slides[prev].classList.add('exit');
+  setTimeout(()=>slides[prev].classList.remove('exit'), 600);
+  slides[next].classList.add('active');
+
+  dots[prev].classList.remove('on');
+  dots[next].classList.add('on');
+  carousel._current = next;
+}
+
+function startTipRotation() {
+  if(_tipAutoInterval) clearInterval(_tipAutoInterval);
+  _tipAutoInterval = setInterval(nextTip, 5000);
+}
+
 /* ═══════════════════════════════════════
    BMI CALCULATOR
 ═══════════════════════════════════════ */
