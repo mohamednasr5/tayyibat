@@ -991,6 +991,166 @@ body{
 }
 
 /* ═══════════════════════════════════════
+   ROTATING MEDICAL TIPS CARD
+═══════════════════════════════════════ */
+.tip-carousel{
+  margin:0 16px 16px;
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  min-height:110px;
+}
+.tip-slide{
+  position:absolute;inset:0;
+  padding:14px 16px;
+  opacity:0;
+  transform:translateX(-20px);
+  transition:opacity .6s ease,transform .6s ease;
+  pointer-events:none;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.tip-slide.active{
+  opacity:1;transform:translateX(0);pointer-events:auto;
+}
+.tip-slide.exit{
+  opacity:0;transform:translateX(20px);
+}
+.tip-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tip-icon-wrap{
+  width:38px;height:38px;flex-shrink:0;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+}
+.tip-category{font-size:.65rem;font-weight:700;letter-spacing:.5px;opacity:.8}
+.tip-title{font-size:.88rem;font-weight:700;color:var(--txt);margin-bottom:3px}
+.tip-body{font-size:.76rem;color:var(--txt2);line-height:1.55}
+.tip-dots{
+  display:flex;gap:5px;justify-content:center;
+  padding:8px 0 10px;
+  position:absolute;bottom:0;left:0;right:0;
+}
+.tip-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--border);
+  transition:background .3s,width .3s;
+}
+.tip-dot.on{background:var(--gold2);width:16px;border-radius:3px}
+.tip-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:0 16px 8px;
+}
+.tip-sec-title{
+  font-size:1rem;font-weight:700;
+  color:var(--gold2);
+  display:flex;align-items:center;gap:8px;
+}
+.tip-next-btn{
+  font-size:.72rem;color:var(--txt3);
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px;
+  cursor:pointer;font-family:'Tajawal',sans-serif;
+  transition:all .2s;
+}
+.tip-next-btn:hover{color:var(--gold2);border-color:var(--gold)}
+
+/* ═══════════════════════════════════════
+   SHARE BUTTONS (Profile)
+═══════════════════════════════════════ */
+.share-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+}
+.share-card-title{
+  font-size:.85rem;font-weight:700;
+  color:var(--gold2);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.share-btns{display:flex;flex-direction:column;gap:8px}
+.share-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px;border-radius:12px;
+  font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:700;
+  cursor:pointer;border:none;width:100%;
+  transition:all .25s;
+}
+.share-wa{
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  color:#fff;
+}
+.share-wa:hover{opacity:.9;transform:translateY(-1px)}
+.share-copy{
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--border);
+  color:var(--txt2);
+}
+.share-copy:hover{border-color:var(--gold);color:var(--gold2)}
+.share-url{
+  background:rgba(255,255,255,.03);
+  border:1px dashed rgba(30,53,96,.8);
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:.72rem;
+  color:var(--txt3);
+  text-align:center;
+  word-break:break-all;
+  margin-top:4px;
+}
+
+/* ═══════════════════════════════════════
+   PWA INSTALL BANNER
+═══════════════════════════════════════ */
+#pwa-banner{
+  position:fixed;
+  bottom:calc(var(--nav) + 8px);
+  left:12px;right:12px;
+  background:linear-gradient(135deg,#0f1f3a,#112244);
+  border:1px solid var(--gold);
+  border-radius:16px;
+  padding:12px 14px;
+  z-index:500;
+  display:none;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(200,150,12,.2);
+  animation:slideUpBanner .5s ease;
+}
+@keyframes slideUpBanner{
+  from{transform:translateY(20px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+#pwa-banner.show{display:flex}
+.pwa-icon{
+  width:46px;height:46px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;
+}
+.pwa-text{flex:1}
+.pwa-title{font-size:.85rem;font-weight:700;color:var(--txt);margin-bottom:2px}
+.pwa-sub{font-size:.7rem;color:var(--txt2)}
+.pwa-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.pwa-install-btn{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;border:none;border-radius:8px;
+  padding:7px 14px;font-family:'Tajawal',sans-serif;
+  font-size:.78rem;font-weight:700;cursor:pointer;
+  white-space:nowrap;
+}
+.pwa-dismiss-btn{
+  background:none;border:none;color:var(--txt3);
+  font-size:.68rem;cursor:pointer;text-align:center;
+  font-family:'Tajawal',sans-serif;
+  text-decoration:underline;
+}
+
+/* ═══════════════════════════════════════
    FASTING DETAIL MODAL
 ═══════════════════════════════════════ */
 .fast-detail-modal .modal-box{
@@ -1239,6 +1399,16 @@ body{
     <div id="disease-alerts"></div>
   </div>
 
+  <!-- Rotating Medical Tips -->
+  <div class="tip-header">
+    <div class="tip-sec-title"><i class="fas fa-lightbulb" style="color:var(--gold)"></i> نصيحة طبية</div>
+    <button class="tip-next-btn" onclick="nextTip()">التالي ›</button>
+  </div>
+  <div class="tip-carousel" id="tip-carousel">
+    <!-- Slides injected by JS -->
+    <div class="tip-dots" id="tip-dots"></div>
+  </div>
+
   <!-- Quick stats -->
   <div class="stats-row">
     <div class="stat-card">
@@ -1417,6 +1587,22 @@ body{
       <div class="prof-row"><span class="prof-key">أفضل نوع صيام</span><span class="prof-val" id="pp-best">-</span></div>
     </div>
 
+    <!-- Share Card -->
+    <div class="share-card">
+      <div class="share-card-title"><i class="fas fa-share-alt"></i> شارك التطبيق مع أصدقائك</div>
+      <div class="share-btns">
+        <button class="share-btn share-wa" onclick="shareWhatsApp()">
+          <i class="fab fa-whatsapp" style="font-size:1.2rem"></i>
+          مشاركة عبر واتساب
+        </button>
+        <button class="share-btn share-copy" onclick="copyLink()">
+          <i class="fas fa-copy"></i>
+          نسخ الرابط
+        </button>
+      </div>
+      <div class="share-url">https://mohamednasr5.github.io/tayyibat/</div>
+    </div>
+
     <button class="btn-logout" onclick="doLogout()">
       <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
     </button>
@@ -1449,6 +1635,19 @@ body{
     <i class="fas fa-user"></i><span>حسابي</span>
   </div>
 </nav>
+
+<!-- PWA Install Banner -->
+<div id="pwa-banner">
+  <div class="pwa-icon">🌿</div>
+  <div class="pwa-text">
+    <div class="pwa-title">ثبّت التطبيق على هاتفك!</div>
+    <div class="pwa-sub">تشغيل سريع بدون متصفح · يعمل بدون انترنت</div>
+  </div>
+  <div class="pwa-actions">
+    <button class="pwa-install-btn" id="pwa-install-btn">تثبيت ⬇️</button>
+    <button class="pwa-dismiss-btn" onclick="dismissPWA()">لاحقاً</button>
+  </div>
+</div>
 
 <!-- Video Modal -->
 <div class="modal-overlay" id="video-modal" onclick="closeModal('video-modal')">
