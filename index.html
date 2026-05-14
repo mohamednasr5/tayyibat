@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a1628">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نظام الطيبات">
+<meta name="description" content="دليل نظام الطيبات الغذائي للدكتور ضياء العوضي مع الصيام المتقطع">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+
+<!-- Android / PWA Icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<!-- Manifest -->
+<link rel="manifest" href="manifest.json">
+<title>نظام الطيبات | د. ضياء العوضي</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+
+<style>
+/* ═══════════════════════════════════════
+   CSS VARIABLES & RESET
+═══════════════════════════════════════ */
+:root {
+  --gold: #c8960c;
+  --gold2: #f5c842;
+  --gold3: #ffeaa0;
+  --green: #1a7a2e;
+  --green2: #2ec951;
+  --red: #a01515;
+  --red2: #e53935;
+  --blue: #0d47a1;
+  --bg: #050e1f;
+  --bg2: #0a1628;
+  --bg3: #0f1f3a;
+  --card: #0d1e38;
+  --card2: #112244;
+  --border: #1e3560;
+  --txt: #e8f0fc;
+  --txt2: #8aa4c8;
+  --txt3: #4a6285;
+  --accent: #2196f3;
+  --shadow: 0 8px 32px rgba(0,0,0,0.7);
+  --nav: 68px;
+  --r: 16px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  min-height:100vh;
+  overflow-x:hidden;
+  padding-bottom:var(--nav);
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+
+/* ═══════════════════════════════════════
+   ANIMATED PARTICLE BG
+═══════════════════════════════════════ */
+#stars-canvas{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+
+/* ═══════════════════════════════════════
+   PAGES SYSTEM
+═══════════════════════════════════════ */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:none;
+}
+.page.active{display:block;animation:fadeUp .45s ease}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ═══════════════════════════════════════
+   LOGIN / REGISTER ANIMATION PAGE
+═══════════════════════════════════════ */
+#auth-page{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  min-height:100vh;padding:0 16px 40px;
+  overflow:hidden;
+}
+
+/* SVG ANIMATION STAGE */
+.anim-stage{
+  width:100%;max-width:380px;
+  height:220px;
+  position:relative;
+  overflow:hidden;
+  border-radius:0 0 var(--r) var(--r);
+  background:linear-gradient(180deg,#020b1a 0%,#0a1628 100%);
+  border-bottom:2px solid var(--border);
+  margin-bottom:-8px;
+}
+
+/* The CSS character animation */
+.char-scene{
+  position:absolute;
+  bottom:20px;left:50%;
+  transform:translateX(-50%);
+  width:280px;height:180px;
+}
+
+/* Animated character SVG stages */
+.anim-frame{
+  position:absolute;
+  top:0;left:0;width:100%;height:100%;
+  opacity:0;
+  transition:opacity .5s;
+}
+.anim-frame.show{opacity:1}
+
+/* Text overlay on animation */
+.anim-label{
+  position:absolute;top:12px;left:0;right:0;
+  text-align:center;
+  font-size:.7rem;
+  color:var(--gold2);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  font-weight:700;
+}
+
+/* Auth Card */
+.auth-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:0 0 24px 24px;
+  padding:24px 20px;
+  width:100%;max-width:380px;
+  box-shadow:var(--shadow);
+  position:relative;z-index:2;
+}
+
+.auth-logo{
+  text-align:center;
+  margin-bottom:20px;
+}
+.logo-circle{
+  width:72px;height:72px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 10px;
+  font-size:2rem;
+  box-shadow:0 0 24px rgba(200,150,12,0.5);
+  animation:pulseGold 2.5s ease-in-out infinite;
+}
+@keyframes pulseGold{
+  0%,100%{box-shadow:0 0 24px rgba(200,150,12,0.5)}
+  50%{box-shadow:0 0 40px rgba(245,200,66,0.8)}
+}
+.logo-title{
+  font-family:'Amiri',serif;
+  font-size:1.5rem;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-weight:700;
+}
+.logo-sub{font-size:.75rem;color:var(--txt2);margin-top:3px}
+
+/* Tab switcher */
+.auth-tabs{
+  display:flex;
+  background:rgba(255,255,255,0.04);
+  border-radius:12px;
+  padding:3px;
+  margin-bottom:20px;
+  border:1px solid var(--border);
+}
+.auth-tab{
+  flex:1;padding:9px;
+  border-radius:9px;
+  text-align:center;
+  font-size:.85rem;font-weight:700;
+  cursor:pointer;
+  color:var(--txt2);
+  transition:all .25s;
+}
+.auth-tab.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;
+}
+
+/* Form fields */
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:.8rem;
+  color:var(--gold2);font-weight:600;
+  margin-bottom:6px;
+}
+.input-wrap{position:relative}
+.field input,.field select{
+  width:100%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px 16px;
+  color:var(--txt);
+  font-family:'Tajawal',sans-serif;
+  font-size:.95rem;
+  outline:none;
+  transition:border-color .3s,box-shadow .3s;
+  -webkit-appearance:none;
+}
+.field input:focus,.field select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(200,150,12,.15);
+}
+.field input option{background:var(--card)}
+.eye-btn{
+  position:absolute;left:14px;top:50%;
+  transform:translateY(-50%);
+  background:none;border:none;
+  color:var(--txt2);cursor:pointer;
+  font-size:1rem;padding:4px;
+}
+.field input[type=password]{padding-left:44px}
+
+/* Disease checkboxes */
+.dis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dis-item{
+  display:flex;flex-direction:column;
+  align-items:center;gap:6px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px 6px;
+  cursor:pointer;
+  transition:all .25s;
+  user-select:none;
+}
+.dis-item.sel{
+  background:rgba(200,150,12,.12);
+  border-color:var(--gold);
+}
+.dis-item input{display:none}
+.dis-icon{font-size:1.5rem}
+.dis-lbl{font-size:.72rem;color:var(--txt2);text-align:center}
+.dis-item.sel .dis-lbl{color:var(--gold2)}
+
+/* Buttons */
+.btn{
+  width:100%;
+  border:none;border-radius:14px;
+  padding:14px;
+  font-family:'Tajawal',sans-serif;
+  font-size:1rem;font-weight:800;
+  cursor:pointer;
+  transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;
+  box-shadow:0 4px 20px rgba(200,150,12,.4);
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,150,12,.5)}
+.btn-gold:active{transform:translateY(0)}
+.btn::after{
+  content:'';position:absolute;
+  top:50%;left:50%;
+  width:0;height:0;
+  background:rgba(255,255,255,.2);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .5s,height .5s,opacity .5s;
+  opacity:0;
+}
+.btn:active::after{width:200px;height:200px;opacity:0}
+
+/* Disclaimer */
+.disclaimer{
+  background:linear-gradient(135deg,rgba(160,21,21,.15),rgba(160,21,21,.05));
+  border:1px solid rgba(229,57,53,.3);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:20px;
+}
+.dis-title{
+  color:#ef5350;font-weight:700;font-size:.85rem;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:8px;
+}
+.disclaimer p{font-size:.75rem;color:#e57373;line-height:1.65}
+
+/* ═══════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--nav);
+  background:rgba(5,14,31,.95);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:none;
+  z-index:1000;
+}
+.bottom-nav.show{display:flex}
+.nav-item{
+  flex:1;display:flex;
+  flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;
+  color:var(--txt3);
+  transition:all .25s;
+  position:relative;
+}
+.nav-item.act{color:var(--gold2)}
+.nav-item.act::before{
+  content:'';position:absolute;top:0;
+  left:50%;transform:translateX(-50%);
+  width:36px;height:2px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  border-radius:0 0 4px 4px;
+}
+.nav-item i{font-size:1.25rem;transition:transform .25s}
+.nav-item.act i{transform:scale(1.2)}
+.nav-item span{font-size:.6rem;font-weight:700;letter-spacing:.3px}
+
+/* ═══════════════════════════════════════
+   APP HEADER
+═══════════════════════════════════════ */
+.app-header{
+  background:linear-gradient(180deg,rgba(10,22,40,.98) 0%,transparent 100%);
+  padding:14px 16px 10px;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(30,53,96,.5);
+}
+.header-row{display:flex;align-items:center;justify-content:space-between}
+.header-title{
+  font-family:'Amiri',serif;
+  font-size:1.3rem;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.user-chip{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:50px;
+  padding:6px 12px;
+  font-size:.78rem;color:var(--txt2);
+}
+.user-chip i{color:var(--gold2)}
+
+/* ═══════════════════════════════════════
+   HOME PAGE
+═══════════════════════════════════════ */
+.home-hero{
+  padding:20px 16px 0;
+  text-align:center;
+}
+.hero-greeting{
+  font-size:.85rem;color:var(--txt2);margin-bottom:4px;
+}
+.hero-name{
+  font-family:'Amiri',serif;
+  font-size:2rem;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;
+}
+.hero-age{font-size:.8rem;color:var(--txt3);margin-bottom:20px}
+
+/* Disease tags */
+.dis-tags{
+  display:flex;flex-wrap:wrap;gap:8px;
+  justify-content:center;margin-bottom:20px;
+}
+.dis-tag{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(200,150,12,.1);
+  border:1px solid rgba(200,150,12,.3);
+  border-radius:20px;
+  padding:5px 12px;
+  font-size:.75rem;color:var(--gold2);
+}
+
+/* Quick stats */
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;padding:0 16px 16px;
+}
+.stat-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 10px;
+  text-align:center;
+}
+.stat-icon{font-size:1.4rem;margin-bottom:6px}
+.stat-val{
+  font-size:1.3rem;font-weight:800;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-lbl{font-size:.65rem;color:var(--txt3);margin-top:2px}
+
+/* Section */
+.section{padding:0 16px 16px}
+.sec-title{
+  font-size:1rem;font-weight:700;
+  color:var(--gold2);
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.sec-title i{color:var(--gold)}
+
+/* Alert cards for diseases */
+.alert-card{
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  border:1px solid;
+  font-size:.82rem;line-height:1.65;
+}
+.alert-card.warn{
+  background:rgba(229,57,53,.08);border-color:rgba(229,57,53,.3);
+  color:#ef9a9a;
+}
+.alert-card.info{
+  background:rgba(33,150,243,.08);border-color:rgba(33,150,243,.3);
+  color:#90caf9;
+}
+.alert-card.ok{
+  background:rgba(46,201,81,.08);border-color:rgba(46,201,81,.3);
+  color:#a5d6a7;
+}
+.alert-title{font-weight:700;margin-bottom:6px;font-size:.88rem}
+
+/* ═══════════════════════════════════════
+   FOOD PAGE
+═══════════════════════════════════════ */
+.food-tabs{
+  display:flex;gap:8px;padding:12px 16px;
+  overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:58px;z-index:90;
+  background:rgba(5,14,31,.9);backdrop-filter:blur(12px);
+}
+.food-tabs::-webkit-scrollbar{display:none}
+.ftab{
+  white-space:nowrap;
+  padding:7px 16px;
+  border-radius:20px;
+  font-size:.8rem;font-weight:700;
+  cursor:pointer;
+  border:1px solid var(--border);
+  color:var(--txt2);
+  background:rgba(255,255,255,.04);
+  transition:all .25s;
+  flex-shrink:0;
+}
+.ftab.act{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;border-color:transparent;
+}
+.ftab.act-red{
+  background:linear-gradient(135deg,var(--red),var(--red2));
+  color:#fff;border-color:transparent;
+}
+
+/* Food cards */
+.food-grid{padding:0 16px 16px}
+.food-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+  transition:transform .25s,box-shadow .25s;
+  position:relative;overflow:hidden;
+}
+.food-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:4px;height:100%;
+  border-radius:4px 0 0 4px;
+}
+.food-card.allowed::before{background:linear-gradient(180deg,var(--green),var(--green2))}
+.food-card.forbidden::before{background:linear-gradient(180deg,var(--red),var(--red2))}
+.food-card:active{transform:scale(.98)}
+
+.fc-top{display:flex;align-items:flex-start;gap:12px}
+.fc-emoji{
+  font-size:2.2rem;
+  width:52px;height:52px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.05);
+  border-radius:12px;flex-shrink:0;
+}
+.fc-info{flex:1}
+.fc-name{
+  font-size:1rem;font-weight:700;
+  color:var(--txt);margin-bottom:4px;
+}
+.fc-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:20px;
+  font-size:.68rem;font-weight:700;
+  margin-bottom:8px;
+}
+.fc-badge.allowed{background:rgba(46,201,81,.15);color:var(--green2);border:1px solid rgba(46,201,81,.3)}
+.fc-badge.forbidden{background:rgba(229,57,53,.15);color:#ef5350;border:1px solid rgba(229,57,53,.3)}
+.fc-desc{font-size:.78rem;color:var(--txt2);line-height:1.6}
+.fc-reason{
+  margin-top:10px;padding:10px 12px;
+  background:rgba(255,255,255,.04);
+  border-radius:10px;
+  font-size:.75rem;color:var(--txt2);line-height:1.6;
+  border-right:3px solid var(--border);
+}
+.fc-reason.ok{border-color:var(--green2)}
+.fc-reason.bad{border-color:var(--red2)}
+
+/* Video button */
+.fc-video-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:20px;
+  background:rgba(255,0,0,.12);
+  border:1px solid rgba(255,0,0,.3);
+  color:#ff6060;font-size:.75rem;font-weight:700;
+  cursor:pointer;margin-top:10px;
+  transition:all .25s;
+  text-decoration:none;
+}
+.fc-video-btn:hover{background:rgba(255,0,0,.2)}
+
+/* Expand toggle */
+.fc-toggle{
+  display:flex;align-items:center;gap:6px;
+  font-size:.75rem;color:var(--txt3);
+  cursor:pointer;margin-top:10px;
+  transition:color .25s;
+}
+.fc-toggle:hover{color:var(--gold2)}
+.fc-expand{display:none}
+.fc-expand.open{display:block}
+
+/* Warning badge for disease */
+.disease-warn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;
+  font-size:.68rem;font-weight:700;
+  margin-top:8px;margin-left:6px;
+}
+.dw-danger{background:rgba(229,57,53,.15);color:#ef5350;border:1px solid rgba(229,57,53,.3)}
+.dw-caution{background:rgba(255,160,0,.15);color:#ffa726;border:1px solid rgba(255,160,0,.3)}
+.dw-ok{background:rgba(46,201,81,.15);color:var(--green2);border:1px solid rgba(46,201,81,.3)}
+
+/* ═══════════════════════════════════════
+   FASTING PAGE
+═══════════════════════════════════════ */
+.fasting-hero{
+  padding:20px 16px;
+  text-align:center;
+}
+.fasting-title{
+  font-family:'Amiri',serif;
+  font-size:1.6rem;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:6px;
+}
+.fasting-sub{font-size:.8rem;color:var(--txt2)}
+
+/* Fasting type cards */
+.fast-types{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.fast-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  cursor:pointer;
+  transition:all .25s;
+  position:relative;
+}
+.fast-card:hover,.fast-card.sel{
+  border-color:var(--gold);
+  background:linear-gradient(145deg,rgba(200,150,12,.08),rgba(200,150,12,.04));
+}
+.fast-card.sel::after{
+  content:'✓';
+  position:absolute;left:14px;top:14px;
+  width:24px;height:24px;
+  background:var(--gold);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:900;
+  color:#050e1f;
+  text-align:center;line-height:24px;
+}
+.fc-row{display:flex;align-items:center;gap:12px}
+.fc-hrs{
+  font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  min-width:60px;text-align:center;
+}
+.fc-details{flex:1}
+.fc-dname{font-size:.95rem;font-weight:700;color:var(--txt);margin-bottom:3px}
+.fc-ddesc{font-size:.72rem;color:var(--txt2);line-height:1.5}
+.fc-level{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:20px;
+  font-size:.65rem;font-weight:700;
+  margin-top:6px;
+}
+.lv-easy{background:rgba(46,201,81,.12);color:var(--green2);border:1px solid rgba(46,201,81,.3)}
+.lv-med{background:rgba(255,160,0,.12);color:#ffa726;border:1px solid rgba(255,160,0,.3)}
+.lv-hard{background:rgba(229,57,53,.12);color:#ef5350;border:1px solid rgba(229,57,53,.3)}
+
+/* Timer */
+.timer-section{padding:0 16px 16px}
+.timer-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px 16px;
+  text-align:center;
+}
+.timer-ring-wrap{
+  position:relative;
+  width:200px;height:200px;
+  margin:0 auto 20px;
+}
+.timer-ring{
+  transform:rotate(-90deg);
+  width:200px;height:200px;
+}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:8}
+.ring-prog{
+  fill:none;
+  stroke:url(#ringGrad);
+  stroke-width:8;
+  stroke-linecap:round;
+  stroke-dasharray:565.5;
+  stroke-dashoffset:565.5;
+  transition:stroke-dashoffset .5s ease;
+}
+.timer-inner{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+.timer-time{
+  font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-variant-numeric:tabular-nums;
+}
+.timer-lbl{font-size:.7rem;color:var(--txt3);margin-top:2px}
+.timer-phase{
+  font-size:.8rem;color:var(--gold2);font-weight:700;
+  margin-bottom:16px;
+}
+
+.timer-btns{display:flex;gap:10px;margin-bottom:16px}
+.tbtn{
+  flex:1;padding:12px;border:none;border-radius:12px;
+  font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;
+  cursor:pointer;transition:all .25s;
+}
+.tbtn-start{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff}
+.tbtn-stop{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff}
+.tbtn-reset{background:rgba(255,255,255,.07);color:var(--txt2);border:1px solid var(--border)}
+
+/* Stats grid */
+.fast-stats{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+  padding:0 16px 16px;
+}
+.fs-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+}
+.fs-val{
+  font-size:1.4rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),#64b5f6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.fs-lbl{font-size:.68rem;color:var(--txt3);margin-top:3px}
+
+/* ═══════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════ */
+.profile-hero{
+  padding:30px 16px 20px;
+  text-align:center;
+}
+.profile-avatar{
+  width:80px;height:80px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px;
+  font-size:2.2rem;
+  box-shadow:0 0 30px rgba(200,150,12,.4);
+}
+.profile-name{
+  font-family:'Amiri',serif;
+  font-size:1.5rem;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:4px;
+}
+.profile-info{font-size:.8rem;color:var(--txt2)}
+
+.profile-cards{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.prof-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+}
+.prof-card-title{
+  font-size:.85rem;font-weight:700;
+  color:var(--gold2);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.prof-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid rgba(30,53,96,.5);
+  font-size:.8rem;
+}
+.prof-row:last-child{border:none}
+.prof-key{color:var(--txt2)}
+.prof-val{color:var(--txt);font-weight:600}
+
+/* Logout */
+.btn-logout{
+  background:rgba(229,57,53,.1);
+  border:1px solid rgba(229,57,53,.3);
+  color:#ef5350;
+  border-radius:12px;
+  padding:12px;
+  width:100%;
+  font-family:'Tajawal',sans-serif;
+  font-size:.9rem;font-weight:700;
+  cursor:pointer;
+  margin-top:8px;
+  transition:all .25s;
+}
+.btn-logout:hover{background:rgba(229,57,53,.2)}
+
+/* ═══════════════════════════════════════
+   FOOTER / SIGNATURE
+═══════════════════════════════════════ */
+.footer-sig{
+  padding:30px 16px 20px;
+  text-align:center;
+  border-top:1px solid var(--border);
+  margin-top:20px;
+}
+.heart-wrap{
+  display:inline-block;
+  font-size:1.6rem;
+  animation:heartbeat .8s ease-in-out infinite;
+  color:#e53935;
+}
+@keyframes heartbeat{
+  0%,100%{transform:scale(1)}
+  14%{transform:scale(1.25)}
+  28%{transform:scale(1)}
+  42%{transform:scale(1.18)}
+  70%{transform:scale(1)}
+}
+.sig-text{
+  font-size:.8rem;color:var(--txt2);
+  margin:8px 0;line-height:1.7;
+}
+.sig-name{
+  color:var(--gold2);font-weight:700;font-size:.9rem;
+}
+.fb-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#1877f2;
+  border-radius:20px;
+  padding:8px 16px;
+  color:#fff;
+  font-size:.8rem;font-weight:700;
+  text-decoration:none;
+  margin-top:10px;
+  transition:opacity .25s;
+}
+.fb-btn:hover{opacity:.85}
+
+/* ═══════════════════════════════════════
+   MODAL (video / notifications)
+═══════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.8);
+  z-index:2000;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  backdrop-filter:blur(6px);
+}
+.modal-overlay.show{display:flex}
+.modal-box{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:24px 24px 0 0;
+  padding:24px 16px;
+  width:100%;max-width:480px;
+  animation:slideUp .35s ease;
+  max-height:85vh;
+  overflow-y:auto;
+}
+@keyframes slideUp{
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
+}
+.modal-title{
+  font-family:'Amiri',serif;
+  font-size:1.2rem;
+  color:var(--gold2);
+  text-align:center;
+  margin-bottom:16px;
+}
+.modal-close{
+  display:block;
+  width:100%;padding:12px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:var(--txt2);
+  font-family:'Tajawal',sans-serif;
+  font-size:.9rem;cursor:pointer;
+  margin-top:16px;
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;
+  padding:12px 20px;
+  border-radius:50px;
+  font-size:.85rem;font-weight:700;
+  z-index:3000;
+  opacity:0;
+  transition:all .4s;
+  white-space:nowrap;
+  pointer-events:none;
+  max-width:90vw;
+  text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════
+   LOADING
+═══════════════════════════════════════ */
+#loader{
+  position:fixed;inset:0;
+  background:var(--bg);
+  z-index:9999;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:16px;
+}
+.loader-ring{
+  width:60px;height:60px;
+  border:3px solid var(--border);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-txt{font-size:.85rem;color:var(--txt2)}
+
+/* ═══════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════ */
+.hidden{display:none!important}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+.text-center{text-align:center}
+.w100{width:100%}
+
+/* Search bar */
+.search-wrap{padding:8px 16px}
+.search-input{
+  width:100%;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 16px 10px 42px;
+  color:var(--txt);
+  font-family:'Tajawal',sans-serif;
+  font-size:.9rem;
+  outline:none;
+}
+.search-wrap-inner{position:relative}
+.search-wrap-inner i{
+  position:absolute;left:14px;top:50%;
+  transform:translateY(-50%);
+  color:var(--txt3);
+}
+</style>
+</head>
+<body>
+
+<!-- Particles BG -->
+<canvas id="stars-canvas"></canvas>
+
+<!-- Loader -->
+<div id="loader">
+  <div style="font-size:2.5rem">🌿</div>
+  <div class="loader-ring"></div>
+  <div class="loader-txt">جارٍ التحميل...</div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════
+     AUTH PAGE
+═══════════════════════════════════════ -->
+<div id="auth-page" class="page active">
+  <!-- Animation Stage -->
+  <div style="display:flex;justify-content:center;padding-top:20px">
+    <div class="anim-stage">
+      <div class="anim-label" id="anim-label">🍕 الرجل يأكل بشراهة</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:180px;overflow:hidden">
+        <canvas id="char-canvas" width="380" height="180" style="width:100%;height:100%"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:0 16px 30px">
+    <div class="auth-card">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="logo-circle">🌿</div>
+        <div class="logo-title">نظام الطيبات</div>
+        <div class="logo-sub">للدكتور ضياء العوضي رحمه الله</div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        <div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنويه هام</div>
+        <p>هذا النظام الغذائي يمكن أن يكون مناسبًا للبعض وغير مناسب للبعض الآخر. المعلومات هنا لأغراض تثقيفية فقط ولا تُغني عن استشارة الطبيب المختص، خاصةً إذا كنت تعاني من أمراض مزمنة أو تتناول أدوية.</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <div class="auth-tab act" onclick="switchTab('login')">تسجيل الدخول</div>
+        <div class="auth-tab" onclick="switchTab('register')">حساب جديد</div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="login-form">
+        <div class="field">
+          <label>اسم المستخدم</label>
+          <input type="text" id="l-user" placeholder="أدخل اسم المستخدم">
+        </div>
+        <div class="field">
+          <label>كلمة السر</label>
+          <div class="input-wrap">
+            <input type="password" id="l-pass" placeholder="••••••••">
+            <button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="doLogin()">
+          <i class="fas fa-sign-in-alt"></i> دخول
+        </button>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="register-form" class="hidden">
+        <div class="field">
+          <label>الاسم الكامل</label>
+          <input type="text" id="r-name" placeholder="مثال: أحمد محمد">
+        </div>
+        <div class="field">
+          <label>اسم المستخدم</label>
+          <input type="text" id="r-user" placeholder="بدون مسافات">
+        </div>
+        <div class="field">
+          <label>كلمة السر</label>
+          <div class="input-wrap">
+            <input type="password" id="r-pass" placeholder="6 أحرف على الأقل">
+            <button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>تاريخ الميلاد</label>
+          <input type="date" id="r-dob">
+        </div>
+        <div class="field">
+          <label>هل تعاني من أي من الأمراض التالية؟ (اختياري)</label>
+          <div class="dis-grid">
+            <label class="dis-item" id="d-sugar">
+              <input type="checkbox" value="sugar">
+              <span class="dis-icon">🩸</span>
+              <span class="dis-lbl">السكري</span>
+            </label>
+            <label class="dis-item" id="d-pressure">
+              <input type="checkbox" value="pressure">
+              <span class="dis-icon">💉</span>
+              <span class="dis-lbl">الضغط</span>
+            </label>
+            <label class="dis-item" id="d-heart">
+              <input type="checkbox" value="heart">
+              <span class="dis-icon">❤️</span>
+              <span class="dis-lbl">القلب</span>
+            </label>
+          </div>
+        </div>
+        <button class="btn btn-gold mt8" onclick="doRegister()">
+          <i class="fas fa-user-plus"></i> إنشاء حساب
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════ -->
+<div id="home-page" class="page">
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-title">🌿 نظام الطيبات</div>
+      <div class="user-chip" id="h-user-chip"><i class="fas fa-user"></i> <span id="h-username">-</span></div>
+    </div>
+  </div>
+
+  <div class="home-hero">
+    <div class="hero-greeting">أهلاً وسهلاً،</div>
+    <div class="hero-name" id="h-name">-</div>
+    <div class="hero-age" id="h-age"></div>
+    <div class="dis-tags" id="h-dis-tags"></div>
+  </div>
+
+  <!-- Disease alerts -->
+  <div class="section">
+    <div class="sec-title"><i class="fas fa-heartbeat"></i> توصيات مخصصة لحالتك</div>
+    <div id="disease-alerts"></div>
+  </div>
+
+  <!-- Quick stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-val" id="s-today">0</div>
+      <div class="stat-lbl">ساعة صيام اليوم</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-val" id="s-week">0</div>
+      <div class="stat-lbl">ساعة هذا الأسبوع</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-val" id="s-month">0</div>
+      <div class="stat-lbl">ساعة هذا الشهر</div>
+    </div>
+  </div>
+
+  <!-- Basics -->
+  <div class="section">
+    <div class="sec-title"><i class="fas fa-info-circle"></i> أسس النظام</div>
+    <div class="alert-card info">
+      <div class="alert-title">🍽️ مبادئ نظام الطيبات الأربعة</div>
+      ١. <strong>الصيام</strong> — الركيزة الأساسية، لا أكل إلا عند الجوع الحقيقي<br>
+      ٢. <strong>نوعية الطعام</strong> — الطيبات تبني الجسم، الخبائث تهدمه<br>
+      ٣. <strong>البروتين</strong> — يوم بعد يوم، وليس يومياً<br>
+      ٤. <strong>الطعام المطبوخ</strong> — يُفضَّل على النيء
+    </div>
+  </div>
+
+  <div class="footer-sig">
+    <div><span class="heart-wrap">❤️</span></div>
+    <div class="sig-text">برمجة وتطوير</div>
+    <div class="sig-name">المهندس محمد حماد</div>
+    <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="fb-btn">
+      <i class="fab fa-facebook"></i> فيسبوك
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FOOD PAGE
+═══════════════════════════════════════ -->
+<div id="food-page" class="page">
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-title">🍽️ قائمة الأطعمة</div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-wrap-inner">
+      <i class="fas fa-search"></i>
+      <input class="search-input" type="text" id="food-search" placeholder="ابحث عن طعام..." oninput="filterFoods()">
+    </div>
+  </div>
+
+  <div class="food-tabs">
+    <div class="ftab act" onclick="showFoodTab('all',this)">🌟 الكل</div>
+    <div class="ftab" onclick="showFoodTab('allowed',this)">✅ المسموح</div>
+    <div class="ftab act-red" onclick="showFoodTab('forbidden',this)" style="background:none;border-color:rgba(229,57,53,.3);color:#ef5350">❌ الممنوع</div>
+    <div class="ftab" onclick="showFoodTab('proteins',this)">🥩 بروتينات</div>
+    <div class="ftab" onclick="showFoodTab('carbs',this)">🍞 نشويات</div>
+    <div class="ftab" onclick="showFoodTab('fats',this)">🫒 دهون</div>
+    <div class="ftab" onclick="showFoodTab('fruits',this)">🍎 فواكه</div>
+  </div>
+
+  <div class="food-grid" id="food-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FASTING PAGE
+═══════════════════════════════════════ -->
+<div id="fast-page" class="page">
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-title">⏱️ الصيام المتقطع</div>
+    </div>
+  </div>
+
+  <div class="fasting-hero">
+    <div class="fasting-title">اختر نوع الصيام</div>
+    <div class="fasting-sub">الصيام ركيزة نظام الطيبات الأولى</div>
+  </div>
+
+  <div class="fast-types" id="fast-types-list"></div>
+
+  <!-- Timer -->
+  <div class="timer-section">
+    <div class="timer-card">
+      <div class="timer-phase" id="timer-phase">اختر نوع الصيام أولاً</div>
+      <div class="timer-ring-wrap">
+        <svg class="timer-ring" viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#c8960c"/>
+              <stop offset="100%" style="stop-color:#f5c842"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="100" cy="100" r="90"/>
+          <circle class="ring-prog" id="ring-prog" cx="100" cy="100" r="90"/>
+        </svg>
+        <div class="timer-inner">
+          <div class="timer-time" id="timer-display">00:00:00</div>
+          <div class="timer-lbl" id="timer-sub">متبقي</div>
+        </div>
+      </div>
+      <div class="timer-btns">
+        <button class="tbtn tbtn-start" id="btn-start" onclick="startFast()">▶ ابدأ</button>
+        <button class="tbtn tbtn-stop" id="btn-stop" onclick="stopFast()" style="display:none">⏹ إيقاف</button>
+        <button class="tbtn tbtn-reset" onclick="resetFast()">↺ إعادة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="section"><div class="sec-title"><i class="fas fa-chart-bar"></i> إحصائيات الصيام</div></div>
+  <div class="fast-stats">
+    <div class="fs-card">
+      <div class="fs-val" id="fs-today">0</div>
+      <div class="fs-lbl">ساعة اليوم</div>
+    </div>
+    <div class="fs-card">
+      <div class="fs-val" id="fs-week">0</div>
+      <div class="fs-lbl">ساعة الأسبوع</div>
+    </div>
+    <div class="fs-card">
+      <div class="fs-val" id="fs-month">0</div>
+      <div class="fs-lbl">ساعة الشهر</div>
+    </div>
+    <div class="fs-card">
+      <div class="fs-val" id="fs-year">0</div>
+      <div class="fs-lbl">ساعة السنة</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PROFILE PAGE
+═══════════════════════════════════════ -->
+<div id="profile-page" class="page">
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-title">👤 الملف الشخصي</div>
+    </div>
+  </div>
+
+  <div class="profile-hero">
+    <div class="profile-avatar">👤</div>
+    <div class="profile-name" id="p-name">-</div>
+    <div class="profile-info" id="p-info">-</div>
+  </div>
+
+  <div class="profile-cards">
+    <div class="prof-card">
+      <div class="prof-card-title"><i class="fas fa-user"></i> المعلومات الشخصية</div>
+      <div class="prof-row"><span class="prof-key">الاسم</span><span class="prof-val" id="pp-name">-</span></div>
+      <div class="prof-row"><span class="prof-key">اسم المستخدم</span><span class="prof-val" id="pp-user">-</span></div>
+      <div class="prof-row"><span class="prof-key">تاريخ الميلاد</span><span class="prof-val" id="pp-dob">-</span></div>
+      <div class="prof-row"><span class="prof-key">العمر</span><span class="prof-val" id="pp-age">-</span></div>
+    </div>
+
+    <div class="prof-card">
+      <div class="prof-card-title"><i class="fas fa-heartbeat"></i> الحالة الصحية</div>
+      <div id="pp-diseases"></div>
+    </div>
+
+    <div class="prof-card">
+      <div class="prof-card-title"><i class="fas fa-clock"></i> إحصائيات الصيام</div>
+      <div class="prof-row"><span class="prof-key">إجمالي ساعات الصيام</span><span class="prof-val" id="pp-total">0 ساعة</span></div>
+      <div class="prof-row"><span class="prof-key">أفضل نوع صيام</span><span class="prof-val" id="pp-best">-</span></div>
+    </div>
+
+    <button class="btn-logout" onclick="doLogout()">
+      <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+    </button>
+  </div>
+
+  <div class="footer-sig">
+    <div><span class="heart-wrap">❤️</span></div>
+    <div class="sig-text">برمجة وتطوير</div>
+    <div class="sig-name">المهندس محمد حماد</div>
+    <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="fb-btn">
+      <i class="fab fa-facebook"></i> تابعني على فيسبوك
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     BOTTOM NAV
+═══════════════════════════════════════ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="nav-item act" onclick="navTo('home')" id="nav-home">
+    <i class="fas fa-home"></i><span>الرئيسية</span>
+  </div>
+  <div class="nav-item" onclick="navTo('food')" id="nav-food">
+    <i class="fas fa-utensils"></i><span>الأطعمة</span>
+  </div>
+  <div class="nav-item" onclick="navTo('fast')" id="nav-fast">
+    <i class="fas fa-clock"></i><span>الصيام</span>
+  </div>
+  <div class="nav-item" onclick="navTo('profile')" id="nav-profile">
+    <i class="fas fa-user"></i><span>حسابي</span>
+  </div>
+</nav>
+
+<!-- Video Modal -->
+<div class="modal-overlay" id="video-modal" onclick="closeModal('video-modal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" id="vmodal-title">فيديو توضيحي</div>
+    <div id="vmodal-content" style="text-align:center;padding:20px 0">
+      <div style="font-size:3rem;margin-bottom:12px">📺</div>
+      <p style="font-size:.85rem;color:var(--txt2);line-height:1.7" id="vmodal-desc"></p>
+      <a id="vmodal-link" href="#" target="_blank" class="fc-video-btn" style="display:inline-flex;margin-top:16px">
+        <i class="fab fa-youtube"></i> مشاهدة على يوتيوب
+      </a>
+    </div>
+    <button class="modal-close" onclick="closeModal('video-modal')">إغلاق</button>
+  </div>
+</div>
+
+<!-- Fasting Done Modal -->
+<div class="modal-overlay" id="done-modal">
+  <div class="modal-box" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:12px;animation:heartbeat .8s infinite">🎉</div>
+    <div class="modal-title">مبروك! انتهت فترة الصيام</div>
+    <p style="font-size:.85rem;color:var(--txt2);margin-bottom:16px">
+      يمكنك الآن الإفطار على شيء طيب من قائمة المسموحات 🌿<br>
+      تذكر: لا تأكل إلا إذا كنت جائعاً حقاً
+    </p>
+    <button class="btn btn-gold" onclick="closeModal('done-modal')">شكراً 🌿</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   FIREBASE INIT
+═══════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBf7IUVNUr7bihe4CqtqUwd3UbNRacq2po",
+  authDomain: "daybat-cfa12.firebaseapp.com",
+  databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com",
+  projectId: "daybat-cfa12",
+  storageBucket: "daybat-cfa12.firebasestorage.app",
+  messagingSenderId: "278890052232",
+  appId: "1:278890052232:web:06d85004268fdf9f4afd3d",
+  measurementId: "G-9BYDWEMR33"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ═══════════════════════════════════════
+   PARTICLES BACKGROUND
+═══════════════════════════════════════ */
+(function(){
+  const c = document.getElementById('stars-canvas');
+  const cx = c.getContext('2d');
+  let W,H,stars=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){
+    stars=[];
+    for(let i=0;i<80;i++) stars.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:Math.random()*1.5+.3,
+      o:Math.random()*.6+.2,
+      s:Math.random()*.003+.001,
+      d:Math.random()<.5?1:-1
+    });
+  }
+  function draw(){
+    cx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.o+=s.s*s.d;
+      if(s.o>0.8||s.o<0.1) s.d*=-1;
+      cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      cx.fillStyle=`rgba(200,180,100,${s.o})`;cx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  addEventListener('resize',()=>{resize();init()});
+  resize();init();draw();
+})();
+
+/* ═══════════════════════════════════════
+   CHARACTER ANIMATION
+═══════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('char-canvas');
+  if(!c)return;
+  const cx=c.getContext('2d');
+  let frame=0,phase=0,phaseTick=0;
+  const phases=[
+    {label:'🍕 الرجل يأكل بشراهة',duration:120,fatness:0.8,color:'#5b9bd5',dead:false},
+    {label:'😰 يبدأ في زيادة الوزن',duration:80,fatness:1.3,color:'#e07b39',dead:false},
+    {label:'😵 يصاب بالأمراض',duration:80,fatness:1.6,color:'#c0392b',dead:false},
+    {label:'💀 العواقب الوخيمة',duration:60,fatness:1.0,color:'#555',dead:true},
+    {label:'🌿 الطيبات هي الحل!',duration:100,fatness:0.8,color:'#27ae60',dead:false},
+  ];
+  const lbl=document.getElementById('anim-label');
+
+  function drawMan(fat,col,dead,t){
+    cx.clearRect(0,0,380,180);
+    const cx_=190,cy_=150;
+    const bw=30*fat,bh=50*fat;
+
+    // Legs
+    if(!dead){
+      const legSwing=Math.sin(t*0.18)*15;
+      cx.strokeStyle=col;cx.lineWidth=8*fat;cx.lineCap='round';
+      cx.beginPath();cx.moveTo(cx_,cy_);cx.lineTo(cx_-15+legSwing,cy_+35);cx.stroke();
+      cx.beginPath();cx.moveTo(cx_,cy_);cx.lineTo(cx_+15-legSwing,cy_+35);cx.stroke();
+    } else {
+      cx.strokeStyle='#555';cx.lineWidth=8;cx.lineCap='round';
+      cx.beginPath();cx.moveTo(cx_-30,cy_+10);cx.lineTo(cx_+30,cy_+10);cx.stroke();
+    }
+
+    // Body
+    cx.fillStyle=col;
+    cx.beginPath();
+    cx.ellipse(cx_,cy_-bh/2,bw,bh/2,0,0,Math.PI*2);
+    cx.fill();
+
+    // Arms
+    if(!dead){
+      const armSwing=Math.sin(t*0.18+Math.PI)*20*fat;
+      cx.strokeStyle=col;cx.lineWidth=6*fat;
+      cx.beginPath();cx.moveTo(cx_-bw*.7,cy_-bh*.3);cx.lineTo(cx_-bw*.7-20+armSwing,cy_);cx.stroke();
+      cx.beginPath();cx.moveTo(cx_+bw*.7,cy_-bh*.3);cx.lineTo(cx_+bw*.7+20-armSwing,cy_);cx.stroke();
+    }
+
+    // Head
+    const headR=20*Math.min(fat,1.1);
+    cx.fillStyle=col;
+    cx.beginPath();cx.arc(cx_,cy_-bh-headR+5,headR,0,Math.PI*2);cx.fill();
+
+    if(!dead){
+      // Eyes
+      cx.fillStyle='#fff';
+      cx.beginPath();cx.arc(cx_-7,cy_-bh-headR+3,4,0,Math.PI*2);cx.fill();
+      cx.beginPath();cx.arc(cx_+7,cy_-bh-headR+3,4,0,Math.PI*2);cx.fill();
+      cx.fillStyle='#333';
+      cx.beginPath();cx.arc(cx_-6,cy_-bh-headR+4,2,0,Math.PI*2);cx.fill();
+      cx.beginPath();cx.arc(cx_+8,cy_-bh-headR+4,2,0,Math.PI*2);cx.fill();
+      // Mouth (eating or sad)
+      if(fat<1.2){
+        cx.strokeStyle='#f39c12';cx.lineWidth=2;
+        cx.beginPath();cx.arc(cx_,cy_-bh-headR+8,6,0,Math.PI);cx.stroke();
+        // Food near mouth
+        cx.fillStyle='#e74c3c';cx.fillRect(cx_+10,cy_-bh-headR+6,8,6);
+      } else {
+        cx.strokeStyle='#c0392b';cx.lineWidth=2;
+        cx.beginPath();cx.arc(cx_,cy_-bh-headR+10,5,Math.PI,0);cx.stroke();
+      }
+    } else {
+      // X eyes
+      cx.strokeStyle='#fff';cx.lineWidth=2;
+      cx.beginPath();cx.moveTo(cx_-10,cy_-bh-headR);cx.lineTo(cx_-6,cy_-bh-headR+4);cx.stroke();
+      cx.beginPath();cx.moveTo(cx_-6,cy_-bh-headR);cx.lineTo(cx_-10,cy_-bh-headR+4);cx.stroke();
+      cx.beginPath();cx.moveTo(cx_+6,cy_-bh-headR);cx.lineTo(cx_+10,cy_-bh-headR+4);cx.stroke();
+      cx.beginPath();cx.moveTo(cx_+10,cy_-bh-headR);cx.lineTo(cx_+6,cy_-bh-headR+4);cx.stroke();
+      // Bones
+      cx.strokeStyle='#888';cx.lineWidth=2;
+      cx.beginPath();cx.moveTo(cx_-50,cy_+20);cx.lineTo(cx_+50,cy_+20);cx.stroke();
+    }
+
+    // Phase 4: green leaf aura
+    if(phase===4){
+      for(let i=0;i<6;i++){
+        const a=t*0.05+i*Math.PI/3;
+        const px=cx_+Math.cos(a)*60,py=(cy_-bh)+Math.sin(a)*40;
+        cx.font='20px serif';cx.fillText('🌿',px-10,py);
+      }
+    }
+  }
+
+  function animate(){
+    const ph=phases[phase];
+    phaseTick++;frame++;
+    if(phaseTick>=ph.duration){phaseTick=0;phase=(phase+1)%phases.length;if(lbl)lbl.textContent=phases[phase].label;}
+    drawMan(ph.fatness,ph.color,ph.dead,frame);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ═══════════════════════════════════════
+   FOOD DATABASE
+═══════════════════════════════════════ */
+const FOODS = [
+  // ── ALLOWED ──
+  {id:'lamb',name:'اللحم الضاني والماعز',emoji:'🥩',cat:'proteins',type:'allowed',
+    desc:'من أفضل البروتينات في نظام الطيبات. يُسمح به مرتين أسبوعياً.',
+    reason:'مصدر ممتاز للبروتين والدهون الطبيعية، يعطي شبعاً طويلاً ويقلل الالتهاب.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+لحم+ضاني+طيبات',
+    diseases:{sugar:'ok',pressure:'caution',heart:'caution'},
+    disNote:{pressure:'يُفضَّل تناوله مشوياً لا مقلياً لمرضى الضغط',heart:'بكميات معتدلة لمرضى القلب'}},
+  {id:'fish',name:'الأسماك البحرية',emoji:'🐟',cat:'proteins',type:'allowed',
+    desc:'مسموحة بجميع أنواعها، مشوية أو مقلية بدون دقيق.',
+    reason:'غنية بأوميغا 3 التي تقلل الالتهابات وتدعم القلب والدماغ.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+سمك+طيبات',
+    diseases:{sugar:'ok',pressure:'ok',heart:'ok'},
+    disNote:{sugar:'ممتازة لمرضى السكري',heart:'الأفضل لمرضى القلب في قائمة البروتينات'}},
+  {id:'pigeon',name:'الحمام والأرانب والسمان',emoji:'🐇',cat:'proteins',type:'allowed',
+    desc:'الطيور الوحيدة المسموحة في النظام.',
+    reason:'بروتين خفيف سهل الهضم، لا يُسبب الالتهاب كالدجاج التجاري.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+حمام+طيبات',
+    diseases:{sugar:'ok',pressure:'ok',heart:'ok'},disNote:{}},
+  {id:'liver',name:'الكبدة والكوارع',emoji:'🫀',cat:'proteins',type:'allowed',
+    desc:'كبدة الضاني ولحم الكوارع مسموحان.',
+    reason:'غنية بالحديد والفيتامينات، تدعم المناعة والطاقة.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+كبدة',
+    diseases:{sugar:'ok',pressure:'caution',heart:'caution'},
+    disNote:{heart:'بكميات قليلة فقط لمرضى القلب'}},
+  {id:'olive-oil',name:'زيت الزيتون',emoji:'🫒',cat:'fats',type:'allowed',
+    desc:'الدهن الأساسي في النظام، يُستخدم مع الزعتر وخل القصب.',
+    reason:'مثبت علمياً لخفض الالتهاب وحماية القلب وخفض الكوليسترول الضار.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+زيت+زيتون',
+    diseases:{sugar:'ok',pressure:'ok',heart:'ok'},
+    disNote:{heart:'من أفضل الأطعمة لمرضى القلب'}},
+  {id:'ghee',name:'السمنة البلدي والزبدة الطبيعية',emoji:'🧈',cat:'fats',type:'allowed',
+    desc:'دهون حيوانية طبيعية، مقبولة بكميات معتدلة.',
+    reason:'مصدر طاقة مستقر، لا يسبب تقلبات السكر كالكربوهيدرات.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+سمنة+بلدي',
+    diseases:{sugar:'caution',pressure:'caution',heart:'danger'},
+    disNote:{heart:'تجنب الإفراط جداً لمرضى القلب',sugar:'بكميات صغيرة مقبولة'}},
+  {id:'rice',name:'الأرز',emoji:'🍚',cat:'carbs',type:'allowed',
+    desc:'مسموح به، ويُفضَّل مع محشي الحمام أو كطبق رئيسي.',
+    reason:'كربوهيدرات طبيعية سهلة الهضم، طاقة للجسم دون مهيجات.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+أرز+طيبات',
+    diseases:{sugar:'danger',pressure:'ok',heart:'ok'},
+    disNote:{sugar:'خطر لمرضى السكري - بكميات صغيرة جداً فقط'}},
+  {id:'potato',name:'البطاطس',emoji:'🥔',cat:'carbs',type:'allowed',
+    desc:'مسموحة مطبوخة أو مشوية بدون قلي عميق.',
+    reason:'سهلة الهضم، مصدر جيد للبوتاسيوم والطاقة.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+بطاطس',
+    diseases:{sugar:'caution',pressure:'ok',heart:'ok'},
+    disNote:{sugar:'ترفع السكر، تناول بكميات صغيرة'}},
+  {id:'zucchini',name:'الكوسة والقلقاس',emoji:'🥒',cat:'carbs',type:'allowed',
+    desc:'مسموحان بدون قشر.',
+    reason:'خفيفان على الجهاز الهضمي، قليلا السكر.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+كوسة',
+    diseases:{sugar:'ok',pressure:'ok',heart:'ok'},disNote:{}},
+  {id:'honey',name:'العسل',emoji:'🍯',cat:'carbs',type:'allowed',
+    desc:'مسموح كمُحلٍّ طبيعي بكميات معتدلة.',
+    reason:'محلي طبيعي يحتوي مضادات الأكسدة، أفضل من السكر الأبيض.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+عسل',
+    diseases:{sugar:'danger',pressure:'ok',heart:'ok'},
+    disNote:{sugar:'ممنوع عملياً لمرضى السكري'}},
+  {id:'jam',name:'المربى والشوكولاتة',emoji:'🍫',cat:'carbs',type:'allowed',
+    desc:'مسموحان في سياقات معينة وبكميات محدودة.',
+    reason:'النظام لا يمنع بعض الحلويات الطبيعية تماماً.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+مربى+شوكولاتة',
+    diseases:{sugar:'danger',pressure:'caution',heart:'caution'},
+    disNote:{sugar:'ممنوع لمرضى السكري'}},
+  {id:'cheese',name:'الأجبان الطازجة',emoji:'🧀',cat:'fats',type:'allowed',
+    desc:'الشيدر والرومي والموزاريلا — الأجبان التي تذوب.',
+    reason:'بروتين ودهون طبيعية، تعطي شبعاً جيداً.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+جبن+طيبات',
+    diseases:{sugar:'ok',pressure:'caution',heart:'caution'},
+    disNote:{pressure:'تجنب الأجبان المملحة'}},
+  {id:'thyme',name:'الزعتر وخل القصب',emoji:'🌿',cat:'fats',type:'allowed',
+    desc:'يُتناول مع زيت الزيتون كوجبة خفيفة.',
+    reason:'مضاد طبيعي للالتهاب والبكتيريا، يدعم الهضم.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+زعتر+زيت+زيتون',
+    diseases:{sugar:'ok',pressure:'ok',heart:'ok'},disNote:{}},
+
+  // ── FORBIDDEN ──
+  {id:'chicken',name:'الدواجن والدجاج',emoji:'🍗',cat:'proteins',type:'forbidden',
+    desc:'من الممنوعات الرئيسية في النظام.',
+    reason:'يرى النظام أنها تسبب الالتهاب والاضطرابات الهرمونية بسبب الهرمونات والعلف الصناعي في التربية التجارية.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+دجاج+ممنوع',
+    diseases:{},disNote:{}},
+  {id:'eggs',name:'البيض',emoji:'🥚',cat:'proteins',type:'forbidden',
+    desc:'يمنعه النظام أو يقلله بشدة.',
+    reason:'يعتبر النظام أنه قد يسبب حساسية أو التهابات لبعض الناس. (تنبيه علمي: البيض آمن ومفيد لمعظم الأشخاص)',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+بيض',
+    diseases:{},disNote:{}},
+  {id:'legumes',name:'البقوليات (الفول والعدس)',emoji:'🫘',cat:'proteins',type:'forbidden',
+    desc:'ممنوعة في النظام.',
+    reason:'تُهيّج الأمعاء وتسبب انتفاخاً وغازات حسب النظام. (تنبيه: مفيدة علمياً لصحة القلب والأمعاء)',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+فول+عدس+ممنوع',
+    diseases:{},disNote:{}},
+  {id:'watermelon',name:'البطيخ والشمام',emoji:'🍉',cat:'fruits',type:'forbidden',
+    desc:'ممنوعان تماماً في النظام.',
+    reason:'يرتفع سكرهما بسرعة في الدم، وقد تُهيّج طبيعتهما المائية الهضم.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+بطيخ+ممنوع',
+    diseases:{},disNote:{}},
+  {id:'veg-oils',name:'الزيوت النباتية المصنعة',emoji:'🛢️',cat:'fats',type:'forbidden',
+    desc:'ممنوعة تماماً (زيت ذرة، فول سوداني، زيت مهدرج).',
+    reason:'من أكبر مسببات الالتهاب المزمن بسبب الأحماض الدهنية المتحولة.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+زيوت+نباتية+ضارة',
+    diseases:{},disNote:{}},
+  {id:'leafy',name:'الخضروات الورقية الكثيرة',emoji:'🥬',cat:'fruits',type:'forbidden',
+    desc:'مقيّدة أو ممنوعة في النظام.',
+    reason:'يرى النظام أن بعض ألياف الخضار النيئة قد تهيج الأمعاء. (تنبيه علمي: ضرورية للصحة العامة)',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+خضروات',
+    diseases:{},disNote:{}},
+  {id:'juices',name:'العصائر والمشروبات الغازية',emoji:'🥤',cat:'fruits',type:'forbidden',
+    desc:'ممنوعة تماماً.',
+    reason:'ترفع السكر بسرعة كبيرة وتحتوي على سكريات مصطنعة وملونات.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+عصير+غازي+ممنوع',
+    diseases:{},disNote:{}},
+  {id:'fast-food',name:'الوجبات السريعة والمقليات',emoji:'🍔',cat:'proteins',type:'forbidden',
+    desc:'ممنوعة تماماً.',
+    reason:'زيوت محترقة، دقيق أبيض، صلصات مصنعة — من أعلى مسببات الالتهاب.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+وجبات+سريعة+ضارة',
+    diseases:{},disNote:{}},
+  {id:'white-flour',name:'الدقيق الأبيض والمعجنات',emoji:'🥐',cat:'carbs',type:'forbidden',
+    desc:'البيتزا، الكرواسون، الباتيه، المكرونة — كلها ممنوعة.',
+    reason:'يُضعف الجهاز الهضمي ويسبب إدماناً للسكر وارتفاعاً حاداً في الإنسولين.',
+    video:'https://www.youtube.com/results?search_query=ضياء+العوضي+دقيق+أبيض+ممنوع',
+    diseases:{},disNote:{}},
+];
+
+/* ═══════════════════════════════════════
+   FASTING TYPES
+═══════════════════════════════════════ */
+const FAST_TYPES = [
+  {id:'12_12',name:'12:12',hours:12,level:'easy',lvlClass:'lv-easy',
+    desc:'١٢ ساعة صيام و١٢ ساعة أكل — مثالي للمبتدئين ويتوافق مع إيقاع الجسم الطبيعي'},
+  {id:'16_8',name:'16:8',hours:16,level:'متوسط',lvlClass:'lv-med',
+    desc:'الأكثر دراسةً وشيوعاً. تناول طعامك من الظهر حتى ٨ مساءً مثلاً'},
+  {id:'18_6',name:'18:6',hours:18,level:'متوسط+',lvlClass:'lv-med',
+    desc:'نسخة أقوى من 16:8 لمن تعوّد على الصيام ويريد نتائج أسرع'},
+  {id:'20_4',name:'20:4 (المحارب)',hours:20,level:'صعب',lvlClass:'lv-hard',
+    desc:'وجبة رئيسية واحدة ليلاً مع وجبة خفيفة، يتطلب تكيّفاً مسبقاً'},
+  {id:'omad',name:'OMAD (وجبة واحدة)',hours:23,level:'صعب جداً',lvlClass:'lv-hard',
+    desc:'وجبة يومية واحدة فقط، أقصى مستويات الصيام — للمتقدمين فقط'},
+  {id:'5_2',name:'5:2 (أسبوعي)',hours:0,level:'مرن',lvlClass:'lv-easy',
+    desc:'أكل طبيعي ٥ أيام وتقليل شديد (٥٠٠-٦٠٠ كالوري) يومين غير متتاليين'},
+];
+
+/* ═══════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════ */
+let currentUser = null;
+let selectedFast = null;
+let fastTimer = null;
+let fastStartTime = null;
+let fastTotalSecs = 0;
+let fastElapsedSecs = 0;
+let isFasting = false;
+let currentFoodTab = 'all';
+
+/* ═══════════════════════════════════════
+   AUTH FUNCTIONS
+═══════════════════════════════════════ */
+function switchTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('act',i===(tab==='login'?0:1)));
+  document.getElementById('login-form').classList.toggle('hidden',tab!=='login');
+  document.getElementById('register-form').classList.toggle('hidden',tab!=='register');
+}
+
+function togglePass(id,btn){
+  const inp=document.getElementById(id);
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.innerHTML=show?'<i class="fas fa-eye-slash"></i>':'<i class="fas fa-eye"></i>';
+}
+
+// Disease selector
+document.querySelectorAll('.dis-item').forEach(item=>{
+  item.addEventListener('click',()=>item.classList.toggle('sel'));
+});
+
+async function doLogin(){
+  const user=document.getElementById('l-user').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  if(!user||!pass){showToast('⚠️ أدخل اسم المستخدم وكلمة السر');return;}
+  try{
+    const snap=await db.ref('users/'+user).get();
+    if(!snap.exists()){showToast('❌ المستخدم غير موجود');return;}
+    const data=snap.val();
+    if(data.password!==btoa(pass)){showToast('❌ كلمة السر خاطئة');return;}
+    currentUser={username:user,...data};
+    localStorage.setItem('tayyibat_user',user);
+    enterApp();
+  }catch(e){showToast('❌ خطأ في الاتصال');console.error(e);}
+}
+
+async function doRegister(){
+  const name=document.getElementById('r-name').value.trim();
+  const user=document.getElementById('r-user').value.trim().replace(/\s/g,'');
+  const pass=document.getElementById('r-pass').value;
+  const dob=document.getElementById('r-dob').value;
+  if(!name||!user||!pass||!dob){showToast('⚠️ أكمل جميع الحقول');return;}
+  if(pass.length<6){showToast('⚠️ كلمة السر 6 أحرف على الأقل');return;}
+  if(!/^[a-zA-Z0-9_\u0600-\u06FF]+$/.test(user)){showToast('⚠️ اسم المستخدم بدون مسافات أو رموز');return;}
+  const diseases=[];
+  document.querySelectorAll('.dis-item.sel input').forEach(cb=>diseases.push(cb.value));
+  try{
+    const snap=await db.ref('users/'+user).get();
+    if(snap.exists()){showToast('❌ اسم المستخدم موجود مسبقاً');return;}
+    const userData={
+      name,username:user,
+      password:btoa(pass),
+      dob,diseases,
+      fastingStats:{},
+      createdAt:Date.now()
+    };
+    await db.ref('users/'+user).set(userData);
+    currentUser={username:user,...userData};
+    localStorage.setItem('tayyibat_user',user);
+    showToast('✅ تم إنشاء الحساب بنجاح!');
+    enterApp();
+  }catch(e){showToast('❌ خطأ في الحفظ');console.error(e);}
+}
+
+async function autoLogin(){
+  const saved=localStorage.getItem('tayyibat_user');
+  if(!saved){hideLoader();return;}
+  try{
+    const snap=await db.ref('users/'+saved).get();
+    if(snap.exists()){
+      currentUser={username:saved,...snap.val()};
+      enterApp();
+    } else {
+      localStorage.removeItem('tayyibat_user');
+      hideLoader();
+    }
+  }catch(e){hideLoader();console.error(e);}
+}
+
+function doLogout(){
+  localStorage.removeItem('tayyibat_user');
+  currentUser=null;
+  isFasting=false;
+  if(fastTimer)clearInterval(fastTimer);
+  document.getElementById('bottom-nav').classList.remove('show');
+  showPage('auth');
+  showToast('👋 تم تسجيل الخروج');
+}
+
+/* ═══════════════════════════════════════
+   ENTER APP
+═══════════════════════════════════════ */
+function enterApp(){
+  hideLoader();
+  buildHome();
+  buildFoods();
+  buildFastingTypes();
+  buildProfile();
+  document.getElementById('bottom-nav').classList.add('show');
+  showPage('home');
+  navTo('home');
+}
+
+/* ═══════════════════════════════════════
+   PAGE NAVIGATION
+═══════════════════════════════════════ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById(id+'-page');
+  if(pg)pg.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function navTo(id){
+  showPage(id);
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('act'));
+  const ni=document.getElementById('nav-'+id);
+  if(ni)ni.classList.add('act');
+}
+
+/* ═══════════════════════════════════════
+   HOME BUILDER
+═══════════════════════════════════════ */
+function buildHome(){
+  if(!currentUser)return;
+  const u=currentUser;
+  document.getElementById('h-username').textContent=u.username;
+  document.getElementById('h-name').textContent=u.name;
+
+  // Age
+  const age=calcAge(u.dob);
+  document.getElementById('h-age').textContent=`${age} سنة • ${new Date(u.dob).toLocaleDateString('ar-EG')}`;
+
+  // Disease tags
+  const dmap={sugar:{icon:'🩸',lbl:'سكري'},pressure:{icon:'💉',lbl:'ضغط'},heart:{icon:'❤️',lbl:'قلب'}};
+  const tagsEl=document.getElementById('h-dis-tags');
+  tagsEl.innerHTML='';
+  if(u.diseases&&u.diseases.length){
+    u.diseases.forEach(d=>{
+      if(dmap[d]) tagsEl.innerHTML+=`<div class="dis-tag">${dmap[d].icon} ${dmap[d].lbl}</div>`;
+    });
+  } else {
+    tagsEl.innerHTML='<div class="dis-tag">✅ لا أمراض مزمنة</div>';
+  }
+
+  // Disease alerts
+  const alertsEl=document.getElementById('disease-alerts');
+  alertsEl.innerHTML='';
+  if(!u.diseases||!u.diseases.length){
+    alertsEl.innerHTML=`<div class="alert-card ok"><div class="alert-title">✅ حالتك الصحية جيدة</div>يمكنك اتباع النظام بشكل كامل مع مراقبة جسمك. تذكر دائماً استشارة الطبيب.</div>`;
+  }
+  if(u.diseases&&u.diseases.includes('sugar')){
+    alertsEl.innerHTML+=`<div class="alert-card warn">
+      <div class="alert-title">🩸 تنبيه مرضى السكري</div>
+      • تجنّب تماماً: الأرز الكثير، العسل، المربى، البطاطس الكثيرة<br>
+      • مثالي لك: الأسماك، اللحم الضاني، زيت الزيتون<br>
+      • <strong>لا تُعدّل جرعة الإنسولين بدون طبيبك أبداً</strong><br>
+      • الصيام المتقطع قد يساعد في حساسية الإنسولين تحت إشراف طبي
+    </div>`;
+  }
+  if(u.diseases&&u.diseases.includes('pressure')){
+    alertsEl.innerHTML+=`<div class="alert-card warn">
+      <div class="alert-title">💉 تنبيه مرضى الضغط</div>
+      • تجنّب: الأجبان المملحة، الإفراط في الدهون الحيوانية<br>
+      • مفيد جداً: زيت الزيتون، الأسماك، الزعتر<br>
+      • لا تقطع أدوية الضغط بدون طبيب<br>
+      • شرب الماء الكافي ضروري لمرضى الضغط
+    </div>`;
+  }
+  if(u.diseases&&u.diseases.includes('heart')){
+    alertsEl.innerHTML+=`<div class="alert-card warn">
+      <div class="alert-title">❤️ تنبيه مرضى القلب</div>
+      • الأفضل: الأسماك البحرية، زيت الزيتون، الخضروات المطبوخة<br>
+      • تجنّب: الإفراط في الدهون الحيوانية، الوجبات السريعة<br>
+      • الصيام المتقطع تحت إشراف طبي فقط<br>
+      • <strong>لا تُوقف أدوية القلب أبداً بدون استشارة طبيبك</strong>
+    </div>`;
+  }
+
+  updateFastStats();
+}
+
+function calcAge(dob){
+  const d=new Date(dob);const now=new Date();
+  let age=now.getFullYear()-d.getFullYear();
+  if(now.getMonth()<d.getMonth()||(now.getMonth()===d.getMonth()&&now.getDate()<d.getDate())) age--;
+  return age;
+}
+
+/* ═══════════════════════════════════════
+   FOOD BUILDER
+═══════════════════════════════════════ */
+function buildFoods(){
+  renderFoods(FOODS);
+}
+
+function showFoodTab(tab,el){
+  currentFoodTab=tab;
+  document.querySelectorAll('.ftab').forEach(t=>{t.classList.remove('act');t.style.background='';t.style.borderColor='';t.style.color='';});
+  if(el){
+    el.classList.add(tab==='forbidden'?'act-red':'act');
+    if(tab==='forbidden'){el.style.background='linear-gradient(135deg,var(--red),var(--red2))';el.style.color='#fff';}
+  }
+  document.getElementById('food-search').value='';
+  filterFoods();
+}
+
+function filterFoods(){
+  const q=document.getElementById('food-search').value.trim().toLowerCase();
+  let filtered=FOODS;
+  if(currentFoodTab!=='all') filtered=FOODS.filter(f=>currentFoodTab==='allowed'?f.type==='allowed':currentFoodTab==='forbidden'?f.type==='forbidden':f.cat===currentFoodTab);
+  if(q) filtered=filtered.filter(f=>f.name.includes(q)||f.desc.includes(q));
+  renderFoods(filtered);
+}
+
+function renderFoods(foods){
+  const el=document.getElementById('food-grid');
+  if(!foods.length){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--txt2)">لا توجد نتائج 🔍</div>`;return;}
+  const u=currentUser;
+  el.innerHTML=foods.map(f=>{
+    const dis=u&&u.diseases&&u.diseases.length?u.diseases:[];
+    let disWarns='';
+    dis.forEach(d=>{
+      if(f.diseases&&f.diseases[d]){
+        const cls={'ok':'dw-ok','caution':'dw-caution','danger':'dw-danger'}[f.diseases[d]];
+        const icons={'ok':'✅','caution':'⚠️','danger':'🚨'};
+        const labels={'sugar':'السكري','pressure':'الضغط','heart':'القلب'};
+        const note=f.disNote&&f.disNote[d]?f.disNote[d]:'';
+        disWarns+=`<span class="disease-warn ${cls}">${icons[f.diseases[d]]} ${labels[d]}</span>`;
+        if(note) disWarns+=`<div style="font-size:.7rem;color:var(--txt2);margin-top:4px;margin-right:4px">↳ ${note}</div>`;
+      }
+    });
+    return `
+    <div class="food-card ${f.type}" id="fc-${f.id}">
+      <div class="fc-top">
+        <div class="fc-emoji">${f.emoji}</div>
+        <div class="fc-info">
+          <div class="fc-name">${f.name}</div>
+          <span class="fc-badge ${f.type}">${f.type==='allowed'?'✅ مسموح':'❌ ممنوع'}</span>
+          <div class="fc-desc">${f.desc}</div>
+          ${disWarns}
+        </div>
+      </div>
+      <div class="fc-toggle" onclick="toggleExpand('${f.id}')">
+        <i class="fas fa-chevron-down" id="arr-${f.id}"></i> السبب وفيديو الدكتور
+      </div>
+      <div class="fc-expand" id="exp-${f.id}">
+        <div class="fc-reason ${f.type==='allowed'?'ok':'bad'}">
+          <strong>${f.type==='allowed'?'✅ لماذا مسموح:':'❌ لماذا ممنوع:'}</strong><br>${f.reason}
+        </div>
+        <a href="${f.video}" target="_blank" class="fc-video-btn">
+          <i class="fab fa-youtube"></i> فيديو الدكتور ضياء عن ${f.name}
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleExpand(id){
+  const exp=document.getElementById('exp-'+id);
+  const arr=document.getElementById('arr-'+id);
+  const open=exp.classList.toggle('open');
+  arr.style.transform=open?'rotate(180deg)':'';
+}
+
+/* ═══════════════════════════════════════
+   FASTING BUILDER
+═══════════════════════════════════════ */
+function buildFastingTypes(){
+  const el=document.getElementById('fast-types-list');
+  el.innerHTML=FAST_TYPES.map(f=>`
+    <div class="fast-card" id="fc-type-${f.id}" onclick="selectFast('${f.id}')">
+      <div class="fc-row">
+        <div class="fc-hrs">${f.hours?f.hours+'س':'5:2'}</div>
+        <div class="fc-details">
+          <div class="fc-dname">${f.name}</div>
+          <div class="fc-ddesc">${f.desc}</div>
+          <span class="fc-level ${f.lvlClass}">المستوى: ${f.level}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function selectFast(id){
+  selectedFast=FAST_TYPES.find(f=>f.id===id);
+  document.querySelectorAll('.fast-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('fc-type-'+id).classList.add('sel');
+  if(selectedFast.hours){
+    fastTotalSecs=selectedFast.hours*3600;
+    document.getElementById('timer-phase').textContent=`صيام ${selectedFast.name} — ${selectedFast.hours} ساعة`;
+    updateTimerDisplay(fastTotalSecs);
+  } else {
+    document.getElementById('timer-phase').textContent='نظام 5:2 — اليومان: الثلاثاء والجمعة (مثلاً)';
+  }
+  showToast('✅ تم اختيار صيام '+selectedFast.name);
+}
+
+function startFast(){
+  if(!selectedFast){showToast('⚠️ اختر نوع الصيام أولاً');return;}
+  if(selectedFast.id==='5_2'){showToast('💡 نظام 5:2: خصص يومين بسعرات محدودة هذا الأسبوع');return;}
+  if(isFasting)return;
+  isFasting=true;
+  fastStartTime=Date.now();
+  fastElapsedSecs=0;
+  document.getElementById('btn-start').style.display='none';
+  document.getElementById('btn-stop').style.display='flex';
+  fastTimer=setInterval(tickFast,1000);
+  showToast('⏱️ بدأ عداد الصيام!');
+}
+
+function tickFast(){
+  fastElapsedSecs=Math.floor((Date.now()-fastStartTime)/1000);
+  const remaining=fastTotalSecs-fastElapsedSecs;
+  if(remaining<=0){
+    clearInterval(fastTimer);
+    isFasting=false;
+    document.getElementById('btn-start').style.display='flex';
+    document.getElementById('btn-stop').style.display='none';
+    updateTimerDisplay(0);
+    updateRing(0,fastTotalSecs);
+    saveFastSession(fastElapsedSecs/3600);
+    document.getElementById('done-modal').classList.add('show');
+    if('Notification' in window&&Notification.permission==='granted'){
+      new Notification('🎉 نظام الطيبات','{body:"انتهت فترة الصيام! يمكنك الإفطار الآن 🌿"}');
+    }
+    return;
+  }
+  updateTimerDisplay(remaining);
+  updateRing(remaining,fastTotalSecs);
+  document.getElementById('timer-phase').textContent=`صيام ${selectedFast.name} — متبقي ${formatTime(remaining)}`;
+}
+
+function stopFast(){
+  if(!isFasting)return;
+  clearInterval(fastTimer);
+  isFasting=false;
+  const hrs=fastElapsedSecs/3600;
+  saveFastSession(hrs);
+  document.getElementById('btn-start').style.display='flex';
+  document.getElementById('btn-stop').style.display='none';
+  showToast(`✅ تم إيقاف الصيام. صمت ${(hrs).toFixed(1)} ساعة`);
+}
+
+function resetFast(){
+  clearInterval(fastTimer);isFasting=false;fastElapsedSecs=0;fastStartTime=null;
+  document.getElementById('btn-start').style.display='flex';
+  document.getElementById('btn-stop').style.display='none';
+  if(selectedFast&&selectedFast.hours){updateTimerDisplay(fastTotalSecs);updateRing(fastTotalSecs,fastTotalSecs);}
+  else{updateTimerDisplay(0);updateRing(0,1);}
+  document.getElementById('timer-phase').textContent=selectedFast?`صيام ${selectedFast.name}`:'اختر نوع الصيام أولاً';
+}
+
+function formatTime(secs){
+  const h=Math.floor(secs/3600);const m=Math.floor((secs%3600)/60);const s=secs%60;
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+function pad(n){return n.toString().padStart(2,'0')}
+
+function updateTimerDisplay(secs){
+  document.getElementById('timer-display').textContent=formatTime(secs);
+}
+
+function updateRing(remaining,total){
+  const prog=document.getElementById('ring-prog');
+  const pct=total>0?remaining/total:0;
+  const dash=565.5;
+  prog.style.strokeDashoffset=dash-(pct*dash);
+}
+
+async function saveFastSession(hours){
+  if(!currentUser||hours<0.1)return;
+  const now=new Date();
+  const key=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}-${Date.now()}`;
+  try{
+    await db.ref(`users/${currentUser.username}/fastingStats/${key}`).set({
+      hours:parseFloat(hours.toFixed(2)),
+      type:selectedFast?selectedFast.id:'unknown',
+      date:now.toISOString()
+    });
+    await loadFastStats();
+  }catch(e){console.error(e);}
+}
+
+async function loadFastStats(){
+  if(!currentUser)return;
+  try{
+    const snap=await db.ref(`users/${currentUser.username}/fastingStats`).get();
+    if(!snap.exists()){setStats(0,0,0,0);return;}
+    const stats=snap.val();
+    const now=new Date();
+    let today=0,week=0,month=0,year=0;
+    Object.values(stats).forEach(s=>{
+      const d=new Date(s.date);
+      const hrs=s.hours||0;
+      year+=hrs;
+      if(d.getFullYear()===now.getFullYear()){
+        if(d.getMonth()===now.getMonth()) month+=hrs;
+        const diff=(now-d)/864e5;
+        if(diff<7) week+=hrs;
+        if(diff<1) today+=hrs;
+      }
+    });
+    setStats(today.toFixed(1),week.toFixed(1),month.toFixed(1),year.toFixed(1));
+  }catch(e){console.error(e);}
+}
+
+function setStats(t,w,m,y){
+  ['today','week','month'].forEach((k,i)=>{
+    const v=[t,w,m][i];
+    document.getElementById('s-'+k).textContent=v;
+  });
+  ['today','week','month','year'].forEach((k,i)=>{
+    const v=[t,w,m,y][i];
+    const el=document.getElementById('fs-'+k);
+    if(el)el.textContent=v;
+  });
+}
+
+function updateFastStats(){loadFastStats();}
+
+/* ═══════════════════════════════════════
+   PROFILE BUILDER
+═══════════════════════════════════════ */
+function buildProfile(){
+  if(!currentUser)return;
+  const u=currentUser;
+  document.getElementById('p-name').textContent=u.name;
+  document.getElementById('p-info').textContent=`@${u.username} • ${calcAge(u.dob)} سنة`;
+  document.getElementById('pp-name').textContent=u.name;
+  document.getElementById('pp-user').textContent=u.username;
+  document.getElementById('pp-dob').textContent=new Date(u.dob).toLocaleDateString('ar-EG');
+  document.getElementById('pp-age').textContent=calcAge(u.dob)+' سنة';
+
+  const dmap={sugar:'🩸 مرض السكري',pressure:'💉 ارتفاع الضغط',heart:'❤️ أمراض القلب'};
+  const ddiv=document.getElementById('pp-diseases');
+  if(u.diseases&&u.diseases.length){
+    ddiv.innerHTML=u.diseases.map(d=>`
+      <div class="prof-row">
+        <span class="prof-key">${dmap[d]||d}</span>
+        <span class="prof-val" style="color:#ef5350">✓ نعم</span>
+      </div>`).join('');
+  } else {
+    ddiv.innerHTML='<div class="prof-row"><span class="prof-key">الحالة الصحية</span><span class="prof-val" style="color:var(--green2)">✅ لا أمراض مزمنة</span></div>';
+  }
+
+  if(selectedFast) document.getElementById('pp-best').textContent=selectedFast.name;
+}
+
+/* ═══════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function hideLoader(){document.getElementById('loader').style.display='none';}
+
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+/* ═══════════════════════════════════════
+   PWA / NOTIFICATIONS
+═══════════════════════════════════════ */
+if('Notification' in window) Notification.requestPermission();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+/* ═══════════════════════════════════════
+   BOOT
+═══════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  setTimeout(autoLogin,800);
+});
+</script>
+</body>
+</html>
