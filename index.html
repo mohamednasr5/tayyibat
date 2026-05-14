@@ -125,14 +125,18 @@ body{
 #auth-page{
   display:flex;flex-direction:column;
   align-items:center;justify-content:flex-start;
-  min-height:100vh;padding:0 16px 40px;
-  overflow:hidden;
+  min-height:100vh;
+  padding:0 12px 60px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  box-sizing:border-box;
 }
 
 /* SVG ANIMATION STAGE */
 .anim-stage{
-  width:100%;max-width:380px;
-  height:220px;
+  width:100%;max-width:420px;
+  height:200px;
   position:relative;
   overflow:hidden;
   border-radius:0 0 var(--r) var(--r);
@@ -174,8 +178,9 @@ body{
   background:linear-gradient(145deg,var(--card),var(--card2));
   border:1px solid var(--border);
   border-radius:0 0 24px 24px;
-  padding:24px 20px;
-  width:100%;max-width:380px;
+  padding:20px 16px;
+  width:100%;max-width:420px;
+  box-sizing:border-box;
   box-shadow:var(--shadow);
   position:relative;z-index:2;
 }
@@ -231,39 +236,69 @@ body{
 }
 
 /* Form fields */
-.field{margin-bottom:16px}
+.field{margin-bottom:14px;width:100%}
 .field label{
   display:block;font-size:.8rem;
   color:var(--gold2);font-weight:600;
   margin-bottom:6px;
 }
-.input-wrap{position:relative}
+.input-wrap{position:relative;width:100%}
 .field input,.field select{
   width:100%;
-  background:rgba(255,255,255,0.05);
-  border:1px solid var(--border);
+  background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--border);
   border-radius:12px;
-  padding:12px 16px;
+  padding:13px 14px;
   color:var(--txt);
   font-family:'Tajawal',sans-serif;
-  font-size:.95rem;
+  font-size:1rem;
   outline:none;
   transition:border-color .3s,box-shadow .3s;
+  box-sizing:border-box;
+  display:block;
   -webkit-appearance:none;
+  appearance:none;
+  min-height:48px;
 }
+.field select{
+  background-image:none;
+  padding-left:40px;
+}
+.field input::placeholder{color:rgba(138,164,200,0.6);font-size:.9rem}
 .field input:focus,.field select:focus{
   border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(200,150,12,.15);
+  box-shadow:0 0 0 3px rgba(200,150,12,.2);
 }
-.field input option{background:var(--card)}
+.field input option{background:var(--card);color:var(--txt)}
 .eye-btn{
-  position:absolute;left:14px;top:50%;
+  position:absolute;left:12px;top:50%;
   transform:translateY(-50%);
   background:none;border:none;
   color:var(--txt2);cursor:pointer;
-  font-size:1rem;padding:4px;
+  font-size:1rem;padding:6px;
+  z-index:2;
 }
-.field input[type=password]{padding-left:44px}
+.field input[type=password]{padding-left:42px}
+
+/* BMI Badge */
+.bmi-result{
+  padding:10px 14px;
+  border-radius:10px;
+  font-size:.82rem;
+  font-weight:700;
+  text-align:center;
+  margin-top:8px;
+  display:none;
+}
+.bmi-result.show{display:block}
+.bmi-normal{background:rgba(46,201,81,.12);border:1px solid rgba(46,201,81,.3);color:#2ec951}
+.bmi-over{background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.3);color:#ffa726}
+.bmi-obese{background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.3);color:#ef5350}
+.bmi-under{background:rgba(33,150,243,.12);border:1px solid rgba(33,150,243,.3);color:#64b5f6}
+
+/* two column layout for weight/height */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.field-row .field{margin-bottom:0}
 
 /* Disease checkboxes */
 .dis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -954,6 +989,94 @@ body{
   transform:translateY(-50%);
   color:var(--txt3);
 }
+
+/* ═══════════════════════════════════════
+   FASTING DETAIL MODAL
+═══════════════════════════════════════ */
+.fast-detail-modal .modal-box{
+  max-height:90vh;
+  overflow-y:auto;
+  border-radius:24px 24px 0 0;
+}
+.fdm-header{
+  text-align:center;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:16px;
+}
+.fdm-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 14px;border-radius:20px;
+  font-size:.72rem;font-weight:700;
+  margin-bottom:10px;
+}
+.fdm-hours{
+  font-size:3rem;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;margin-bottom:6px;
+}
+.fdm-name{font-family:'Amiri',serif;font-size:1.3rem;color:var(--txt);margin-bottom:4px}
+.fdm-tagline{font-size:.8rem;color:var(--txt2)}
+
+.fdm-section{margin-bottom:16px}
+.fdm-sec-title{
+  font-size:.88rem;font-weight:700;
+  color:var(--gold2);
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:10px;
+  padding-bottom:6px;
+  border-bottom:1px solid rgba(30,53,96,.5);
+}
+.fdm-timeline{display:flex;flex-direction:column;gap:8px}
+.fdm-tl-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.03);
+  border-radius:10px;
+  border-right:3px solid var(--border);
+}
+.fdm-tl-item.fasting{border-color:var(--accent)}
+.fdm-tl-item.eating{border-color:var(--green2)}
+.fdm-tl-time{
+  font-size:.75rem;font-weight:700;
+  color:var(--gold2);
+  min-width:60px;
+  flex-shrink:0;
+}
+.fdm-tl-text{font-size:.78rem;color:var(--txt2);line-height:1.5}
+
+.fdm-meal-plan{display:flex;flex-direction:column;gap:8px}
+.fdm-meal{
+  padding:10px 12px;
+  background:rgba(255,255,255,.03);
+  border-radius:10px;
+}
+.fdm-meal-name{font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:4px}
+.fdm-meal-items{font-size:.75rem;color:var(--txt2);line-height:1.6}
+
+.fdm-bmi-box{
+  padding:12px 14px;
+  border-radius:12px;
+  margin-bottom:12px;
+  border:1px solid;
+}
+.fdm-bmi-norm{background:rgba(46,201,81,.08);border-color:rgba(46,201,81,.3)}
+.fdm-bmi-over{background:rgba(255,160,0,.08);border-color:rgba(255,160,0,.3)}
+.fdm-bmi-obese{background:rgba(229,57,53,.08);border-color:rgba(229,57,53,.3)}
+.fdm-bmi-under{background:rgba(33,150,243,.08);border-color:rgba(33,150,243,.3)}
+.fdm-bmi-title{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.fdm-bmi-list{font-size:.77rem;line-height:1.8}
+
+.fdm-tips{display:flex;flex-direction:column;gap:6px}
+.fdm-tip{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:.78rem;color:var(--txt2);line-height:1.5;
+  padding:8px 10px;
+  background:rgba(255,255,255,.03);
+  border-radius:8px;
+}
+.fdm-tip-icon{flex-shrink:0;font-size:1rem}
 </style>
 </head>
 <body>
@@ -976,8 +1099,8 @@ body{
 ═══════════════════════════════════════ -->
 <div id="auth-page" class="page active">
   <!-- Animation Stage -->
-  <div style="display:flex;justify-content:center;padding-top:20px">
-    <div class="anim-stage">
+  <div style="display:flex;justify-content:center;padding-top:16px;width:100%">
+    <div class="anim-stage" style="max-width:420px;width:100%;margin:0 auto">
       <div class="anim-label" id="anim-label">🍕 الرجل يأكل بشراهة</div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:180px;overflow:hidden">
         <canvas id="char-canvas" width="380" height="180" style="width:100%;height:100%"></canvas>
@@ -985,8 +1108,8 @@ body{
     </div>
   </div>
 
-  <div style="display:flex;justify-content:center;padding:0 16px 30px">
-    <div class="auth-card">
+  <div style="display:flex;justify-content:center;padding:0 0 30px;width:100%;box-sizing:border-box">
+    <div class="auth-card" style="border-radius:0 0 24px 24px">
       <!-- Logo -->
       <div class="auth-logo">
         <div class="logo-circle">🌿</div>
@@ -1043,8 +1166,27 @@ body{
         </div>
         <div class="field">
           <label>تاريخ الميلاد</label>
-          <input type="date" id="r-dob">
+          <input type="date" id="r-dob" style="color-scheme:dark">
         </div>
+        <div class="field">
+          <label>الجنس</label>
+          <select id="r-gender">
+            <option value="">-- اختر الجنس --</option>
+            <option value="male">ذكر 👨</option>
+            <option value="female">أنثى 👩</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>الوزن (كجم)</label>
+            <input type="number" id="r-weight" placeholder="مثال: 80" min="30" max="300" oninput="calcBMILive()">
+          </div>
+          <div class="field">
+            <label>الطول (سم)</label>
+            <input type="number" id="r-height" placeholder="مثال: 170" min="100" max="250" oninput="calcBMILive()">
+          </div>
+        </div>
+        <div id="bmi-live-result" class="bmi-result"></div>
         <div class="field">
           <label>هل تعاني من أي من الأمراض التالية؟ (اختياري)</label>
           <div class="dis-grid">
@@ -1258,6 +1400,10 @@ body{
       <div class="prof-row"><span class="prof-key">اسم المستخدم</span><span class="prof-val" id="pp-user">-</span></div>
       <div class="prof-row"><span class="prof-key">تاريخ الميلاد</span><span class="prof-val" id="pp-dob">-</span></div>
       <div class="prof-row"><span class="prof-key">العمر</span><span class="prof-val" id="pp-age">-</span></div>
+      <div class="prof-row"><span class="prof-key">الوزن</span><span class="prof-val" id="pp-weight">-</span></div>
+      <div class="prof-row"><span class="prof-key">الطول</span><span class="prof-val" id="pp-height">-</span></div>
+      <div class="prof-row"><span class="prof-key">مؤشر كتلة الجسم (BMI)</span><span class="prof-val" id="pp-bmi">-</span></div>
+      <div class="prof-row"><span class="prof-key">التصنيف الصحي</span><span class="prof-val" id="pp-bmicat">-</span></div>
     </div>
 
     <div class="prof-card">
@@ -1332,10 +1478,260 @@ body{
   </div>
 </div>
 
+<!-- Fasting Detail Modal -->
+<div class="modal-overlay fast-detail-modal" id="fast-detail-modal" onclick="closeModal('fast-detail-modal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div id="fast-detail-content"></div>
+    <button class="modal-close" onclick="closeModal('fast-detail-modal')">إغلاق ✕</button>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════
-   FIREBASE INIT
+   BMI CALCULATOR
 ═══════════════════════════════════════ */
+function calcBMI(weight,height){
+  const h=height/100;
+  return weight/(h*h);
+}
+
+function getBMICategory(bmi){
+  if(bmi<18.5) return {cat:'نقص_الوزن',label:'نقص في الوزن',emoji:'📉',cls:'bmi-under',fdmCls:'fdm-bmi-under',color:'#64b5f6'};
+  if(bmi<25)   return {cat:'مثالي',label:'وزن مثالي',emoji:'✅',cls:'bmi-normal',fdmCls:'fdm-bmi-norm',color:'#2ec951'};
+  if(bmi<30)   return {cat:'زيادة_الوزن',label:'زيادة في الوزن',emoji:'⚠️',cls:'bmi-over',fdmCls:'fdm-bmi-over',color:'#ffa726'};
+  if(bmi<35)   return {cat:'سمنة',label:'سمنة (الدرجة الأولى)',emoji:'🔴',cls:'bmi-obese',fdmCls:'fdm-bmi-obese',color:'#ef5350'};
+  if(bmi<40)   return {cat:'سمنة_مفرطة',label:'سمنة مفرطة (الدرجة الثانية)',emoji:'🚨',cls:'bmi-obese',fdmCls:'fdm-bmi-obese',color:'#ef5350'};
+  return {cat:'سمنة_شديدة',label:'سمنة شديدة (الدرجة الثالثة)',emoji:'‼️',cls:'bmi-obese',fdmCls:'fdm-bmi-obese',color:'#c62828'};
+}
+
+function calcBMILive(){
+  const w=parseFloat(document.getElementById('r-weight').value);
+  const h=parseFloat(document.getElementById('r-height').value);
+  const el=document.getElementById('bmi-live-result');
+  if(!w||!h||w<30||h<100){el.className='bmi-result';el.style.display='none';return;}
+  const bmi=calcBMI(w,h);
+  const cat=getBMICategory(bmi);
+  el.className='bmi-result show '+cat.cls;
+  el.style.display='block';
+  el.innerHTML=`${cat.emoji} مؤشر كتلة الجسم: <strong>${bmi.toFixed(1)}</strong> — <strong>${cat.label}</strong>`;
+}
+
+/* ═══════════════════════════════════════
+   FASTING DETAIL DATA
+═══════════════════════════════════════ */
+const FAST_DETAIL = {
+  '12_12':{
+    schedule:[
+      {time:'8 مساءً → 8 صباحاً',type:'fasting',text:'فترة الصيام (12 ساعة) — معظمها نوم، يتكيف جسمك بسهولة'},
+      {time:'8 صباحاً',type:'eating',text:'الإفطار — يفضل البدء بماء دافئ أو شاي أخضر'},
+      {time:'8 صباحاً → 8 مساءً',type:'eating',text:'نافذة الأكل (12 ساعة) — 2 إلى 3 وجبات'},
+    ],
+    howItWorks:'يتوافق هذا النظام مع الإيقاع البيولوجي الطبيعي للجسم. معظم فترة الصيام أثناء النوم مما يجعله سهل الالتزام. الجسم يبدأ في حرق الدهون بعد 10-12 ساعة من الصيام.',
+    benefits:['🔥 يبدأ حرق الدهون بعد 10 ساعات','😴 معظمه أثناء النوم','💪 مثالي للمبتدئين','🧠 يحسن حساسية الإنسولين','⚡ يرفع مستوى الطاقة'],
+    tips:[
+      {icon:'💧',text:'اشرب 2-3 أكواب ماء عند الاستيقاظ قبل الإفطار'},
+      {icon:'☕',text:'القهوة والشاي بدون سكر مسموح في فترة الصيام'},
+      {icon:'🌙',text:'أغلق مطبخك بعد الساعة 8 مساءً'},
+      {icon:'📱',text:'استخدم العداد لتتبع ساعات صيامك'},
+    ],
+    meals:{
+      normal:{title:'وزن مثالي (BMI 18.5-25)',items:'🌅 إفطار: بيض مسلوق + زيت زيتون + خبز اسمر\n🌞 غداء: لحم ضاني أو سمك + أرز + سلطة\n🌙 عشاء: تمر + جبن + زعتر بزيت زيتون أو عسل'},
+      over:{title:'زيادة الوزن (BMI 25-30)',items:'🌅 إفطار خفيف: تمر 3 حبات + ماء + شاي\n🌞 غداء رئيسي: سمك أو لحم ضاني مشوي + خضروات مطبوخة\n🌙 عشاء خفيف: زبادي طبيعي + ملعقة عسل — أو أتخطاه إن لم أجع'},
+      obese:{title:'السمنة (BMI 30+)',items:'🌅 إفطار: ماء + شاي أخضر فقط (لا طعام حتى تشعر بالجوع)\n🌞 غداء: سمك مشوي أو لحم ضاني + خضروات مطبوخة (بدون أرز أو خبز)\n🌙 تخطي العشاء إن أمكن — إن جعت: تمر 2 حبة + ماء'},
+      under:{title:'نقص الوزن (BMI أقل من 18.5)',items:'🌅 إفطار غني: خبز اسمر + زيت زيتون + عسل + جبن\n🌞 غداء كامل: بروتين (لحم/سمك) + أرز + بقوليات\n🌙 عشاء دسم: بيض + جبن + مكسرات'},
+    }
+  },
+  '16_8':{
+    schedule:[
+      {time:'8 مساءً → 12 ظهراً',type:'fasting',text:'فترة الصيام (16 ساعة) — نوم + صباح بدون طعام'},
+      {time:'12 ظهراً',type:'eating',text:'أول وجبة — يُنصح بفطور صغير أولاً'},
+      {time:'12 ظهراً → 8 مساءً',type:'eating',text:'نافذة الأكل (8 ساعات) — وجبتان أو ثلاثة'},
+    ],
+    howItWorks:'الأكثر دراسةً وأثبتها علمياً. بعد 16 ساعة صيام يدخل الجسم في حالة الكيتوز الخفيفة حيث يحرق الدهون بكفاءة عالية. هرمون النمو يرتفع بنسبة تصل إلى 2000% في هذه المرحلة.',
+    benefits:['🔥 حرق فعّال للدهون','🧠 وضوح ذهني ملحوظ','💊 تحسين حساسية الإنسولين','⚡ زيادة هرمون النمو','🫀 تحسين صحة القلب','🧬 تنشيط عملية الالتهام الذاتي (Autophagy)'],
+    tips:[
+      {icon:'☀️',text:'لا تأكل أي شيء قبل الظهر — القهوة السوداء والشاي والماء مسموح'},
+      {icon:'🥗',text:'ابدأ وجبتك الأولى بشيء خفيف مثل سلطة أو شوربة'},
+      {icon:'🚶',text:'المشي خلال فترة الصيام يسرع حرق الدهون'},
+      {icon:'💤',text:'النوم المبكر يجعل ساعات الصيام أسهل'},
+    ],
+    meals:{
+      normal:{title:'وزن مثالي (BMI 18.5-25)',items:'🌞 12 ظهراً (إفطار): سمك أو بيض + خضروات مطبوخة + زيت زيتون\n🌅 3-4 عصراً: تمر + مكسرات + زبادي طبيعي\n🌙 7 مساءً (عشاء): لحم ضاني أو دجاج بلدي + أرز + سلطة'},
+      over:{title:'زيادة الوزن (BMI 25-30)',items:'🌞 12 ظهراً: سمك مشوي أو لحم ضاني + خضروات مطبوخة (بدون خبز)\n🌅 3-4 عصراً (اختياري): تمر 2 حبة + ماء فقط إن جعت\n🌙 7 مساءً: شوربة خضار + لحم أو تخطيه'},
+      obese:{title:'السمنة (BMI 30+)',items:'🌞 12 ظهراً: ماء + شوربة خضار صافية فقط لأول أسبوع\n🌞 بعد التكيف: سمك أو لحم ضاني مشوي + خضروات مطبوخة (بدون كربوهيدرات)\n🌙 7 مساءً: الامتناع عن العشاء أو تمر 1-2 حبة + ماء'},
+      under:{title:'نقص الوزن (BMI أقل من 18.5)',items:'🌞 12 ظهراً: وجبة غنية جداً — بيض + جبن + زيت زيتون + خبز اسمر + عسل\n🌅 3-4 عصراً: مكسرات + تمر + زبادي\n🌙 7 مساءً: لحم أو سمك + أرز + خضروات'},
+    }
+  },
+  '18_6':{
+    schedule:[
+      {time:'8 مساءً → 2 ظهراً',type:'fasting',text:'فترة الصيام (18 ساعة)'},
+      {time:'2 ظهراً',type:'eating',text:'الوجبة الأولى — بعد 18 ساعة كاملة'},
+      {time:'2 ظهراً → 8 مساءً',type:'eating',text:'نافذة الأكل (6 ساعات) — وجبتان فقط'},
+    ],
+    howItWorks:'نسخة متقدمة من 16:8. الجسم يدخل في مرحلة Autophagy (التجديد الخلوي) بشكل أعمق. مناسب لمن تعوّد على 16:8 لأسابيع.',
+    benefits:['🔥 حرق دهون أعمق','🧬 التهام خلوي متقدم','💊 تحسين قوي للإنسولين','🧠 تحسين الذاكرة والتركيز','⚡ طاقة مستقرة طوال اليوم'],
+    tips:[
+      {icon:'⚠️',text:'لا تبدأ هذا النظام مباشرة — تأكد من التكيف مع 16:8 أولاً'},
+      {icon:'💧',text:'اشرب 3-4 لترات ماء يومياً لتخفيف الجوع'},
+      {icon:'🧂',text:'إضافة قليل ملح للماء تساعد في تخفيف الدوخة'},
+      {icon:'🥩',text:'الوجبة الأولى يجب أن تكون غنية بالبروتين'},
+    ],
+    meals:{
+      normal:{title:'وزن مثالي',items:'🌞 2 ظهراً: لحم ضاني أو سمك + خضروات + أرز صغير\n🌙 7 مساءً: بيض أو جبن + زيت زيتون + خبز اسمر + عسل'},
+      over:{title:'زيادة الوزن',items:'🌞 2 ظهراً: سمك مشوي + خضروات مطبوخة (بدون كربوهيدرات)\n🌙 7 مساءً: سلطة + قطعة لحم صغيرة أو الامتناع'},
+      obese:{title:'السمنة',items:'🌞 2 ظهراً: الوجبة الوحيدة — سمك أو لحم ضاني مشوي + خضروات مطبوخة\n🌙 7 مساءً: يُفضَّل الامتناع تماماً أو تمر 1-2 حبة فقط'},
+      under:{title:'نقص الوزن',items:'🌞 2 ظهراً: وجبة كبيرة ومتكاملة — بروتين + كربوهيدرات + دهون صحية\n🌙 7 مساءً: وجبة ثانية دسمة — بيض + جبن + مكسرات + عسل'},
+    }
+  },
+  '20_4':{
+    schedule:[
+      {time:'8 مساءً → 4 مساءً',type:'fasting',text:'فترة الصيام (20 ساعة)'},
+      {time:'4 مساءً',type:'eating',text:'وجبة خفيفة صغيرة'},
+      {time:'7-8 مساءً',type:'eating',text:'الوجبة الرئيسية الكبيرة (4 ساعات نافذة)'},
+    ],
+    howItWorks:'نظام المحارب — مستوحى من طريقة تغذية المحاربين القدامى: الصيام نهاراً والأكل ليلاً. الجهاز الهضمي يرتاح طوال اليوم مما يعزز الالتهام الخلوي والتجديد.',
+    benefits:['🔥 حرق دهون مكثف','🦁 زيادة التركيز والانتباه','🧬 التهام خلوي عميق','⚡ طاقة عالية نهاراً','💪 بناء عضلي جيد مع التمرين'],
+    tips:[
+      {icon:'⚠️',text:'للمتكيفين فقط — لا تجربه من البداية'},
+      {icon:'🥗',text:'الوجبة الخفيفة (4 مساءً): تمر + مكسرات أو فاكهة صغيرة'},
+      {icon:'🍖',text:'الوجبة الكبيرة يجب أن تحتوي على بروتين كافٍ وخضروات'},
+      {icon:'🚫',text:'لا تأكل شيئاً قبل الساعة 4 مساءً مطلقاً'},
+    ],
+    meals:{
+      normal:{title:'وزن مثالي',items:'🌅 4 مساءً (خفيف): تمر 3-5 حبات + ماء\n🌙 7 مساءً (رئيسي): لحم ضاني + أرز + خضروات + جبن + زيت زيتون'},
+      over:{title:'زيادة الوزن',items:'🌅 4 مساءً (خفيف): تمر 2-3 حبات فقط\n🌙 7 مساءً: سمك مشوي أو لحم ضاني + خضروات مطبوخة (بدون نشويات)'},
+      obese:{title:'السمنة',items:'🌅 4 مساءً: ماء فقط أو تمر 1-2 حبة\n🌙 7 مساءً: وجبة واحدة — بروتين + خضروات (لا كربوهيدرات)'},
+      under:{title:'نقص الوزن',items:'🌅 4 مساءً: تمر + مكسرات + زبادي\n🌙 7 مساءً: وجبة كبيرة جداً — بروتين + كربوهيدرات + دهون + حلو طبيعي'},
+    }
+  },
+  'omad':{
+    schedule:[
+      {time:'طوال اليوم',type:'fasting',text:'صيام 23 ساعة كاملة'},
+      {time:'ساعة واحدة يومياً',type:'eating',text:'وجبة واحدة كبيرة — عادةً وقت العشاء'},
+    ],
+    howItWorks:'أقصى درجات الصيام المتقطع. وجبة واحدة يومياً تتيح للجسم راحة هضمية كاملة. مستويات الالتهام الخلوي والتجديد تصل لأعلى مستوياتها. مناسب للمتقدمين جداً فقط.',
+    benefits:['🔥 أقصى حرق للدهون','🧬 أعلى مستوى التهام خلوي','🧠 وضوح ذهني استثنائي','💰 توفير الوقت والمال','⏱️ تبسيط الحياة الغذائية'],
+    tips:[
+      {icon:'⛔',text:'ممنوع للمبتدئين — تأكد من شهور من التكيف مع أنواع أخرى'},
+      {icon:'👨‍⚕️',text:'استشر طبيبك قبل البدء — مراقبة الصحة ضرورية'},
+      {icon:'🍖',text:'الوجبة الواحدة يجب أن تكون كاملة ومتوازنة غذائياً'},
+      {icon:'💧',text:'شرب الماء والشاي والقهوة طوال اليوم ضروري'},
+      {icon:'🏋️',text:'التمرين في نهاية فترة الصيام قبل الوجبة للحصول على أفضل النتائج'},
+    ],
+    meals:{
+      normal:{title:'وزن مثالي',items:'🌙 الوجبة الكاملة: لحم ضاني + أرز + خضروات مطبوخة + سلطة + جبن + تمر + عسل\n✅ يجب أن تحتوي على جميع العناصر الغذائية'},
+      over:{title:'زيادة الوزن',items:'🌙 الوجبة الكاملة: سمك أو لحم ضاني + خضروات مطبوخة متنوعة + أرز بكميات أقل\n⚠️ تجنب الحلويات والكربوهيدرات الزائدة'},
+      obese:{title:'السمنة',items:'🌙 الوجبة الكاملة: بروتين (سمك/لحم) + خضروات مطبوخة فقط (لا أرز ولا خبز)\n🔴 هذا النظام فعّال جداً للسمنة لكن يحتاج إشرافاً طبياً'},
+      under:{title:'نقص الوزن',items:'⚠️ OMAD غير مناسب لنقص الوزن\n✅ يُنصح بـ 16:8 أو 12:12 مع وجبات غنية بالسعرات'},
+    }
+  },
+  '5_2':{
+    schedule:[
+      {time:'5 أيام من الأسبوع',type:'eating',text:'أكل طبيعي صحي دون قيود'},
+      {time:'يومان غير متتاليان',type:'fasting',text:'تقليل السعرات إلى 500-600 فقط (للرجال 600 / للنساء 500)'},
+    ],
+    howItWorks:'نظام مرن يناسب من لا يستطيع الصيام اليومي. في اليومين المحدودين لا تمتنع عن الأكل بل تأكل كميات صغيرة جداً. الأيام المقترحة: الاثنين والخميس أو الثلاثاء والجمعة.',
+    benefits:['🔄 مرونة عالية في الحياة اليومية','📅 لا يؤثر على المناسبات الاجتماعية','🔥 فقدان وزن تدريجي وصحي','🧠 تحسين الأيض على المدى البعيد','💪 سهل الاستمرار على المدى الطويل'],
+    tips:[
+      {icon:'📅',text:'اختر يومين غير متتاليين — مثلاً الاثنين والخميس'},
+      {icon:'🥗',text:'في اليومين المحدودين: شوربة خضار + قطعة بروتين صغيرة'},
+      {icon:'💧',text:'الماء والشاي والقهوة بدون سكر مسموح في أي وقت'},
+      {icon:'✅',text:'في الأيام الطبيعية: تناول نظام الطيبات بشكل كامل'},
+    ],
+    meals:{
+      normal:{title:'اليومان المحدودان (وزن مثالي)',items:'🌅 صباح: شاي أخضر أو قهوة بدون سكر\n🌞 غداء: شوربة خضار صافية + قطعة سمك صغيرة (250-300 سعرة)\n🌙 مساء: زبادي طبيعي + تمر 1-2 حبة (200 سعرة)'},
+      over:{title:'اليومان المحدودان (زيادة الوزن)',items:'🌞 غداء: شوربة خضار فقط (100-150 سعرة)\n🌙 مساء: سلطة + تمر 1-2 + ماء (300-350 سعرة)'},
+      obese:{title:'اليومان المحدودان (السمنة)',items:'🌅 صباح: ماء فقط\n🌞 غداء: شوربة خضار صافية جداً (100 سعرة)\n🌙 مساء: خضار مطبوخ + قطعة بروتين صغيرة (400 سعرة)'},
+      under:{title:'اليومان المحدودان (نقص الوزن)',items:'⚠️ 5:2 غير مناسب جداً لنقص الوزن\n✅ يُنصح بـ 16:8 مع وجبات غنية فقط'},
+    }
+  },
+};
+
+function getBMIMealKey(user){
+  if(!user||!user.bmiCategory) return 'normal';
+  const c=user.bmiCategory;
+  if(c==='نقص_الوزن') return 'under';
+  if(c==='مثالي') return 'normal';
+  if(c==='زيادة_الوزن') return 'over';
+  return 'obese'; // سمنة, سمنة_مفرطة, سمنة_شديدة
+}
+
+function openFastDetail(fastId){
+  const detail=FAST_DETAIL[fastId];
+  const ft=FAST_TYPES.find(f=>f.id===fastId);
+  if(!detail||!ft) return;
+
+  const mealKey=getBMIMealKey(currentUser);
+  const meal=detail.meals[mealKey];
+
+  const bmi=currentUser&&currentUser.bmi?currentUser.bmi:null;
+  const bmiCat=bmi?getBMICategory(bmi):null;
+
+  const bmiBox=bmi?`
+    <div class="fdm-bmi-box ${bmiCat.fdmCls}">
+      <div class="fdm-bmi-title" style="color:${bmiCat.color}">${bmiCat.emoji} ${bmiCat.label} — BMI: ${bmi.toFixed(1)}</div>
+      <div class="fdm-bmi-list" style="color:${bmiCat.color}">
+        <strong>وجبات الإفطار المقترحة لحالتك:</strong><br>
+        ${meal.items.split('\n').map(l=>`${l}<br>`).join('')}
+      </div>
+    </div>`:'';
+
+  const scheduleHTML=detail.schedule.map(s=>`
+    <div class="fdm-tl-item ${s.type}">
+      <div class="fdm-tl-time">${s.time}</div>
+      <div class="fdm-tl-text">${s.text}</div>
+    </div>`).join('');
+
+  const benefitsHTML=detail.benefits.map(b=>`<span style="display:inline-block;padding:4px 10px;background:rgba(200,150,12,.08);border:1px solid rgba(200,150,12,.2);border-radius:20px;font-size:.72rem;color:var(--gold2);margin:3px">${b}</span>`).join('');
+
+  const tipsHTML=detail.tips.map(t=>`
+    <div class="fdm-tip">
+      <span class="fdm-tip-icon">${t.icon}</span>
+      <span>${t.text}</span>
+    </div>`).join('');
+
+  const lvlColors={'lv-easy':'var(--green2)','lv-med':'#ffa726','lv-hard':'#ef5350'};
+  const lvlBg={'lv-easy':'rgba(46,201,81,.12)','lv-med':'rgba(255,160,0,.12)','lv-hard':'rgba(229,57,53,.12)'};
+
+  document.getElementById('fast-detail-content').innerHTML=`
+    <div class="fdm-header">
+      <span class="fdm-badge" style="background:${lvlBg[ft.lvlClass]||'rgba(200,150,12,.12)'};border:1px solid;border-color:${lvlColors[ft.lvlClass]||'var(--gold)'};color:${lvlColors[ft.lvlClass]||'var(--gold2)'}">المستوى: ${ft.level}</span>
+      <div class="fdm-hours">${ft.hours?ft.hours+'س':'5:2'}</div>
+      <div class="fdm-name">${ft.name}</div>
+      <div class="fdm-tagline">${ft.desc}</div>
+    </div>
+
+    <div class="fdm-section">
+      <div class="fdm-sec-title"><i class="fas fa-clock"></i> الجدول اليومي</div>
+      <div class="fdm-timeline">${scheduleHTML}</div>
+    </div>
+
+    <div class="fdm-section">
+      <div class="fdm-sec-title"><i class="fas fa-brain"></i> كيف يعمل</div>
+      <div style="font-size:.8rem;color:var(--txt2);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:10px">${detail.howItWorks}</div>
+    </div>
+
+    <div class="fdm-section">
+      <div class="fdm-sec-title"><i class="fas fa-star"></i> الفوائد</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${benefitsHTML}</div>
+    </div>
+
+    <div class="fdm-section">
+      <div class="fdm-sec-title"><i class="fas fa-utensils"></i> خطة الوجبات بعد الإفطار</div>
+      ${bmiBox}
+      ${!bmi?`<div style="font-size:.78rem;color:var(--txt2);padding:10px;background:rgba(255,255,255,.03);border-radius:10px">💡 سجّل وزنك وطولك في حسابك للحصول على خطة مخصصة لك</div>`:''}
+    </div>
+
+    <div class="fdm-section">
+      <div class="fdm-sec-title"><i class="fas fa-lightbulb"></i> نصائح مهمة</div>
+      <div class="fdm-tips">${tipsHTML}</div>
+    </div>
+  `;
+
+  document.getElementById('fast-detail-modal').classList.add('show');
+}
+
+
 const firebaseConfig = {
   apiKey: "AIzaSyBf7IUVNUr7bihe4CqtqUwd3UbNRacq2po",
   authDomain: "daybat-cfa12.firebaseapp.com",
@@ -1683,18 +2079,26 @@ async function doRegister(){
   const user=document.getElementById('r-user').value.trim().replace(/\s/g,'');
   const pass=document.getElementById('r-pass').value;
   const dob=document.getElementById('r-dob').value;
-  if(!name||!user||!pass||!dob){showToast('⚠️ أكمل جميع الحقول');return;}
+  const gender=document.getElementById('r-gender').value;
+  const weight=parseFloat(document.getElementById('r-weight').value);
+  const height=parseFloat(document.getElementById('r-height').value);
+  if(!name||!user||!pass||!dob){showToast('⚠️ أكمل جميع الحقول الأساسية');return;}
+  if(!gender){showToast('⚠️ اختر الجنس');return;}
+  if(!weight||!height||weight<30||height<100){showToast('⚠️ أدخل الوزن والطول بشكل صحيح');return;}
   if(pass.length<6){showToast('⚠️ كلمة السر 6 أحرف على الأقل');return;}
   if(!/^[a-zA-Z0-9_\u0600-\u06FF]+$/.test(user)){showToast('⚠️ اسم المستخدم بدون مسافات أو رموز');return;}
   const diseases=[];
   document.querySelectorAll('.dis-item.sel input').forEach(cb=>diseases.push(cb.value));
+  const bmi=calcBMI(weight,height);
+  const bmiCat=getBMICategory(bmi);
   try{
     const snap=await db.ref('users/'+user).get();
     if(snap.exists()){showToast('❌ اسم المستخدم موجود مسبقاً');return;}
     const userData={
       name,username:user,
       password:btoa(pass),
-      dob,diseases,
+      dob,gender,weight,height,bmi:parseFloat(bmi.toFixed(1)),bmiCategory:bmiCat.cat,
+      diseases,
       fastingStats:{},
       createdAt:Date.now()
     };
@@ -1775,7 +2179,12 @@ function buildHome(){
 
   // Age
   const age=calcAge(u.dob);
-  document.getElementById('h-age').textContent=`${age} سنة • ${new Date(u.dob).toLocaleDateString('ar-EG')}`;
+  let ageStr=`${age} سنة`;
+  if(u.bmi){
+    const cat=getBMICategory(u.bmi);
+    ageStr+=` • BMI: ${u.bmi.toFixed(1)} ${cat.emoji} ${cat.label}`;
+  }
+  document.getElementById('h-age').textContent=ageStr;
 
   // Disease tags
   const dmap={sugar:{icon:'🩸',lbl:'سكري'},pressure:{icon:'💉',lbl:'ضغط'},heart:{icon:'❤️',lbl:'قلب'}};
@@ -1915,14 +2324,18 @@ function toggleExpand(id){
 function buildFastingTypes(){
   const el=document.getElementById('fast-types-list');
   el.innerHTML=FAST_TYPES.map(f=>`
-    <div class="fast-card" id="fc-type-${f.id}" onclick="selectFast('${f.id}')">
-      <div class="fc-row">
+    <div class="fast-card" id="fc-type-${f.id}">
+      <div class="fc-row" onclick="selectFast('${f.id}')">
         <div class="fc-hrs">${f.hours?f.hours+'س':'5:2'}</div>
         <div class="fc-details">
           <div class="fc-dname">${f.name}</div>
           <div class="fc-ddesc">${f.desc}</div>
           <span class="fc-level ${f.lvlClass}">المستوى: ${f.level}</span>
         </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="selectFast('${f.id}')" style="flex:1;padding:8px;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);border-radius:10px;color:var(--gold2);font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">▶ اختر واعدّ العداد</button>
+        <button onclick="openFastDetail('${f.id}')" style="flex:1;padding:8px;background:rgba(33,150,243,.1);border:1px solid rgba(33,150,243,.3);border-radius:10px;color:#64b5f6;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">📖 شرح كامل + الأكل</button>
       </div>
     </div>`).join('');
 }
@@ -2076,6 +2489,13 @@ function buildProfile(){
   document.getElementById('pp-user').textContent=u.username;
   document.getElementById('pp-dob').textContent=new Date(u.dob).toLocaleDateString('ar-EG');
   document.getElementById('pp-age').textContent=calcAge(u.dob)+' سنة';
+  document.getElementById('pp-weight').textContent=u.weight?u.weight+' كجم':'-';
+  document.getElementById('pp-height').textContent=u.height?u.height+' سم':'-';
+  if(u.bmi){
+    const cat=getBMICategory(u.bmi);
+    document.getElementById('pp-bmi').textContent=u.bmi.toFixed(1);
+    document.getElementById('pp-bmicat').innerHTML=`<span style="color:${cat.color}">${cat.emoji} ${cat.label}</span>`;
+  }
 
   const dmap={sugar:'🩸 مرض السكري',pressure:'💉 ارتفاع الضغط',heart:'❤️ أمراض القلب'};
   const ddiv=document.getElementById('pp-diseases');
