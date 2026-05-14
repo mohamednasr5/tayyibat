@@ -92,12 +92,17 @@ body{
 }
 
 /* ═══════════════════════════════════════
-   PAGES SYSTEM
+   PAGES SYSTEM — fully isolated, no bleed
 ═══════════════════════════════════════ */
 .page{
-  position:relative;z-index:1;
-  min-height:100vh;
+  position:fixed;
+  inset:0;
+  z-index:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
   display:none;
+  padding-bottom:var(--nav);
 }
 .page.active{display:block;animation:fadeUp .45s ease}
 
@@ -1736,10 +1741,12 @@ function enterApp(){
    PAGE NAVIGATION
 ═══════════════════════════════════════ */
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('active');
+    p.scrollTop=0;
+  });
   const pg=document.getElementById(id+'-page');
-  if(pg)pg.classList.add('active');
-  window.scrollTo(0,0);
+  if(pg){pg.classList.add('active');pg.scrollTop=0;}
 }
 
 function navTo(id){
