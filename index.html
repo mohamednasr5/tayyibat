@@ -25,6 +25,24 @@
 
 <title>طيبات | نظام صحي ذكي</title>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBf7IUVNUr7bihe4CqtqUwd3UbNRacq2po",
+    authDomain: "daybat-cfa12.firebaseapp.com",
+    databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com",
+    projectId: "daybat-cfa12",
+    storageBucket: "daybat-cfa12.firebasestorage.app",
+    messagingSenderId: "278890052232",
+    appId: "1:278890052232:web:06d85004268fdf9f4afd3d",
+    measurementId: "G-9BYDWEMR33"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -1609,17 +1627,68 @@ function toggleSound(){
 }
 
 /* ═══════════════════════════════════════════════
-   DATA & USERS (localStorage only — no Firebase needed)
+   DATA & USERS — Firebase Realtime Database
+   البيانات محفوظة في السحابة — لا تُمسح بمسح الكوكيز
 ═══════════════════════════════════════════════ */
 let currentUser = null;
 let selectedFast = null;
 let fastInterval = null;
 let fastStartTime = null;
 
-function getUsers(){ return JSON.parse(localStorage.getItem('tayyibat_users')||'{}') }
-function saveUsers(u){ localStorage.setItem('tayyibat_users',JSON.stringify(u)) }
+/* ── مساعدات session (مؤقتة فقط لتذكر المستخدم الحالي) ── */
 function getSession(){ return localStorage.getItem('tayyibat_session') }
 function saveSession(u){ localStorage.setItem('tayyibat_session',u) }
+function clearSession(){ localStorage.removeItem('tayyibat_session') }
+
+/* ── Firebase helpers ── */
+function fbRef(path){ return db.ref(path) }
+
+async function fbGetUser(username){
+  // تحويل نقاط الاستخدام غير المسموحة في Firebase keys
+  const key = username.replace(/\./g,'_dot_');
+  const snap = await fbRef('users/'+key).once('value');
+  return snap.val();
+}
+
+async function fbSaveUser(userData){
+  const key = userData.username.replace(/\./g,'_dot_');
+  await fbRef('users/'+key).set(userData);
+}
+
+async function fbUserExists(username){
+  const u = await fbGetUser(username);
+  return u !== null;
+}
+
+/* سجلات الصيام في Firebase */
+async function fbSaveFastRecord(record){
+  if(!currentUser) return;
+  const key = currentUser.username.replace(/\./g,'_dot_');
+  await fbRef('fast_records/'+key).push(record);
+}
+
+async function fbLoadFastRecords(){
+  if(!currentUser) return [];
+  const key = currentUser.username.replace(/\./g,'_dot_');
+  const snap = await fbRef('fast_records/'+key).once('value');
+  const val = snap.val();
+  if(!val) return [];
+  return Object.values(val);
+}
+
+/* ── Spinner داخل الزر ── */
+function setBtnLoading(btnId, loading, originalText=''){
+  const btn = document.getElementById(btnId);
+  if(!btn) return;
+  if(loading){
+    btn.disabled = true;
+    btn.dataset.orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.orig || originalText;
+  }
+}
 
 /* ═══════════════════════════════════════════════
    AUTH
@@ -1655,44 +1724,58 @@ function toggleDis(key){
   playSound('click');
 }
 
-function doLogin(){
-  const u = document.getElementById('l-user').value.trim();
+async function doLogin(){
+  const u = document.getElementById('l-user').value.trim().toLowerCase();
   const p = document.getElementById('l-pass').value;
   if(!u||!p){ showToast('❌ أدخل اسم المستخدم وكلمة المرور'); return; }
-  const users = getUsers();
-  if(!users[u]||users[u].password!==btoa(p)){
-    showToast('❌ اسم المستخدم أو كلمة المرور غير صحيحة'); return;
+  setBtnLoading('btn-login', true);
+  try {
+    const userData = await fbGetUser(u);
+    if(!userData || userData.password !== btoa(p)){
+      showToast('❌ اسم المستخدم أو كلمة المرور غير صحيحة');
+      setBtnLoading('btn-login', false);
+      return;
+    }
+    saveSession(u);
+    currentUser = userData;
+    playSound('success');
+    bootApp();
+  } catch(e){
+    showToast('❌ خطأ في الاتصال بالخادم');
+    setBtnLoading('btn-login', false);
   }
-  saveSession(u);
-  currentUser = users[u];
-  playSound('success');
-  bootApp();
 }
 
-function doRegister(){
-  const name = document.getElementById('r-name').value.trim();
-  const user = document.getElementById('r-user').value.trim();
-  const pass = document.getElementById('r-pass').value;
-  const dob  = document.getElementById('r-dob').value;
+async function doRegister(){
+  const name   = document.getElementById('r-name').value.trim();
+  const user   = document.getElementById('r-user').value.trim().toLowerCase();
+  const pass   = document.getElementById('r-pass').value;
+  const dob    = document.getElementById('r-dob').value;
   const gender = document.getElementById('r-gender').value;
-  const w    = parseFloat(document.getElementById('r-weight').value)||0;
-  const h    = parseFloat(document.getElementById('r-height').value)||0;
+  const w      = parseFloat(document.getElementById('r-weight').value)||0;
+  const h      = parseFloat(document.getElementById('r-height').value)||0;
   if(!name||!user||!pass||!dob){ showToast('❌ أكمل جميع الحقول'); return; }
   if(!gender){ showToast('❌ اختر الجنس'); return; }
   if(pass.length<6){ showToast('❌ كلمة المرور 6 أحرف على الأقل'); return; }
-  const users = getUsers();
-  if(users[user]){ showToast('❌ اسم المستخدم محجوز'); return; }
-  const bmi = w&&h? +(w/((h/100)**2)).toFixed(1):0;
-  users[user]={name,username:user,password:btoa(pass),dob,gender,weight:w,height:h,bmi,diseases:selectedDiseases,created:Date.now()};
-  saveUsers(users);
-  saveSession(user);
-  currentUser=users[user];
-  playSound('success');
-  bootApp();
+  setBtnLoading('btn-register', true);
+  try {
+    const exists = await fbUserExists(user);
+    if(exists){ showToast('❌ اسم المستخدم محجوز'); setBtnLoading('btn-register',false); return; }
+    const bmi = w&&h ? +(w/((h/100)**2)).toFixed(1) : 0;
+    const userData = {name,username:user,password:btoa(pass),dob,gender,weight:w,height:h,bmi,diseases:selectedDiseases,created:Date.now()};
+    await fbSaveUser(userData);
+    saveSession(user);
+    currentUser = userData;
+    playSound('success');
+    bootApp();
+  } catch(e){
+    showToast('❌ خطأ في الاتصال بالخادم');
+    setBtnLoading('btn-register', false);
+  }
 }
 
 function doLogout(){
-  localStorage.removeItem('tayyibat_session');
+  clearSession();
   currentUser=null; selectedFast=null;
   if(fastInterval){clearInterval(fastInterval);fastInterval=null;}
   document.getElementById('bottom-nav').classList.remove('show');
@@ -1700,11 +1783,13 @@ function doLogout(){
   showToast('👋 تم تسجيل الخروج');
 }
 
-function autoLogin(){
+async function autoLogin(){
   const s = getSession();
   if(s){
-    const users=getUsers();
-    if(users[s]){currentUser=users[s];bootApp();return;}
+    try{
+      const userData = await fbGetUser(s);
+      if(userData){ currentUser=userData; bootApp(); return; }
+    }catch(e){}
   }
   hideLoader();
 }
@@ -2292,14 +2377,24 @@ function resetFast(){
   document.getElementById('btn-stop').disabled=true;
 }
 
-function saveFastRecord(hrs){
-  const records=JSON.parse(localStorage.getItem('fast_records')||'[]');
-  records.push({date:new Date().toISOString(),hrs,type:selectedFast?.id});
-  localStorage.setItem('fast_records',JSON.stringify(records));
+async function saveFastRecord(hrs){
+  const record = {date:new Date().toISOString(), hrs, type:selectedFast?.id};
+  // حفظ في Firebase
+  await fbSaveFastRecord(record).catch(()=>{});
+  // نسخة محلية احتياطية للسرعة
+  const local = JSON.parse(localStorage.getItem('fast_records_local')||'[]');
+  local.push(record);
+  localStorage.setItem('fast_records_local', JSON.stringify(local));
 }
 
-function loadFastStats(){
-  const records=JSON.parse(localStorage.getItem('fast_records')||'[]');
+async function loadFastStats(){
+  let records = [];
+  try {
+    records = await fbLoadFastRecords();
+  } catch(e){
+    // fallback to local cache
+    records = JSON.parse(localStorage.getItem('fast_records_local')||'[]');
+  }
   const now=new Date();
   const today=now.toDateString();
   const weekAgo=Date.now()-7*86400000;
@@ -2429,18 +2524,20 @@ function openEditProfile(){
   playSound('click');
 }
 
-function saveProfileEdit(){
+async function saveProfileEdit(){
   const name=document.getElementById('edit-name').value.trim();
   const dob=document.getElementById('edit-dob').value;
   if(!name){showToast('❌ أدخل الاسم');return;}
-  const users=getUsers();
-  users[currentUser.username].name=name;
-  users[currentUser.username].dob=dob;
-  saveUsers(users);
-  currentUser=users[currentUser.username];
-  buildProfile();buildHomeDisTags();buildMedicalAlerts();
-  closeModal('edit-profile-modal');
-  playSound('success');showToast('✅ تم حفظ البيانات');
+  setBtnLoading('btn-save-profile',true);
+  try{
+    const updated = {...currentUser, name, dob};
+    await fbSaveUser(updated);
+    currentUser = updated;
+    buildProfile();buildHomeDisTags();buildMedicalAlerts();
+    closeModal('edit-profile-modal');
+    playSound('success');showToast('✅ تم حفظ البيانات');
+  }catch(e){showToast('❌ خطأ في الحفظ');}
+  setBtnLoading('btn-save-profile',false);
 }
 
 function openEditHealth(){
@@ -2451,19 +2548,20 @@ function openEditHealth(){
   playSound('click');
 }
 
-function saveHealthEdit(){
+async function saveHealthEdit(){
   const w=parseFloat(document.getElementById('edit-weight').value)||0;
   const h=parseFloat(document.getElementById('edit-height').value)||0;
   const bmi=w&&h?+(w/((h/100)**2)).toFixed(1):0;
-  const users=getUsers();
-  users[currentUser.username].weight=w;
-  users[currentUser.username].height=h;
-  users[currentUser.username].bmi=bmi;
-  saveUsers(users);
-  currentUser=users[currentUser.username];
-  buildProfile();
-  closeModal('edit-health-modal');
-  playSound('success');showToast('✅ تم حفظ البيانات الصحية');
+  setBtnLoading('btn-save-health',true);
+  try{
+    const updated = {...currentUser, weight:w, height:h, bmi};
+    await fbSaveUser(updated);
+    currentUser = updated;
+    buildProfile();
+    closeModal('edit-health-modal');
+    playSound('success');showToast('✅ تم حفظ البيانات الصحية');
+  }catch(e){showToast('❌ خطأ في الحفظ');}
+  setBtnLoading('btn-save-health',false);
 }
 
 function openEditDiseases(){
@@ -2491,14 +2589,17 @@ function toggleEditDis(key){
   playSound('click');
 }
 
-function saveDiseasesEdit(){
-  const users=getUsers();
-  users[currentUser.username].diseases=editDiseases;
-  saveUsers(users);
-  currentUser=users[currentUser.username];
-  buildProfile();buildHomeDisTags();buildMedicalAlerts();buildTips();
-  closeModal('edit-diseases-modal');
-  playSound('success');showToast('✅ تم تحديث الحالة الصحية');
+async function saveDiseasesEdit(){
+  setBtnLoading('btn-save-diseases',true);
+  try{
+    const updated = {...currentUser, diseases:editDiseases};
+    await fbSaveUser(updated);
+    currentUser = updated;
+    buildProfile();buildHomeDisTags();buildMedicalAlerts();buildTips();
+    closeModal('edit-diseases-modal');
+    playSound('success');showToast('✅ تم تحديث الحالة الصحية');
+  }catch(e){showToast('❌ خطأ في الحفظ');}
+  setBtnLoading('btn-save-diseases',false);
 }
 
 /* ═══════════════════════════════════════════════
