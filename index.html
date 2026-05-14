@@ -849,6 +849,14 @@ body{
         <label>تاريخ الميلاد</label>
         <input type="date" id="r-dob">
       </div>
+      <div class="field">
+        <label>الجنس</label>
+        <select id="r-gender">
+          <option value="">اختر الجنس</option>
+          <option value="male">👨 ذكر</option>
+          <option value="female">👩 أنثى</option>
+        </select>
+      </div>
       <div class="field-row">
         <div class="field">
           <label>الوزن (كجم)</label>
@@ -1527,14 +1535,16 @@ function doRegister(){
   const user = document.getElementById('r-user').value.trim();
   const pass = document.getElementById('r-pass').value;
   const dob  = document.getElementById('r-dob').value;
+  const gender = document.getElementById('r-gender').value;
   const w    = parseFloat(document.getElementById('r-weight').value)||0;
   const h    = parseFloat(document.getElementById('r-height').value)||0;
   if(!name||!user||!pass||!dob){ showToast('❌ أكمل جميع الحقول'); return; }
+  if(!gender){ showToast('❌ اختر الجنس'); return; }
   if(pass.length<6){ showToast('❌ كلمة المرور 6 أحرف على الأقل'); return; }
   const users = getUsers();
   if(users[user]){ showToast('❌ اسم المستخدم محجوز'); return; }
   const bmi = w&&h? +(w/((h/100)**2)).toFixed(1):0;
-  users[user]={name,username:user,password:btoa(pass),dob,weight:w,height:h,bmi,diseases:selectedDiseases,created:Date.now()};
+  users[user]={name,username:user,password:btoa(pass),dob,gender,weight:w,height:h,bmi,diseases:selectedDiseases,created:Date.now()};
   saveUsers(users);
   saveSession(user);
   currentUser=users[user];
@@ -1797,64 +1807,72 @@ function nextTip(){
    FOOD DATA
 ═══════════════════════════════════════════════ */
 const FOOD_DATA=[
-  {id:1,emoji:'🥩',name:'اللحوم الحمراء',cat:'بروتين',status:'allowed',desc:'مصدر ممتاز للبروتين والحديد والزنك',reason:'البروتين الكامل ضروري لبناء العضلات واصلاح الخلايا',ytSearch:'دكتور ضياء العوضي اللحوم الحمراء',sugar:'⚠️ تناول باعتدال - الدهون تبطئ امتصاص السكر',pressure:'⚠️ اختر اللحوم الخالية من الدهون',chemo:'✅ ضروري لإصلاح الأنسجة أثناء العلاج',heart:'⚠️ تجنب الدهون المشبعة الزائدة'},
-  {id:2,emoji:'🐟',name:'السمك (السلمون، التونة)',cat:'بروتين',status:'allowed',desc:'غني بالأوميجا 3 والبروتين والفيتامين D',reason:'الأوميجا 3 يحمي القلب ويقلل الالتهابات',ytSearch:'دكتور ضياء العوضي السمك والأوميجا 3',sugar:'✅ ممتاز لمريض السكر',pressure:'✅ يخفض الكوليسترول والضغط',chemo:'✅ يقوي المناعة أثناء العلاج',heart:'✅ الأفضل لصحة القلب'},
-  {id:3,emoji:'🥚',name:'البيض',cat:'بروتين',status:'allowed',desc:'بروتين كامل وفيتامين B12 وكولين',reason:'أفضل مصدر للبروتين الحيواني الكامل',ytSearch:'دكتور ضياء العوضي البيض فوائد',sugar:'✅ لا يرفع السكر',pressure:'✅ 2-3 بيضات يومياً آمنة',chemo:'✅ سهل الهضم وغني بالتغذية'},
-  {id:4,emoji:'🥑',name:'الأفوكادو',cat:'دهون صحية',status:'allowed',desc:'دهون أحادية غير مشبعة وبوتاسيوم وفيبر',reason:'يخفض الكوليسترول الضار ويرفع الجيد',ytSearch:'دكتور ضياء العوضي الأفوكادو',sugar:'✅ مثالي - لا يرفع السكر',pressure:'✅ البوتاسيوم يخفض الضغط'},
-  {id:5,emoji:'🥦',name:'البروكلي',cat:'خضروات',status:'allowed',desc:'سلفورافان، فيتامين C وK ومضادات الأكسدة',reason:'مضادات الأكسدة القوية تحمي خلايا الجسم',ytSearch:'دكتور ضياء العوضي البروكلي',sugar:'✅ مؤشر جلايسيمي منخفض',allergy:'✅ نادراً ما يسبب حساسية',chemo:'✅ السلفورافان يحارب الخلايا السرطانية'},
-  {id:6,emoji:'🧄',name:'الثوم',cat:'توابل',status:'allowed',desc:'الأليسين مضاد طبيعي للالتهاب والبكتيريا',reason:'يحسن المناعة ويخفض الضغط والكوليسترول',ytSearch:'دكتور ضياء العوضي الثوم فوائد',sugar:'✅ يساعد في تنظيم السكر',pressure:'✅ يخفض ضغط الدم بشكل طبيعي'},
-  {id:7,emoji:'🫐',name:'التوت الأزرق',cat:'فواكه',status:'allowed',desc:'أنثوسيانين قوي ومضادات أكسدة',reason:'أقوى مضادات الأكسدة في الفواكه',ytSearch:'دكتور ضياء العوضي التوت فوائد',sugar:'⚠️ كميات صغيرة - يحتوي سكر طبيعي',chemo:'✅ يحمي الخلايا السليمة أثناء الكيماوي'},
-  {id:8,emoji:'🌰',name:'المكسرات (جوز، لوز)',cat:'مكسرات',status:'allowed',desc:'دهون صحية وبروتين وفيبر ومغنيسيوم',reason:'يخفض الكوليسترول ويحسن صحة القلب',ytSearch:'دكتور ضياء العوضي المكسرات',sugar:'⚠️ حصة يد واحدة يومياً',pressure:'✅ المغنيسيوم يخفض الضغط',kidney:'⚠️ تجنب المفرط - عالي الفوسفور'},
-  {id:9,emoji:'🍬',name:'السكر والحلويات',cat:'سكريات',status:'forbidden',desc:'سكروز وفركتوز يرفعان السكر بسرعة',reason:'يسبب ارتفاع حاد في الأنسولين وإدمان السكر — ابتعد تماماً في نظام الطيبات',ytSearch:'دكتور ضياء العوضي السكر أضرار',sugar:'❌ ممنوع تماماً',pressure:'⚠️ يزيد الوزن ويرفع الضغط',chemo:'⚠️ السكر يغذي خلايا السرطان'},
-  {id:10,emoji:'🥤',name:'المشروبات الغازية',cat:'مشروبات',status:'forbidden',desc:'سكر مكرر وثاني أكسيد الكربون وأحماض',reason:'200 سعرة فارغة بدون قيمة غذائية — ممنوع في نظام الطيبات',ytSearch:'دكتور ضياء العوضي المشروبات الغازية أضرار',sugar:'❌ ترفع السكر بشدة',pressure:'❌ الصوديوم يرفع الضغط',kidney:'❌ تحمض البول وتسبب الحصوات'},
-  {id:11,emoji:'🍞',name:'الخبز الأبيض والمعجنات',cat:'كربوهيدرات',status:'forbidden',desc:'دقيق مكرر مرتفع المؤشر الجلايسيمي',reason:'يرفع السكر كالسكر الخالص — ابتعد عنه في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الخبز الأبيض والدقيق المكرر',sugar:'❌ ممنوع استبدل بالشوفان',pressure:'⚠️ قلل الكميات',chemo:'⚠️ قلل - يسبب الالتهاب'},
-  {id:12,emoji:'🛢️',name:'الزيوت المهدرجة والمقليات',cat:'دهون',status:'forbidden',desc:'دهون متحولة ترفع الكوليسترول الضار',reason:'أخطر الدهون على القلب — ممنوع تماماً في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الزيوت المهدرجة أضرار',heart:'❌ ممنوع تماماً',pressure:'❌ يرفع الكوليسترول',sugar:'❌ يزيد مقاومة الإنسولين'},
-  {id:13,emoji:'🫒',name:'زيت الزيتون البكر',cat:'دهون صحية',status:'allowed',desc:'حمض الأوليك وبوليفينول قوية',reason:'الذهب السائل — ركيزة أساسية في نظام الطيبات',ytSearch:'دكتور ضياء العوضي زيت الزيتون',heart:'✅ يخفض الكوليسترول الضار',pressure:'✅ يرون الأوعية الدموية',sugar:'✅ يحسن حساسية الإنسولين'},
-  {id:14,emoji:'🌿',name:'الكركم',cat:'توابل',status:'allowed',desc:'الكركومين مضاد التهاب الأقوى طبيعياً',reason:'مضاد التهاب طبيعي قوي — موصى به بشدة في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الكركم فوائد',chemo:'✅ يعزز مفعول العلاج الكيماوي',allergy:'✅ مضاد طبيعي للحساسية',sugar:'✅ يحسن حساسية الإنسولين'},
-  {id:15,emoji:'🍳',name:'اللحوم المصنعة (سجق، نقانق)',cat:'بروتين',status:'forbidden',desc:'نترات وصوديوم وإضافات مصنعة',reason:'مرتبطة بسرطان القولون — ممنوع كلياً في نظام الطيبات',ytSearch:'دكتور ضياء العوضي اللحوم المصنعة أضرار',chemo:'❌ ممنوع تماماً - يزيد خطر السرطان',heart:'❌ الصوديوم والدهون خطيرة',pressure:'❌ الصوديوم يرفع الضغط بشدة'},
-  {id:16,emoji:'🍯',name:'العسل الطبيعي',cat:'محليات',status:'allowed',desc:'مضادات أكسدة وأنزيمات وخصائص مضادة للميكروبات',reason:'محلي طبيعي مسموح بكميات معتدلة في نظام الطيبات',ytSearch:'دكتور ضياء العوضي العسل فوائد',sugar:'⚠️ ملعقة صغيرة فقط',chemo:'✅ يقوي المناعة ويلطف الحلق'},
-  {id:17,emoji:'🥛',name:'الألبان المبستر والأجبان المصنعة',cat:'مشتقات',status:'forbidden',desc:'مواد حافظة وبكتيريا وهرمونات صناعية',reason:'الألبان المعالجة وغير الطازجة ممنوعة في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الحليب والألبان',sugar:'❌ الكازين يعيق امتصاص الإنسولين',allergy:'❌ مصدر شائع للحساسية'},
-  {id:18,emoji:'🌾',name:'الشوفان الطبيعي',cat:'كربوهيدرات',status:'allowed',desc:'بيتا جلوكان وفيبر قابل للذوبان وبروتين نباتي',reason:'كربوهيدرات معقدة تبطئ امتصاص السكر — بديل ممتاز للخبز',ytSearch:'دكتور ضياء العوضي الشوفان فوائد',sugar:'✅ يبطئ ارتفاع السكر',pressure:'✅ يخفض الكوليسترول',heart:'✅ يحمي الأوعية الدموية'},
-  {id:19,emoji:'🍋',name:'الليمون والحمضيات',cat:'فواكه',status:'allowed',desc:'فيتامين C وفلافونويد وليمونين',reason:'يدعم المناعة ويقلى الالتهاب — مُرحَّب به في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الليمون فوائد',chemo:'✅ فيتامين C يدعم خلايا الدم البيضاء',allergy:'✅ مضاد للالتهاب'},
-  {id:20,emoji:'🍚',name:'الأرز الأبيض المكرر',cat:'كربوهيدرات',status:'forbidden',desc:'نشا مكرر عالي المؤشر الجلايسيمي',reason:'يرفع السكر سريعاً — استبدله بالأرز البني أو الشوفان',ytSearch:'دكتور ضياء العوضي الأرز الأبيض',sugar:'❌ مرتفع المؤشر الجلايسيمي',pressure:'⚠️ قلل الكميات'},
-  {id:21,emoji:'🧈',name:'الزبدة والسمن الصناعي',cat:'دهون',status:'forbidden',desc:'دهون مشبعة ومتحولة وكوليسترول مرتفع',reason:'الدهون المشبعة الزائدة ممنوعة — استبدل بزيت الزيتون',ytSearch:'دكتور ضياء العوضي الزبدة والدهون',heart:'❌ يرفع الكوليسترول الضار',pressure:'❌ يُثقل الأوعية الدموية'},
-  {id:22,emoji:'🥬',name:'السبانخ والخضروات الورقية',cat:'خضروات',status:'allowed',desc:'حديد ومغنيسيوم وفيتامين K وحمض فوليك',reason:'الخضروات الورقية الداكنة مُوصى بها بشدة في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الخضروات الورقية',sugar:'✅ مؤشر جلايسيمي صفري تقريباً',chemo:'✅ يعزز بناء خلايا الدم'},
-  {id:23,emoji:'☕',name:'القهوة والكافيين الزائد',cat:'مشروبات',status:'forbidden',desc:'مثير للأعصاب يرفع الكورتيزول والأدرينالين',reason:'الكمية الزائدة من الكافيين مُقلِّقة للنوم وضارة — الطيبات تُوصي بالتقليل',ytSearch:'دكتور ضياء العوضي القهوة والكافيين',pressure:'❌ يرفع ضغط الدم مؤقتاً',heart:'⚠️ تجنب أكثر من كوبين'},
-  {id:24,emoji:'🫚',name:'زيت جوز الهند',cat:'دهون صحية',status:'allowed',desc:'دهون ثلاثية متوسطة السلسلة MCT',reason:'دهون سريعة الحرق — مقبول باعتدال في نظام الطيبات',ytSearch:'دكتور ضياء العوضي زيت جوز الهند',sugar:'✅ لا يرفع الأنسولين',heart:'⚠️ اعتدال في الاستخدام'},
+  {id:1,emoji:'🥩',name:'اللحوم الحمراء (خروف، ماعز، جمل)',cat:'بروتين',status:'allowed',desc:'أفضل مصادر البروتين في نظام الطيبات — خروف وماعز وجمل وبتلو',reason:'الدكتور ضياء يُقدّم لحم الخروف والماعز كأفضل اللحوم — يوم بعد يوم وليس يومياً',ytSearch:'دكتور ضياء العوضي اللحوم الحمراء'},
+  {id:2,emoji:'🐟',name:'السمك البحري (بدون دقيق)',cat:'بروتين',status:'allowed',desc:'أسماك البحر المفترسة — مشوي أو مقلي بدون دقيق',reason:'السمك البحري مسموح كبروتين — يوم بعد يوم — ويُفضّل المشوي',ytSearch:'دكتور ضياء العوضي السمك البحري'},
+  {id:3,emoji:'🕊️',name:'الحمام والسمان فقط',cat:'بروتين',status:'allowed',desc:'الحمام والسمان — الطيور البرية الوحيدة المسموحة',reason:'الاستثناء الوحيد من الطيور — طيور برية غير مُعلَّفة صناعياً',ytSearch:'دكتور ضياء العوضي الحمام السمان'},
+  {id:4,emoji:'🫀',name:'الكبدة والكوارع والأحشاء',cat:'بروتين',status:'allowed',desc:'كبدة خروف، كوارع، لحمة رأس، ممبار، عكاوي — كلها مسموحة',reason:'الأحشاء من اللحوم الحمراء مسموحة تماماً في نظام الطيبات',ytSearch:'دكتور ضياء العوضي الكبدة الكوارع'},
+  {id:5,emoji:'🦞',name:'المأكولات البحرية والكابوريا',cat:'بروتين',status:'allowed',desc:'كابوريا، جراد بحر — مسموحة بدرجة أقل من السمك',reason:'المأكولات البحرية مسموحة — يُقلَّل الجمبري والروبيان',ytSearch:'دكتور ضياء العوضي مأكولات بحرية'},
+  {id:6,emoji:'🐔',name:'الدجاج والدواجن',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً — دجاج، ديك رومي، بط، أوز بجميع أنواعها',reason:'ممنوع في الطيبات — الدواجن تُعلَّف صناعياً بهرمونات مصطنعة. الاستثناء: حمام وسمان فقط',ytSearch:'دكتور ضياء العوضي لماذا الدجاج ممنوع'},
+  {id:7,emoji:'🥚',name:'البيض بجميع أشكاله',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً — مقلي، مسلوق، أومليت، شكشوكة، في المخبوزات',reason:'البيض ممنوع كلياً في نظام الطيبات — من مسببات الالتهاب. استثناء: بيض السمان بكميات قليلة جداً',ytSearch:'دكتور ضياء العوضي لماذا البيض ممنوع'},
+  {id:8,emoji:'🍚',name:'الأرز بجميع أنواعه',cat:'نشويات',status:'allowed',desc:'الأرز الأبيض، البسمتي، الأرز البني — مسموحة جميعاً',reason:'ركيزة نظام الطيبات الأساسية — الأرز يُشبع ويُمد الجسم بطاقة نظيفة',ytSearch:'دكتور ضياء العوضي الأرز'},
+  {id:9,emoji:'🥔',name:'البطاطس بجميع أشكالها',cat:'نشويات',status:'allowed',desc:'مسلوقة، مشوية، مقلية، حلوة — كلها مسموحة',reason:'البطاطس هي الخضروات الأساسية الوحيدة المسموحة — مصدر كربوهيدرات ممتاز',ytSearch:'دكتور ضياء العوضي البطاطس'},
+  {id:10,emoji:'🌽',name:'الذرة والفريك والبرغل',cat:'نشويات',status:'allowed',desc:'الفريك، البرغل، الذرة — حبوب كاملة مسموحة',reason:'الحبوب الكاملة الأصلية مسموحة — بديل جيد عن الدقيق المكرر',ytSearch:'دكتور ضياء العوضي الفريك الذرة'},
+  {id:11,emoji:'🍞',name:'الخبز الأبيض والدقيق المكرر',cat:'نشويات',status:'forbidden',desc:'ممنوع — عيش بلدي، شامي، سوري، فرنساوي، فينو، بيتزا',reason:'الدقيق الأبيض المكرر ممنوع في الطيبات — يُسبب الالتهاب ويرفع السكر',ytSearch:'دكتور ضياء العوضي الدقيق الأبيض ممنوع'},
+  {id:12,emoji:'🍝',name:'المكرونة بجميع أنواعها',cat:'نشويات',status:'forbidden',desc:'ممنوعة — سباغيتي، لازانيا، كانيلوني، حتى القمح الكامل',reason:'المكرونة ممنوعة في الطيبات حتى القمح الكامل — مصدر التهاب مزمن',ytSearch:'دكتور ضياء العوضي المكرونة ممنوعة'},
+  {id:13,emoji:'🫒',name:'زيت الزيتون البكر الممتاز',cat:'دهون صحية',status:'allowed',desc:'أفضل الزيوت في نظام الطيبات — يُستخدم بكثرة',reason:'ركيزة أساسية — زيت الزيتون البكر هو الدهن الأول في نظام الطيبات',ytSearch:'دكتور ضياء العوضي زيت الزيتون'},
+  {id:14,emoji:'🧈',name:'الزبدة والسمن البلدي',cat:'دهون صحية',status:'allowed',desc:'الزبدة الطبيعية والسمن البلدي — مسموحان',reason:'الدهون الحيوانية الطبيعية مسموحة في الطيبات خلافاً للزيوت النباتية المكررة',ytSearch:'دكتور ضياء العوضي الزبدة السمن'},
+  {id:15,emoji:'🛢️',name:'زيت الذرة وعباد الشمس والزيوت النباتية',cat:'دهون',status:'forbidden',desc:'ممنوعة — زيت الذرة، عباد الشمس، فول الصويا، زيت النخيل المكرر',reason:'الزيوت النباتية المكررة ممنوعة تماماً — تُسبب الالتهاب وتُؤثر على الأوعية',ytSearch:'دكتور ضياء العوضي زيوت نباتية ممنوعة'},
+  {id:16,emoji:'🧀',name:'الجبن المطبوخ والمعتق (شيدر، رومي)',cat:'ألبان',status:'allowed',desc:'الأجبان المطبوخة والمعتقة فقط — شيدر، رومي، موتزاريلا',reason:'الأجبان المعتقة والمطبوخة مسموحة — ليست ألبان سائلة طازجة',ytSearch:'دكتور ضياء العوضي الجبن المسموح'},
+  {id:17,emoji:'🥛',name:'الحليب والزبادي والألبان السائلة',cat:'ألبان',status:'forbidden',desc:'ممنوع — حليب بقر، زبادي، لبن رايب، جبن أبيض، قريش طازج',reason:'الألبان السائلة والطازجة ممنوعة كلياً — من أقوى مسببات الالتهاب في الطيبات',ytSearch:'دكتور ضياء العوضي الحليب الألبان ممنوعة'},
+  {id:18,emoji:'🍇',name:'العنب والتين والتمر والمانجو',cat:'فواكه',status:'allowed',desc:'العنب، التين، التمر، المانجو، الفراولة، الجوافة، الرمان (مهروس)',reason:'الفواكه الحلوة الصيفية مسموحة — مصدر طبيعي للطاقة والسكريات الجيدة',ytSearch:'دكتور ضياء العوضي الفواكه المسموحة'},
+  {id:19,emoji:'🍉',name:'البطيخ والبرتقال والكيوي',cat:'فواكه',status:'forbidden',desc:'البطيخ ممنوع تماماً — البرتقال والكيوي والكنتالوب يُقلَّلان',reason:'البطيخ ممنوع تماماً في الطيبات — البرتقال والليمون يُقلَّلان',ytSearch:'دكتور ضياء العوضي البطيخ ممنوع فواكه'},
+  {id:20,emoji:'🍯',name:'العسل الطبيعي والسكر',cat:'محليات',status:'allowed',desc:'العسل الطبيعي والسكر مسموحان في الطيبات بكميات معقولة',reason:'مفاجأة النظام — السكر مسموح لأنه "طاقة نقية" حسب الدكتور ضياء',ytSearch:'دكتور ضياء العوضي السكر والعسل المسموح'},
+  {id:21,emoji:'🧂',name:'خل القصب والملح',cat:'توابل',status:'allowed',desc:'خل القصب (ليس خل التفاح) مُوصى به بشدة — الملح مسموح',reason:'خل القصب من أهم مكونات الطيبات — يُؤخذ على زيت زيتون أو ماء بعد الأكل',ytSearch:'دكتور ضياء العوضي خل القصب فوائد'},
+  {id:22,emoji:'🌿',name:'الكركم والزعتر والبهارات الطبيعية',cat:'توابل',status:'allowed',desc:'الكركم، الزعتر، الكمون، الفلفل الأسود — كلها مسموحة',reason:'التوابل الطبيعية مسموحة — الكركم مضاد التهاب قوي جداً في الطيبات',ytSearch:'دكتور ضياء العوضي الكركم التوابل'},
+  {id:23,emoji:'🥗',name:'الخضروات النيئة والورقية',cat:'خضروات',status:'forbidden',desc:'ممنوع — جرجير، سبانخ، طماطم، خيار، خس، ملوخية، كرنب نيء',reason:'الخضروات النيئة ممنوعة كلياً — الألياف النيئة تُتعب الأمعاء حسب الدكتور ضياء. البديل: مطبوخة',ytSearch:'دكتور ضياء العوضي لماذا الخضروات النيئة ممنوعة'},
+  {id:24,emoji:'🫕',name:'الخضروات المطبوخة جيداً',cat:'خضروات',status:'allowed',desc:'بامية، كوسا، باذنجان، فلفل، قلقاس، قرنبيط — مطبوخة فقط',reason:'الخضروات المطبوخة (المسبكة) فقط هي المسموحة — لا خضراوات نيئة أبداً',ytSearch:'دكتور ضياء العوضي الخضروات المطبوخة'},
+  {id:25,emoji:'🫘',name:'البقوليات (فول، عدس، حمص، فاصوليا)',cat:'بقوليات',status:'forbidden',desc:'ممنوعة تماماً — فول، عدس، حمص، فاصوليا، لوبيا، بازلاء',reason:'البقوليات ممنوعة في الطيبات — تُسبب انتفاخاً وتعب الأمعاء وصعوبة الهضم',ytSearch:'دكتور ضياء العوضي البقوليات ممنوعة'},
+  {id:26,emoji:'🥤',name:'المشروبات الغازية ومشروبات الطاقة',cat:'مشروبات',status:'forbidden',desc:'ممنوعة تماماً — كوكاكولا، بيبسي، مشروبات طاقة',reason:'الغازيات ومشروبات الطاقة ممنوعة كلياً في نظام الطيبات',ytSearch:'دكتور ضياء العوضي المشروبات الغازية ممنوعة'},
+  {id:27,emoji:'🍵',name:'الشاي الأخضر والقهوة',cat:'مشروبات',status:'allowed',desc:'الشاي الأخضر مسموح — القهوة مسموحة باعتدال',reason:'الشاي الأخضر والقهوة مسموحان — الشاي الأخضر مُفضَّل في الطيبات',ytSearch:'دكتور ضياء العوضي الشاي الأخضر القهوة'},
+  {id:28,emoji:'🫖',name:'الشاي الأحمر والأسود',cat:'مشروبات',status:'forbidden',desc:'ممنوع — الشاي الأسود والأحمر — البديل الشاي الأخضر',reason:'الشاي الأسود والأحمر ممنوع في الطيبات — يُستبدل بالشاي الأخضر',ytSearch:'دكتور ضياء العوضي الشاي الأسود ممنوع'},
+  {id:29,emoji:'🍫',name:'البسبوسة وشوكولاتة الحليب',cat:'سكريات',status:'allowed',desc:'البسبوسة وحلويات المولد (الملبن والنوجا) وشوكولاتة الحليب — مسموحة',reason:'بعض الحلويات التقليدية مسموحة في الطيبات — البسبوسة والشوكولاتة بالحليب',ytSearch:'دكتور ضياء العوضي الحلويات المسموحة'},
+  {id:30,emoji:'🍬',name:'الحلويات الصناعية والبسكويت',cat:'سكريات',status:'forbidden',desc:'ممنوع — كيك، بسكويت، كوكيز، شيبسي، برينجلز، شوكولاتة داكنة',reason:'الحلويات الصناعية والمعجنات الحلوة ممنوعة — تحتوي دقيق وإضافات مصنعة',ytSearch:'دكتور ضياء العوضي الحلويات الصناعية ممنوعة'},
+  {id:31,emoji:'🧆',name:'الأطعمة المصنعة والمعلبات',cat:'مصنعات',status:'forbidden',desc:'ممنوعة — سجق، نقانق، فسيخ مصنع، مأكولات جاهزة مصنعة',reason:'المصنعات والمعلبات ممنوعة — تحتوي مواد حافظة ونترات وإضافات ضارة',ytSearch:'دكتور ضياء العوضي المعلبات المصنعات ممنوعة'},
 ];
 
-let activeTab = 'all', searchQuery = '';
+let activeTab = 'all', activeStatus = 'all', searchQuery = '';
 
 function buildFoodData(){
   const tabsEl = document.getElementById('food-tabs');
-  const cats = ['all',...new Set(FOOD_DATA.map(f=>f.cat))];
-  const tabLabels = {all:'الكل'};
-  tabsEl.innerHTML = cats.map(c=>`<div class="ftab${c==='all'?' act':''}" onclick="setFoodTab('${c}')">${tabLabels[c]||c}</div>`).join('');
+  const cats = ['all','allowed','forbidden',...new Set(FOOD_DATA.map(f=>f.cat))];
+  const tabLabels = {all:'🍽️ الكل',allowed:'✅ مسموح',forbidden:'❌ ممنوع'};
+  tabsEl.innerHTML = cats.map(c=>{
+    const isStatus = c==='allowed'||c==='forbidden';
+    const cls = c==='all'?' act':c==='forbidden'?' act-forbidden':'';
+    return `<div class="ftab${cls}" onclick="setFoodTab('${c}')" data-tab="${c}">${tabLabels[c]||c}</div>`;
+  }).join('');
   renderFood();
 }
 
 function setFoodTab(cat){
-  activeTab=cat;
-  document.querySelectorAll('.ftab').forEach(t=>{t.classList.remove('act','act-red')});
-  event.target.classList.add('act');
+  activeTab = cat;
+  if(cat==='allowed'||cat==='forbidden') activeStatus=cat;
+  else activeStatus='all';
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('act','act-forbidden'));
+  const el = document.querySelector(`.ftab[data-tab="${cat}"]`);
+  if(el) el.classList.add(cat==='forbidden'?'act-forbidden':'act');
   renderFood();
 }
 
 function filterFood(){ searchQuery=document.getElementById('food-search').value; renderFood(); }
 
 function renderFood(){
-  const u = currentUser;
-  const diseases = u&&u.diseases||[];
   let foods = FOOD_DATA;
-  if(activeTab!=='all') foods=foods.filter(f=>f.cat===activeTab);
+  if(activeStatus==='allowed') foods=foods.filter(f=>f.status==='allowed');
+  else if(activeStatus==='forbidden') foods=foods.filter(f=>f.status==='forbidden');
+  else if(activeTab!=='all') foods=foods.filter(f=>f.cat===activeTab);
   if(searchQuery) foods=foods.filter(f=>f.name.includes(searchQuery)||f.desc.includes(searchQuery)||f.cat.includes(searchQuery));
   document.getElementById('food-grid').innerHTML = foods.map(f=>{
-    const warns = diseases.map(d=>{
-      if(!f[d]) return '';
-      const cls = f[d].startsWith('❌')?'dw-danger':f[d].startsWith('⚠️')?'dw-caution':'dw-ok';
-      const label = {sugar:'السكري',pressure:'الضغط',allergy:'الحساسية',chemo:'كيماوي',heart:'القلب',kidney:'الكلى'}[d]||d;
-      return `<span class="disease-warn ${cls}">${f[d]} ${label}</span>`;
-    }).join('');
     return `<div class="food-card ${f.status}">
       <div class="fc-top">
         <div class="fc-emoji">${f.emoji}</div>
@@ -1862,7 +1880,6 @@ function renderFood(){
           <div class="fc-name">${f.name}</div>
           <span class="fc-badge ${f.status}">${f.status==='allowed'?'✅ مسموح':'❌ ممنوع'}</span>
           <div class="fc-desc">${f.desc}</div>
-          ${warns}
         </div>
       </div>
       <div class="fc-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.innerHTML=this.nextElementSibling.classList.contains('open')?'▲ إخفاء التفاصيل':'▼ عرض التفاصيل'">▼ عرض التفاصيل</div>
@@ -1870,7 +1887,7 @@ function renderFood(){
         <div class="fc-reason ${f.status==='allowed'?'ok':'bad'}">${f.reason}</div>
         <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(f.ytSearch||'دكتور ضياء العوضي '+f.name)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:9px 16px;background:linear-gradient(135deg,#c00,#ff1744);color:#fff;border-radius:10px;font-size:.8rem;font-weight:700;text-decoration:none;transition:transform .2s,box-shadow .2s;box-shadow:0 3px 12px rgba(255,0,0,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(255,0,0,.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 3px 12px rgba(255,0,0,.3)'">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-          شاهد د. ضياء العوضي يتحدث عن ${f.name}
+          شاهد د. ضياء العوضي عن: ${f.name}
         </a>
       </div>
     </div>`;
