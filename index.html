@@ -2688,6 +2688,10 @@ function buildHome(){
   }
 
   updateFastStats();
+
+  // ── Build personalized medical tips carousel ──
+  buildTipCarousel(u);
+  startTipRotation();
 }
 
 function calcAge(dob){
@@ -2990,6 +2994,39 @@ if('Notification' in window) Notification.requestPermission();
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
+
+/* PWA Install Banner */
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if(!localStorage.getItem('pwa_dismissed')) {
+    setTimeout(() => {
+      const banner = document.getElementById('pwa-banner');
+      if(banner) banner.classList.add('show');
+    }, 3000);
+  }
+});
+
+document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('pwa-banner').classList.remove('show');
+  if(outcome === 'accepted') showToast('✅ تم تثبيت التطبيق بنجاح!');
+});
+
+function dismissPWA() {
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('pwa_dismissed', '1');
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner').classList.remove('show');
+  deferredPrompt = null;
+});
 
 /* ═══════════════════════════════════════
    BOOT
