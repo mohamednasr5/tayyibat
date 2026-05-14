@@ -590,6 +590,50 @@ body{
 .fs-val{font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--blue2),#64b5f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .fs-lbl{font-size:.68rem;color:var(--txt3);margin-top:3px}
 
+/* زر تفاصيل الصيام */
+.fast-detail-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 12px;border-radius:20px;font-size:.68rem;font-weight:700;
+  background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);
+  color:var(--gold2);cursor:pointer;margin-top:8px;
+  font-family:'Tajawal',sans-serif;transition:all .25s;
+}
+.fast-detail-btn:hover{background:rgba(200,150,12,.2);transform:translateY(-1px)}
+
+/* مودال تفاصيل الصيام */
+.fast-modal-body{font-size:.82rem;color:var(--txt2);line-height:1.8}
+.fast-modal-section{margin-bottom:14px}
+.fast-modal-section-title{
+  font-size:.88rem;font-weight:700;color:var(--gold2);
+  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid rgba(200,150,12,.2);padding-bottom:6px;
+}
+.fast-food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}
+.fast-food-item{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:8px 10px;font-size:.72rem;color:var(--txt);
+  display:flex;align-items:center;gap:6px;
+}
+.fast-food-item.ok{border-color:rgba(46,201,81,.3);background:rgba(46,201,81,.06)}
+.fast-food-item.no{border-color:rgba(229,57,53,.3);background:rgba(229,57,53,.06);color:#ef9a9a}
+.fast-schedule-box{
+  background:linear-gradient(135deg,rgba(200,150,12,.08),rgba(200,150,12,.03));
+  border:1px solid rgba(200,150,12,.25);border-radius:12px;padding:12px;
+  margin:8px 0;display:flex;align-items:center;gap:12px;
+}
+.fast-schedule-icon{font-size:2rem;flex-shrink:0}
+.fast-schedule-info{flex:1}
+.fast-schedule-title{font-size:.82rem;font-weight:700;color:var(--gold2)}
+.fast-schedule-sub{font-size:.72rem;color:var(--txt2);margin-top:3px}
+.select-from-modal-btn{
+  width:100%;padding:14px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;
+  cursor:pointer;margin-top:16px;transition:all .3s;
+  box-shadow:0 4px 20px rgba(200,150,12,.3);
+}
+.select-from-modal-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,150,12,.5)}
+
 /* ═══════════════════════════ PROFILE PAGE ═══════════════════════════ */
 .profile-hero{padding:30px 16px 20px;text-align:center}
 .profile-avatar-3d{
@@ -743,6 +787,59 @@ body{
 .sig-text{font-size:.8rem;color:var(--txt2);margin:8px 0;line-height:1.7}
 .sig-name{color:var(--gold2);font-weight:700;font-size:.9rem}
 
+/* توقيع المطور */
+.dev-sig{
+  margin-top:22px;padding-top:18px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.dev-sig-line{
+  width:60px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,150,12,.5),transparent);
+  margin-bottom:6px;
+}
+.dev-sig-label{
+  font-size:.68rem;color:var(--txt3);letter-spacing:.5px;
+  text-transform:uppercase;font-weight:600;
+}
+.dev-sig-heart-wrap{
+  display:inline-block;
+  animation:devHeart .8s ease-in-out infinite;
+  filter:drop-shadow(0 0 6px rgba(229,57,53,.6));
+}
+@keyframes devHeart{
+  0%,100%{transform:scale(1)}
+  14%{transform:scale(1.35)}
+  28%{transform:scale(1)}
+  42%{transform:scale(1.22)}
+  70%{transform:scale(1)}
+}
+.dev-heart{font-size:1.4rem}
+.dev-sig-name{
+  font-family:'Amiri',serif;font-size:1.1rem;font-weight:700;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3),var(--gold2));
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 3s linear infinite;
+  letter-spacing:.3px;
+}
+.dev-sig-fb{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:6px;
+  padding:9px 20px;border-radius:50px;
+  background:linear-gradient(135deg,#1877f2,#0a5dc4);
+  color:#fff;text-decoration:none;
+  font-size:.82rem;font-weight:700;
+  font-family:'Tajawal',sans-serif;
+  box-shadow:0 4px 18px rgba(24,119,242,.35);
+  transition:all .3s;
+}
+.dev-sig-fb:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 28px rgba(24,119,242,.55);
+}
+.dev-sig-fb:active{transform:translateY(0) scale(.97)}
+.dev-sig-fb i{font-size:1.05rem}
+
 /* ═══════════════════════════ SHARE CARD ═══════════════════════════ */
 .share-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:16px}
 .share-card-title{font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
@@ -758,6 +855,26 @@ body{
 .hidden{display:none!important}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
 .text-center{text-align:center}.w100{width:100%}
+
+/* تلوين التحية حسب الوقت */
+.greet-morning{color:#f5c842!important}
+.greet-afternoon{color:#42a5f5!important}
+.greet-evening{color:#ff8a65!important}
+.greet-night{color:#7986cb!important}
+
+/* حالة الجسم badge تحت الاسم */
+.bmi-status-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;
+  margin-bottom:12px;transition:transform .25s;cursor:default;
+  box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+.bmi-status-badge:hover{transform:translateY(-2px)}
+.bsb-under{background:rgba(100,181,246,.15);border:1px solid rgba(100,181,246,.4);color:#64b5f6}
+.bsb-normal{background:rgba(102,187,106,.15);border:1px solid rgba(102,187,106,.4);color:#66bb6a}
+.bsb-over{background:rgba(255,167,38,.15);border:1px solid rgba(255,167,38,.4);color:#ffa726}
+.bsb-obese{background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.4);color:#ef5350}
+
 .search-wrap{padding:8px 16px}
 .search-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:10px 16px 10px 42px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
 .search-input:focus{border-color:var(--gold)}
@@ -973,6 +1090,7 @@ body{
   <div class="home-hero">
     <div class="hero-greeting" id="hero-greeting">مرحباً بك،</div>
     <div class="hero-name" id="pp-name">-</div>
+    <div id="hero-bmi-status"></div>
     <div class="hero-bmi-wrap" id="bmi-hero-wrap">
       <i class="fas fa-weight"></i> <span id="bmi-hero-val">--</span>
     </div>
@@ -1016,6 +1134,20 @@ body{
     <div class="heart-wrap">♥</div>
     <div class="sig-text">نظام الطيبات الغذائي<br><span class="sig-name">للدكتور ضياء العوضي رحمه الله</span></div>
     <div style="font-size:.72rem;color:var(--txt3);margin-top:6px">نظام صحي ذكي مع رعاية إلهية</div>
+
+    <!-- Developer Signature -->
+    <div class="dev-sig">
+      <div class="dev-sig-line"></div>
+      <div class="dev-sig-label">برمجة وتطوير</div>
+      <div class="dev-sig-heart-wrap">
+        <span class="dev-heart">❤️</span>
+      </div>
+      <div class="dev-sig-name">المهندس محمد حماد</div>
+      <a class="dev-sig-fb" href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener">
+        <i class="fab fa-facebook"></i>
+        <span>تواصل معنا على فيسبوك</span>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -1232,6 +1364,13 @@ body{
     </div>
     <button class="btn btn-gold mt16" onclick="saveDiseasesEdit()"><i class="fas fa-save"></i> حفظ</button>
     <button class="modal-close" onclick="closeModal('edit-diseases-modal')">إغلاق</button>
+  </div>
+</div>
+
+<!-- ═══════════════ FASTING DETAIL MODAL ═══════════════ -->
+<div class="modal-overlay" id="fast-detail-modal">
+  <div class="modal-box" id="fast-detail-content">
+    <!-- يُبنى ديناميكياً -->
   </div>
 </div>
 
@@ -1581,36 +1720,57 @@ function bootApp(){
   buildHomeDisTags();
   buildMedicalAlerts();
   loadFastStats();
-  updateEgyptGreeting();
+  startGreetingSync();
   document.getElementById('bottom-nav').classList.add('show');
   goPage('home');
   hideLoader();
 }
 
 /* ═══════════════════════════════════════════════
-   EGYPT TIME GREETING
+   EGYPT TIME GREETING — مزامنة تلقائية مع توقيت مصر
 ═══════════════════════════════════════════════ */
+let greetingTimer = null;
+
+function getEgyptHour(){
+  // Africa/Cairo: UTC+2 شتاء، UTC+3 صيف (تلقائي مع Intl)
+  const now = new Date();
+  return parseInt(now.toLocaleString('en-US', {timeZone:'Africa/Cairo', hour:'numeric', hour12:false}), 10);
+}
+
 function updateEgyptGreeting(){
   const greetEl = document.getElementById('hero-greeting');
   if(!greetEl) return;
-  // Egypt is UTC+2 (or UTC+3 during daylight saving - EET/EEST)
-  const now = new Date();
-  const egyptTime = new Date(now.toLocaleString('en-US', {timeZone: 'Africa/Cairo'}));
-  const hour = egyptTime.getHours();
-  let greeting;
+  const hour = getEgyptHour();
+  let greeting, greetClass;
   if(hour >= 5 && hour < 12){
     greeting = '☀️ صباح الخير،';
-  } else if(hour >= 12 && hour < 18){
+    greetClass = 'greet-morning';
+  } else if(hour >= 12 && hour < 17){
     greeting = '🌤️ مساء الخير،';
-  } else if(hour >= 18 && hour < 21){
+    greetClass = 'greet-afternoon';
+  } else if(hour >= 17 && hour < 21){
     greeting = '🌆 مساء النور،';
+    greetClass = 'greet-evening';
   } else {
-    greeting = '🌙 مساء الخير،';
+    greeting = '🌙 تصبح على خير،';
+    greetClass = 'greet-night';
   }
   greetEl.textContent = greeting;
-  // Also update the greeting in pp-name element below
+  greetEl.className = 'hero-greeting ' + greetClass;
+  // اسم المستخدم في الشريط العلوي
   const ppName = document.getElementById('pp-name');
   if(ppName && currentUser) ppName.textContent = currentUser.name;
+}
+
+function startGreetingSync(){
+  updateEgyptGreeting();
+  // مزامنة عند بداية الدقيقة القادمة بالضبط
+  const now = new Date();
+  const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+  setTimeout(()=>{
+    updateEgyptGreeting();
+    greetingTimer = setInterval(updateEgyptGreeting, 60000);
+  }, msToNextMinute);
 }
 
 /* ═══════════════════════════════════════════════
@@ -1898,11 +2058,71 @@ function renderFood(){
    FASTING
 ═══════════════════════════════════════════════ */
 const FAST_TYPES=[
-  {id:'16_8',hrs:16,name:'16/8 - للمبتدئين',desc:'16 ساعة صيام و8 ساعات أكل. الأكثر شيوعاً وسهولة',level:'lv-easy',emoji:'🟢'},
-  {id:'18_6',hrs:18,name:'18/6 - المتوسط',desc:'18 ساعة صيام و6 ساعات أكل. يسرع حرق الدهون',level:'lv-med',emoji:'🟡'},
-  {id:'20_4',hrs:20,name:'20/4 - المحارب',desc:'20 ساعة صيام و4 ساعات أكل. لمن لديه تجربة',level:'lv-hard',emoji:'🔴'},
-  {id:'24',hrs:24,name:'24 ساعة - OMAD',desc:'وجبة واحدة يومياً. للمتقدمين فقط',level:'lv-hard',emoji:'⚫'},
-  {id:'5_2',hrs:0,name:'5:2 - الأسبوعي',desc:'5 أيام طبيعية + يومان بـ 500 سعرة فقط',level:'lv-med',emoji:'📅'},
+  {
+    id:'16_8', hrs:16, name:'16/8 — للمبتدئين', emoji:'🟢',
+    desc:'16 ساعة صيام و8 ساعات أكل. الأكثر شيوعاً وسهولة',
+    level:'lv-easy',
+    schedule:'صيام من 8 مساءً حتى 12 ظهراً | أكل من 12 ظهراً حتى 8 مساءً',
+    fullDesc:'أسهل بروتوكولات الصيام المتقطع وأكثرها دراسةً. يعتمد على فترة إمساك تبدأ غالباً بعد العشاء وتنتهي عند الغداء، مما يجعل قسطاً من الصيام خلال النوم. مناسب لجميع المستويات، يُحسّن حساسية الإنسولين ويحفّز حرق الدهون.',
+    benefits:['تحسين حساسية الإنسولين','حرق الدهون الزائدة','تقليل الالتهابات','تنشيط الأوتوفاجي (تجديد الخلايا)','مناسب للمبتدئين وسهل الاستمرار'],
+    fasting_allowed:['ماء بارد أو ساخن 🫗','قهوة سوداء بدون سكر ☕','شاي أخضر أو أعشاب 🍵','شاي بالزنجبيل أو القرفة','ماء مضاف إليه ليمون طازج 🍋'],
+    eating_allowed:['دجاج أو لحم بقري مشوي 🍗','بيض (مسلوق أو مقلي بزيت زيتون) 🥚','سمك مشوي أو سردين 🐟','خضروات ورقية: سبانخ، جرجير 🥗','أفوكادو 🥑','زيت زيتون بكر ممتاز 🫙','مكسرات: لوز، جوز (بكميات معتدلة) 🥜','فواكه منخفضة السكر: فراولة، توت 🍓'],
+    eating_forbidden:['سكر أبيض ومحليات صناعية 🚫','خبز أبيض ومعجنات ❌','مشروبات غازية ❌','وجبات سريعة ومقليات ❌','عصائر معبأة مضاف إليها سكر ❌'],
+    whoFor:'مناسب للجميع — المبتدئين والمتقدمين، الرجال والنساء، من يريد إنقاص الوزن أو تحسين صحته العامة.',
+    caution:'⚠️ مرضى السكري يجب استشارة الطبيب. ⚠️ الحوامل والمرضعات يمتنعن.',
+  },
+  {
+    id:'18_6', hrs:18, name:'18/6 — المتوسط', emoji:'🟡',
+    desc:'18 ساعة صيام و6 ساعات أكل. يسرع حرق الدهون',
+    level:'lv-med',
+    schedule:'صيام من 6 مساءً حتى 12 ظهراً | أكل من 12 ظهراً حتى 6 مساءً',
+    fullDesc:'ترقية طبيعية من 16/8 لمن يريد نتائج أسرع. ساعتا صيام إضافيتان تمنح الجسم وقتاً أطول في حالة الكيتوسيس وحرق الدهون. فترة الأكل 6 ساعات تسمح بوجبتين كاملتين ووجبة خفيفة.',
+    benefits:['حرق دهون أسرع من 16/8','تحسين مستويات الأنسولين','تنشيط أعمق للأوتوفاجي','تحسين الكوليسترول والدهون الثلاثية','مناسب لمن لديه تجربة سابقة في الصيام'],
+    fasting_allowed:['ماء بكميات كافية 🫗','قهوة سوداء أو إسبريسو ☕','شاي أخضر أو شاي أسود بدون سكر','شاي القرفة أو الزنجبيل','ماء بالليمون والنعناع الطازج 🌿'],
+    eating_allowed:['لحوم مشوية (دجاج، لحم بقري، ضأن) 🍖','سمك: سلمون، تونا، سردين 🐟','بيض بجميع أشكاله 🥚','سلطات ورقية بزيت الزيتون 🥗','خضروات مطبوخة بالبخار 🥦','مكسرات وبذور 🥜','أفوكادو وزيت جوز الهند 🥑','جبنة طبيعية قليلة الدسم 🧀'],
+    eating_forbidden:['السكر بجميع أشكاله 🚫','الحبوب المكررة والأرز الأبيض ❌','الخبز الأبيض والبسكويت ❌','العصائر المعبأة والمشروبات الغازية ❌','الحلويات والشوكولاتة بالحليب ❌'],
+    whoFor:'لمن جرّب 16/8 لأسابيع وأراد الانتقال للمستوى التالي. مثالي لإنقاص الوزن بوتيرة أسرع.',
+    caution:'⚠️ لا يُنصح به للمبتدئين الكاملين. ⚠️ مرضى السكري والضغط يستشيرون الطبيب.',
+  },
+  {
+    id:'20_4', hrs:20, name:'20/4 — بروتوكول المحارب', emoji:'🔴',
+    desc:'20 ساعة صيام و4 ساعات أكل. لمن لديه تجربة',
+    level:'lv-hard',
+    schedule:'صيام من 8 مساءً حتى 4 عصراً | أكل من 4 عصراً حتى 8 مساءً',
+    fullDesc:'يُعرف أيضاً بـ"نظام المحارب" (Warrior Diet). فترة أكل ضيقة 4 ساعات فقط تتيح وجبة رئيسية كبيرة ووجبة خفيفة. مستوى عالٍ من الكيتوسيس وحرق الدهون. يحتاج تكيفاً مسبقاً.',
+    benefits:['أعلى مستوى كيتوسيس يومي','حرق دهون مكثف جداً','ارتفاع قوي في هرمون النمو','تنظيف خلوي عميق (أوتوفاجي متقدم)','تحسين التركيز والطاقة الذهنية'],
+    fasting_allowed:['ماء وفير جداً 💧','قهوة سوداء بدون أي إضافات ☕','شاي أعشاب طبيعي','يُسمح بكميات صغيرة جداً من الخضار النيئ (جزر، خيار) في منتصف الصيام'],
+    eating_allowed:['وجبة كبيرة غنية بالبروتين والدهون الصحية','لحوم حمراء أو دواجن مشوية 🥩','سمك دهني: سلمون، ماكريل 🐟','بيض بكميات جيدة 🥚','خضروات مشوية أو بالبخار 🥦','مكسرات وزيوت صحية 🫙','أفوكادو وجبن طبيعي'],
+    eating_forbidden:['السكر والنشويات المكررة تماماً 🚫','أي أطعمة مصنعة أو معلبة ❌','الدقيق الأبيض بجميع صوره ❌','الحلويات والمعجنات ❌','المشروبات الغازية والعصائر المحلاة ❌'],
+    whoFor:'للمتقدمين في الصيام الذين مارسوا 16/8 أو 18/6 لأشهر. لمن يريد نتائج قصوى في حرق الدهون.',
+    caution:'⚠️ غير مناسب للمبتدئين. ⚠️ لا للحوامل ومرضى السكري وأمراض القلب بدون إشراف طبي.',
+  },
+  {
+    id:'24', hrs:24, name:'24 ساعة — OMAD', emoji:'⚫',
+    desc:'وجبة واحدة يومياً. للمتقدمين فقط',
+    level:'lv-hard',
+    schedule:'صيام 23 ساعة | وجبة واحدة كاملة (يُفضّل العشاء)',
+    fullDesc:'OMAD = One Meal A Day. وجبة واحدة يومياً في ساعة محددة. يُطلق أعلى مستوى من هرمون النمو ويُفعّل الأوتوفاجي بأقصاه. الوجبة الواحدة يجب أن تكون متكاملة ومشبعة لمتطلبات اليوم كاملاً.',
+    benefits:['أقصى استجابة لهرمون النمو','تفعيل الأوتوفاجي بمستوى عالٍ جداً','إنقاص وزن سريع جداً','تبسيط حياة الأكل لوجبة واحدة','تحسين الحساسية تجاه الإنسولين بشكل كبير'],
+    fasting_allowed:['ماء بكميات وفيرة 💧','قهوة سوداء وشاي بدون أي سعرات ☕','شاي زنجبيل وأعشاب طبيعية','الملح الصخري في الماء للمعادن (اختياري)'],
+    eating_allowed:['وجبة كاملة عالية السعرات الصحية (800-1200 سعرة)','لحوم مشوية + بيض + خضروات 🥩','بروتين كافٍ: 1.2-1.6 جرام لكل كيلو من الوزن','دهون صحية كافية: زيت زيتون، أفوكادو، مكسرات','خضروات بألوان متنوعة للفيتامينات والمعادن 🥗'],
+    eating_forbidden:['السكر والنشويات المكررة 🚫','الوجبات السريعة والمقليات ❌','العصائر والمشروبات ذات السعرات ❌','الأطعمة المصنعة والمعلبات ❌'],
+    whoFor:'للمتقدمين جداً الذين مارسوا الصيام لأشهر طويلة. لمن لديه هدف إنقاص وزن سريع تحت إشراف.',
+    caution:'⚠️ خطر على مرضى السكري (هبوط سكر حاد). ⚠️ غير مناسب لأمراض القلب أو الكلى. ⚠️ راجع طبيبك.',
+  },
+  {
+    id:'5_2', hrs:0, name:'5:2 — الأسبوعي', emoji:'📅',
+    desc:'5 أيام طبيعية + يومان بـ 500 سعرة فقط',
+    level:'lv-med',
+    schedule:'أكل طبيعي 5 أيام | تقييد (500-600 سعرة) يومين غير متتاليين',
+    fullDesc:'نظام مرن جداً. خمسة أيام تأكل بشكل طبيعي (صحي) ويومان في الأسبوع (غير متتاليين مثل الاثنين والخميس) تقيّد فيها السعرات إلى 500-600 فقط. لا صيام كامل، مما يجعله أكثر قبولاً اجتماعياً.',
+    benefits:['مرونة عالية وسهل الاستمرار','فقدان وزن تدريجي مستدام','تحسين المؤشرات الأيضية','مناسب للحياة الاجتماعية','أقل إجهاداً نفسياً من الصيام اليومي'],
+    fasting_allowed:['في أيام التقييد: كل الأطعمة لكن بحدود 500-600 سعرة','شوربة خضار صافية 🥣','بيضة مسلوقة وسلطة ورقية 🥗','قطعة صغيرة فاكهة طازجة 🍓','ماء وشاي وقهوة سوداء بلا حدود'],
+    eating_allowed:['أيام الأكل الطبيعي: اتبع قواعد الطيبات كاملاً','لحوم مشوية + خضروات + دهون صحية 🍗','بيض وألبان طبيعية 🥚','مكسرات وفواكه طازجة 🥜','زيت زيتون وأفوكادو 🥑'],
+    eating_forbidden:['في جميع الأيام: السكر الأبيض والمحليات الصناعية 🚫','الدقيق الأبيض والخبز المصنع ❌','المشروبات الغازية والعصائر المعبأة ❌','الوجبات السريعة والأطعمة المقلية ❌'],
+    whoFor:'مثالي لمن لا يتحمل الصيام اليومي أو حياته الاجتماعية تحتاج مرونة أكبر.',
+    caution:'⚠️ لا تختر يومين متتاليين للصيام. ⚠️ مرضى السكري يستشيرون الطبيب لحساب الجرعات.',
+  },
 ];
 
 function buildFastTypes(){
@@ -1916,10 +2136,91 @@ function buildFastTypes(){
         <div class="fc-details">
           <div class="fc-dname">${f.emoji} ${f.name}</div>
           <div class="fc-ddesc">${f.desc}</div>
-          <span class="fc-level ${f.level}">${f.level==='lv-easy'?'سهل':f.level==='lv-med'?'متوسط':'متقدم'}</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="fc-level ${f.level}">${f.level==='lv-easy'?'سهل':f.level==='lv-med'?'متوسط':'متقدم'}</span>
+            <button class="fast-detail-btn" onclick="event.stopPropagation();showFastDetail('${f.id}')">
+              <i class="fas fa-info-circle"></i> تفاصيل الصيام
+            </button>
+          </div>
         </div>
       </div>
     </div>`).join('');
+}
+
+function showFastDetail(id){
+  const f = FAST_TYPES.find(x=>x.id===id);
+  if(!f) return;
+  const lvLabel = f.level==='lv-easy'?'سهل':f.level==='lv-med'?'متوسط':'متقدم';
+  const lvColor = f.level==='lv-easy'?'var(--green2)':f.level==='lv-med'?'#ffa726':'#ef5350';
+  const content = document.getElementById('fast-detail-content');
+  content.innerHTML = `
+    <div class="modal-title">${f.emoji} ${f.name}</div>
+    <div class="fast-modal-body">
+
+      <div class="fast-schedule-box">
+        <div class="fast-schedule-icon">⏱️</div>
+        <div class="fast-schedule-info">
+          <div class="fast-schedule-title">جدول الصيام</div>
+          <div class="fast-schedule-sub">${f.schedule}</div>
+        </div>
+      </div>
+
+      <div class="fast-modal-section">
+        <div class="fast-modal-section-title"><i class="fas fa-info-circle" style="color:var(--blue2)"></i> عن هذا النظام</div>
+        <p>${f.fullDesc}</p>
+        <div style="margin-top:6px;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;border:1px solid;color:${lvColor};border-color:${lvColor};background:${lvColor}18">
+          المستوى: ${lvLabel}
+        </div>
+      </div>
+
+      <div class="fast-modal-section">
+        <div class="fast-modal-section-title"><i class="fas fa-star" style="color:var(--gold2)"></i> الفوائد الصحية</div>
+        ${f.benefits.map(b=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.78rem"><span style="color:var(--green2)">✓</span> ${b}</div>`).join('')}
+      </div>
+
+      <div class="fast-modal-section">
+        <div class="fast-modal-section-title"><i class="fas fa-tint" style="color:var(--blue2)"></i> مسموح أثناء الصيام</div>
+        <div class="fast-food-grid">
+          ${f.fasting_allowed.map(x=>`<div class="fast-food-item ok">✅ ${x}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="fast-modal-section">
+        <div class="fast-modal-section-title"><i class="fas fa-utensils" style="color:var(--green2)"></i> الأكل المسموح (فترة الإفطار) — متوافق مع الطيبات</div>
+        <div class="fast-food-grid">
+          ${f.eating_allowed.map(x=>`<div class="fast-food-item ok">🟢 ${x}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="fast-modal-section">
+        <div class="fast-modal-section-title"><i class="fas fa-ban" style="color:var(--red2)"></i> ممنوع — حتى في فترة الأكل</div>
+        <div class="fast-food-grid">
+          ${f.eating_forbidden.map(x=>`<div class="fast-food-item no">${x}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="fast-modal-section">
+        <div class="fast-modal-section-title"><i class="fas fa-users" style="color:var(--teal2)"></i> لمن هذا النظام؟</div>
+        <p>${f.whoFor}</p>
+      </div>
+
+      <div style="background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.3);border-radius:12px;padding:12px;font-size:.75rem;color:#ef9a9a;line-height:1.7">
+        ${f.caution}
+      </div>
+
+      <button class="select-from-modal-btn" onclick="selectFastFromModal('${f.id}')">
+        <i class="fas fa-check-circle"></i> اختيار هذا النظام وضبط العداد
+      </button>
+    </div>
+    <button class="modal-close" onclick="closeModal('fast-detail-modal')">إغلاق</button>
+  `;
+  document.getElementById('fast-detail-modal').classList.add('show');
+  playSound('click');
+}
+
+function selectFastFromModal(id){
+  selectFast(id);
+  closeModal('fast-detail-modal');
 }
 
 function selectFast(id){
@@ -1928,8 +2229,12 @@ function selectFast(id){
   document.getElementById('fc-'+id).classList.add('sel');
   localStorage.setItem('selected_fast',id);
   updateTimerDisplay();
-  showToast(`✅ تم اختيار ${selectedFast.name}`);
+  showToast(`✅ تم اختيار ${selectedFast.name} — العداد جاهز`);
   playSound('click');
+  // Scroll to timer
+  setTimeout(()=>{
+    document.querySelector('.timer-section')?.scrollIntoView({behavior:'smooth',block:'center'});
+  }, 400);
 }
 
 function startFast(){
@@ -2023,7 +2328,10 @@ function updateTimerDisplay(){
   if(fastStartTime) return;
   if(selectedFast){
     document.getElementById('timer-label').textContent=selectedFast.name;
-    document.getElementById('fast-stats-line').textContent=`نوع الصيام: ${selectedFast.name} | ${selectedFast.hrs||'5:2'} ساعة`;
+    const hrs = selectedFast.hrs ? `${selectedFast.hrs} ساعة صيام` : '5 أيام عادي + يومان 500 سعرة';
+    document.getElementById('fast-stats-line').innerHTML=
+      `<span style="color:var(--gold2)">${selectedFast.emoji} ${selectedFast.name}</span> &nbsp;|&nbsp; ${hrs}<br>
+       <span style="font-size:.7rem;color:var(--txt3)">${selectedFast.schedule||''}</span>`;
   }
 }
 
@@ -2049,6 +2357,12 @@ function buildProfile(){
     if(el) el.innerHTML=`<span style="color:${cat.color}">${cat.emoji} ${cat.label}</span>`;
     const hero=document.getElementById('bmi-hero-val');
     if(hero) hero.textContent='BMI: '+u.bmi.toFixed(1);
+    // badge تحت الاسم
+    const bsBadge = document.getElementById('hero-bmi-status');
+    if(bsBadge){
+      const bsClass = u.bmi<18.5?'bsb-under':u.bmi<25?'bsb-normal':u.bmi<30?'bsb-over':'bsb-obese';
+      bsBadge.innerHTML=`<span class="bmi-status-badge ${bsClass}">${cat.emoji} ${cat.label} · BMI ${u.bmi.toFixed(1)}</span>`;
+    }
   }
   const ddiv=document.getElementById('pp-diseases');
   if(ddiv){
