@@ -101,10 +101,18 @@ body{
   overflow-y:auto;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  display:none;
   padding-bottom:var(--nav);
+  background:var(--bg);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
 }
-.page.active{display:block;animation:fadeUp .45s ease}
+.page.active{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  animation:fadeUp .35s ease;
+}
 
 @keyframes fadeUp{
   from{opacity:0;transform:translateY(28px)}
