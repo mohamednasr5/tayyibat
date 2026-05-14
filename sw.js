@@ -1,44 +1,106 @@
-const CACHE = 'tayyibat-v2';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icons/favicon.ico',
-  './icons/favicon.svg',
-  './icons/favicon-32.png',
-  './icons/favicon-16.png',
-  './icons/apple-touch-icon.png',
-  './icons/icon-72.png',
-  './icons/icon-96.png',
-  './icons/icon-120.png',
-  './icons/icon-144.png',
-  './icons/icon-152.png',
-  './icons/icon-180.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+const CACHE_NAME = 'tayyibat-v1';
+const ASSETS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/sw.js',
+  '/manifest.json',
+  '/animations.css',
+  '/advanced-ai.js'
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+// Install event - cache assets
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Caching app shell');
+        return cache.addAll(ASSETS_TO_CACHE);
+      })
+      .catch(err => {
+        console.log('Cache error:', err);
+      })
+  );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
+// Activate event - clean up old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request)
-      .then(r => {
-        const clone = r.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return r;
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', event => {
+  const { request } = event;
+
+  // Skip non-GET requests
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  // Skip cross-origin requests
+  if (new URL(request.url).origin !== location.origin) {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+
+        return fetch(request)
+          .then(response => {
+            // Check if we received a valid response
+            if (!response || response.status !== 200 || response.type === 'basic') {
+              return response;
+            }
+
+            // Clone the response
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(request, responseToCache);
+              });
+
+            return response;
+          })
+          .catch(error => {
+            console.log('Fetch error:', error);
+            // Return offline page or cached asset
+            return caches.match('/index.html');
+          });
       })
-      .catch(() => caches.match(e.request))
   );
+});
+
+// Handle messages from clients
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// Background sync (if supported)
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-recipes') {
+    event.waitUntil(
+      // Implement background sync logic here
+      Promise.resolve()
+    );
+  }
 });
