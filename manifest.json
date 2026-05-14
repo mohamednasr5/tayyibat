@@ -1,154 +1,42 @@
 {
   "name": "طيبات - نظام صحي ذكي",
   "short_name": "طيبات",
-  "description": "تطبيق طيبات - نظام صحي ذكي للتغذية والصيام المتقطع مع ذكاء اصطناعي",
-  "start_url": "/",
-  "scope": "/",
+  "description": "نظام طيبات الصحي للدكتور ضياء العوضي — تغذية ذكية وصيام متقطع ونصائح طبية",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#FF6B6B",
-  "background_color": "#ffffff",
+  "theme_color": "#0a1628",
+  "background_color": "#050e1f",
   "prefer_related_applications": false,
-  
-  "icons": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FF6B6B' width='192' height='192'/><text x='50%' y='50%' font-size='120' fill='white' text-anchor='middle' dy='.3em' font-family='Arial, sans-serif' font-weight='bold'>🍳</text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23FF6B6B' width='512' height='512'/><text x='50%' y='50%' font-size='350' fill='white' text-anchor='middle' dy='.3em' font-family='Arial, sans-serif' font-weight='bold'>🍳</text></svg>",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FF6B6B' width='192' height='192'/><text x='50%' y='50%' font-size='120' fill='white' text-anchor='middle' dy='.3em' font-family='Arial, sans-serif' font-weight='bold'>🍳</text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    },
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%23FF6B6B' width='96' height='96'/><text x='50%' y='50%' font-size='60' fill='white' text-anchor='middle' dy='.3em'>🍳</text></svg>",
-      "sizes": "96x96",
-      "type": "image/svg+xml"
-    }
-  ],
+  "lang": "ar",
+  "dir": "rtl",
 
-  "screenshots": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23f8f8f8' width='540' height='720'/><rect fill='%23FF6B6B' width='540' height='100'/><text x='270' y='60' font-size='48' fill='white' text-anchor='middle' font-family='Arial' font-weight='bold'>طيبات</text></svg>",
-      "sizes": "540x720",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect fill='%23f8f8f8' width='1280' height='720'/><rect fill='%23FF6B6B' width='1280' height='100'/><text x='640' y='60' font-size='64' fill='white' text-anchor='middle' font-family='Arial' font-weight='bold'>طيبات</text></svg>",
-      "sizes": "1280x720",
-      "type": "image/svg+xml",
-      "form_factor": "wide"
-    }
+  "icons": [
+    { "src": "icons/icon-72.png",  "sizes": "72x72",   "type": "image/png" },
+    { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png" },
+    { "src": "icons/icon-120.png", "sizes": "120x120", "type": "image/png" },
+    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png" },
+    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png" },
+    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
 
   "categories": ["health", "food", "lifestyle"],
-  
+
   "shortcuts": [
     {
-      "name": "تحليل المكونات",
-      "short_name": "تحليل",
-      "description": "حلل المكونات المتاحة واحصل على وصفات",
-      "url": "/?mode=ingredients",
-      "icons": [
-        {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text x='48' y='60' font-size='60' text-anchor='middle'>🥬</text></svg>",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
-        }
-      ]
+      "name": "الأطعمة المسموحة",
+      "short_name": "أطعمة",
+      "url": "./?page=food",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
-      "name": "الصحة والإحصائيات",
-      "short_name": "صحة",
-      "description": "اعرض إحصائياتك الصحية",
-      "url": "/?mode=health",
-      "icons": [
-        {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text x='48' y='60' font-size='60' text-anchor='middle'>🏥</text></svg>",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
-        }
-      ]
-    },
-    {
-      "name": "بيانات الملف الشخصي",
-      "short_name": "ملفي",
-      "description": "عدّل بيانات ملفك الشخصي",
-      "url": "/?mode=profile",
-      "icons": [
-        {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text x='48' y='60' font-size='60' text-anchor='middle'>👤</text></svg>",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
-        }
-      ]
+      "name": "الصيام المتقطع",
+      "short_name": "صيام",
+      "url": "./?page=fast",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
-  ],
-
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "recipe_title",
-      "text": "recipe_description",
-      "url": "recipe_url"
-    }
-  },
-
-  "launch_handler": {
-    "client_mode": ["navigate-new", "auto"]
-  },
-
-  "file_handlers": [
-    {
-      "action": "/import",
-      "accept": {
-        "application/json": [".json"]
-      }
-    }
-  ],
-
-  "protocol_handlers": [
-    {
-      "protocol": "web+tayyibat",
-      "url": "/recipe?id=%s"
-    }
-  ],
-
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.tayyibat.app",
-      "id": "com.tayyibat.app"
-    }
-  ],
-
-  "screenshots_alt": {
-    "ar": "لقطة شاشة من تطبيق طيبات"
-  },
-
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-
-  "display_override": ["window-controls-overlay", "standalone", "browser"],
-
-  "scope_extensions": [
-    {
-      "origin": "https://*.tayyibat.com"
-    }
-  ],
-
-  "note_to_self": "تطبيق طيبات - نظام صحي ذكي متكامل للتغذية والصيام المتقطع"
+  ]
 }
