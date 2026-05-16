@@ -189,7 +189,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .tag-allergy{background:rgba(171,71,188,.15);border:1px solid rgba(171,71,188,.4);color:#ab47bc}
 .tag-chemo{background:rgba(255,112,67,.15);border:1px solid rgba(255,112,67,.4);color:#ff7043}
 .tag-heart{background:rgba(236,64,122,.15);border:1px solid rgba(236,64,122,.4);color:#ec407a}
-.tag-kidney{background:rgba(102,187,106,.15);border:1px solid rgba(102,187,106,.4);color:#66bb6a}
+.tag-kidney{background:rgba(102,187,106,.15);border:1px solid rgba(102,187,106,.3);color:var(--green2)}
 .tag-none{background:rgba(46,201,81,.1);border:1px solid rgba(46,201,81,.3);color:var(--green2)}
 
 /* STATS */
@@ -285,8 +285,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .fc-reason{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;font-size:.75rem;color:var(--txt2);line-height:1.6;border-right:3px solid var(--border);}
 .fc-reason.ok{border-color:var(--green2)}
 .fc-reason.bad{border-color:var(--red2)}
-.fc-toggle{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--txt3);cursor:pointer;margin-top:10px;transition:color .25s}
+.fc-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.fc-toggle{font-size:.75rem;color:var(--txt3);cursor:pointer;transition:color .25s}
 .fc-toggle:hover{color:var(--gold2)}
+.fc-youtube-btn{background:rgba(229,57,53,.15);border:1px solid rgba(229,57,53,.3);color:#ef5350;padding:4px 10px;border-radius:8px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .3s;}
+.fc-youtube-btn:hover{background:#e53935;color:#fff;box-shadow:0 0 10px rgba(229,57,53,.4)}
 .fc-expand{display:none}
 .fc-expand.open{display:block}
 
@@ -344,6 +347,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .lv-easy{background:rgba(46,201,81,.15);color:var(--green2);border:1px solid rgba(46,201,81,.3)}
 .lv-med{background:rgba(255,160,0,.15);color:#ffa726;border:1px solid rgba(255,160,0,.3)}
 .lv-hard{background:rgba(229,57,53,.15);color:#ef5350;border:1px solid rgba(229,57,53,.3)}
+.fast-info-btn{background:rgba(33,150,243,.12);border:1px solid rgba(33,150,243,.3);color:var(--blue2);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;display:inline-flex;align-items:center;gap:4px;transition:all .25s;}
+.fast-info-btn:hover{background:var(--blue2);color:#fff}
 
 /* TIMER */
 .timer-section{padding:0 16px 16px}
@@ -412,6 +417,12 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .disclaimer{background:linear-gradient(135deg,rgba(160,21,21,.15),rgba(160,21,21,.05));border:1px solid rgba(229,57,53,.3);border-radius:14px;padding:14px 16px;margin-bottom:20px}
 .dis-title{color:#ef5350;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .disclaimer p{font-size:.75rem;color:#e57373;line-height:1.65}
+
+/* FASTING BLOCK DETAILS INSIDE MODAL */
+.fast-details-content{font-size:.85rem;line-height:1.8;color:var(--txt2)}
+.fast-details-content h4{color:var(--gold2);margin:14px 0 6px;font-size:.95rem}
+.fast-details-content ul{padding-right:16px;margin-bottom:10px}
+.fast-details-content li{margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -667,7 +678,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="ai-page-header">
     <div class="ai-hero-badge">
       <i class="fas fa-brain"></i>
-      ذكاء اصطناعي ذكي مدمج ومتخصص في نظام الطيبات
+      ذكاء اصطناعي متطور مخصص لنظام الطيبات ومفتوح النتائج
     </div>
     <div class="ai-hero-title">مساعدك الصحي الشخصي</div>
     <div class="ai-hero-sub" id="ai-hero-sub">مخصص لحالتك الصحية، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله</div>
@@ -842,17 +853,27 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
+<div class="modal-overlay" id="fast-details-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="fast-modal-title">📋 تفاصيل بروتوكول الصيام</div>
+    <div class="fast-details-content" id="fast-modal-body">
+      </div>
+    <button class="modal-close" onclick="closeModal('fast-details-modal')">فهمت ذلك وعودة</button>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
 /* ═══════════════ CONFIG & KNOWLEDGE BASE FOR FALLBACK AI ═══════════════ */
 const TAYYIBAT_CONFIG = {
-  CLAUDE_API_KEY: "", // ضع مفتاح Claude هنا إذا أردت استخدامه كخيار أول "sk-ant-xxx"
-  HUGGINGFACE_TOKEN: "", // توكن HuggingFace كخيار مجاني ثانٍ "hf_xxx"
+  CLAUDE_API_KEY: "", // ضع مفتاح Claude هنا إذا توفر "sk-ant-xxx"
+  HUGGINGFACE_TOKEN: "", // توكن مجاني تماماً من موقع Hugging Face بدون قيود "hf_xxx"
   ENABLED_APIS: {
-    claude: false, // تحول لـ true عند إضافة المفتاح
-    huggingface: false, // تحول لـ true عند إضافة التوكن
-    ollama: false // تحول لـ true عند تشغيل Ollama محلياً على جهازك
+    claude: false, 
+    huggingface: false, 
+    ollama: false,
+    free_public: true // خيار عام مجاني مفتوح ومدمج تلقائياً لحالات الطوارئ
   },
   TIMEOUT: 12000
 };
@@ -873,7 +894,7 @@ const TAYYIBAT_KNOWLEDGE = {
     forbidden: [
       { name: "الدجاج والدواجن", detail: "ممنوعة كلياً بسبب الهرمونات والمزارع الاصطناعية" },
       { name: "البيض", detail: "ممنوع بجميع أشكاله (يستثنى بيض السمان باعتدال)" },
-      { name: "الدقيق والأبيض المعجنات", detail: "الخبز الأبيض والمكرونة تسبب الالتهابات وتتعب الأمعاء" },
+      { name: "الدقيق الأبيض والمعجنات", detail: "الخبز الأبيض والمكرونة تسبب الالتهابات وتتعب الأمعاء" },
       { name: "الزيوت النباتية التجارية", detail: "زيت الذرة، عباد الشمس، والصويا ممنوعة تماماً" },
       { name: "الألبان السائلة", detail: "الحليب والزبادي والرايب مسببات قوية للالتهاب المعوي" },
       { name: "الخضروات النيئة", detail: "السلطات النيئة والجرجير والخيار والخس ممنوعة لأن أليافها تجهد الهضم" },
@@ -883,10 +904,38 @@ const TAYYIBAT_KNOWLEDGE = {
     ]
   },
   fastingProtocols: {
-    "16_8": { name: "16/8 للمبتدئين", hours: 16, schedule: "صيام 16 ساعة ونافذة أكل 8 ساعات (مثلاً 12 ظهراً - 8 مساءً)" },
-    "18_6": { name: "18/6 المتوسط", hours: 18, schedule: "صيام 18 ساعة ونافذة أكل 6 ساعات للالتهابات العميقة والتنظيف الخلوي" },
-    "20_4": { name: "20/4 المحارب", hours: 20, schedule: "صيام 20 ساعة وأكل وجبة إلى وجبتين خلال 4 ساعات لأعلى حرق وتنظيف للسموم" },
-    "omad": { name: "OMAD وجبة واحدة", hours: 23, schedule: "صيام 23 ساعة ووجبة واحدة ضخمة متكاملة يومياً للمتقدمين جداً" }
+    "16_8": { 
+      name: "16/8 للمبتدئين", 
+      hours: 16, 
+      schedule: "صيام 16 ساعة ونافذة أكل 8 ساعات (مثلاً 12 ظهراً - 8 مساءً)",
+      allowedFood: "اللحوم الحمراء، الأسماك البحرية، الأرز الأبيض، البطاطس المطبوخة، والدهون الطبيعية في الوجبات الأساسية.",
+      forbiddenFood: "الدواجن، البيض، الدقيق ومشتقاته، الألبان السائلة، المشروبات الغازية والخضار النيء.",
+      tips: "ابدأ تدريجياً، ركز على كفاية احتياجك من السوائل الصافية (الماء والشاي الأخضر) في ساعات الصيام بدون سكر، واجعل وجبة كسر الصيام غنية بالبروتينات والدهون الصحية للشعور بالشبع."
+    },
+    "18_6": { 
+      name: "18/6 المتوسط", 
+      hours: 18, 
+      schedule: "صيام 18 ساعة ونافذة أكل 6 ساعات للالتهابات العميقة والتنظيف الخلوي",
+      allowedFood: "اللحم الأحمر النقي، السمك البحري المشوي، مع كميات معتدلة جداً من الأرز الأبيض والدهون الصحية.",
+      forbiddenFood: "نفس ممنوعات نظام الطيبات القطعية كاملة دون أي تهاون.",
+      tips: "بروتوكول ممتاز لرفع مستويات حرق الدهون وتطهير الأمعاء العميقة، يفضل فيه تناول وجبتين متكاملتين تماماً خلال نافذة الـ 6 ساعات دون نقرشة بينهما لتفادي تحفيز الإنسولين."
+    },
+    "20_4": { 
+      name: "20/4 المحارب", 
+      hours: 20, 
+      schedule: "صيام 20 ساعة وأكل وجبة إلى وجبتين خلال 4 ساعات لأعلى حرق وتنظيف للسموم",
+      allowedFood: "وجبات مكثفة من البروتين الحيواني المسموح (لحم الضأن أو الماعز)، شوربات طبيعية مسبكة، ودهون مشبعة.",
+      forbiddenFood: "النشويات الكثيرة، السكريات حتى الفواكه يفضل تقنينها جداً في هذا الوضع الحرج الضيق.",
+      tips: "هذا البروتوكول متقدم جداً. يتطلب شرب كميات ضخمة من الماء الصافي خلال الـ 20 ساعة. يمنع منعاً باتاً الإجهاد البدني العنيف خلال الأيام الأولى، ويفضل فتح الصيام بشوربة دافئة تليها الوجبة الأساسية تدريجياً."
+    },
+    "24": { 
+      name: "24 ساعة — OMAD", 
+      hours: 23, 
+      schedule: "صيام 23 ساعة | وجبة واحدة كاملة ضخمة متكاملة يومياً للمتقدمين جداً",
+      allowedFood: "نصف كيلو إلى 800 جرام من اللحوم الحمراء أو السمك المشوي، أرز أبيض وبطاطس مطبوخة لضمان السعرات الفائتة.",
+      forbiddenFood: "كافة ممنوعات نظام الطيبات.",
+      tips: "بروتوكول علاجي قوي جداً للأمراض المزمنة المستعصية تحت مظلة الأوتوفاجي (التنظيف الخلوي التلقائي). يجب أن تكون الوجبة الوحيدة ضخمة جداً ومغذية لتغطية السعرات المطلوبة ليومك، مع الحصول على نوم كافٍ يمتد من 8 إلى 9 ساعات لتجديد طاقة الجسم."
+    }
   }
 };
 
@@ -1059,7 +1108,7 @@ const ALL_TIPS=[
   {icon:'🧄',color:'#ab47bc',bg:'rgba(171,71,188,.12)',title:'الثوم الطبيعي',body:'مضاد طبيعي للبكتيريا. يحسن الكوليسترول ويخفض ضغط الدم.'},
   {icon:'🐟',color:'#26a69a',bg:'rgba(38,166,154,.12)',title:'السمك البحري',body:'ركيزة أساسية في الطيبات — مشوي أو مقلي بدون دقيق 2-3 مرات أسبوعياً.'},
   {icon:'🫒',color:'#c8960c',bg:'rgba(200,150,12,.12)',title:'زيت الزيتون البكر',body:'الدهن الأول في نظام الطيبات — ملعقتان كبيرتان يومياً على الريق.'},
-  {icon:'🚫',color:'#e53935',bg:'rgba(229,57,53,.12)',title:'ابتعد عن الدجاج',body:'الدجاج والدواجن ممنوعة تماماً in الطيبات — تُعلَّف بهرمونات مصطنعة.'},
+  {icon:'🚫',color:'#e53935',bg:'rgba(229,57,53,.12)',title:'ابتعد عن الدجاج',body:'الدجاج والدواجن ممنوعة تماماً في الطيبات — تُعلَّف بهرمونات مصطنعة.'},
   {icon:'🍳',color:'#b71c1c',bg:'rgba(183,28,28,.12)',title:'ابتعد عن البيض',body:'البيض ممنوع كلياً في الطيبات. استثناء: بيض السمان.'},
   {icon:'🍞',color:'#ef6c00',bg:'rgba(239,108,0,.12)',title:'ابتعد عن الدقيق الأبيض',body:'الخبز الأبيض والمعجنات ترفع السكر — استبدلها بالأرز أو البطاطس.'},
   {icon:'🥤',color:'#c62828',bg:'rgba(198,40,40,.12)',title:'ابتعد عن الغازيات',body:'المشروبات الغازية تحمّض الجسم — ممنوعة كلياً في نظام الطيبات.'},
@@ -1081,30 +1130,30 @@ function nextTip(){
 
 /* FOOD DATA */
 const FOOD_DATA=[
-  {id:1,emoji:'🥩',name:'اللحوم الحمراء (خروف، ماعز، جمل)',cat:'بروتين',status:'allowed',desc:'أفضل مصادر البروتين في نظام الطيبات',reason:'الدكتور ضياء يُقدّم لحم الخروف والماعز كأفضل اللحوم'},
-  {id:2,emoji:'🐟',name:'السمك البحري (بدون دقيق)',cat:'بروتين',status:'allowed',desc:'أسماك البحر — مشوي أو مقلي بدون دقيق',reason:'السمك البحري مسموح كبروتين — يُفضّل المشوي'},
-  {id:3,emoji:'🕊️',name:'الحمام والسمان فقط',cat:'بروتين',status:'allowed',desc:'الطيور البرية الوحيدة المسموحة',reason:'الاستثناء الوحيد من الطيور — طيور برية غير مُعلَّفة'},
-  {id:4,emoji:'🐔',name:'الدجاج والدواجن',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً — دجاج، ديك رومي، بط، أوز',reason:'الدواجن تُعلَّف بهرمونات مصطنعة. الاستثناء: حمام وسمان فقط'},
-  {id:5,emoji:'🥚',name:'البيض بجميع أشكاله',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً — مقلي، مسلوق، أومليت',reason:'البيض ممنوع كلياً. استثناء: بيض السمان بكميات قليلة'},
-  {id:6,emoji:'🍚',name:'الأرز بجميع أنواعه',cat:'نشويات',status:'allowed',desc:'الأرز الأبيض، البسمتي، الأرز البني',reason:'ركيزة نظام الطيبات الأساسية'},
-  {id:7,emoji:'🥔',name:'البطاطس بجميع أشكالها',cat:'نشويات',status:'allowed',desc:'مسلوقة، مشوية، مقلية، حلوة',reason:'مصدر كربوهيدرات ممتاز'},
-  {id:8,emoji:'🍞',name:'الخبز الأبيض والدقيق المكرر',cat:'نشويات',status:'forbidden',desc:'ممنوع — عيش بلدي، شامي، سوري، فرنساوي',reason:'الدقيق الأبيض المكرر ممنوع — يُسبب الالتهاب ويرفع السكر'},
-  {id:9,emoji:'🍝',name:'المكرونة بجميع أنواعها',cat:'نشويات',status:'forbidden',desc:'ممنوعة — سباغيتي، لازانيا، حتى القمح الكامل',reason:'المكرونة ممنوعة في الطيبات — مصدر التهاب مزمن'},
-  {id:10,emoji:'🫒',name:'زيت الزيتون البكر الممتاز',cat:'دهون صحية',status:'allowed',desc:'أفضل الزيوت في نظام الطيبات',reason:'ركيزة أساسية — الدهن الأول في نظام الطيبات'},
-  {id:11,emoji:'🧈',name:'الزبدة والسمن البلدي',cat:'دهون صحية',status:'allowed',desc:'الزبدة الطبيعية والسمن البلدي',reason:'الدهون الحيوانية الطبيعية مسموحة'},
-  {id:12,emoji:'🛢️',name:'زيت الذرة وعباد الشمس',cat:'دهون',status:'forbidden',desc:'ممنوعة — زيت الذرة، عباد الشمس، فول الصويا',reason:'الزيوت النباتية المكررة ممنوعة تماماً — تُسبب الالتهاب'},
-  {id:13,emoji:'🥛',name:'الحليب والزبادي والألبان السائلة',cat:'ألبان',status:'forbidden',desc:'ممنوع — حليب بقر، زبادي، لبن رايب',reason:'الألبان السائلة ممنوعة كلياً — من أقوى مسببات الالتهاب'},
-  {id:14,emoji:'🧀',name:'الجبن المطبوخ والمعتق',cat:'ألبان',status:'allowed',desc:'الأجبان المطبوخة والمعتقة فقط — شيدر، رومي',reason:'الأجبان المعتقة والمطبوخة مسموحة'},
-  {id:15,emoji:'🫕',name:'الخضروات المطبوخة جيداً',cat:'خضروات',status:'allowed',desc:'بامية، كوسا، باذنجان، فلفل، قلقاس — مطبوخة فقط',reason:'الخضروات المطبوخة (المسبكة) فقط هي المسموحة'},
-  {id:16,emoji:'🥗',name:'الخضروات النيئة والورقية',cat:'خضروات',status:'forbidden',desc:'ممنوع — جرجير، سبانخ، طماطم، خيار، خس نيء',reason:'الخضروات النيئة ممنوعة — الألياف النيئة تُتعب الأمعاء'},
-  {id:17,emoji:'🫘',name:'البقوليات (فول، عدس، حمص)',cat:'بقوليات',status:'forbidden',desc:'ممنوعة تماماً — فول، عدس، حمص، فاصوليا',reason:'البقوليات ممنوعة — تُسبب انتفاخاً وتعب الأمعاء'},
-  {id:18,emoji:'🍇',name:'العنب والتين والتمر والمانجو',cat:'فواكه',status:'allowed',desc:'فواكه حلوة صيفية مسموحة',reason:'الفواكه الحلوة الصيفية مسموحة — مصدر طبيعي للطاقة'},
-  {id:19,emoji:'🍯',name:'العسل الطبيعي والسكر',cat:'محليات',status:'allowed',desc:'العسل الطبيعي والسكر مسموحان بكميات معقولة',reason:'السكر مسموح كـطاقة نقية'},
-  {id:20,emoji:'🧂',name:'خل القصب والملح',cat:'توابل',status:'allowed',desc:'خل القصب مُوصى به بشدة — الملح مسموح',reason:'خل القصب من أهم مكونات الطيبات'},
-  {id:21,emoji:'🌿',name:'الكركم والزعتر والبهارات الطبيعية',cat:'توابل',status:'allowed',desc:'الكركم، الزعتر، الكمون، الفلفل الأسود',reason:'التوابل الطبيعية مسموحة — الكركم مضاد التهاب قوي'},
-  {id:22,emoji:'🥤',name:'المشروبات الغازية',cat:'مشروبات',status:'forbidden',desc:'ممنوعة تماماً — كوكاكولا، بيبسي، مشروبات طاقة',reason:'الغازيات ومشروبات الطاقة ممنوعة كلياً'},
-  {id:23,emoji:'🍵',name:'الشاي الأخضر والقهوة',cat:'مشروبات',status:'allowed',desc:'الشاي الأخضر مسموح — القهوة مسموحة باعتدال',reason:'الشاي الأخضر مُفضَّل في الطيبات'},
-  {id:24,emoji:'🫖',name:'الشاي الأحمر والأسود',cat:'مشروبات',status:'forbidden',desc:'ممنوع — البديل الشاي الأخضر',reason:'الشاي الأسود ممنوع — يُسبب نقص الحديد والمغنيسيوم'},
+  {id:1,emoji:'🥩',name:'اللحوم الحمراء (خروف، ماعز، جمل)',cat:'بروتين',status:'allowed',desc:'أفضل مصادر البروتين في نظام الطيبات',reason:'الدكتور ضياء يُقدّم لحم الخروف والماعز كأفضل اللحوم', ytQuery:'اللحوم الحمراء'},
+  {id:2,emoji:'🐟',name:'السمك البحري (بدون دقيق)',cat:'بروتين',status:'allowed',desc:'أسماك البحر — مشوي أو مقلي بدون دقيق',reason:'السمك البحري مسموح كبروتين — يُفضّل المشوي', ytQuery:'السمك البحري'},
+  {id:3,emoji:'🕊️',name:'الحمام والسمان فقط',cat:'بروتين',status:'allowed',desc:'الطيور البرية الوحيدة المسموحة',reason:'الاستثناء الوحيد من الطيور — طيور برية غير مُعلَّفة', ytQuery:'الحمام والسمان'},
+  {id:4,emoji:'🐔',name:'الدجاج والدواجن',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً — دجاج، ديك رومي، بط، أوز',reason:'الدواجن تُعلَّف بهرمونات مصطنعة. الاستثناء: حمام وسمان فقط', ytQuery:'منع الدجاج الدواجن'},
+  {id:5,emoji:'🥚',name:'البيض بجميع أشكاله',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً — مقلي، مسلوق، أومليت',reason:'البيض ممنوع كلياً. استثناء: بيض السمان بكميات قليلة', ytQuery:'منع البيض'},
+  {id:6,emoji:'🍚',name:'الأرز بجميع أنواعه',cat:'نشويات',status:'allowed',desc:'الأرز الأبيض، البسمتي، الأرز البني',reason:'ركيزة نظام الطيبات الأساسية', ytQuery:'الارز والنشويات'},
+  {id:7,emoji:'🥔',name:'البطاطس بجميع أشكالها',cat:'نشويات',status:'allowed',desc:'مسلوقة، مشوية، مقلية، حلوة',reason:'مصدر كربوهيدرات ممتاز', ytQuery:'البطاطس والبطاطا'},
+  {id:8,emoji:'🍞',name:'الخبز الأبيض والدقيق المكرر',cat:'نشويات',status:'forbidden',desc:'ممنوع — عيش بلدي، شامي، سوري، فرنساوي',reason:'الدقيق الأبيض المكرر ممنوع — يُسبب الالتهاب ويرفع السكر', ytQuery:'منع الخبز الدقيق المعجنات'},
+  {id:9,emoji:'🍝',name:'المكرونة بجميع أنواعها',cat:'نشويات',status:'forbidden',desc:'ممنوعة — سباغيتي، لازانيا، حتى القمح الكامل',reason:'المكرونة ممنوعة في الطيبات — مصدر التهاب مزمن', ytQuery:'منع المكرونة'},
+  {id:10,emoji:'🫒',name:'زيت الزيتون البكر الممتاز',cat:'دهون صحية',status:'allowed',desc:'أفضل الزيوت في نظام الطيبات',reason:'ركيزة أساسية — الدهن الأول في نظام الطيبات', ytQuery:'زيت الزيتون البكر الممتاز'},
+  {id:11,emoji:'🧈',name:'الزبدة والسمن البلدي',cat:'دهون صحية',status:'allowed',desc:'الزبدة الطبيعية والسمن البلدي',reason:'الدهون الحيوانية الطبيعية مسموحة', ytQuery:'السمن البلدي والزبدة'},
+  {id:12,emoji:'🛢️',name:'زيت الذرة وعباد الشمس',cat:'دهون',status:'forbidden',desc:'ممنوعة — زيت الذرة، عباد الشمس، فول الصويا',reason:'الزيوت النباتية المكررة ممنوعة تماماً — تُسبب الالتهاب', ytQuery:'منع الزيوت النباتية المهدرجة'},
+  {id:13,emoji:'🥛',name:'الحليب والزبادي والألبان السائلة',cat:'ألبان',status:'forbidden',desc:'ممنوع — حليب بقر، زبادي، لبن رايب',reason:'الألبان السائلة ممنوعة كلياً — من أقوى مسببات الالتهاب', ytQuery:'منع اللبن الحليب والزبادي'},
+  {id:14,emoji:'🧀',name:'الجبن المطبوخ والمعتق',cat:'ألبان',status:'allowed',desc:'الأجبان المطبوخة والمعتقة فقط — شيدر، رومي',reason:'الأجبان المعتقة والمطبوخة مسموحة', ytQuery:'الجبن المطبوخ والمعتق الجبنة شيدر رومي'},
+  {id:15,emoji:'🫕',name:'الخضروات المطبوخة جيداً',cat:'خضروات',status:'allowed',desc:'بامية، كوسا، باذنجان، فلفل، قلقاس — مطبوخة فقط',reason:'الخضروات المطبوخة (المسبكة) فقط هي المسموحة', ytQuery:'الخضار المطبوخ الخضروات المسبكة'},
+  {id:16,emoji:'🥗',name:'الخضروات النيئة والورقية',cat:'خضروات',status:'forbidden',desc:'ممنوع — جرجير، سبانخ، طماطم، خيار، خس نيء',reason:'الخضروات النيئة ممنوعة — الألياف النيئة تُتعب الأمعاء', ytQuery:'منع السلطة الخضار النيء الخيار الخس جرجير'},
+  {id:17,emoji:'🫘',name:'البقوليات (فول، عدس، حمص)',cat:'بقوليات',status:'forbidden',desc:'ممنوعة تماماً — فول، عدس، حمص، فاصوليا',reason:'البقوليات ممنوعة — تُسبب انتفاخاً وتعب الأمعاء', ytQuery:'منع الفول البقوليات العدس الحمص'},
+  {id:18,emoji:'🍇',name:'العنب والتين والتمر والمانجو',cat:'فواكه',status:'allowed',desc:'فواكه حلوة صيفية مسموحة',reason:'الفواكه الحلوة الصيفية مسموحة — مصدر طبيعي للطاقة', ytQuery:'الفواكه الحلوة العنب التين التمر المانجو'},
+  {id:19,emoji:'🍯',name:'العسل الطبيعي والسكر',cat:'محليات',status:'allowed',desc:'العسل الطبيعي والسكر مسموحان بكميات معقولة',reason:'السكر مسموح كـطاقة نقية', ytQuery:'العسل والسكر الابيض طاقة نقية'},
+  {id:20,emoji:'🧂',name:'خل القصب والملح',cat:'توابل',status:'allowed',desc:'خل القصب مُوصى به بشدة — الملح مسموح',reason:'خل القصب من أهم مكونات الطيبات', ytQuery:'خل القصب والملح البحري'},
+  {id:21,emoji:'🌿',name:'الكركم والزعتر والبهارات الطبيعية',cat:'توابل',status:'allowed',desc:'الكركم، الزعتر، الكمون، الفلفل الأسود',reason:'التوابل الطبيعية مسموحة — الكركم مضاد التهاب قوي', ytQuery:'الكركم البهارات التوابل الطبيعية'},
+  {id:22,emoji:'🥤',name:'المشروبات الغازية',cat:'مشروبات',status:'forbidden',desc:'ممنوعة تماماً — كوكاكولا، بيبسي، مشروبات طاقة',reason:'الغازيات ومشروبات الطاقة ممنوعة كلياً', ytQuery:'منع الحاجه الساقعة المشروبات الغازية الببسي'},
+  {id:23,emoji:'🍵',name:'الشاي الأخضر والقهوة',cat:'مشروبات',status:'allowed',desc:'الشاي الأخضر مسموح — القهوة مسموحة باعتدال',reason:'الشاي الأخضر مُفضَّل في الطيبات', ytQuery:'الشاي الاخضر والقهوة المسموحة'},
+  {id:24,emoji:'🫖',name:'الشاي الأحمر والأسود',cat:'مشروبات',status:'forbidden',desc:'ممنوع — البديل الشاي الأخضر',reason:'الشاي الأسود ممنوع — يُسبب نقص الحديد والمغنيسيوم', ytQuery:'منع الشاي الاحمر والاسود'},
 ];
 let activeTab='all',activeStatus='all',searchQuery='';
 function buildFoodData(){
@@ -1116,13 +1165,18 @@ function buildFoodData(){
 }
 function setFoodTab(cat){activeTab=cat;activeStatus=(cat==='allowed'||cat==='forbidden')?cat:'all';document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('act','act-red'));const el=document.querySelector(`.ftab[data-tab="${cat}"]`);if(el)el.classList.add(cat==='forbidden'?'act-red':'act');renderFood();}
 function filterFood(){searchQuery=document.getElementById('food-search').value;renderFood();}
+function searchFoodYoutube(queryText) {
+  const fullQuery = "الدكتور ضياء العوضي " + queryText;
+  const url = "https://www.youtube.com/results?search_query=" + encodeURIComponent(fullQuery);
+  window.open(url, '_blank');
+}
 function renderFood(){
   let foods=FOOD_DATA;
   if(activeStatus==='allowed')foods=foods.filter(f=>f.status==='allowed');
   else if(activeStatus==='forbidden')foods=foods.filter(f=>f.status==='forbidden');
   else if(activeTab!=='all')foods=foods.filter(f=>f.cat===activeTab);
   if(searchQuery)foods=foods.filter(f=>f.name.includes(searchQuery)||f.desc.includes(searchQuery)||f.cat.includes(searchQuery));
-  document.getElementById('food-grid').innerHTML=foods.map(f=>`<div class="food-card ${f.status}"><div class="fc-top"><div class="fc-emoji">${f.emoji}</div><div class="fc-info"><div class="fc-name">${f.name}</div><span class="fc-badge ${f.status}">${f.status==='allowed'?'✅ مسموح':'❌ ممنوع'}</span><div class="fc-desc">${f.desc}</div></div></div><div class="fc-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.innerHTML=this.nextElementSibling.classList.contains('open')?'▲ إخفاء':'▼ عرض التفاصيل'">▼ عرض التفاصيل</div><div class="fc-expand"><div class="fc-reason ${f.status==='allowed'?'ok':'bad'}">${f.reason}</div></div></div>`).join('')||'<div style="text-align:center;padding:30px;color:var(--txt3)">لا توجد نتائج</div>';
+  document.getElementById('food-grid').innerHTML=foods.map(f=>`<div class="food-card ${f.status}"><div class="fc-top"><div class="fc-emoji">${f.emoji}</div><div class="fc-info"><div class="fc-name">${f.name}</div><span class="fc-badge ${f.status}">${f.status==='allowed'?'✅ مسموح':'❌ ممنوع'}</span><div class="fc-desc">${f.desc}</div></div></div><div class="fc-toggle-row"><div class="fc-toggle" onclick="this.parentElement.nextElementSibling.classList.toggle('open');this.innerHTML=this.parentElement.nextElementSibling.classList.contains('open')?'▲ إخفاء':'▼ عرض التفاصيل'">▼ عرض التفاصيل</div><button class="fc-youtube-btn" onclick="searchFoodYoutube('${f.ytQuery}')"><i class="fab fa-youtube"></i> بحث يوتيوب</button></div><div class="fc-expand"><div class="fc-reason ${f.status==='allowed'?'ok':'bad'}">${f.reason}</div></div></div>`).join('')||'<div style="text-align:center;padding:30px;color:var(--txt3)">لا توجد نتائج</div>';
 }
 
 /* ══════════════════════════════════════════════
@@ -1146,14 +1200,14 @@ const DISEASE_QUICK_PROMPTS = {
   allergy: ['ما الأطعمة الآمنة لمريض الحساسية في الطيبات؟','كيف أتجنب مسببات الحساسية الغذائية؟','ما هي الأطعمة المضادة للالتهاب؟'],
   chemo: ['كيف أحافظ على وزني خلال الكيماوي؟','ما الأطعمة التي تخفف الغثيان خلال العلاج؟','اقترح وجبات سهلة الهضم للمريض'],
   heart: ['ما الأطعمة المفيدة لصحة القلب في الطيبات؟','هل الصيام آمن لمريض القلب؟','كيف أخفض الكوليسترول بالطيبات؟'],
-  kidney: ['ما الأطعمة الآمنة لمريض الكلى?','كم كمية البروتين المناسبة لي؟','اقترح وجبات منخفضة البوتاسيوم'],
+  kidney: ['ما الأطعمة الآمنة لمريض الكلى؟','كم كمية البروتين المناسبة لي؟','اقترح وجبات منخفضة البوتاسيوم'],
 };
 const DEFAULT_QUICK_PROMPTS = [
   'ما هي قواعد نظام الطيبات الأساسية؟',
   'هل الدجاج مسموح في الطيبات؟',
   'اقترح لي وجبة غداء من الطيبات',
   'ما أفضل بروتوكول صيام للمبتدئين؟',
-  'ما هي الأطعمة التي تعالج الالتهاب؟',
+  'ما هي الأطعمة التي تعالج الالتهاب?','أعطني خطة صيام مخصصة لوضعي'
 ];
 
 function buildAiSystemPrompt() {
@@ -1165,11 +1219,10 @@ function buildAiSystemPrompt() {
   const bmiCat = currentUser.bmi ? getBMICategory(currentUser.bmi).label : '—';
   const disStr = diseases.length ? diseases.map(d => DISEASE_AR[d] || d).join('، ') : 'لا أمراض مزمنة — بصحة جيدة';
 
-  // دمج قاعدة المعرفة بذكاء داخل الـ Prompt للنظام
   const allowedSection = TAYYIBAT_KNOWLEDGE.basicPrinciples.allowed.map(f => `✅ ${f.name}: ${f.detail}`).join('\n');
   const forbiddenSection = TAYYIBAT_KNOWLEDGE.basicPrinciples.forbidden.map(f => `❌ ${f.name}: ${f.detail}`).join('\n');
 
-  return `أنت طبيب وخبير تغذية ذكي ومحترف، متخصص في نظام الطيبات الغذائي للدكتور ضياء العوضي رحمه الله.
+  return `أنت طبيب واستشاري وخبير تغذية ذكي، متخصص ومبني كلياً على أبحاث نظام الطيبات الغذائي للدكتور ضياء العوضي رحمه الله.
 
 == بيانات المستخدم الحالي ==
 الاسم الكامل: ${name}
@@ -1177,17 +1230,17 @@ function buildAiSystemPrompt() {
 مؤشر كتلة الجسم (BMI): ${bmi} (${bmiCat})
 الأمراض والوضع الصحي: ${disStr}
 
-== قاعدة المعرفة الأساسية الملتزم بها للنظام ==
+== قاعدة المعرفة الأساسية الملتزم بها لنظام الطيبات ==
 ${allowedSection}
 
-الممنوعات القطعية:
+الممنوعات القطعية والنهائية:
 ${forbiddenSection}
 
-== طريقة الرد والبروتوكول العلمي ==
-1. خصص مقترحات الوجبات والإجابات لتناسب حالة المستخدم الطبية: [${disStr}].
+== طريقة الرد والبروتوكول العلمي الذكي ==
+1. خصص مقترحات الوجبات والإجابات لتناسب حالة المستخدم الطبية الفريدة: [${disStr}].
 2. إذا سأل المستخدم عن طعام ممنوع، وضح له مباشرة سبب المنع بناء على قاعدة البيانات واقترح البديل المسموح فوراً.
-3. اكتب الرد بنقاط منظمة ومريحة للعين ومكتوبة باللغة العربية الواضحة والودودة مع استخدام الرموز التعبيرية المناسبة.
-4. أضف جملة تحذيرية نهاية الردود الحساسة: "تنبيه: يرجى دائماً استشارة الطبيب المتابع لحالتك قبل البدء"`;
+3. اكتب الرد بنقاط منظم، مريح للعين، واضح ومكتوب باللغة العربية الودودة مع استخدام الرموز التعبيرية المناسبة.
+4. أضف جملة تحذيرية نهاية الردود الطبية الحساسة: "تنبيه: يرجى دائماً مراجعة الطبيب المتابع لحالتك قبل البدء"`;
 }
 
 function buildAiPage() {
@@ -1228,7 +1281,7 @@ function buildAiPage() {
 
   if (aiMessages.length === 0) {
     const diseases_list = diseases.length ? diseases.map(d=>DISEASE_AR[d]||d).join(' و') : 'لا أمراض مزمنة';
-    addAiMessage('assistant', `مرحباً ${currentUser.name}! 👋\n\nأنا مساعدك الصحي ومستشارك الذكي لنظام الطيبات للدكتور ضياء العوضي رحمه الله.\n\nلقد قمت بتحليل وضعك الصحي الحالي: **${diseases_list}**، وسأقوم بتقديم التوجيهات الغذائية والوجبات التي تلبي احتياجات جسمك تماماً.\n\nتفضل بسؤالي عن أي طعام أو بروتوكول صيام وسأجيبك فوراً! 🌿`);
+    addAiMessage('assistant', `مرحباً ${currentUser.name}! 👋\n\nأنا مساعدك ومستشارك الصحي الشامل المدمج بنظام الـ API العام والحر لنظام الطيبات للدكتور ضياء العوضي رحمه الله.\n\nلقد قمت بتحليل وضعك الصحي الحالي: **${diseases_list}**، وسأقوم بتقديم التوجيهات المفتوحة والذكية لمساعدتك الآن.\n\nاسألني عن أي طعام أو استشارة وسأجيبك فوراً! 🌿`);
   }
 }
 
@@ -1250,7 +1303,7 @@ function addAiThinking() {
   const div = document.createElement('div');
   div.className = 'ai-msg assistant';
   div.id = 'ai-thinking-msg';
-  div.innerHTML = `<div class="ai-msg-label">🤖 مساعد طيبات الذكي</div><div class="ai-thinking-wrap">جاري صياغة إجابة طبية مخصصة لحالتك...<div class="ai-dots"><span></span><span></span><span></span></div></div>`;
+  div.innerHTML = `<div class="ai-msg-label">🤖 مساعد طيبات الذكي</div><div class="ai-thinking-wrap">جاري صياغة إجابة فورية وحرة مخصصة لحالتك...<div class="ai-dots"><span></span><span></span><span></span></div></div>`;
   wrap.appendChild(div);
   div.scrollIntoView({behavior:'smooth',block:'end'});
 }
@@ -1265,7 +1318,6 @@ function sendQuickPrompt(text) {
   sendAiMessage();
 }
 
-/* محرك الـ Fallback المتطور للمحرك الذكي */
 async function sendAiMessage() {
   if (aiIsLoading) return;
   const input = document.getElementById('ai-msg-input');
@@ -1284,8 +1336,33 @@ async function sendAiMessage() {
   let aiSuccess = false;
   let finalReply = "";
 
-  // 1️⃣ محاولة رقم 1: Claude API
-  if (TAYYIBAT_CONFIG.ENABLED_APIS.claude && TAYYIBAT_CONFIG.CLAUDE_API_KEY) {
+  // 1️⃣ المحاولة الأولى: API ذكاء اصطناعي حر عام مجاني وسريع جداً وبدون تسجيل
+  if (TAYYIBAT_CONFIG.ENABLED_APIS.free_public) {
+    try {
+      // استخدام نموذج ذكاء اصطناعي حر ومباشر لمعالجة الطلبات بدون مفاتيح تسجيل
+      const systemPrompt = buildAiSystemPrompt();
+      const response = await fetch(`https://text.pollinations.ai/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...aiMessages
+          ],
+          model: "openai",
+          jsonMode: false
+        }),
+        signal: AbortSignal.timeout(TAYYIBAT_CONFIG.TIMEOUT)
+      });
+      if (response.ok) {
+        finalReply = await response.text();
+        if (finalReply) { aiSuccess = true; console.log("Response generated via Public Free API"); }
+      }
+    } catch (e) { console.warn("Public Free API failed, trying fallback...", e); }
+  }
+
+  // 2️⃣ المحاولة الثانية (البديل المدمج): Claude API في حال تم توفير المفتاح
+  if (!aiSuccess && TAYYIBAT_CONFIG.ENABLED_APIS.claude && TAYYIBAT_CONFIG.CLAUDE_API_KEY) {
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -1305,12 +1382,12 @@ async function sendAiMessage() {
       if (response.ok) {
         const data = await response.json();
         finalReply = data.content?.[0]?.text;
-        if (finalReply) { aiSuccess = true; console.log("Response fetched from Claude API"); }
+        if (finalReply) { aiSuccess = true; }
       }
-    } catch (e) { console.warn("Claude API failed, trying fallback...", e); }
+    } catch (e) { console.warn("Claude API failed...", e); }
   }
 
-  // 2️⃣ محاولة رقم 2: HuggingFace API (البديل المجاني)
+  // 3️⃣ المحاولة الثالثة: HuggingFace API كخيار معزز
   if (!aiSuccess && TAYYIBAT_CONFIG.ENABLED_APIS.huggingface && TAYYIBAT_CONFIG.HUGGINGFACE_TOKEN) {
     try {
       const response = await fetch('https://api-inference.huggingface.co/models/MistralAI/Mistral-7B-Instruct-v0.2', {
@@ -1321,61 +1398,30 @@ async function sendAiMessage() {
         },
         body: JSON.stringify({
           inputs: `<s>[SYSTEM] ${buildAiSystemPrompt()} [/SYSTEM]\n[USER] ${text} [/USER]\n[ASSISTANT]`,
-          parameters: { max_new_tokens: 800, text_cleaner: true }
+          parameters: { max_new_tokens: 800 }
         }),
         signal: AbortSignal.timeout(TAYYIBAT_CONFIG.TIMEOUT)
       });
       if (response.ok) {
         const data = await response.json();
         let outText = data[0]?.generated_text || data.generated_text || "";
-        if (outText.includes('[ASSISTANT]')) {
-          outText = outText.split('[ASSISTANT]').pop();
-        }
+        if (outText.includes('[ASSISTANT]')) outText = outText.split('[ASSISTANT]').pop();
         finalReply = outText.trim();
-        if (finalReply) { aiSuccess = true; console.log("Response fetched from HuggingFace Fallback"); }
+        if (finalReply) { aiSuccess = true; }
       }
-    } catch (e) { console.warn("HuggingFace fallback failed...", e); }
-  }
-
-  // 3️⃣ محاولة رقم 3: Ollama Local AI
-  if (!aiSuccess && TAYYIBAT_CONFIG.ENABLED_APIS.ollama) {
-    try {
-      const response = await fetch('http://localhost:11434/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'mistral',
-          system: buildAiSystemPrompt(),
-          prompt: text,
-          stream: false
-        }),
-        signal: AbortSignal.timeout(TAYYIBAT_CONFIG.TIMEOUT)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        finalReply = data.response;
-        if (finalReply) { aiSuccess = true; console.log("Response fetched from Ollama Local Server"); }
-      }
-    } catch (e) { console.warn("Ollama Local failed...", e); }
+    } catch (e) { console.warn("HuggingFace failed...", e); }
   }
 
   removeAiThinking();
 
-  // عرض النتيجة النهائية للمستخدم بناءً على حالة النجاح
   if (aiSuccess && finalReply) {
     aiMessages.push({role:'assistant', content:finalReply});
     addAiMessage('assistant', finalReply);
     playSound('success');
   } else {
-    // الرد التلقائي الذكي من قاعدة البيانات المحلية في حال انقطاع جميع الـ APIs أو الإنترنت
-    let localResponse = `أهلاً بك. يبدو أنني أواجه صعوبة مؤقتة في الاتصال بالسيرفرات الخارجية.\n\nإليك التوجيه الأساسي لنظام الطيبات بناءً على حالتك:\n`;
-    const diseases = currentUser.diseases || [];
-    if (diseases.length > 0) {
-      localResponse += `• نظام الطيبات يوصي بالالتزام القطعي باللحوم الحمراء، الأسماك المشوية، الأرز والبطاطس المسلوقة.\n• يرجى مراجعة نافذة **"نصائح طبية مخصصة لك"** في الشاشة الرئيسية حيث تحتوي على كافة التعليمات المحفوظة لجسمك لمرض (${diseases.map(d => DISEASE_AR[d]).join(' و ')}).`;
-    } else {
-      localResponse += `• طعامك مسموح بالكامل طالما تبتعد عن الدواجن، البيض، الدقيق الأبيض، والألبان السائلة.\n• يمكنك تصفح قسم **الأطعمة** لمراجعة المسموح والممنوع بالتفصيل المباشر.`;
-    }
-    localResponse += `\n\n💡 *نصيحة:* تأكد من تفعيل أحد مفاتيح الـ API (مثل Claude أو HuggingFace Token) داخل كود الإعدادات (TAYYIBAT_CONFIG) لفتح المحادثات المتقدمة الكاملة!`;
+    // معالجة ذكية محلية من قاعدة البيانات في حالة عدم توفر شبكة نهائياً
+    let localResponse = `أهلاً بك يا ${currentUser.name}.\n\nيبدو أن خوادم التحليل غير مستقرة حالياً بسبب مشاكل اتصال بالإنترنت، إليك التوجيه الأساسي:\n`;
+    localResponse += `• نوصي بالالتزام التام بقواعد نظام الطيبات (اللحم الأحمر، الرز المسلوق، السمك المشوي البكر وزيت الزيتون).\n• يرجى تصفح قسم **الأطعمة** وقراءة المسموح والممنوع، أو فتح قسم **الصيام** للاطلاع على بروتوكولك الخاص بالكامل محلياً وبشكل فوري.`;
     addAiMessage('assistant', localResponse);
   }
 
@@ -1383,25 +1429,44 @@ async function sendAiMessage() {
   if (btn) {btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال';}
 }
 
-function clearAiChat() {
-  aiMessages = [];
-  document.getElementById('ai-chat-wrap').innerHTML = '';
-  buildAiPage();
-  showToast('🗑️ تم مسح المحادثة');
-}
-
-/* FASTING */
-const FAST_TYPES=[
-  {id:'16_8',hrs:16,name:'16/8 — للمبتدئين',emoji:'🟢',desc:'16 ساعة صيام و8 ساعات أكل',level:'lv-easy',schedule:'صيام من 8 مساءً حتى 12 ظهراً'},
-  {id:'18_6',hrs:18,name:'18/6 — المتوسط',emoji:'🟡',desc:'18 ساعة صيام و6 ساعات أكل',level:'lv-med',schedule:'صيام من 6 مساءً حتى 12 ظهراً'},
-  {id:'20_4',hrs:20,name:'20/4 — بروتوكول المحارب',emoji:'🔴',desc:'20 ساعة صيام و4 ساعات أكل',level:'lv-hard',schedule:'صيام من 8 مساءً حتى 4 عصراً'},
-  {id:'24',hrs:24,name:'24 ساعة — OMAD',emoji:'⚫',desc:'وجبة واحدة يومياً. للمتقدمين فقط',level:'lv-hard',schedule:'صيام 23 ساعة | وجبة واحدة كاملة'},
-  {id:'5_2',hrs:0,name:'5:2 — الأسبوعي',emoji:'📅',desc:'5 أيام طبيعية + يومان بـ 500 سعرة',level:'lv-med',schedule:'أكل طبيعي 5 أيام | تقييد يومين'},
-];
+/* FASTING BLOCK LOGIC AND DETAILS POPUP */
 function buildFastTypes(){
   const el=document.getElementById('fast-types');const saved=localStorage.getItem('selected_fast');if(saved)selectedFast=FAST_TYPES.find(f=>f.id===saved)||null;
-  el.innerHTML=FAST_TYPES.map(f=>`<div class="fast-card${selectedFast&&selectedFast.id===f.id?' sel':''}" id="fc-${f.id}" onclick="selectFast('${f.id}')"><div class="fc-row"><div class="fc-hrs">${f.hrs||'5:2'}</div><div class="fc-details"><div class="fc-dname">${f.emoji} ${f.name}</div><div class="fc-ddesc">${f.desc}</div><div><span class="fc-level ${f.level}">${f.level==='lv-easy'?'سهل':f.level==='lv-med'?'متوسط':'متقدم'}</span></div><div style="font-size:.68rem;color:var(--txt3);margin-top:4px">${f.schedule}</div></div></div></div>`).join('');
+  el.innerHTML=FAST_TYPES.map(f=>`<div class="fast-card${selectedFast&&selectedFast.id===f.id?' sel':''}" id="fc-${f.id}" onclick="selectFast('${f.id}')"><div class="fc-row"><div class="fc-hrs">${f.hrs||'5:2'}</div><div class="fc-details"><div class="fc-dname">${f.emoji} ${f.name}</div><div class="fc-ddesc">${f.desc}</div><div><span class="fc-level ${f.level}">${f.level==='lv-easy'?'سهل':f.level==='lv-med'?'متوسط':'متقدم'}</span></div><div style="font-size:.68rem;color:var(--txt3);margin-top:4px">${f.schedule}</div><button class="fast-info-btn" onclick="event.stopPropagation();openFastingDetailsModal('${f.id}')"><i class="fas fa-info-circle"></i> معلومات كاملة عن النظام</button></div></div></div>`).join('');
 }
+function openFastingDetailsModal(id) {
+  const proto = TAYYIBAT_KNOWLEDGE.fastingProtocols[id] || FAST_TYPES.find(f=>f.id===id);
+  if (!proto) return;
+  
+  const originalProto = FAST_TYPES.find(f=>f.id===id);
+  const titleEl = document.getElementById('fast-modal-title');
+  const bodyEl = document.getElementById('fast-modal-body');
+  
+  titleEl.innerHTML = `${originalProto.emoji} تفاصيل نظام ${originalProto.name}`;
+  
+  // بناء تفاصيل كاملة وديناميكية لكل نوع صيام بناءً على قاعدة البيانات المعرفية المحفوظة بالداخل
+  let html = `<div class="fast-info-block">
+    <p style="color:var(--txt); font-weight:700; margin-bottom:10px;">⏰ طبيعة الجدول الزمني: <span style="color:var(--gold2);">${proto.schedule || originalProto.schedule}</span></p>
+    <h4>✅ الأكل المسموح به في نافذة تناول الطعام:</h4>
+    <p>${proto.allowedFood || "اللحوم الحمراء (خروف، ماعز، جمل)، الأسماك البحرية المشوية، الأرز الأبيض، البطاطس المسلوقة، زيت الزيتون البكر الممتاز، والسمن البلدي الطبيعي."}</p>
+    
+    <h4>❌ الممنوعات القطعية أثناء هذا البروتوكول:</h4>
+    <p>${proto.forbiddenFood || "الدجاج، الدواجن، البيض، الخبز الأبيض، المكرونة، الزيوت النباتية التجارية، والألبان السائلة كالحليب والزبادي."}</p>
+    
+    <h4>💡 نصائح مخصصة للمستخدم لتطبيق هذا الصيام:</h4>
+    <ul>
+      <li>${proto.tips || "احرص على شرب ماء كافٍ جداً خلال ساعات الصيام لمساعدة الكلى على طرد السموم الناتجة عن الحرق."}</li>
+      <li>لا تقم بكسر الصيام على وجبة ضخمة فجأة، ابدأ تدريجياً بشوربة مسموحة دافئة لحماية جدار المعدة.</li>
+      <li>احرص على كفاية السعرات الحرارية في الوجبة لتفادي الشعور بالهبوط والضعف العام خلال الأيام الأولى.</li>
+    </ul>
+    <p style="font-size:.75rem; color:var(--red2); margin-top:15px; font-weight:700;">⚠️ تنبيه: نظام الصيام المتقطع يرفع كفاءة المناعة؛ لكن إذا كنت مريضاً بمرض مزمن أو تتناول جرعات أدوية محددة المواعيد، يرجى دائماً مراجعة طبيبك المعالج لتعديل الأوقات.</p>
+  </div>`;
+  
+  bodyEl.innerHTML = html;
+  document.getElementById('fast-details-modal').classList.add('show');
+  playSound('click');
+}
+
 function selectFast(id){selectedFast=FAST_TYPES.find(f=>f.id===id)||null;document.querySelectorAll('.fast-card').forEach(c=>c.classList.remove('sel'));document.getElementById('fc-'+id).classList.add('sel');localStorage.setItem('selected_fast',id);updateTimerDisplay();showToast(`✅ تم اختيار ${selectedFast.name}`);playSound('click');}
 function updateTimerDisplay(){if(fastStartTime)return;if(selectedFast){document.getElementById('timer-label').textContent=selectedFast.name;document.getElementById('fast-stats-line').innerHTML=`<span style="color:var(--gold2)">${selectedFast.emoji} ${selectedFast.name}</span> &nbsp;|&nbsp; ${selectedFast.schedule}`;}}
 function startFast(){if(!selectedFast){showToast('⚠️ اختر نوع الصيام أولاً');return;}if(fastInterval)return;fastStartTime=Date.now();localStorage.setItem('fast_start',fastStartTime);document.getElementById('btn-start').disabled=true;document.getElementById('btn-stop').disabled=false;fastInterval=setInterval(tickTimer,1000);playSound('success');showToast('🌙 بدأ الصيام - بالتوفيق!');}
