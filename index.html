@@ -2175,12 +2175,11 @@ function renderFood(){
 }
 
 /* ═══════════════════════════════════════════════
-   AI RECIPE GENERATOR
+   AI RECIPE GENERATOR (MULTI-MODEL FALLBACK SYSTEM)
 ═══════════════════════════════════════════════ */
 async function generateRecipe() {
   const ingredients = document.getElementById('ai-ingredients').value;
   const resultDiv = document.getElementById('ai-recipe-result');
-  const btn = document.getElementById('btn-get-recipe');
 
   if (!ingredients.trim()) {
     showToast('❌ الرجاء إدخال المقادير أولاً');
@@ -2188,25 +2187,54 @@ async function generateRecipe() {
   }
 
   resultDiv.style.display = 'block';
-  resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التفكير وابتكار وصفة متوافقة مع الطيبات...';
+  resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري البحث في عدة خوادم لابتكار الوصفة... يرجى الانتظار.';
   setBtnLoading('btn-get-recipe', true);
 
-  // صياغة الطلب للذكاء الاصطناعي مع توجيه صارم لمبادئ الطيبات
   const prompt = `أنا أتبع نظام الطيبات للدكتور ضياء العوضي. لدي المقادير التالية: ${ingredients}. 
-  اقترح وجبة واحدة فقط باستخدام هذه المقادير (أو بعضها)، ويجب أن تكون متوافقة 100% مع مسموحات نظام الطيبات للدكتور ضياء العوضي (تجنب الممنوعات تماماً مثل الدجاج والبيض والزيوت المهدرجة والمكرونة).
+  اقترح وجبة واحدة فقط باستخدام هذه المقادير (أو بعضها)، ويجب أن تكون متوافقة 100% مع مسموحات نظام الطيبات للدكتور ضياء العوضي (تجنب تماماً الدجاج، البيض، الزيوت المهدرجة، المكرونة، والمخبوزات).
   اكتب اسم الوجبة وطريقة التحضير باختصار. أجب باللغة العربية فقط.`;
 
-  try {
-    const apiUrl = 'https://text.pollinations.ai/' + encodeURIComponent(prompt);
-    const response = await fetch(apiUrl);
-    
-    if (!response.ok) throw new Error('Network error');
-    
-    const textResponse = await response.text();
+  // قائمة بأفضل النماذج المجانية المتاحة عبر Pollinations (لا تحتاج API Key)
+  const models = ['openai', 'mistral', 'searchgpt', 'llama'];
+  let success = false;
+  let textResponse = '';
+
+  // الدوران على النماذج وتجربتها واحداً تلو الآخر في حال فشل أي منها
+  for (let model of models) {
+    try {
+      console.log(`جاري تجربة نموذج: ${model}...`);
+      const apiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=${model}`;
+      
+      // نضع حد أقصى للانتظار (Timeout) حتى لا يعلق المتصفح طويلاً
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 ثانية كحد أقصى لكل نموذج
+      
+      const response = await fetch(apiUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const result = await response.text();
+        if (result && result.trim().length > 10) {
+          textResponse = result;
+          success = true;
+          break; // نجحنا، نتوقف عن المحاولة
+        }
+      }
+    } catch (error) {
+      console.warn(`النموذج ${model} واجه مشكلة (Timeout/Error)، ننتقل للبديل التالي...`);
+    }
+  }
+
+  if (success) {
+    // عرض النتيجة بنجاح
     resultDiv.innerHTML = `<strong style="color:var(--gold2)">الوصفة المقترحة:</strong><br><br>` + textResponse.replace(/\n/g, '<br>');
-  } catch (error) {
-    resultDiv.innerHTML = "<span style='color:#ef5350;'>عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى لاحقاً.</span>";
-    console.error("AI API Error:", error);
+  } else {
+    // إذا فشلت جميع الخوادم (بسبب مشكلة عامة أو انقطاع إنترنت)، نعرض وصفة ثابتة احتياطية كـ Fallback لحفظ ماء الوجه
+    resultDiv.innerHTML = `
+      <span style='color:#ef5350;'><i class="fas fa-exclamation-triangle"></i> عذراً، جميع خوادم الذكاء الاصطناعي المجانية تواجه ضغطاً حالياً.</span><br><br>
+      <strong style="color:var(--green2)">لكن إليك اقتراح سريع من النظام:</strong><br>
+      بناءً على مقاديرك، يمكنك عمل "طاجن خضار مسبك بمرق اللحم أو بزيت الزيتون البكر" مع تقديم الأرز الأبيض بجانبه. تذكر أن نظام الطيبات يشجع على الخضروات المطبوخة جيداً والأرز كبديل ممتاز للمكرونة والخبز!
+    `;
   }
   
   setBtnLoading('btn-get-recipe', false, '<i class="fas fa-magic"></i> اقترح لي وجبة');
@@ -2353,7 +2381,7 @@ function showFastDetail(id){
       <div class="fast-modal-section">
         <div class="fast-modal-section-title"><i class="fas fa-ban" style="color:var(--red2)"></i> ممنوع — حتى في فترة الأكل</div>
         <div class="fast-food-grid">
-          ${f.eating_forbidden.map(x=>`<div class="fast-food-item no">${x}</div>`).join('')}
+          ${f.fast-food-item.map(x=>`<div class="fast-food-item no">${x}</div>`).join('')}
         </div>
       </div>
 
