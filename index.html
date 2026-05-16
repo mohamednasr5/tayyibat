@@ -11,7 +11,6 @@
 <meta name="description" content="نظام طيبات الصحي - تغذية ذكية وصيام متقطع مع نصائح طبية مخصصة">
 <link rel="manifest" href="manifest.json">
 
-<!-- ═══ Favicon & Icons ═══ -->
 <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
@@ -25,7 +24,6 @@
 
 <title>طيبات | نظام صحي ذكي</title>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
@@ -43,7 +41,6 @@
   const db = firebase.database();
 </script>
 
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -901,14 +898,61 @@ body{
 .disclaimer{background:linear-gradient(135deg,rgba(160,21,21,.15),rgba(160,21,21,.05));border:1px solid rgba(229,57,53,.3);border-radius:14px;padding:14px 16px;margin-bottom:20px}
 .dis-title{color:#ef5350;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .disclaimer p{font-size:.75rem;color:#e57373;line-height:1.65}
+
+/* ══════════ AI RECIPE SECTION ══════════ */
+.ai-recipe-section {
+  padding: 0 16px 16px;
+}
+.ai-recipe-card {
+  background: linear-gradient(145deg, var(--card), var(--card2));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.ai-recipe-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold2);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ai-textarea {
+  width: 100%;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--txt);
+  font-family: 'Tajawal', sans-serif;
+  font-size: .9rem;
+  outline: none;
+  resize: vertical;
+  margin-bottom: 10px;
+  transition: border-color 0.3s;
+}
+.ai-textarea:focus {
+  border-color: var(--gold);
+}
+#ai-recipe-result {
+  margin-top: 15px;
+  font-size: .85rem;
+  color: var(--txt);
+  line-height: 1.6;
+  display: none;
+  background: rgba(255,255,255,.03);
+  padding: 12px;
+  border-radius: 12px;
+  border-right: 3px solid var(--gold);
+}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ UNIVERSE 3D CANVAS ═══════════════ -->
 <canvas id="universe-canvas"></canvas>
 
-<!-- ═══════════════ LOADER ═══════════════ -->
 <div id="loader">
   <div class="loader-3d">
     <div class="loader-ring-outer"></div>
@@ -918,14 +962,11 @@ body{
   <div class="loader-txt">جاري تحميل نظام طيبات...</div>
 </div>
 
-<!-- ═══════════════ SOUND TOGGLE ═══════════════ -->
 <button class="sound-btn show" id="sound-btn" onclick="toggleSound()" title="تبديل الصوت">
   <i class="fas fa-volume-up" id="sound-icon"></i>
 </button>
 
-<!-- ═══════════════ AUTH PAGE ═══════════════ -->
 <div class="page active" id="auth-page">
-  <!-- 3D HERO ANIMATION -->
   <div class="auth-hero" style="width:100%;max-width:420px">
     <div class="hero-orb" style="width:180px;height:180px;background:rgba(200,150,12,.15);top:10px;left:-40px;animation-delay:0s"></div>
     <div class="hero-orb" style="width:120px;height:120px;background:rgba(33,150,243,.12);bottom:-20px;right:-20px;animation-delay:2s"></div>
@@ -936,14 +977,12 @@ body{
     </div>
   </div>
 
-  <!-- AUTH CARD -->
   <div class="auth-card" style="width:100%;max-width:420px">
     <div class="auth-tabs">
       <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">تسجيل الدخول</div>
       <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">إنشاء حساب</div>
     </div>
 
-    <!-- LOGIN FORM -->
     <div id="login-form">
       <div class="field">
         <label>اسم المستخدم</label>
@@ -958,12 +997,11 @@ body{
           <button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button>
         </div>
       </div>
-      <button class="btn btn-gold mt8" onclick="doLogin()">
+      <button class="btn btn-gold mt8" id="btn-login" onclick="doLogin()">
         <i class="fas fa-sign-in-alt"></i> دخول
       </button>
     </div>
 
-    <!-- REGISTER FORM -->
     <div id="register-form" class="hidden">
       <div class="field">
         <label>الاسم الكامل</label>
@@ -1004,7 +1042,6 @@ body{
       </div>
       <div class="bmi-result" id="bmi-result"></div>
 
-      <!-- DISEASE SELECTION - ENHANCED -->
       <div class="disease-section">
         <div class="dis-section-title">
           <i class="fas fa-notes-medical" style="color:var(--red2)"></i>
@@ -1073,14 +1110,13 @@ body{
         <p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً قبل تغيير نظامك الغذائي خاصةً عند وجود أمراض مزمنة.</p>
       </div>
 
-      <button class="btn btn-gold" onclick="doRegister()">
+      <button class="btn btn-gold" id="btn-register" onclick="doRegister()">
         <i class="fas fa-user-plus"></i> إنشاء حساب
       </button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ BOTTOM NAV ═══════════════ -->
 <nav class="bottom-nav" id="bottom-nav">
   <div class="nav-item act" id="nav-home" onclick="goPage('home')">
     <i class="fas fa-home"></i><span>الرئيسية</span>
@@ -1096,7 +1132,6 @@ body{
   </div>
 </nav>
 
-<!-- ═══════════════ HOME PAGE ═══════════════ -->
 <div class="page" id="home-page">
   <div class="app-header">
     <div class="header-row">
@@ -1115,13 +1150,11 @@ body{
     <div class="dis-tags" id="home-dis-tags"></div>
   </div>
 
-  <!-- Medical Alerts (Dynamic by diseases) -->
   <div class="section" id="medical-alerts-section">
     <div class="sec-title"><i class="fas fa-notes-medical"></i> نصائح طبية مخصصة لك</div>
     <div id="medical-alerts-container"></div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-icon">⏱️</div>
@@ -1140,20 +1173,17 @@ body{
     </div>
   </div>
 
-  <!-- Tip Carousel -->
   <div class="tip-header">
     <div class="tip-sec-title"><i class="fas fa-lightbulb"></i> نصيحة صحية</div>
     <button class="tip-next-btn" onclick="nextTip()">التالية ›</button>
   </div>
   <div class="tip-carousel" id="tip-carousel"></div>
 
-  <!-- Footer -->
   <div class="footer-sig">
     <div class="heart-wrap">♥</div>
     <div class="sig-text">نظام الطيبات الغذائي<br><span class="sig-name">للدكتور ضياء العوضي رحمه الله</span></div>
     <div style="font-size:.72rem;color:var(--txt3);margin-top:6px">نظام صحي ذكي مع رعاية إلهية</div>
 
-    <!-- Developer Signature -->
     <div class="dev-sig">
       <div class="dev-sig-line"></div>
       <div class="dev-sig-label">برمجة وتطوير</div>
@@ -1169,25 +1199,42 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════ FOOD PAGE ═══════════════ -->
 <div class="page" id="food-page">
   <div class="app-header">
     <div class="header-row">
-      <div class="header-title">🥗 الأطعمة</div>
+      <div class="header-title">🥗 الأطعمة والوصفات</div>
       <div class="user-chip"><i class="fas fa-search"></i></div>
     </div>
   </div>
+
   <div class="search-wrap">
     <div class="search-wrap-inner">
       <i class="fas fa-search"></i>
-      <input class="search-input" type="search" id="food-search" placeholder="ابحث عن طعام..." oninput="filterFood()">
+      <input class="search-input" type="search" id="food-search" placeholder="ابحث عن طعام أو وصف... (البحث فوري)" oninput="filterFood()">
     </div>
   </div>
+
+  <div class="ai-recipe-section">
+    <div class="ai-recipe-card">
+      <div class="ai-recipe-title">
+        <i class="fas fa-robot"></i> الذكاء الاصطناعي (وصفات الطيبات)
+      </div>
+      <p style="font-size: .78rem; color: var(--txt2); margin-bottom: 10px; line-height: 1.5;">أدخل ما لديك في مطبخك من مقادير، وسنقترح عليك وجبة فورية ومطابقة 100% لنظام الطيبات:</p>
+      
+      <textarea id="ai-ingredients" class="ai-textarea" rows="2" placeholder="مثال: لحم، بطاطس، بصل، طماطم، زيت زيتون..."></textarea>
+      
+      <button class="btn btn-gold" id="btn-get-recipe" onclick="generateRecipe()" style="padding: 10px; font-size: .9rem;">
+        <i class="fas fa-magic"></i> اقترح لي وجبة
+      </button>
+      
+      <div id="ai-recipe-result"></div>
+    </div>
+  </div>
+
   <div class="food-tabs-wrap" id="food-tabs"></div>
   <div class="food-grid" id="food-grid"></div>
 </div>
 
-<!-- ═══════════════ FASTING PAGE ═══════════════ -->
 <div class="page" id="fast-page">
   <div class="app-header">
     <div class="header-row">
@@ -1238,7 +1285,6 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════ PROFILE PAGE ═══════════════ -->
 <div class="page" id="profile-page">
   <div class="app-header">
     <div class="header-row">
@@ -1251,7 +1297,6 @@ body{
     <div class="profile-info" id="p-info">-</div>
   </div>
   <div class="profile-cards">
-    <!-- Personal Info -->
     <div class="prof-card">
       <div class="prof-card-title">
         <span><i class="fas fa-id-card" style="color:var(--gold)"></i> بيانات شخصية</span>
@@ -1263,7 +1308,6 @@ body{
       <div class="prof-row"><span class="prof-key">العمر</span><span class="prof-val" id="pp-age">-</span></div>
     </div>
 
-    <!-- Health Info -->
     <div class="prof-card">
       <div class="prof-card-title">
         <span><i class="fas fa-heartbeat" style="color:var(--red2)"></i> البيانات الصحية</span>
@@ -1275,7 +1319,6 @@ body{
       <div class="prof-row"><span class="prof-key">التصنيف</span><span class="prof-val" id="pp-bmicat">-</span></div>
     </div>
 
-    <!-- Diseases -->
     <div class="prof-card">
       <div class="prof-card-title">
         <span><i class="fas fa-notes-medical" style="color:var(--red2)"></i> الحالة الصحية</span>
@@ -1284,7 +1327,6 @@ body{
       <div id="pp-diseases"></div>
     </div>
 
-    <!-- Dr. Zia Al-Awadi Bio -->
     <div class="prof-card" style="border-color:rgba(200,150,12,.35);background:linear-gradient(145deg,#0d1e38,#1a2a10)">
       <div class="prof-card-title" style="flex-direction:column;align-items:flex-start;gap:10px">
         <div style="display:flex;align-items:center;gap:10px;width:100%">
@@ -1303,7 +1345,6 @@ body{
       </div>
     </div>
 
-    <!-- Share -->
     <div class="share-card">
       <div class="share-card-title"><i class="fas fa-share-alt" style="color:var(--blue2)"></i> مشاركة التطبيق</div>
       <div class="share-btns">
@@ -1317,18 +1358,16 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════ EDIT PROFILE MODAL ═══════════════ -->
 <div class="modal-overlay" id="edit-profile-modal">
   <div class="modal-box">
     <div class="modal-title">✏️ تعديل البيانات الشخصية</div>
     <div class="field"><label>الاسم الكامل</label><input type="text" id="edit-name" placeholder="الاسم الكامل"></div>
     <div class="field"><label>تاريخ الميلاد</label><input type="date" id="edit-dob"></div>
-    <button class="btn btn-gold" onclick="saveProfileEdit()"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-gold" id="btn-save-profile" onclick="saveProfileEdit()"><i class="fas fa-save"></i> حفظ</button>
     <button class="modal-close" onclick="closeModal('edit-profile-modal')">إغلاق</button>
   </div>
 </div>
 
-<!-- ═══════════════ EDIT HEALTH MODAL ═══════════════ -->
 <div class="modal-overlay" id="edit-health-modal">
   <div class="modal-box">
     <div class="modal-title">💪 تعديل البيانات الصحية</div>
@@ -1337,12 +1376,11 @@ body{
       <div class="field"><label>الطول (سم)</label><input type="number" id="edit-height" placeholder="170" min="100" max="250" oninput="calcEditBMI()"></div>
     </div>
     <div class="bmi-result" id="edit-bmi-result"></div>
-    <button class="btn btn-gold" onclick="saveHealthEdit()"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-gold" id="btn-save-health" onclick="saveHealthEdit()"><i class="fas fa-save"></i> حفظ</button>
     <button class="modal-close" onclick="closeModal('edit-health-modal')">إغلاق</button>
   </div>
 </div>
 
-<!-- ═══════════════ EDIT DISEASES MODAL ═══════════════ -->
 <div class="modal-overlay" id="edit-diseases-modal">
   <div class="modal-box">
     <div class="modal-title">🏥 تعديل الأمراض المزمنة</div>
@@ -1380,22 +1418,18 @@ body{
         </div>
       </div>
     </div>
-    <button class="btn btn-gold mt16" onclick="saveDiseasesEdit()"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-gold mt16" id="btn-save-diseases" onclick="saveDiseasesEdit()"><i class="fas fa-save"></i> حفظ</button>
     <button class="modal-close" onclick="closeModal('edit-diseases-modal')">إغلاق</button>
   </div>
 </div>
 
-<!-- ═══════════════ FASTING DETAIL MODAL ═══════════════ -->
 <div class="modal-overlay" id="fast-detail-modal">
   <div class="modal-box" id="fast-detail-content">
-    <!-- يُبنى ديناميكياً -->
-  </div>
+    </div>
 </div>
 
-<!-- ═══════════════ TOAST ═══════════════ -->
 <div id="toast"></div>
 
-<!-- ═══════════════ PWA BANNER ═══════════════ -->
 <div id="pwa-banner">
   <div class="pwa-icon">🌿</div>
   <div class="pwa-text">
@@ -2109,6 +2143,7 @@ function setFoodTab(cat){
   renderFood();
 }
 
+/* بحث فورى (تلقائي مع كل حرف يكتب) */
 function filterFood(){ searchQuery=document.getElementById('food-search').value; renderFood(); }
 
 function renderFood(){
@@ -2137,6 +2172,44 @@ function renderFood(){
       </div>
     </div>`;
   }).join('')||'<div style="text-align:center;padding:30px;color:var(--txt3)">لا توجد نتائج</div>';
+}
+
+/* ═══════════════════════════════════════════════
+   AI RECIPE GENERATOR
+═══════════════════════════════════════════════ */
+async function generateRecipe() {
+  const ingredients = document.getElementById('ai-ingredients').value;
+  const resultDiv = document.getElementById('ai-recipe-result');
+  const btn = document.getElementById('btn-get-recipe');
+
+  if (!ingredients.trim()) {
+    showToast('❌ الرجاء إدخال المقادير أولاً');
+    return;
+  }
+
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التفكير وابتكار وصفة متوافقة مع الطيبات...';
+  setBtnLoading('btn-get-recipe', true);
+
+  // صياغة الطلب للذكاء الاصطناعي مع توجيه صارم لمبادئ الطيبات
+  const prompt = `أنا أتبع نظام الطيبات للدكتور ضياء العوضي. لدي المقادير التالية: ${ingredients}. 
+  اقترح وجبة واحدة فقط باستخدام هذه المقادير (أو بعضها)، ويجب أن تكون متوافقة 100% مع مسموحات نظام الطيبات للدكتور ضياء العوضي (تجنب الممنوعات تماماً مثل الدجاج والبيض والزيوت المهدرجة والمكرونة).
+  اكتب اسم الوجبة وطريقة التحضير باختصار. أجب باللغة العربية فقط.`;
+
+  try {
+    const apiUrl = 'https://text.pollinations.ai/' + encodeURIComponent(prompt);
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) throw new Error('Network error');
+    
+    const textResponse = await response.text();
+    resultDiv.innerHTML = `<strong style="color:var(--gold2)">الوصفة المقترحة:</strong><br><br>` + textResponse.replace(/\n/g, '<br>');
+  } catch (error) {
+    resultDiv.innerHTML = "<span style='color:#ef5350;'>عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى لاحقاً.</span>";
+    console.error("AI API Error:", error);
+  }
+  
+  setBtnLoading('btn-get-recipe', false, '<i class="fas fa-magic"></i> اقترح لي وجبة');
 }
 
 /* ═══════════════════════════════════════════════
