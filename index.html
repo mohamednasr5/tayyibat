@@ -1016,11 +1016,30 @@ let currentUser = null;
 let soundEnabled = true;
 
 function goToPage(pageName) {
+  // 1. إخفاء كل الصفحات وإظهار الصفحة المطلوبة
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageName + '-page').classList.add('active');
+  const targetPage = document.getElementById(pageName + '-page');
+  if (targetPage) {
+    targetPage.classList.add('active');
+  }
   
+  // 2. إزالة التفعيل من جميع أزرار الشريط السفلي
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.target.closest('.nav-item')?.classList.add('active');
+  
+  // 3. تفعيل الزر الصحيح بأمان
+  if (typeof event !== 'undefined' && event && event.target) {
+    // في حالة استدعاء الدالة عبر نقرة فعلية من المستخدم
+    const clickedItem = event.target.closest('.nav-item');
+    if (clickedItem) clickedItem.classList.add('active');
+  } else {
+    // في حالة استدعاء الدالة برمجياً (مثل دالة autoLogin)
+    document.querySelectorAll('.nav-item').forEach(n => {
+      const onClickAttr = n.getAttribute('onclick');
+      if (onClickAttr && onClickAttr.includes(`'${pageName}'`)) {
+        n.classList.add('active');
+      }
+    });
+  }
 }
 
 function playSound(type) {
