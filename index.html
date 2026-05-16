@@ -10,16 +10,11 @@
 <meta name="apple-mobile-web-app-title" content="طيبات">
 <meta name="description" content="نظام طيبات الصحي - تغذية ذكية وصيام متقطع مع نصائح طبية مخصصة بالذكاء الاصطناعي">
 
-<!-- PWA -->
 <link rel="manifest" href="manifest.json">
-
-<!-- Favicon -->
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
 
 <title>طيبات | نظام صحي ذكي + AI</title>
 
@@ -27,7 +22,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -130,7 +124,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .eye-btn{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--txt2);cursor:pointer;font-size:1rem;padding:6px;z-index:2;}
 .field input[type=password]{padding-left:42px}
 
-/* Error message */
 .auth-error{background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.35);border-radius:10px;padding:10px 14px;font-size:.82rem;color:#ef5350;margin-bottom:14px;display:none;animation:bounceIn .3s ease;}
 .auth-error.show{display:block}
 .auth-success{background:rgba(46,201,81,.12);border:1px solid rgba(46,201,81,.35);border-radius:10px;padding:10px 14px;font-size:.82rem;color:#2ec951;margin-bottom:14px;display:none;animation:bounceIn .3s ease;}
@@ -423,7 +416,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .fast-details-content ul{padding-right:16px;margin-bottom:10px}
 .fast-details-content li{margin-bottom:4px}
 
-/* Spinner inside button */
 .btn-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#050e1f;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-left:6px}
 </style>
 </head>
@@ -462,7 +454,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">إنشاء حساب</div>
     </div>
 
-    <!-- LOGIN FORM -->
     <div id="login-form">
       <div class="auth-error" id="login-error"></div>
       <div class="field">
@@ -484,7 +475,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       </button>
     </div>
 
-    <!-- REGISTER FORM -->
     <div id="register-form" class="hidden">
       <div class="auth-error" id="reg-error"></div>
       <div class="auth-success" id="reg-success"></div>
@@ -829,19 +819,15 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 
 <script>
 /* ═══════════════ CONFIG ═══════════════ */
-// كلمات المرور في قاعدة البيانات مشفرة بـ Base64
-// يمكنك ضبط Firebase بمفتاحك الخاص هنا:
 const FIREBASE_CONFIG = {
   databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com"
 };
 
 /* ═══════════════ LOCAL FALLBACK DB ═══════════════ */
-// هذا احتياطي للعمل بدون Firebase
-// كلمات المرور مشفرة بـ Base64 مثل قاعدة البيانات
 const FALLBACK_USERS = {
   'mohamednasr': {
     name: 'محمد نصر حماد', username: 'mohamednasr',
-    password: 'MTIzNDU2', // base64 of 123456
+    password: 'MTIzNDU2', 
     bmi: 34.3, dob: '1988-02-25', gender: 'male', height: 179, weight: 110, diseases: []
   },
   'هيما': {
@@ -853,7 +839,6 @@ const FALLBACK_USERS = {
 
 /* ═══════════════ DB LAYER ═══════════════ */
 async function dbGetUser(username) {
-  // Try Firebase first
   if (window.__firebaseReady) {
     try {
       const db = window.__firebaseDB;
@@ -865,13 +850,11 @@ async function dbGetUser(username) {
       if (snap.exists()) return snap.val();
     } catch(e) { /* fallback */ }
   }
-  // Local fallback
   const local = getLocalUsers();
   return local[username] || null;
 }
 
 async function dbSaveUser(username, data) {
-  // Save to Firebase
   if (window.__firebaseReady) {
     try {
       const db = window.__firebaseDB;
@@ -880,7 +863,6 @@ async function dbSaveUser(username, data) {
       await set(ref(db, `users/${username}`), data);
     } catch(e) { console.warn('Firebase save failed, using local'); }
   }
-  // Always save locally as backup
   const local = getLocalUsers();
   local[username] = data;
   localStorage.setItem('tayyibat_users', JSON.stringify(local));
@@ -1013,15 +995,12 @@ async function doLogin() {
     const user = await dbGetUser(username);
     if (!user) { showAuthError('login', '❌ اسم المستخدم غير موجود'); return; }
     
-    // Check password — stored as base64
     const storedPass = user.password || '';
     let passMatch = false;
-    // Try base64 decode
     try {
       const decoded = decodePass(storedPass);
       passMatch = decoded === password;
     } catch(e) {}
-    // Also try plain match (للمستخدمين القدامى)
     if (!passMatch) passMatch = storedPass === password;
 
     if (!passMatch) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); return; }
@@ -1061,14 +1040,13 @@ async function doRegister() {
   btn.innerHTML = '<span class="btn-spinner"></span> جاري الإنشاء...';
 
   try {
-    // Check if username exists
     const existing = await dbGetUser(username);
     if (existing) { showAuthError('reg', '❌ اسم المستخدم محجوز، اختر آخر'); return; }
 
     const bmi = weight && height ? +(weight / ((height / 100) ** 2)).toFixed(1) : 0;
     const userData = {
       name, username,
-      password: encodePass(password), // store encoded
+      password: encodePass(password),
       dob, gender, weight, height, bmi,
       diseases: [...selectedDiseases],
       created: Date.now()
@@ -1612,7 +1590,6 @@ function loadFastStats(){
     const el=document.getElementById('fs-'+k);
     if(el)el.textContent=k==='today'?todayC:k==='week'?weekC:k==='month'?monthC:records.length;
   });
-  // Restore running fast
   const savedStart=localStorage.getItem('fast_start');
   const savedType=localStorage.getItem('fast_type');
   if(savedStart&&savedType&&!fastRunning){
@@ -1684,7 +1661,7 @@ function copyLink(){
   else{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showToast('✅ تم نسخ الرابط');}catch(e){}document.body.removeChild(ta);}
 }
 
-/* ═══════════════ AI PAGE ═══════════════ */
+/* ═══════════════ AI PAGE - POLLINATIONS ═══════════════ */
 let aiHistory=[];
 const QUICK_PROMPTS=[
   'ما أفضل أطعمة لحالتي الصحية؟','هل يمكنني الصيام مع مرضي؟',
@@ -1699,133 +1676,4 @@ function buildAiPage(){
   const dis=u.diseases||[];
   const map={sugar:'🩸 السكري',pressure:'💉 الضغط',allergy:'🌸 الحساسية',chemo:'⚕️ كيماوي',heart:'❤️ القلب',kidney:'🫘 الكلى'};
   const bmiInfo=getBMIInfo(u.bmi);
-  const ctx=`الاسم: ${u.name||u.username} | الجنس: ${u.gender==='male'?'ذكر':'أنثى'} | العمر: ${calcAge(u.dob)} | الوزن: ${u.weight||'غير محدد'} كجم | الطول: ${u.height||'غير محدد'} سم | BMI: ${u.bmi||'غير محسوب'} (${bmiInfo.label}) | الأمراض: ${dis.length?dis.map(d=>map[d]).join('، '):'لا يوجد — بصحة جيدة'}`;
-  document.getElementById('ai-user-context').textContent=ctx;
-  const bar=document.getElementById('ai-dis-bar');
-  bar.innerHTML=dis.length?dis.map(d=>`<div class="dis-tag tag-${d}">${map[d]||d}</div>`).join(''):'<div class="dis-tag tag-none">✅ بصحة جيدة</div>';
-  document.getElementById('quick-prompts-bar').innerHTML=QUICK_PROMPTS.map(q=>`<button class="qprompt" onclick="setAiPrompt('${q}')">${q}</button>`).join('');
-  if(!aiHistory.length){
-    addAiMsg('assistant',`مرحباً ${u.name||u.username}! 🌿\n\nأنا مساعدك الصحي الذكي المتخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n\nلقد اطلعت على حالتك الصحية${dis.length?' ولاحظت أن لديك: '+dis.map(d=>map[d]).join(' و '):' وأنت بصحة جيدة الحمد لله'}.\n\nيمكنني مساعدتك في:\n• نصائح غذائية مخصصة لحالتك\n• شرح أطعمة الطيبات المسموحة والممنوعة\n• خطط الصيام المتقطع المناسبة لك\n• الإجابة على أي سؤال صحي\n\nاسألني بحرية! 🤝`);
-  }
-}
-
-function setAiPrompt(text){
-  document.getElementById('ai-msg-input').value=text;
-  document.getElementById('ai-msg-input').focus();
-}
-
-function addAiMsg(role,text){
-  const wrap=document.getElementById('ai-chat-wrap');
-  const div=document.createElement('div');
-  div.className=`ai-msg ${role}`;
-  const label=role==='user'?'<i class="fas fa-user"></i> أنت':'<i class="fas fa-robot"></i> طبيبك الذكي';
-  div.innerHTML=`<div class="ai-msg-label">${label}</div><div class="ai-msg-body">${text}</div>`;
-  wrap.appendChild(div);
-  wrap.scrollTop=wrap.scrollHeight;
-}
-
-function addThinkingIndicator(){
-  const wrap=document.getElementById('ai-chat-wrap');
-  const div=document.createElement('div');
-  div.className='ai-msg assistant';div.id='ai-thinking';
-  div.innerHTML=`<div class="ai-msg-label"><i class="fas fa-robot"></i> طبيبك الذكي</div>
-    <div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري التفكير...</div>`;
-  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
-}
-function removeThinkingIndicator(){const el=document.getElementById('ai-thinking');if(el)el.remove();}
-
-async function sendAiMessage(){
-  const input=document.getElementById('ai-msg-input');
-  const text=input.value.trim();if(!text)return;
-  addAiMsg('user',text);
-  aiHistory.push({role:'user',content:text});
-  input.value='';
-  const btn=document.getElementById('btn-ai-send');
-  btn.disabled=true;addThinkingIndicator();
-  const u=currentUser||{};
-  const dis=(u.diseases||[]);
-  const mapDis={sugar:'مرض السكري',pressure:'ارتفاع ضغط الدم',allergy:'الحساسية',chemo:'مريض علاج كيماوي',heart:'أمراض القلب',kidney:'أمراض الكلى'};
-  const bmiInfo=getBMIInfo(u.bmi);
-  const systemPrompt=`أنت مساعد صحي متخصص في نظام الطيبات الغذائي للدكتور ضياء العوضي رحمه الله. تتحدث باللغة العربية فقط وبشكل ودود ومفيد.
-
-بيانات المستخدم:
-- الاسم: ${u.name||u.username||'المستخدم'}
-- الجنس: ${u.gender==='male'?'ذكر':'أنثى'}
-- العمر: ${calcAge(u.dob)}
-- الوزن: ${u.weight||'غير محدد'} كجم
-- الطول: ${u.height||'غير محدد'} سم
-- مؤشر كتلة الجسم BMI: ${u.bmi||'غير محسوب'} (${bmiInfo.label})
-- الأمراض المزمنة: ${dis.length?dis.map(d=>mapDis[d]).join(' و '):'لا يوجد — بصحة جيدة'}
-
-أساسيات نظام الطيبات:
-المسموح: اللحوم الحمراء (خروف، ماعز، جمل)، السمك البحري، الحمام والسمان، الأرز، البطاطس، زيت الزيتون البكر، الزبدة والسمن البلدي، الجبن المطبوخ والمعتق، الخضروات المطبوخة جيداً، الفواكه الحلوة، المكسرات الطبيعية، البهارات الطبيعية، القهوة والشاي، العسل الطبيعي.
-الممنوع: الدجاج والدواجن، البيض (إلا بيض السمان)، الخبز الأبيض والدقيق المكرر، المكرونة، الزيوت النباتية المكررة، الحليب والزبادي والألبان السائلة، البقوليات (فول، عدس، حمص)، الخضروات النيئة، المشروبات الغازية، السكر الأبيض، الفول السوداني.
-
-قواعد الإجابة:
-- كن موجزاً ومفيداً ومخصصاً لحالة المستخدم
-- إذا كان لديه أمراض، نبّه على ما يناسبه تحديداً
-- أضف إيموجي للتوضيح
-- ذكّر دائماً باستشارة الطبيب للحالات الخاصة
-- لا تتجاوز 300 كلمة في الإجابة`;
-  try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:systemPrompt,messages:aiHistory})
-    });
-    removeThinkingIndicator();
-    if(!response.ok)throw new Error('API Error: '+response.status);
-    const data=await response.json();
-    const reply=data.content?.[0]?.text||'عذراً، لم أتمكن من الحصول على إجابة.';
-    aiHistory.push({role:'assistant',content:reply});
-    addAiMsg('assistant',reply);
-    playSound('success');
-  }catch(err){
-    removeThinkingIndicator();
-    const fallback=generateLocalResponse(text,u,dis);
-    aiHistory.push({role:'assistant',content:fallback});
-    addAiMsg('assistant',fallback);
-  }
-  btn.disabled=false;
-  document.getElementById('ai-chat-wrap').scrollTop=9999;
-}
-
-function generateLocalResponse(q,u,dis){
-  const ql=q.toLowerCase();
-  const mapDis={sugar:'السكري',pressure:'الضغط',allergy:'الحساسية',chemo:'الكيماوي',heart:'القلب',kidney:'الكلى'};
-  if(ql.includes('دجاج')||ql.includes('فروج'))
-    return `🚫 الدجاج ممنوع تماماً في نظام الطيبات ${u.name||''}!\n\nالسبب: يُعلَّف بهرمونات مصطنعة ومضادات حيوية.\n\n✅ البدائل المسموحة:\n• لحم الخروف أو الماعز\n• السمك البحري المشوي\n• الحمام والسمان فقط من الطيور\n\n⚠️ استشر طبيبك دائماً.`;
-  if(ql.includes('صيام')||ql.includes('صايم')){
-    const sugarWarn=dis.includes('sugar')?'\n⚠️ تنبيه: مريض السكري يجب استشارة طبيبه قبل الصيام!':'';
-    return `⏱️ الصيام المتقطع من أهم ركائز الطيبات!\n\nأنصحك ببروتوكول 16/8 للبداية:\n• صيام 16 ساعة (من 8 مساءً إلى 12 ظهراً)\n• نافذة أكل 8 ساعات\n\n✅ يحسن حساسية الإنسولين\n✅ ينشّط الأوتوفاجي\n✅ يحرق الدهون${sugarWarn}`;
-  }
-  if(ql.includes('أرز')||ql.includes('رز'))
-    return `🍚 الأرز مسموح ومستحب في نظام الطيبات!\n\n✅ يُفضّل الأرز البسمتي\n✅ يُطهى بزيت الزيتون أو السمن البلدي\n✅ يؤكل مع اللحم أو السمك`;
-  const disNote=dis.length?`\n\n🏥 ملاحظة: بما أن لديك ${dis.map(d=>mapDis[d]).join(' و ')}، يُنصح باستشارة طبيبك قبل أي تغيير غذائي.`:'';
-  return `🌿 نظام الطيبات للدكتور ضياء العوضي:\n\n✅ المسموح: اللحوم الحمراء، السمك البحري، الأرز، البطاطس، زيت الزيتون، الخضروات المطبوخة، الفواكه.\n\n🚫 الممنوع: الدجاج، البيض، الدقيق، المعجنات، الألبان السائلة، البقوليات، الخضار النيء، الغازيات، السكر.${disNote}\n\nاسألني عن أي طعام محدد وسأجيبك! 💪`;
-}
-
-function clearAiChat(){
-  aiHistory=[];
-  document.getElementById('ai-chat-wrap').innerHTML='';
-  buildAiPage();
-  showToast('🗑️ تم مسح المحادثة');
-}
-
-/* ═══════════════ PWA SERVICE WORKER ═══════════════ */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js')
-      .then(reg=>console.log('SW registered:',reg.scope))
-      .catch(e=>console.log('SW failed:',e));
-  });
-}
-
-/* ═══════════════ INIT ═══════════════ */
-window.addEventListener('DOMContentLoaded',()=>{
-  // Wait a bit for Firebase module to initialize
-  setTimeout(autoLogin,1500);
-});
-</script>
-</body>
-</html>
+  const ctx=`الاسم: ${u.name||u.username} | الجنس: ${u.gender==='male'?'ذكر':'أنثى'} | العمر: ${calcAge(u.dob)} | الوزن: ${u.weight||'غير محدد'} كجم | الطول: ${u.height||'غير محدد'} سم | BMI: ${u.bmi||'غير محسوب'} (${bmiInfo.label}) | الأمراض: ${dis.length?dis.map(d=>map[d]).join('، '):'لا يوجد — بصحة جيدة'
