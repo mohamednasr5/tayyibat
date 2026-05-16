@@ -89,10 +89,35 @@
 const FALLBACK_USERS={'mohamednasr':{name:'محمد نصر حماد',username:'mohamednasr',password:'MTIzNDU2',bmi:34.3,dob:'1988-02-25',gender:'male',height:179,weight:110,diseases:[]},'هيما':{name:'ابراهيم امام',username:'هيما',password:'aGVtYXNhdDEyMzQ1Ng==',bmi:29.6,dob:'1984-09-10',gender:'male',height:182,weight:98,diseases:['allergy']}};
 const DISEASES_LIST=[{key:'sugar',icon:'🩸',name:'مرض السكري',hint:'السكر النوع 1 أو 2'},{key:'pressure',icon:'💉',name:'ارتفاع الضغط',hint:'ضغط الدم المرتفع'},{key:'allergy',icon:'🌸',name:'الحساسية',hint:'حساسية غذاء أو بيئة'},{key:'chemo',icon:'⚕️',name:'علاج كيماوي',hint:'مريض يأخذ كيماوي'},{key:'heart',icon:'❤️',name:'أمراض القلب',hint:'ذبحة أو قصور قلبي'},{key:'kidney',icon:'🫘',name:'أمراض الكلى',hint:'قصور كلوي أو حصوات'}];
 
-async function dbGetUser(u){if(window.__firebaseReady){try{const db=window.__firebaseDB;const ref=window.__firebaseRef;const get=window.__firebaseGet;const child=window.__firebaseChild;const snap=await get(child(ref(db),`users/$async function dbGetUser(u){if(window.__firebaseReady){try{const db=window.__firebaseDB;const ref=window.__firebaseRef;const get=window.__firebaseGet;const child=window.__firebaseChild;const snap=await get(child(ref(db),`users/${u}`));if(snap.exists())return snap.val();}catch(e){}}const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');const merged = Object.assign({},FALLBACK_USERS,l);return merged[u]||null;}{u}`));if(snap.exists())return snap.val();}catch(e){}}const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');return Object.assign({},FALLBACK_USERS,l)[u]||null;}
-async function dbSaveUser(u,d){if(window.__firebaseReady){try{await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB,`users/${u}`),d);}catch(e){}}const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');l[u]=d;localStorage.setItem('tayyibat_users',JSON.stringify(l));}
-function encodePass(p){return btoa(unescape(encodeURIComponent(p)))}function decodePass(e){try{return decodeURIComponent(escape(atob(e)))}catch(x){return e}}
+async function dbGetUser(u){
+  if(window.__firebaseReady){
+    try{
+      const db=window.__firebaseDB;
+      const ref=window.__firebaseRef;
+      const get=window.__firebaseGet;
+      const child=window.__firebaseChild;
+      const snap=await get(child(ref(db),`users/${u}`));
+      if(snap.exists()) return snap.val();
+    }catch(e){}
+  }
+  const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');
+  const merged=Object.assign({},FALLBACK_USERS,l);
+  return merged[u]||null;
+}
 
+async function dbSaveUser(u,d){
+  if(window.__firebaseReady){
+    try{
+      await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB,`users/${u}`),d);
+    }catch(e){}
+  }
+  const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');
+  l[u]=d;
+  localStorage.setItem('tayyibat_users',JSON.stringify(l));
+}
+
+function encodePass(p){return btoa(unescape(encodeURIComponent(p)))}
+function decodePass(e){try{return decodeURIComponent(escape(atob(e)))}catch(x){return e}}
 let soundEnabled=localStorage.getItem('sound_enabled')!=='false';let audioCtx;
 function playSound(t){if(!soundEnabled)return;const ac=audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)());if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);if(t==='click'){o.frequency.value=880;g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.08)}else if(t==='success'){o.type='sine';o.frequency.setValueAtTime(523,ac.currentTime);o.frequency.setValueAtTime(659,ac.currentTime+.1);o.frequency.setValueAtTime(784,ac.currentTime+.2);g.gain.setValueAtTime(.2,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.4)}else if(t==='nav'){o.type='sine';o.frequency.value=660;g.gain.setValueAtTime(.07,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.06)}o.start();o.stop(ac.currentTime+.5)}
 function toggleSound(){soundEnabled=!soundEnabled;localStorage.setItem('sound_enabled',soundEnabled);document.getElementById('sound-icon').className=soundEnabled?'fas fa-volume-up':'fas fa-volume-mute';showToast(soundEnabled?'🔊 الصوت مفعّل':'🔇 الصوت معطّل')}
