@@ -1088,6 +1088,7 @@ async function autoLogin() {
       }
     } catch(e) {}
   }
+  // إصلاح التوقف على شاشة التحميل: إخفاء الـ Loader إذا لم يكن هناك مستخدم
   hideLoader();
 }
 
@@ -1676,4 +1677,145 @@ function buildAiPage(){
   const dis=u.diseases||[];
   const map={sugar:'🩸 السكري',pressure:'💉 الضغط',allergy:'🌸 الحساسية',chemo:'⚕️ كيماوي',heart:'❤️ القلب',kidney:'🫘 الكلى'};
   const bmiInfo=getBMIInfo(u.bmi);
-  const ctx=`الاسم: ${u.name||u.username} | الجنس: ${u.gender==='male'?'ذكر':'أنثى'} | العمر: ${calcAge(u.dob)} | الوزن: ${u.weight||'غير محدد'} كجم | الطول: ${u.height||'غير محدد'} سم | BMI: ${u.bmi||'غير محسوب'} (${bmiInfo.label}) | الأمراض: ${dis.length?dis.map(d=>map[d]).join('، '):'لا يوجد — بصحة جيدة'
+  const ctx=`الاسم: ${u.name||u.username} | الجنس: ${u.gender==='male'?'ذكر':'أنثى'} | العمر: ${calcAge(u.dob)} | الوزن: ${u.weight||'غير محدد'} كجم | الطول: ${u.height||'غير محدد'} سم | BMI: ${u.bmi||'غير محسوب'} (${bmiInfo.label}) | الأمراض: ${dis.length?dis.map(d=>map[d]).join('، '):'لا يوجد — بصحة جيدة'}`;
+  document.getElementById('ai-user-context').textContent=ctx;
+  const bar=document.getElementById('ai-dis-bar');
+  bar.innerHTML=dis.length?dis.map(d=>`<div class="dis-tag tag-${d}">${map[d]||d}</div>`).join(''):'<div class="dis-tag tag-none">✅ بصحة جيدة</div>';
+  document.getElementById('quick-prompts-bar').innerHTML=QUICK_PROMPTS.map(q=>`<button class="qprompt" onclick="setAiPrompt('${q}')">${q}</button>`).join('');
+  if(!aiHistory.length){
+    addAiMsg('assistant',`مرحباً ${u.name||u.username}! 🌿\n\nأنا مساعدك الصحي الذكي المتخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n\nلقد اطلعت على حالتك الصحية${dis.length?' ولاحظت أن لديك: '+dis.map(d=>map[d]).join(' و '):' وأنت بصحة جيدة الحمد لله'}.\n\nيمكنني مساعدتك في:\n• نصائح غذائية مخصصة لحالتك\n• شرح أطعمة الطيبات المسموحة والممنوعة\n• خطط الصيام المتقطع المناسبة لك\n• الإجابة على أي سؤال صحي\n\nاسألني بحرية! 🤝`);
+  }
+}
+
+function setAiPrompt(text){
+  document.getElementById('ai-msg-input').value=text;
+  document.getElementById('ai-msg-input').focus();
+}
+
+function addAiMsg(role,text){
+  const wrap=document.getElementById('ai-chat-wrap');
+  const div=document.createElement('div');
+  div.className=`ai-msg ${role}`;
+  const label=role==='user'?'<i class="fas fa-user"></i> أنت':'<i class="fas fa-robot"></i> طبيبك الذكي';
+  div.innerHTML=`<div class="ai-msg-label">${label}</div><div class="ai-msg-body">${text}</div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop=wrap.scrollHeight;
+}
+
+function addThinkingIndicator(){
+  const wrap=document.getElementById('ai-chat-wrap');
+  const div=document.createElement('div');
+  div.className='ai-msg assistant';div.id='ai-thinking';
+  div.innerHTML=`<div class="ai-msg-label"><i class="fas fa-robot"></i> طبيبك الذكي</div>
+    <div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري التفكير...</div>`;
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+function removeThinkingIndicator(){const el=document.getElementById('ai-thinking');if(el)el.remove();}
+
+async function sendAiMessage(){
+  const input=document.getElementById('ai-msg-input');
+  const text=input.value.trim();if(!text)return;
+  addAiMsg('user',text);
+  aiHistory.push({role:'user',content:text});
+  input.value='';
+  const btn=document.getElementById('btn-ai-send');
+  btn.disabled=true;addThinkingIndicator();
+  
+  const u=currentUser||{};
+  const dis=(u.diseases||[]);
+  const mapDis={sugar:'مرض السكري',pressure:'ارتفاع ضغط الدم',allergy:'الحساسية',chemo:'مريض علاج كيماوي',heart:'أمراض القلب',kidney:'أمراض الكلى'};
+  const bmiInfo=getBMIInfo(u.bmi);
+  
+  const systemPrompt=`أنت مساعد صحي متخصص في نظام الطيبات الغذائي للدكتور ضياء العوضي رحمه الله. تتحدث باللغة العربية فقط وبشكل ودود ومفيد.
+
+بيانات المستخدم:
+- الاسم: ${u.name||u.username||'المستخدم'}
+- الجنس: ${u.gender==='male'?'ذكر':'أنثى'}
+- العمر: ${calcAge(u.dob)}
+- الوزن: ${u.weight||'غير محدد'} كجم
+- الطول: ${u.height||'غير محدد'} سم
+- مؤشر كتلة الجسم BMI: ${u.bmi||'غير محسوب'} (${bmiInfo.label})
+- الأمراض المزمنة: ${dis.length?dis.map(d=>mapDis[d]).join(' و '):'لا يوجد — بصحة جيدة'}
+
+أساسيات نظام الطيبات:
+المسموح: اللحوم الحمراء (خروف، ماعز، جمل)، السمك البحري، الحمام والسمان، الأرز، البطاطس، زيت الزيتون البكر، الزبدة والسمن البلدي، الجبن المطبوخ والمعتق، الخضروات المطبوخة جيداً، الفواكه الحلوة، المكسرات الطبيعية، البهارات الطبيعية، القهوة والشاي، العسل الطبيعي.
+الممنوع: الدجاج والدواجن، البيض (إلا بيض السمان)، الخبز الأبيض والدقيق المكرر، المكرونة، الزيوت النباتية المكررة، الحليب والزبادي والألبان السائلة، البقوليات (فول، عدس، حمص)، الخضروات النيئة، المشروبات الغازية، السكر الأبيض، الفول السوداني.
+
+قواعد الإجابة:
+- كن موجزاً ومفيداً ومخصصاً لحالة المستخدم
+- إذا كان لديه أمراض، نبّه على ما يناسبه تحديداً
+- أضف إيموجي للتوضيح
+- ذكّر دائماً باستشارة الطبيب للحالات الخاصة
+- لا تتجاوز 300 كلمة في الإجابة`;
+
+  try{
+    // استخدام Pollinations AI - مجاني ومفتوح بدون مفاتيح أو CORS
+    const response=await fetch('https://text.pollinations.ai/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages: [
+          {role: 'system', content: systemPrompt},
+          ...aiHistory
+        ],
+        model: 'openai', // يستخدم GPT-4o-mini تلقائياً
+        seed: Math.floor(Math.random() * 10000)
+      })
+    });
+    
+    removeThinkingIndicator();
+    
+    if(!response.ok) throw new Error('API Error');
+    
+    const reply = await response.text();
+    aiHistory.push({role:'assistant',content:reply});
+    addAiMsg('assistant',reply);
+    playSound('success');
+  }catch(err){
+    removeThinkingIndicator();
+    const fallback=generateLocalResponse(text,u,dis);
+    aiHistory.push({role:'assistant',content:fallback});
+    addAiMsg('assistant',fallback);
+  }
+  btn.disabled=false;
+  document.getElementById('ai-chat-wrap').scrollTop=9999;
+}
+
+function generateLocalResponse(q,u,dis){
+  const ql=q.toLowerCase();
+  const mapDis={sugar:'السكري',pressure:'الضغط',allergy:'الحساسية',chemo:'الكيماوي',heart:'القلب',kidney:'الكلى'};
+  if(ql.includes('دجاج')||ql.includes('فروج'))
+    return `🚫 الدجاج ممنوع تماماً في نظام الطيبات ${u.name||''}!\n\nالسبب: يُعلَّف بهرمونات مصطنعة ومضادات حيوية.\n\n✅ البدائل المسموحة:\n• لحم الخروف أو الماعز\n• السمك البحري المشوي\n• الحمام والسمان فقط من الطيور\n\n⚠️ استشر طبيبك دائماً.`;
+  if(ql.includes('صيام')||ql.includes('صايم')){
+    const sugarWarn=dis.includes('sugar')?'\n⚠️ تنبيه: مريض السكري يجب استشارة طبيبه قبل الصيام!':'';
+    return `⏱️ الصيام المتقطع من أهم ركائز الطيبات!\n\nأنصحك ببروتوكول 16/8 للبداية:\n• صيام 16 ساعة (من 8 مساءً إلى 12 ظهراً)\n• نافذة أكل 8 ساعات\n\n✅ يحسن حساسية الإنسولين\n✅ ينشّط الأوتوفاجي\n✅ يحرق الدهون${sugarWarn}`;
+  }
+  if(ql.includes('أرز')||ql.includes('رز'))
+    return `🍚 الأرز مسموح ومستحب في نظام الطيبات!\n\n✅ يُفضّل الأرز البسمتي\n✅ يُطهى بزيت الزيتون أو السمن البلدي\n✅ يؤكل مع اللحم أو السمك`;
+  const disNote=dis.length?`\n\n🏥 ملاحظة: بما أن لديك ${dis.map(d=>mapDis[d]).join(' و ')}، يُنصح باستشارة طبيبك قبل أي تغيير غذائي.`:'';
+  return `🌿 نظام الطيبات للدكتور ضياء العوضي:\n\n✅ المسموح: اللحوم الحمراء، السمك البحري، الأرز، البطاطس، زيت الزيتون، الخضروات المطبوخة، الفواكه.\n\n🚫 الممنوع: الدجاج، البيض، الدقيق، المعجنات، الألبان السائلة، البقوليات، الخضار النيء، الغازيات، السكر.${disNote}\n\nاسألني عن أي طعام محدد وسأجيبك! 💪`;
+}
+
+function clearAiChat(){
+  aiHistory=[];
+  document.getElementById('ai-chat-wrap').innerHTML='';
+  buildAiPage();
+  showToast('🗑️ تم مسح المحادثة');
+}
+
+/* ═══════════════ PWA SERVICE WORKER ═══════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(reg=>console.log('SW registered:',reg.scope))
+      .catch(e=>console.log('SW failed:',e));
+  });
+}
+
+/* ═══════════════ INIT ═══════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(autoLogin,1500);
+});
+</script>
+</body>
+</html>
