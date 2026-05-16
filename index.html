@@ -86,119 +86,445 @@
 <div id="toast"></div>
 
 <script>
-const FALLBACK_USERS={'mohamednasr':{name:'محمد نصر حماد',username:'mohamednasr',password:'MTIzNDU2',bmi:34.3,dob:'1988-02-25',gender:'male',height:179,weight:110,diseases:[]},'هيما':{name:'ابراهيم امام',username:'هيما',password:'aGVtYXNhdDEyMzQ1Ng==',bmi:29.6,dob:'1984-09-10',gender:'male',height:182,weight:98,diseases:['allergy']}};
-const DISEASES_LIST=[{key:'sugar',icon:'🩸',name:'مرض السكري',hint:'السكر النوع 1 أو 2'},{key:'pressure',icon:'💉',name:'ارتفاع الضغط',hint:'ضغط الدم المرتفع'},{key:'allergy',icon:'🌸',name:'الحساسية',hint:'حساسية غذاء أو بيئة'},{key:'chemo',icon:'⚕️',name:'علاج كيماوي',hint:'مريض يأخذ كيماوي'},{key:'heart',icon:'❤️',name:'أمراض القلب',hint:'ذبحة أو قصور قلبي'},{key:'kidney',icon:'🫘',name:'أمراض الكلى',hint:'قصور كلوي أو حصوات'}];
+const FALLBACK_USERS = {
+  'mohamednasr': { name: 'محمد نصر حماد', username: 'mohamednasr', password: 'MTIzNDU2', bmi: 34.3, dob: '1988-02-25', gender: 'male', height: 179, weight: 110, diseases: [] },
+  'هيما': { name: 'ابراهيم امام', username: 'هيما', password: 'aGVtYXNhdDEyMzQ1Ng==', bmi: 29.6, dob: '1984-09-10', gender: 'male', height: 182, weight: 98, diseases: ['allergy'] }
+};
 
-async function dbGetUser(u){
-  if(window.__firebaseReady){
-    try{
-      const db=window.__firebaseDB;
-      const ref=window.__firebaseRef;
-      const get=window.__firebaseGet;
-      const child=window.__firebaseChild;
-      const snap=await get(child(ref(db),`users/${u}`));
-      if(snap.exists()) return snap.val();
-    }catch(e){}
+const DISEASES_LIST = [
+  { key: 'sugar', icon: '🩸', name: 'مرض السكري', hint: 'السكر النوع 1 أو 2' },
+  { key: 'pressure', icon: '💉', name: 'ارتفاع الضغط', hint: 'ضغط الدم المرتفع' },
+  { key: 'allergy', icon: '🌸', name: 'الحساسية', hint: 'حساسية غذاء أو بيئة' },
+  { key: 'chemo', icon: '⚕️', name: 'علاج كيماوي', hint: 'مريض يأخذ كيماوي' },
+  { key: 'heart', icon: '❤️', name: 'أمراض القلب', hint: 'ذبحة أو قصور قلبي' },
+  { key: 'kidney', icon: '🫘', name: 'أمراض الكلى', hint: 'قصور كلوي أو حصوات' }
+];
+
+// تم فك الضغط وكتابة الدوال بشكل واضح لمنع أخطاء المتصفح
+async function dbGetUser(u) {
+  if (window.__firebaseReady) {
+    try {
+      const db = window.__firebaseDB;
+      const ref = window.__firebaseRef;
+      const get = window.__firebaseGet;
+      const child = window.__firebaseChild;
+      const snap = await get(child(ref(db), `users/${u}`));
+      if (snap.exists()) {
+        return snap.val();
+      }
+    } catch (e) {
+      // Firebase failed, use local
+    }
   }
-  const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');
-  const merged=Object.assign({},FALLBACK_USERS,l);
-  return merged[u]||null;
+  const l = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+  const merged = Object.assign({}, FALLBACK_USERS, l);
+  return merged[u] || null;
 }
 
-async function dbSaveUser(u,d){
-  if(window.__firebaseReady){
-    try{
-      await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB,`users/${u}`),d);
-    }catch(e){}
+async function dbSaveUser(u, d) {
+  if (window.__firebaseReady) {
+    try {
+      const db = window.__firebaseDB;
+      const ref = window.__firebaseRef;
+      const set = window.__firebaseSet;
+      await set(ref(db, `users/${u}`), d);
+    } catch (e) {
+      // Firebase failed, use local
+    }
   }
-  const l=JSON.parse(localStorage.getItem('tayyibat_users')||'{}');
-  l[u]=d;
-  localStorage.setItem('tayyibat_users',JSON.stringify(l));
+  const l = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+  l[u] = d;
+  localStorage.setItem('tayyibat_users', JSON.stringify(l));
 }
 
-function encodePass(p){return btoa(unescape(encodeURIComponent(p)))}
-function decodePass(e){try{return decodeURIComponent(escape(atob(e)))}catch(x){return e}}
-let soundEnabled=localStorage.getItem('sound_enabled')!=='false';let audioCtx;
-function playSound(t){if(!soundEnabled)return;const ac=audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)());if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);if(t==='click'){o.frequency.value=880;g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.08)}else if(t==='success'){o.type='sine';o.frequency.setValueAtTime(523,ac.currentTime);o.frequency.setValueAtTime(659,ac.currentTime+.1);o.frequency.setValueAtTime(784,ac.currentTime+.2);g.gain.setValueAtTime(.2,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.4)}else if(t==='nav'){o.type='sine';o.frequency.value=660;g.gain.setValueAtTime(.07,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.06)}o.start();o.stop(ac.currentTime+.5)}
-function toggleSound(){soundEnabled=!soundEnabled;localStorage.setItem('sound_enabled',soundEnabled);document.getElementById('sound-icon').className=soundEnabled?'fas fa-volume-up':'fas fa-volume-mute';showToast(soundEnabled?'🔊 الصوت مفعّل':'🔇 الصوت معطّل')}
+function encodePass(p) { 
+  return btoa(unescape(encodeURIComponent(p))); 
+}
 
-let currentUser=null,selectedDiseases=[],editDiseases=[];
-function getSession(){return localStorage.getItem('tayyibat_session')}function saveSession(u){localStorage.setItem('tayyibat_session',u)}function clearSession(){localStorage.removeItem('tayyibat_session')}
+function decodePass(e) { 
+  try { 
+    return decodeURIComponent(escape(atob(e))); 
+  } catch (x) { 
+    return e; 
+  } 
+}
 
-function switchAuthTab(t){document.getElementById('login-form').classList.toggle('hidden',t!=='login');document.getElementById('register-form').classList.toggle('hidden',t!=='register');document.getElementById('tab-login').classList.toggle('active',t==='login');document.getElementById('tab-register').classList.toggle('active',t==='register');document.querySelectorAll('.auth-error').forEach(e=>e.classList.remove('show'));playSound('nav')}
-function showAuthError(f,m){const e=document.getElementById(f+'-error');e.textContent=m;e.classList.add('show')}
-function togglePass(i,b){const inp=document.getElementById(i);const s=inp.type==='password';inp.type=s?'text':'password';b.innerHTML=`<i class="fas fa-${s?'eye-slash':'eye'}"></i>`}
+let soundEnabled = localStorage.getItem('sound_enabled') !== 'false';
+let audioCtx;
 
-function buildDisGrid(cId,arrRef){const c=document.getElementById(cId);c.innerHTML=DISEASES_LIST.map(d=>`<div class="dis-item" id="${cId}-${d.key}" onclick="toggleDis('${d.key}','${cId}')"><div class="dis-icon3d">${d.icon}</div><div class="dis-info"><div class="dis-name">${d.name}</div><div class="dis-hint">${d.hint}</div></div><div class="dis-check"></div></div>`).join('');arrRef.forEach(k=>{const e=document.getElementById(`${cId}-${k}`);if(e)e.className=`dis-item sel sel-${k}`})}
-function toggleDis(k,cId){const isA=cId==='dis-grid-auth';const arr=isA?selectedDiseases:editDiseases;const idx=arr.indexOf(k);const el=document.getElementById(`${cId}-${k}`);if(idx>-1){arr.splice(idx,1);el.className='dis-item'}else{arr.push(k);el.className=`dis-item sel sel-${k}`}playSound('click')}
+function playSound(t) {
+  if (!soundEnabled) return;
+  const ac = audioCtx || (audioCtx = new (window.AudioContext || window.webkitAudioContext)());
+  if (!ac) return;
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.connect(g); g.connect(ac.destination);
+  if (t === 'click') {
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(.12, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .08);
+  } else if (t === 'success') {
+    o.type = 'sine';
+    o.frequency.setValueAtTime(523, ac.currentTime);
+    o.frequency.setValueAtTime(659, ac.currentTime + .1);
+    o.frequency.setValueAtTime(784, ac.currentTime + .2);
+    g.gain.setValueAtTime(.2, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .4);
+  } else if (t === 'nav') {
+    o.type = 'sine'; o.frequency.value = 660;
+    g.gain.setValueAtTime(.07, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .06);
+  }
+  o.start(); o.stop(ac.currentTime + .5);
+}
 
-function calcBMI(p){const w=parseFloat(document.getElementById(p+'-weight').value)||0;const h=parseFloat(document.getElementById(p+'-height').value)||0;const el=document.getElementById(p==='r'?'bmi-result':'e-bmi-result');if(!w||!h){el.classList.remove('show');return}const bmi=+(w/((h/100)**2)).toFixed(1);let c='bmi-normal',t='';if(bmi<18.5){c='bmi-under';t=`نحافة — BMI: ${bmi}`}else if(bmi<25){c='bmi-normal';t=`وزن مثالي — BMI: ${bmi}`}else if(bmi<30){c='bmi-over';t=`زيادة وزن — BMI: ${bmi}`}else if(bmi<40){c='bmi-obese';t=`سمنة — BMI: ${bmi}`}else{c='bmi-morbid';t=`سمنة مفرطة — BMI: ${bmi}`}el.className=`bmi-result show ${c}`;el.textContent=t}
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('sound_enabled', soundEnabled);
+  document.getElementById('sound-icon').className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+  showToast(soundEnabled ? '🔊 الصوت مفعّل' : '🔇 الصوت معطّل');
+}
 
-async function doLogin(){document.querySelectorAll('.auth-error').forEach(e=>e.classList.remove('show'));const u=document.getElementById('l-user').value.trim().toLowerCase();const p=document.getElementById('l-pass').value;if(!u||!p){showAuthError('login','❌ أدخل اسم المستخدم وكلمة المرور');return}const b=document.getElementById('btn-login');b.disabled=true;b.innerHTML='<span class="btn-spinner"></span> جاري التحقق...';try{const user=await dbGetUser(u);if(!user){showAuthError('login','❌ اسم المستخدم غير موجود');return}let m=false;try{m=decodePass(user.password)===p}catch(e){}if(!m)m=user.password===p;if(!m){showAuthError('login','❌ كلمة المرور غير صحيحة');return}currentUser={...user,username:u};saveSession(u);playSound('success');showToast('✅ أهلاً '+user.name);bootApp()}catch(e){showAuthError('login','❌ خطأ في الاتصال')}finally{b.disabled=false;b.innerHTML='<i class="fas fa-sign-in-alt"></i> دخول'}}
-async function doRegister(){document.querySelectorAll('.auth-error').forEach(e=>e.classList.remove('show'));const n=document.getElementById('r-name').value.trim();const u=document.getElementById('r-user').value.trim().toLowerCase();const p=document.getElementById('r-pass').value;const d=document.getElementById('r-dob').value;const g=document.getElementById('r-gender').value;const w=parseFloat(document.getElementById('r-weight').value)||0;const h=parseFloat(document.getElementById('r-height').value)||0;if(!n){showAuthError('reg','❌ أدخل الاسم');return}if(!u){showAuthError('reg','❌ أدخل اسم المستخدم');return}if(!p||p.length<6){showAuthError('reg','❌ كلمة المرور 6 أحرف على الأقل');return}if(!d){showAuthError('reg','❌ أدخل تاريخ الميلاد');return}if(!g){showAuthError('reg','❌ اختر الجنس');return}const b=document.getElementById('btn-register');b.disabled=true;b.innerHTML='<span class="btn-spinner"></span> جاري الإنشاء...';try{const ex=await dbGetUser(u);if(ex){showAuthError('reg','❌ اسم المستخدم محجوز');return}const bmi=w&&h?+(w/((h/100)**2)).toFixed(1):0;const ud={name:n,username:u,password:encodePass(p),dob:d,gender:g,weight:w,height:h,bmi:bmi,diseases:[...selectedDiseases],created:Date.now()};await dbSaveUser(u,ud);currentUser={...ud};saveSession(u);selectedDiseases=[];playSound('success');showToast('✅ تم إنشاء الحساب');bootApp()}catch(e){showAuthError('reg','❌ خطأ في الإنشاء')}finally{b.disabled=false;b.innerHTML='<i class="fas fa-user-plus"></i> إنشاء حساب'}}
-function doLogout(){clearSession();currentUser=null;document.getElementById('bottom-nav').classList.remove('show');aiHistory=[];goPage('auth');showToast('👋 تم تسجيل الخروج')}
-async function autoLogin(){const s=getSession();if(s){try{const u=await dbGetUser(s);if(u){currentUser={...u,username:s};bootApp();return}}catch(e){}}hideLoader()}
+let currentUser = null, selectedDiseases = [], editDiseases = [];
 
-function bootApp(){buildDisGrid('dis-grid-auth',[]);buildFoodData();buildFastTypes();buildTips();buildProfile();buildHomeDisTags();buildMedicalAlerts();loadFastStats();startGreetingSync();buildAiPage();document.getElementById('bottom-nav').classList.add('show');goPage('home');hideLoader()}
-function hideLoader(){const l=document.getElementById('loader');l.style.opacity='0';setTimeout(()=>l.style.display='none',400)}
+function getSession() { return localStorage.getItem('tayyibat_session'); }
+function saveSession(u) { localStorage.setItem('tayyibat_session', u); }
+function clearSession() { localStorage.removeItem('tayyibat_session'); }
 
-let gTimer;function getEgyptHour(){return parseInt(new Date().toLocaleString('en-US',{timeZone:'Africa/Cairo',hour:'numeric',hour12:false}),10)}function updateGreeting(){const e=document.getElementById('hero-greeting');if(!e)return;const h=getEgyptHour();e.textContent=h>=5&&h<12?'☀️ صباح الخير،':h>=12&&h<17?'🌤️ مساء الخير،':h>=17&&h<21?'🌆 مساء النور،':'🌙 تصبح على خير،';if(currentUser)document.getElementById('pp-name').textContent=currentUser.name}function startGreetingSync(){updateGreeting();const n=new Date();setTimeout(()=>{updateGreeting();gTimer=setInterval(updateGreeting,60000)},(60-n.getSeconds())*1000-n.getMilliseconds())}
+function switchAuthTab(t) {
+  document.getElementById('login-form').classList.toggle('hidden', t !== 'login');
+  document.getElementById('register-form').classList.toggle('hidden', t !== 'register');
+  document.getElementById('tab-login').classList.toggle('active', t === 'login');
+  document.getElementById('tab-register').classList.toggle('active', t === 'register');
+  document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+  playSound('nav');
+}
 
-function goPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page')?.classList.add('active');document.querySelectorAll('.nav-item').forEach(v=>v.classList.remove('act'));document.getElementById('nav-'+n)?.classList.add('act');if(n!=='auth')playSound('nav');if(n==='home'&&currentUser){if(currentUser.bmi){document.getElementById('bmi-hero-wrap').style.display='inline-flex';document.getElementById('bmi-hero-val').textContent='BMI: '+currentUser.bmi}document.getElementById('p-name').textContent=currentUser.name;const b=getBMIInfo(currentUser.bmi);document.getElementById('hero-bmi-status').innerHTML=`<span class="bmi-status-badge ${b.cls}">${b.label}</span>`}}
-let tTimer;function showToast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tTimer);tTimer=setTimeout(()=>t.classList.remove('show'),d)}
+function showAuthError(f, m) {
+  const e = document.getElementById(f + '-error');
+  e.textContent = m;
+  e.classList.add('show');
+}
 
-(function(){const c=document.getElementById('universe-canvas');const x=c.getContext('2d');let W,H,s=[];function r(){W=c.width=innerWidth;H=c.height=innerHeight}r();addEventListener('resize',r);for(let i=0;i<200;i++)s.push({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random(),sz:Math.random()*2+.5,sp:Math.random()*.0003+.0001,c:Math.random()<.3?`rgba(200,150,12,${Math.random()*.8+.2})`:`rgba(180,210,255,${Math.random()*.8+.2})`});function d(){if(!W){requestAnimationFrame(d);return}x.clearRect(0,0,W,H);s.forEach(p=>{p.z-=p.sp;if(p.z<=0)p.z=1;const px=(p.x/p.z+1)*W/2,py=(p.y/p.z+1)*H/2,r=p.sz*(1-p.z),a=1-p.z;x.beginPath();x.arc(px,py,Math.max(r,.2),0,Math.PI*2);x.fillStyle=p.c.replace(/[\d.]+\)$/,`${a.toFixed(2)})`);x.fill()});requestAnimationFrame(d)}d()})();
-(function(){const s=document.getElementById('dna-stage');if(!s)return;const c=document.createElement('canvas');c.width=420;c.height=200;c.style.cssText='position:absolute;inset:0;width:100%;height:100%';s.appendChild(c);const x=c.getContext('2d');let t=0;function d(){x.clearRect(0,0,c.width,c.height);const cx=c.width/2,cy=c.height/2,a=40,l=c.width*.8,n=12;t+=.02;for(let i=0;i<=n;i++){const x1=cx-l/2+(l/n)*i,y1=cy+Math.sin(i*(Math.PI*2/n)+t)*a,y2=cy+Math.sin(i*(Math.PI*2/n)+t+Math.PI)*a,z1=Math.cos(i*(Math.PI*2/n)+t),z2=Math.cos(i*(Math.PI*2/n)+t+Math.PI);x.beginPath();x.arc(x1,y1,Math.max(5+z1*3,1),0,Math.PI*2);x.fillStyle=`rgba(200,150,12,${.4+z1*.4})`;x.fill();x.beginPath();x.arc(x1,y2,Math.max(5+z2*3,1),0,Math.PI*2);x.fillStyle=`rgba(33,150,243,${.4+z2*.4})`;x.fill();if(i>0){const px=cx-l/2+(l/n)*(i-1),py1=cy+Math.sin((i-1)*(Math.PI*2/n)+t)*a,py2=cy+Math.sin((i-1)*(Math.PI*2/n)+t+Math.PI)*a;x.beginPath();x.moveTo(px,py1);x.lineTo(x1,y1);x.strokeStyle='rgba(200,150,12,.25)';x.lineWidth=1.5;x.stroke();x.beginPath();x.moveTo(px,py2);x.lineTo(x1,y2);x.strokeStyle='rgba(33,150,243,.2)';x.stroke()}}requestAnimationFrame(d)}d()})();
+function togglePass(i, b) {
+  const inp = document.getElementById(i);
+  const s = inp.type === 'password';
+  inp.type = s ? 'text' : 'password';
+  b.innerHTML = '<i class="fas fa-' + (s ? 'eye-slash' : 'eye') + '"></i>';
+}
 
-const MEDICAL_ADVICE={sugar:{title:'🩸 السكري',cls:'sugar',tips:['تجنب السكريات البسيطة','الصيام المتقطع يحسن الإنسولين','أضف القرفة للطعام']},pressure:{title:'💉 الضغط',cls:'pressure',tips:['قلل الملح لـ 1500 ملجم','الثوم والزنجبيل يخفضان الضغط']},allergy:{title:'🌸 الحساسية',cls:'allergy',tips:['الكركم مضاد للالتهاب','أوميجا 3 مضاد قوي للحساسية']},chemo:{title:'⚕️ الكيماوي',cls:'chemo',tips:['وجبات صغيرة ومتكررة','الزنجبيل يقلل الغثيان']},heart:{title:'❤️ القلب',cls:'heart',tips:['تجنب الدهون المتحولة','أوميجا 3 من السمك أساسي']},kidney:{title:'🫘 الكلى',cls:'kidney',tips:['راقب البروتين','شرب ماء كافٍ يمنع الحصوات']}};
-function buildMedicalAlerts(){const c=document.getElementById('medical-alerts-container');const d=currentUser?.diseases?.length?currentUser.diseases:[];if(!d.length){c.innerHTML='<div class="alert-card ok"><div class="alert-title">✅ أنت بصحة جيدة</div></div>';return}c.innerHTML=d.map(k=>{const a=MEDICAL_ADVICE[k];if(!a)return'';return`<div class="alert-card ${a.cls}"><div class="alert-title">${a.title}</div><ul class="alert-tips">${a.tips.map(t=>`<li>${t}</li>`).join('')}</ul></div>`}).join('')}
-function buildHomeDisTags(){const c=document.getElementById('home-dis-tags');const d=currentUser?.diseases?.length?currentUser.diseases:[];const m={sugar:'🩸 السكري',pressure:'💉 الضغط',allergy:'🌸 الحساسية',chemo:'⚕️ كيماوي',heart:'❤️ القلب',kidney:'🫘 الكلى'};if(!d.length){c.innerHTML='<div class="dis-tag tag-none">✅ بصحة جيدة</div>';return}c.innerHTML=d.map(k=>`<div class="dis-tag tag-${k}">${m[k]||k}</div>`).join('')}
+function buildDisGrid(cId, arrRef) {
+  const c = document.getElementById(cId);
+  c.innerHTML = DISEASES_LIST.map(d => '<div class="dis-item" id="' + cId + '-' + d.key + '" onclick="toggleDis(\'' + d.key + '\',\'' + cId + '\')"><div class="dis-icon3d">' + d.icon + '</div><div class="dis-info"><div class="dis-name">' + d.name + '</div><div class="dis-hint">' + d.hint + '</div></div><div class="dis-check"></div></div>').join('');
+  arrRef.forEach(function(k) {
+    const e = document.getElementById(cId + '-' + k);
+    if (e) e.className = 'dis-item sel sel-' + k;
+  });
+}
 
-const ALL_TIPS=[{icon:'💧',bg:'rgba(66,165,245,.12)',title:'الماء أساس الصحة',body:'اشرب 8-10 أكواب ماء يومياً.'},{icon:'🥗',bg:'rgba(102,187,106,.12)',title:'الخضروات المطبوخة',body:'في الطيبات الخضروات مطبوخة فقط.'},{icon:'⏱️',bg:'rgba(200,150,12,.12)',title:'الصيام المتقطع',body:'16/8 للمبتدئين يحسن الإنسولين.'},{icon:'🚫',bg:'rgba(229,57,53,.12)',title:'ابتعد عن الدجاج',body:'ممنوع تماماً في الطيبات.'}];
-let tipIdx=0,tipT;function buildTips(){const c=document.getElementById('tip-carousel');c.innerHTML=ALL_TIPS.map((t,i)=>`<div class="tip-slide${i===0?' active':''}" data-tip="${i}"><div class="tip-top"><div class="tip-icon-wrap" style="background:${t.bg}"><span>${t.icon}</span></div><div><div class="tip-title">${t.title}</div></div></div><div class="tip-body">${t.body}</div></div>`).join('');const d=document.createElement('div');d.className='tip-dots';d.innerHTML=ALL_TIPS.map((_,i)=>`<div class="tip-dot${i===0?' on':''}" onclick="gotoTip(${i})"></div>`).join('');c.appendChild(d);if(tipT)clearInterval(tipT);tipT=setInterval(nextTip,5500)}function gotoTip(i){const s=document.querySelectorAll('#tip-carousel .tip-slide'),d=document.querySelectorAll('#tip-carousel .tip-dot');s[tipIdx].classList.remove('active');d[tipIdx].classList.remove('on');tipIdx=i;s[tipIdx].classList.add('active');d[tipIdx].classList.add('on')}function nextTip(){gotoTip((tipIdx+1)%ALL_TIPS.length)}
+function toggleDis(k, cId) {
+  const isA = cId === 'dis-grid-auth';
+  const arr = isA ? selectedDiseases : editDiseases;
+  const idx = arr.indexOf(k);
+  const el = document.getElementById(cId + '-' + k);
+  if (idx > -1) {
+    arr.splice(idx, 1);
+    el.className = 'dis-item';
+  } else {
+    arr.push(k);
+    el.className = 'dis-item sel sel-' + k;
+  }
+  playSound('click');
+}
 
-const FOOD_DATA=[{id:1,emoji:'🥩',name:'اللحوم الحمراء',cat:'بروتين',status:'allowed',desc:'أفضل مصادر البروتين',reason:'ركيزة أساسية في الطيبات'},{id:2,emoji:'🐟',name:'السمك البحري',cat:'بروتين',status:'allowed',desc:'مشوي أو مقلي بدون دقيق',reason:'مصدر ممتاز لأوميجا 3'},{id:3,emoji:'🐔',name:'الدجاج',cat:'بروتين',status:'forbidden',desc:'ممنوع تماماً',reason:'يُعلَّف بهرمونات ومضادات حيوية'},{id:4,emoji:'🍚',name:'الأرز',cat:'نشويات',status:'allowed',desc:'بجميع أنواعه',reason:'مصدر طاقة نظيف'},{id:5,emoji:'🍞',name:'الخبز الأبيض',cat:'نشويات',status:'forbidden',desc:'ممنوع تماماً',reason:'يُسبب الالتهاب ويرفع السكر'},{id:6,emoji:'🫒',name:'زيت الزيتون',cat:'دهون',status:'allowed',desc:'البكر الممتاز',reason:'الدهن الأول في الطيبات'},{id:7,emoji:'🥛',name:'الألبان السائلة',cat:'ألبان',status:'forbidden',desc:'حليب وزبادي',reason:'من أقوى مسببات الالتهاب'},{id:8,emoji:'🧀',name:'الجبن المعتق',cat:'ألبان',status:'allowed',desc:'المطبوخ والمعتق فقط',reason:'بروتينها محلّل وأسهل هضماً'},{id:9,emoji:'🫕',name:'الخضروات المطبوخة',cat:'خضروات',status:'allowed',desc:'مسبكة جيداً',reason:'تليين الألياف يسهّل الهضم'},{id:10,emoji:'🥗',name:'الخضروات النيئة',cat:'خضروات',status:'forbidden',desc:'ممنوعة',reason:'تُتعب الأمعاء وتُسبب الانتفاخ'},{id:11,emoji:'🍇',name:'الفواكه الحلوة',cat:'فواكه',status:'allowed',desc:'مسموحة باعتدال',reason:'مصدر طبيعي للسكريات'},{id:12,emoji:'🥤',name:'الغازيات',cat:'مشروبات',status:'forbidden',desc:'ممنوعة كلياً',reason:'تحمّض الجسم وتدمر البكتيريا النافعة'}];
-let curCat='الكل';function buildFoodData(){const t=document.getElementById('food-tabs');const c=['الكل','مسموح','ممنوع',...new Set(FOOD_DATA.map(f=>f.cat))];t.innerHTML=c.map(x=>`<div class="ftab${x==='الكل'?' act':''}" onclick="filterCat('${x}')">${x}</div>`).join('');renderFood()}function filterCat(c){curCat=c;document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('act','act-red'));document.querySelectorAll('.ftab').forEach(t=>{if(t.textContent===c)t.classList.add(c==='ممنوع'?'act-red':'act')});renderFood()}function filterFood(){renderFood()}
-function renderFood(){const q=document.getElementById('food-search').value.trim().toLowerCase();const g=document.getElementById('food-grid');let d=FOOD_DATA;if(curCat==='مسموح')d=d.filter(f=>f.status==='allowed');else if(curCat==='ممنوع')d=d.filter(f=>f.status==='forbidden');else if(curCat!=='الكل')d=d.filter(f=>f.cat===curCat);if(q)d=d.filter(f=>f.name.includes(q)||f.desc.includes(q));g.innerHTML=d.map(f=>`<div class="food-card ${f.status}"><div class="fc-top"><div class="fc-emoji">${f.emoji}</div><div class="fc-info"><div class="fc-name">${f.name}</div><div class="fc-badge ${f.status}">${f.status==='allowed'?'✅ مسموح':'🚫 ممنوع'}</div><div class="fc-desc">${f.desc}</div></div></div><div class="fc-expand" id="fc-exp-${f.id}"><div class="fc-reason ${f.status==='allowed'?'ok':'bad'}">${f.reason}</div><div class="fc-toggle-row"><button class="fc-youtube-btn" onclick="openYoutube('${f.name}')"><i class="fab fa-youtube"></i> شاهد فيديو للدكتور ضياء يتحدث عن ذلك</button></div></div><div class="fc-toggle-row" style="margin-top:8px"><span class="fc-toggle" onclick="toggleFoodCard(${f.id})">▼ تفاصيل أكثر</span></div></div>`).join('')}
-function toggleFoodCard(id){const e=document.getElementById('fc-exp-'+id);const o=e.classList.contains('open');e.classList.toggle('open',!o);e.nextElementSibling?.querySelector('.fc-toggle').textContent=o?'▼ تفاصيل أكثر':'▲ إخفاء'}
-function openYoutube(n){window.open('https://www.youtube.com/results?search_query='+encodeURIComponent('الدكتور ضياء العوضي '+n),'_blank')}
+function calcBMI(p) {
+  const w = parseFloat(document.getElementById(p + '-weight').value) || 0;
+  const h = parseFloat(document.getElementById(p + '-height').value) || 0;
+  const el = document.getElementById(p === 'r' ? 'bmi-result' : 'e-bmi-result');
+  if (!w || !h) { el.classList.remove('show'); return; }
+  const bmi = +(w / ((h / 100) ** 2)).toFixed(1);
+  let c = 'bmi-normal', t = '';
+  if (bmi < 18.5) { c = 'bmi-under'; t = 'نحافة — BMI: ' + bmi; }
+  else if (bmi < 25) { c = 'bmi-normal'; t = 'وزن مثالي — BMI: ' + bmi; }
+  else if (bmi < 30) { c = 'bmi-over'; t = 'زيادة وزن — BMI: ' + bmi; }
+  else if (bmi < 40) { c = 'bmi-obese'; t = 'سمنة — BMI: ' + bmi; }
+  else { c = 'bmi-morbid'; t = 'سمنة مفرطة — BMI: ' + bmi; }
+  el.className = 'bmi-result show ' + c;
+  el.textContent = t;
+}
 
-const FAST_TYPES=[{id:'16-8',hrs:'16/8',name:'بروتوكول ليفنسكي',desc:'16 صيام، 8 أكل',level:'easy',details:{intro:'أشهر بروتوكول. مثالي للمبتدئين.',howto:['صيام من 8 مساءً إلى 12 ظهراً','2-3 وجبات من الطيبات'],allowedFoods:['اللحوم والأسماك','الأرز والبطاطس','الخضروات المطبوخة'],forbiddenFoods:['السكريات','الدجاج','الألبان السائلة'],benefits:['تحسين الإنسولين','حرق الدهون'],caution:'غير مناسب لسكر النوع 1 إلا باستشارة'}},{id:'18-6',hrs:'18/6',name:'بروتوكول التطوير',desc:'18 صيام، 6 أكل',level:'med',details:{intro:'لمن اعتاد الصيام.',howto:['نافذة الأكل: 2-8 مساءً'],allowedFoods:['لحم وسمك كأساس','أرز وبطاطس','مكسرات كوجبة خفيفة'],forbiddenFoods:['سكريات','وجبات خفيفة بين الوجبات'],benefits:['حرق أعمق','ضبط الضغط'],caution:'تدرّج من 16 إلى 18'}},{id:'20-4',hrs:'20/4',name:'بروتوكول المحارب',desc:'20 صيام، 4 أكل',level:'med',details:{intro:'نتائج ممتازة لحرق الدهون.',howto:['نافذة أكل 4 ساعات'],allowedFoods:['وجبة ضخمة من اللحم','أرز وبطاطس وفواكه'],forbiddenFoods:['تشتيت السعرات','سكريات ومشروبات محلاة'],benefits:['حرق عميق','تحسين هرمون النمو'],caution:'للمتمرسين فقط'}},{id:'omad',hrs:'23/1',name:'OMAD',desc:'وجبة واحدة يومياً',level:'hard',details:{intro:'الأقوى. للمتقدمين.',howto:['وجبة واحدة كبيرة غنية','ماء وقهوة خلال الصيام'],allowedFoods:['وجبة ضخمة شاملة','لحوم وأرز وخضار'],forbiddenFoods:['أي أكل صلب خارج الوجبة'],benefits:['أقصى حرق','أوتوفاجي عميق'],caution:'خطير بدون تدرج'}},{id:'5-2',hrs:'5:2',name:'بروتوكول 5:2',desc:'يومان تقييد 500 سعرة',level:'easy',details:{intro:'نظام مرن.',howto:['5 أيام عادي','يومان أقل من 500 سعرة'],allowedFoods:['أيام العادي: كل مسموحات الطيبات','يوم التقييد: بروتين خفيف وخضار'],forbiddenFoods:['في التقييد: دهون ثقيلة وحلويات'],benefits:['فقدان مستدام','سهل الالتزام'],caution:'حافظ على البروتين في التقييد'}}];
-let selFast=null,fTimer=null,fStart=null,fRun=false,fType=null;
-function buildFastTypes(){document.getElementById('fast-types').innerHTML=FAST_TYPES.map(f=>`<div class="fast-card" id="fast-${f.id}" onclick="selectFast('${f.id}')"><div class="fc-row"><div class="fc-hrs">${f.hrs}</div><div class="fc-details"><div class="fc-dname">${f.name}</div><div class="fc-ddesc">${f.desc}</div><span class="fc-level lv-${f.level}">${f.level==='easy'?'مبتدئ':f.level==='med'?'متوسط':'متقدم'}</span></div></div><button class="fast-info-btn" onclick="event.stopPropagation();showFastDetails('${f.id}')"><i class="fas fa-info-circle"></i> تفاصيل</button></div>`).join('')}
-function selectFast(id){selFast=FAST_TYPES.find(f=>f.id===id);document.querySelectorAll('.fast-card').forEach(c=>c.classList.remove('sel'));document.getElementById('fast-'+id).classList.add('sel');document.getElementById('timer-label').textContent=selFast.name;document.getElementById('timer-phase').textContent='✅ تم الاختيار';playSound('click')}
-function showFastDetails(id){const f=FAST_TYPES.find(x=>x.id===id);const d=f.details;document.getElementById('fast-modal-title').textContent='📋 '+f.name;document.getElementById('fast-modal-body').innerHTML=`<p>${d.intro}</p><h4>🕐 التطبيق:</h4><ul>${d.howto.map(h=>`<li>${h}</li>`).join('')}</ul><h4>✅ المأكولات المتاحة:</h4><ul>${d.allowedFoods.map(x=>`<li style="color:#2ec951">${x}</li>`).join('')}</ul><h4>🚫 المأكولات المحظورة:</h4><ul>${d.forbiddenFoods.map(x=>`<li style="color:#ef5350">${x}</li>`).join('')}</ul><h4>🌟 الفوائد:</h4><ul>${d.benefits.map(x=>`<li>${x}</li>`).join('')}</ul><h4>⚠️ تنبيه:</h4><p style="color:#ef5350">${d.caution}</p>`;openModal('fast-details-modal')}
-function openModal(id){document.getElementById(id).classList.add('show')}function closeModal(id){document.getElementById(id).classList.remove('show')}
-function startFast(){if(!selFast){showToast('❌ اختر نوع الصيام');return}if(fRun)return;fStart=Date.now();fRun=true;fType=selFast;localStorage.setItem('fast_start',fStart);localStorage.setItem('fast_type',fType.id);document.getElementById('btn-start').disabled=true;document.getElementById('btn-stop').disabled=false;document.getElementById('timer-phase').textContent='🔥 صائم...';fTimer=setInterval(updateTimer,1000);updateTimer();playSound('success');showToast('🌿 بدأ الصيام!')}
-function stopFast(){if(!fRun)return;const e=Date.now()-fStart;fRun=false;clearInterval(fTimer);document.getElementById('btn-start').disabled=false;document.getElementById('btn-stop').disabled=true;document.getElementById('timer-phase').textContent='✅ انتهى';recordFast(e);localStorage.removeItem('fast_start');localStorage.removeItem('fast_type');playSound('success');showToast(`✅ انتهى — ${(e/3600000).toFixed(1)} ساعة`);document.getElementById('ring-prog').style.strokeDashoffset=565.5}
-function resetFast(){if(fRun)stopFast();fStart=null;fType=null;document.getElementById('timer-display').textContent='00:00:00';document.getElementById('timer-label').textContent='اختر نوع الصيام';document.getElementById('timer-phase').textContent='⏸️ في وضع الراحة';document.getElementById('fast-stats-line').textContent='لم يبدأ بعد';document.getElementById('ring-prog').style.strokeDashoffset=565.5;document.querySelectorAll('.fast-card').forEach(c=>c.classList.remove('sel'));selFast=null}
-function updateTimer(){if(!fStart||!fRun)return;const e=Date.now()-fStart;const h=Math.floor(e/3600000),m=Math.floor((e%3600000)/60000),s=Math.floor((e%60000)/1000);document.getElementById('timer-display').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;if(fType){const t=parseFloat(fType.id.split('-')[0])||16;const p=Math.min(e/(t*3600000),1);document.getElementById('ring-prog').style.strokeDashoffset=565.5*(1-p);document.getElementById('fast-stats-line').textContent=`${Math.floor(p*100)}% — ${h} ساعة ${m} دقيقة`;if(p>=1)document.getElementById('timer-phase').textContent='🏆 اكتمل!'}}
-function recordFast(e){if(!currentUser)return;const k='fasts_'+currentUser.username;let r=JSON.parse(localStorage.getItem(k)||'[]');r.push({ts:Date.now(),e,t:fType?.id||''});localStorage.setItem(k,JSON.stringify(r));loadFastStats()}
-function loadFastStats(){if(!currentUser)return;const r=JSON.parse(localStorage.getItem('fasts_'+currentUser.username)||'[]');const n=Date.now(),d=86400000;document.getElementById('s-today').textContent=r.filter(x=>n-x.ts<d).length;document.getElementById('s-week').textContent=r.filter(x=>n-x.ts<d*7).length;document.getElementById('s-month').textContent=r.filter(x=>n-x.ts<d*30).length;const ss=localStorage.getItem('fast_start'),st=localStorage.getItem('fast_type');if(ss&&st&&!fRun){fStart=parseInt(ss);fType=FAST_TYPES.find(f=>f.id===st);selFast=fType;if(fType){fRun=true;document.getElementById('btn-start').disabled=true;document.getElementById('btn-stop').disabled=false;document.getElementById('timer-label').textContent=fType.name;document.getElementById('timer-phase').textContent='🔥 صائم...';document.getElementById('fast-'+fType.id)?.classList.add('sel');fTimer=setInterval(updateTimer,1000);updateTimer()}}}
+async function doLogin() {
+  document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+  const u = document.getElementById('l-user').value.trim().toLowerCase();
+  const p = document.getElementById('l-pass').value;
+  if (!u || !p) { showAuthError('login', '❌ أدخل اسم المستخدم وكلمة المرور'); return; }
+  const b = document.getElementById('btn-login');
+  b.disabled = true;
+  b.innerHTML = '<span class="btn-spinner"></span> جاري التحقق...';
+  try {
+    const user = await dbGetUser(u);
+    if (!user) { showAuthError('login', '❌ اسم المستخدم غير موجود'); return; }
+    let m = false;
+    try { m = decodePass(user.password) === p; } catch (e) {}
+    if (!m) m = user.password === p;
+    if (!m) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); return; }
+    currentUser = Object.assign({}, user, { username: u });
+    saveSession(u);
+    playSound('success');
+    showToast('✅ أهلاً ' + user.name);
+    bootApp();
+  } catch (e) {
+    showAuthError('login', '❌ خطأ في الاتصال');
+  } finally {
+    b.disabled = false;
+    b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+  }
+}
 
-function getBMIInfo(b){if(!b)return{label:'غير محسوب',cls:'bsb-normal'};if(b<18.5)return{label:'نحافة',cls:'bsb-under'};if(b<25)return{label:'وزن مثالي',cls:'bsb-normal'};if(b<30)return{label:'زيادة وزن',cls:'bsb-over'};if(b<40)return{label:'سمنة',cls:'bsb-obese'};return{label:'سمنة مفرطة',cls:'bsb-morbid'}}
-function calcAge(d){if(!d)return'-';const b=new Date(d),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a+' سنة'}
-function buildProfile(){if(!currentUser)return;const u=currentUser;document.getElementById('p-name').textContent=u.name;document.getElementById('p-name2').textContent=u.name;document.getElementById('pp-weight').textContent=u.weight?u.weight+' كجم':'-';document.getElementById('pp-height').textContent=u.height?u.height+' سم':'-';document.getElementById('pp-dob').textContent=u.dob||'-';document.getElementById('pp-age').textContent=calcAge(u.dob);document.getElementById('pp-bmi').textContent=u.bmi||'-';const bi=getBMIInfo(u.bmi);document.getElementById('pp-bmicat').innerHTML=`<span class="bmi-status-badge ${bi.cls}">${bi.label}</span>`;document.getElementById('p-info').textContent=`${u.gender==='male'?'👨 ذكر':'👩 أنثى'} | ${calcAge(u.dob)}`;const m={sugar:'🩸 السكري',pressure:'💉 الضغط',allergy:'🌸 الحساسية',chemo:'⚕️ كيماوي',heart:'❤️ القلب',kidney:'🫘 الكلى'};document.getElementById('pp-diseases').innerHTML=u.diseases?.length?u.diseases.map(d=>m[d]).join('، '):'✅ بصحة جيدة'}
-function openEditProfile(){const u=currentUser;document.getElementById('e-weight').value=u.weight||'';document.getElementById('e-height').value=u.height||'';document.getElementById('e-dob').value=u.dob||'';editDiseases=[...(u.diseases||[])];buildDisGrid('dis-grid-edit',editDiseases);openModal('edit-profile-modal')}
-async function saveEditProfile(){const w=parseFloat(document.getElementById('e-weight').value)||0,h=parseFloat(document.getElementById('e-height').value)||0,d=document.getElementById('e-dob').value;currentUser.weight=w;currentUser.height=h;currentUser.dob=d;currentUser.bmi=w&&h?+(w/((h/100)**2)).toFixed(1):0;currentUser.diseases=[...editDiseases];await dbSaveUser(currentUser.username,currentUser);buildProfile();buildHomeDisTags();buildMedicalAlerts();buildAiPage();closeModal('edit-profile-modal');showToast('✅ تم تحديث البيانات')}
-function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent('🌿 نظام طيبات الصحي\nhttps://tayyibat-health.netlify.app/'),'_blank')}
+async function doRegister() {
+  document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+  const n = document.getElementById('r-name').value.trim();
+  const u = document.getElementById('r-user').value.trim().toLowerCase();
+  const p = document.getElementById('r-pass').value;
+  const d = document.getElementById('r-dob').value;
+  const g = document.getElementById('r-gender').value;
+  const w = parseFloat(document.getElementById('r-weight').value) || 0;
+  const h = parseFloat(document.getElementById('r-height').value) || 0;
+  if (!n) { showAuthError('reg', '❌ أدخل الاسم'); return; }
+  if (!u) { showAuthError('reg', '❌ أدخل اسم المستخدم'); return; }
+  if (!p || p.length < 6) { showAuthError('reg', '❌ كلمة المرور 6 أحرف على الأقل'); return; }
+  if (!d) { showAuthError('reg', '❌ أدخل تاريخ الميلاد'); return; }
+  if (!g) { showAuthError('reg', '❌ اختر الجنس'); return; }
+  const b = document.getElementById('btn-register');
+  b.disabled = true;
+  b.innerHTML = '<span class="btn-spinner"></span> جاري الإنشاء...';
+  try {
+    const ex = await dbGetUser(u);
+    if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز'); return; }
+    const bmi = w && h ? +(w / ((h / 100) ** 2)).toFixed(1) : 0;
+    const ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), created: Date.now() };
+    await dbSaveUser(u, ud);
+    currentUser = Object.assign({}, ud);
+    saveSession(u);
+    selectedDiseases = [];
+    playSound('success');
+    showToast('✅ تم إنشاء الحساب');
+    bootApp();
+  } catch (e) {
+    showAuthError('reg', '❌ خطأ في الإنشاء');
+  } finally {
+    b.disabled = false;
+    b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب';
+  }
+}
 
-let aiHistory=[];const QP=['ما أفضل أطعمة لحالتي؟','هل أستطيع الصيام مع مرضي؟','بديل صحي للدجاج؟','خطة غذاء يوم كامل'];
-function buildAiPage(){if(!currentUser)return;const u=currentUser,d=u.diseases||[],m={sugar:'🩸 السكري',pressure:'💉 الضغط',allergy:'🌸 الحساسية',chemo:'⚕️ كيماوي',heart:'❤️ القلب',kidney:'🫘 الكلى'},bi=getBMIInfo(u.bmi);document.getElementById('ai-user-context').textContent=`الاسم: ${u.name} | BMI: ${u.bmi||'-'} (${bi.label}) | الأمراض: ${d.length?d.map(x=>m[x]).join('، '):'لا يوجد'}`;document.getElementById('ai-dis-bar').innerHTML=d.length?d.map(x=>`<div class="dis-tag tag-${x}">${m[x]}</div>`).join(''):'<div class="dis-tag tag-none">✅ بصحة جيدة</div>';document.getElementById('quick-prompts-bar').innerHTML=QP.map(q=>`<button class="qprompt" onclick="document.getElementById('ai-msg-input').value='${q}'">${q}</button>`).join('');if(!aiHistory.length)addAiMsg('assistant',`مرحباً ${u.name}! 🌿\nأنا مساعدك الصحي بنظام الطيبات.\nاسألني بحرية! 🤝`)}
-function addAiMsg(r,t){const w=document.getElementById('ai-chat-wrap'),d=document.createElement('div');d.className=`ai-msg ${r}`;d.innerHTML=`<div class="ai-msg-label">${r==='user'?'<i class="fas fa-user"></i> أنت':'<i class="fas fa-robot"></i> طبيبك الذكي'}</div><div>${t}</div>`;w.appendChild(d);w.scrollTop=w.scrollHeight}
-function addThink(){const w=document.getElementById('ai-chat-wrap'),d=document.createElement('div');d.id='ai-thinking';d.className='ai-msg assistant';d.innerHTML='<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري التفكير...</div>';w.appendChild(d);w.scrollTop=w.scrollHeight}
-function removeThink(){document.getElementById('ai-thinking')?.remove()}
+function doLogout() {
+  clearSession(); currentUser = null;
+  document.getElementById('bottom-nav').classList.remove('show');
+  aiHistory = [];
+  goPage('auth');
+  showToast('👋 تم تسجيل الخروج');
+}
 
-const AI_APIS=[{url:'https://text.pollinations.ai/',body:(s,h)=>JSON.stringify({messages:[{role:'system',content:s},...h],model:'openai',seed:Math.floor(Math.random()*1e4)}),parse:async r=>await r.text()},{url:'https://www.blackbox.ai/api/chat',body:(s,h)=>JSON.stringify({messages:[{role:'system',content:s},...h]}),parse:async r=>{const d=await r.json();return d.response||d.choices?.[0]?.message?.content}},{url:'https://api.deepinfra.com/v1/openai/chat/completions',body:(s,h)=>JSON.stringify({model:'meta-llama/Meta-Llama-3-8B-Instruct',messages:[{role:'system',content:s},...h]}),parse:async r=>(await r.json()).choices?.[0]?.message?.content||'عذراً لم أستطع الإجابة.'}];
+async function autoLogin() {
+  const s = getSession();
+  if (s) {
+    try {
+      const u = await dbGetUser(s);
+      if (u) {
+        currentUser = Object.assign({}, u, { username: s });
+        bootApp(); return;
+      }
+    } catch (e) {}
+  }
+  hideLoader();
+}
 
-async function sendAiMessage(){const i=document.getElementById('ai-msg-input'),t=i.value.trim();if(!t)return;addAiMsg('user',t);aiHistory.push({role:'user',content:t});i.value='';document.getElementById('btn-ai-send').disabled=true;addThink();const u=currentUser||{},d=u.diseases||[],m={sugar:'السكري',pressure:'الضغط',allergy:'الحساسية',chemo:'الكيماوي',heart:'القلب',kidney:'الكلى'},bi=getBMIInfo(u.bmi);const sys=`أنت مساعد صحي بنظام الطيبات للدكتور ضياء العوضي. تتحدث بالعربية. المستخدم: ${u.name}، BMI: ${u.bmi||'-'} (${bi.label})، الأمراض: ${d.length?d.map(x=>m[x]).join(' و '):'لا يوجد'}. المسموح: لحوم، سمك، أرز، بطاطس، زيت زيتون، خضار مطبوخة، فواكه. الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر. كن موجزاً ومفيداً.`;
-let reply='';for(const api of AI_APIS){try{const r=await fetch(api.url,{method:'POST',headers:{'Content-Type':'application/json'},body:api.body(sys,aiHistory)});if(r.ok){reply=await api.parse(r);if(reply)break}}catch(e){continue}}
-removeThink();if(!reply)reply=generateLocalResponse(t,u,d);aiHistory.push({role:'assistant',content:reply});addAiMsg('assistant',reply);document.getElementById('btn-ai-send').disabled=false;document.getElementById('ai-chat-wrap').scrollTop=9999}
-function generateLocalResponse(q,u,d){const ql=q.toLowerCase();if(ql.includes('دجاج'))return`🚫 الدجاج ممنوع في الطيبات!\n✅ البدائل: لحم خروف، سمك، حمام.`;if(ql.includes('صيام'))return`⏱️ الصيام المتقطع مفيد! أنصح بـ 16/8.`;return`🌿 نظام الطيبات:\n✅ المسموح: لحوم، أرز، خضار مطبوخة.\n🚫 الممنوع: دجاج، دقيق، ألبان سائلة.`}
-function clearAiChat(){aiHistory=[];document.getElementById('ai-chat-wrap').innerHTML='';buildAiPage();showToast('🗑️ تم مسح المحادثة')}
+function bootApp() {
+  buildDisGrid('dis-grid-auth', []);
+  buildFoodData(); buildFastTypes(); buildTips(); buildProfile();
+  buildHomeDisTags(); buildMedicalAlerts(); loadFastStats(); startGreetingSync(); buildAiPage();
+  document.getElementById('bottom-nav').classList.add('show');
+  goPage('home');
+  hideLoader();
+}
 
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
-window.addEventListener('DOMContentLoaded',()=>setTimeout(autoLogin,1000));
+function hideLoader() {
+  const l = document.getElementById('loader');
+  l.style.opacity = '0';
+  setTimeout(function() { l.style.display = 'none'; }, 400);
+}
+
+let gTimer;
+function getEgyptHour() { return parseInt(new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false }), 10); }
+function updateGreeting() {
+  const e = document.getElementById('hero-greeting'); if (!e) return;
+  const h = getEgyptHour();
+  e.textContent = h >= 5 && h < 12 ? '☀️ صباح الخير،' : h >= 12 && h < 17 ? '🌤️ مساء الخير،' : h >= 17 && h < 21 ? '🌆 مساء النور،' : '🌙 تصبح على خير،';
+  if (currentUser) document.getElementById('pp-name').textContent = currentUser.name;
+}
+function startGreetingSync() {
+  updateGreeting();
+  const n = new Date();
+  setTimeout(function() { updateGreeting(); gTimer = setInterval(updateGreeting, 60000); }, (60 - n.getSeconds()) * 1000 - n.getMilliseconds());
+}
+
+function goPage(n) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var pg = document.getElementById(n + '-page');
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(v) { v.classList.remove('act'); });
+  var nv = document.getElementById('nav-' + n);
+  if (nv) nv.classList.add('act');
+  if (n !== 'auth') playSound('nav');
+  if (n === 'home' && currentUser) {
+    if (currentUser.bmi) {
+      document.getElementById('bmi-hero-wrap').style.display = 'inline-flex';
+      document.getElementById('bmi-hero-val').textContent = 'BMI: ' + currentUser.bmi;
+    }
+    document.getElementById('p-name').textContent = currentUser.name;
+    var b = getBMIInfo(currentUser.bmi);
+    document.getElementById('hero-bmi-status').innerHTML = '<span class="bmi-status-badge ' + b.cls + '">' + b.label + '</span>';
+  }
+}
+
+let tTimer;
+function showToast(m, d) {
+  d = d || 2500;
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  clearTimeout(tTimer);
+  tTimer = setTimeout(function() { t.classList.remove('show'); }, d);
+}
+
+// Unverse Canvas
+(function() {
+  var c = document.getElementById('universe-canvas');
+  var x = c.getContext('2d');
+  var W, H, s = [];
+  function r() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  r(); addEventListener('resize', r);
+  for (var i = 0; i < 200; i++) s.push({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random(), sz: Math.random() * 2 + .5, sp: Math.random() * .0003 + .0001, cl: Math.random() < .3 ? 'rgba(200,150,12,' + (Math.random() * .8 + .2) + ')' : 'rgba(180,210,255,' + (Math.random() * .8 + .2) + ')' });
+  function d() {
+    if (!W) { requestAnimationFrame(d); return; }
+    x.clearRect(0, 0, W, H);
+    s.forEach(function(p) {
+      p.z -= p.sp; if (p.z <= 0) p.z = 1;
+      var px = (p.x / p.z + 1) * W / 2, py = (p.y / p.z + 1) * H / 2, r = p.sz * (1 - p.z), a = 1 - p.z;
+      x.beginPath(); x.arc(px, py, Math.max(r, .2), 0, Math.PI * 2);
+      x.fillStyle = p.cl.replace(/[\d.]+\)$/, a.toFixed(2) + ')'); x.fill();
+    });
+    requestAnimationFrame(d);
+  } d();
+})();
+
+// DNA Canvas
+(function() {
+  var s = document.getElementById('dna-stage'); if (!s) return;
+  var c = document.createElement('canvas'); c.width = 420; c.height = 200;
+  c.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
+  s.appendChild(c); var x = c.getContext('2d'); var t = 0;
+  function d() {
+    x.clearRect(0, 0, c.width, c.height);
+    var cx = c.width / 2, cy = c.height / 2, a = 40, l = c.width * .8, n = 12;
+    t += .02;
+    for (var i = 0; i <= n; i++) {
+      var x1 = cx - l / 2 + (l / n) * i, y1 = cy + Math.sin(i * (Math.PI * 2 / n) + t) * a, y2 = cy + Math.sin(i * (Math.PI * 2 / n) + t + Math.PI) * a, z1 = Math.cos(i * (Math.PI * 2 / n) + t), z2 = Math.cos(i * (Math.PI * 2 / n) + t + Math.PI);
+      x.beginPath(); x.arc(x1, y1, Math.max(5 + z1 * 3, 1), 0, Math.PI * 2);
+      x.fillStyle = 'rgba(200,150,12,' + (.4 + z1 * .4) + ')'; x.fill();
+      x.beginPath(); x.arc(x1, y2, Math.max(5 + z2 * 3, 1), 0, Math.PI * 2);
+      x.fillStyle = 'rgba(33,150,243,' + (.4 + z2 * .4) + ')'; x.fill();
+      if (i > 0) {
+        var px = cx - l / 2 + (l / n) * (i - 1), py1 = cy + Math.sin((i - 1) * (Math.PI * 2 / n) + t) * a, py2 = cy + Math.sin((i - 1) * (Math.PI * 2 / n) + t + Math.PI) * a;
+        x.beginPath(); x.moveTo(px, py1); x.lineTo(x1, y1); x.strokeStyle = 'rgba(200,150,12,.25)'; x.lineWidth = 1.5; x.stroke();
+        x.beginPath(); x.moveTo(px, py2); x.lineTo(x1, y2); x.strokeStyle = 'rgba(33,150,243,.2)'; x.stroke();
+      }
+    }
+    requestAnimationFrame(d);
+  } d();
+})();
+
+// Medical Advice
+const MEDICAL_ADVICE = { sugar: { title: '🩸 السكري', cls: 'sugar', tips: ['تجنب السكريات البسيطة', 'الصيام المتقطع يحسن الإنسولين', 'أضف القرفة للطعام'] }, pressure: { title: '💉 الضغط', cls: 'pressure', tips: ['قلل الملح لـ 1500 ملجم', 'الثوم والزنجبيل يخفضان الضغط'] }, allergy: { title: '🌸 الحساسية', cls: 'allergy', tips: ['الكركم مضاد للالتهاب', 'أوميجا 3 مضاد قوي للحساسية'] }, chemo: { title: '⚕️ الكيماوي', cls: 'chemo', tips: ['وجبات صغيرة ومتكررة', 'الزنجبيل يقلل الغثيان'] }, heart: { title: '❤️ القلب', cls: 'heart', tips: ['تجنب الدهون المتحولة', 'أوميجا 3 من السمك أساسي'] }, kidney: { title: '🫘 الكلى', cls: 'kidney', tips: ['راقب البروتين', 'شرب ماء كافٍ يمنع الحصوات'] } };
+function buildMedicalAlerts() { const c = document.getElementById('medical-alerts-container'); const d = currentUser && currentUser.diseases && currentUser.diseases.length ? currentUser.diseases : []; if (!d.length) { c.innerHTML = '<div class="alert-card ok"><div class="alert-title">✅ أنت بصحة جيدة</div></div>'; return; } c.innerHTML = d.map(function(k) { const a = MEDICAL_ADVICE[k]; if (!a) return ''; return '<div class="alert-card ' + a.cls + '"><div class="alert-title">' + a.title + '</div><ul class="alert-tips">' + a.tips.map(function(t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>'; }).join(''); }
+function buildHomeDisTags() { const c = document.getElementById('home-dis-tags'); const d = currentUser && currentUser.diseases && currentUser.diseases.length ? currentUser.diseases : []; const m = { sugar: '🩸 السكري', pressure: '💉 الضغط', allergy: '🌸 الحساسية', chemo: '⚕️ كيماوي', heart: '❤️ القلب', kidney: '🫘 الكلى' }; if (!d.length) { c.innerHTML = '<div class="dis-tag tag-none">✅ بصحة جيدة</div>'; return; } c.innerHTML = d.map(function(k) { return '<div class="dis-tag tag-' + k + '">' + (m[k] || k) + '</div>'; }).join(''); }
+
+// Tips
+const ALL_TIPS = [{ icon: '💧', bg: 'rgba(66,165,245,.12)', title: 'الماء أساس الصحة', body: 'اشرب 8-10 أكواب ماء يومياً.' }, { icon: '🥗', bg: 'rgba(102,187,106,.12)', title: 'الخضروات المطبوخة', body: 'في الطيبات الخضروات مطبوخة فقط.' }, { icon: '⏱️', bg: 'rgba(200,150,12,.12)', title: 'الصيام المتقطع', body: '16/8 للمبتدئين يحسن الإنسولين.' }, { icon: '🚫', bg: 'rgba(229,57,53,.12)', title: 'ابتعد عن الدجاج', body: 'ممنوع تماماً في الطيبات.' }];
+let tipIdx = 0, tipT;
+function buildTips() { const c = document.getElementById('tip-carousel'); c.innerHTML = ALL_TIPS.map(function(t, i) { return '<div class="tip-slide' + (i === 0 ? ' active' : '') + '"><div class="tip-top"><div class="tip-icon-wrap" style="background:' + t.bg + '"><span>' + t.icon + '</span></div><div><div class="tip-title">' + t.title + '</div></div></div><div class="tip-body">' + t.body + '</div></div>'; }).join(''); const d = document.createElement('div'); d.className = 'tip-dots'; d.innerHTML = ALL_TIPS.map(function(_, i) { return '<div class="tip-dot' + (i === 0 ? ' on' : '') + '" onclick="gotoTip(' + i + ')"></div>'; }).join(''); c.appendChild(d); if (tipT) clearInterval(tipT); tipT = setInterval(nextTip, 5500); }
+function gotoTip(i) { const s = document.querySelectorAll('#tip-carousel .tip-slide'), d = document.querySelectorAll('#tip-carousel .tip-dot'); s[tipIdx].classList.remove('active'); d[tipIdx].classList.remove('on'); tipIdx = i; s[tipIdx].classList.add('active'); d[tipIdx].classList.add('on'); }
+function nextTip() { gotoTip((tipIdx + 1) % ALL_TIPS.length); }
+
+// Foods
+const FOOD_DATA = [{ id: 1, emoji: '🥩', name: 'اللحوم الحمراء', cat: 'بروتين', status: 'allowed', desc: 'أفضل مصادر البروتين', reason: 'ركيزة أساسية في الطيبات' }, { id: 2, emoji: '🐟', name: 'السمك البحري', cat: 'بروتين', status: 'allowed', desc: 'مشوي أو مقلي بدون دقيق', reason: 'مصدر ممتاز لأوميجا 3' }, { id: 3, emoji: '🐔', name: 'الدجاج', cat: 'بروتين', status: 'forbidden', desc: 'ممنوع تماماً', reason: 'يُعلَّف بهرمونات ومضادات حيوية' }, { id: 4, emoji: '🍚', name: 'الأرز', cat: 'نشويات', status: 'allowed', desc: 'بجميع أنواعه', reason: 'مصدر طاقة نظيف' }, { id: 5, emoji: '🍞', name: 'الخبز الأبيض', cat: 'نشويات', status: 'forbidden', desc: 'ممنوع تماماً', reason: 'يُسبب الالتهاب ويرفع السكر' }, { id: 6, emoji: '🫒', name: 'زيت الزيتون', cat: 'دهون', status: 'allowed', desc: 'البكر الممتاز', reason: 'الدهن الأول في الطيبات' }, { id: 7, emoji: '🥛', name: 'الألبان السائلة', cat: 'ألبان', status: 'forbidden', desc: 'حليب وزبادي', reason: 'من أقوى مسببات الالتهاب' }, { id: 8, emoji: '🧀', name: 'الجبن المعتق', cat: 'ألبان', status: 'allowed', desc: 'المطبوخ والمعتق فقط', reason: 'بروتينها محلّل وأسهل هضماً' }, { id: 9, emoji: '🫕', name: 'الخضروات المطبوخة', cat: 'خضروات', status: 'allowed', desc: 'مسبكة جيداً', reason: 'تليين الألياف يسهّل الهضم' }, { id: 10, emoji: '🥗', name: 'الخضروات النيئة', cat: 'خضروات', status: 'forbidden', desc: 'ممنوعة', reason: 'تُتعب الأمعاء وتُسبب الانتفاخ' }, { id: 11, emoji: '🍇', name: 'الفواكه الحلوة', cat: 'فواكه', status: 'allowed', desc: 'مسموحة باعتدال', reason: 'مصدر طبيعي للسكريات' }, { id: 12, emoji: '🥤', name: 'الغازيات', cat: 'مشروبات', status: 'forbidden', desc: 'ممنوعة كلياً', reason: 'تحمّض الجسم وتدمر البكتيريا النافعة' }];
+let curCat = 'الكل';
+function buildFoodData() { const t = document.getElementById('food-tabs'); const c = ['الكل', 'مسموح', 'ممنوع'].concat(Array.from(new Set(FOOD_DATA.map(function(f) { return f.cat; })))); t.innerHTML = c.map(function(x) { return '<div class="ftab' + (x === 'الكل' ? ' act' : '') + '" onclick="filterCat(\'' + x + '\')">' + x + '</div>'; }).join(''); renderFood(); }
+function filterCat(c) { curCat = c; document.querySelectorAll('.ftab').forEach(function(t) { t.classList.remove('act', 'act-red'); }); document.querySelectorAll('.ftab').forEach(function(t) { if (t.textContent === c) t.classList.add(c === 'ممنوع' ? 'act-red' : 'act'); }); renderFood(); }
+function filterFood() { renderFood(); }
+function renderFood() { const q = document.getElementById('food-search').value.trim().toLowerCase(); const g = document.getElementById('food-grid'); let d = FOOD_DATA; if (curCat === 'مسموح') d = d.filter(function(f) { return f.status === 'allowed'; }); else if (curCat === 'ممنوع') d = d.filter(function(f) { return f.status === 'forbidden'; }); else if (curCat !== 'الكل') d = d.filter(function(f) { return f.cat === curCat; }); if (q) d = d.filter(function(f) { return f.name.includes(q) || f.desc.includes(q); }); g.innerHTML = d.map(function(f) { return '<div class="food-card ' + f.status + '"><div class="fc-top"><div class="fc-emoji">' + f.emoji + '</div><div class="fc-info"><div class="fc-name">' + f.name + '</div><div class="fc-badge ' + f.status + '">' + (f.status === 'allowed' ? '✅ مسموح' : '🚫 ممنوع') + '</div><div class="fc-desc">' + f.desc + '</div></div></div><div class="fc-expand" id="fc-exp-' + f.id + '"><div class="fc-reason ' + (f.status === 'allowed' ? 'ok' : 'bad') + '">' + f.reason + '</div><div class="fc-toggle-row"><button class="fc-youtube-btn" onclick="openYoutube(\'' + f.name + '\')"><i class="fab fa-youtube"></i> شاهد فيديو للدكتور ضياء يتحدث عن ذلك</button></div></div><div class="fc-toggle-row" style="margin-top:8px"><span class="fc-toggle" onclick="toggleFoodCard(' + f.id + ')">▼ تفاصيل أكثر</span></div></div>'; }).join(''); }
+function toggleFoodCard(id) { const e = document.getElementById('fc-exp-' + id); const o = e.classList.contains('open'); e.classList.toggle('open', !o); var tog = e.nextElementSibling ? e.nextElementSibling.querySelector('.fc-toggle') : null; if (tog) tog.textContent = o ? '▼ تفاصيل أكثر' : '▲ إخفاء'; }
+function openYoutube(n) { window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent('الدكتور ضياء العوضي ' + n), '_blank'); }
+
+// Fasting
+const FAST_TYPES = [{ id: '16-8', hrs: '16/8', name: 'بروتوكول ليفنسكي', desc: '16 صيام، 8 أكل', level: 'easy', details: { intro: 'أشهر بروتوكول. مثالي للمبتدئين.', howto: ['صيام من 8 مساءً إلى 12 ظهراً', '2-3 وجبات من الطيبات'], allowedFoods: ['اللحوم والأسماك', 'الأرز والبطاطس', 'الخضروات المطبوخة'], forbiddenFoods: ['السكريات', 'الدجاج', 'الألبان السائلة'], benefits: ['تحسين الإنسولين', 'حرق الدهون'], caution: 'غير مناسب لسكر النوع 1 إلا باستشارة' } }, { id: '18-6', hrs: '18/6', name: 'بروتوكول التطوير', desc: '18 صيام، 6 أكل', level: 'med', details: { intro: 'لمن اعتاد الصيام.', howto: ['نافذة الأكل: 2-8 مساءً'], allowedFoods: ['لحم وسمك كأساس', 'أرز وبطاطس', 'مكسرات كوجبة خفيفة'], forbiddenFoods: ['سكريات', 'وجبات خفيفة بين الوجبات'], benefits: ['حرق أعمق', 'ضبط الضغط'], caution: 'تدرّج من 16 إلى 18' } }, { id: 'omad', hrs: '23/1', name: 'OMAD', desc: 'وجبة واحدة يومياً', level: 'hard', details: { intro: 'الأقوى. للمتقدمين.', howto: ['وجبة واحدة كبيرة غنية', 'ماء وقهوة خلال الصيام'], allowedFoods: ['وجبة ضخمة شاملة', 'لحوم وأرز وخضار'], forbiddenFoods: ['أي أكل صلب خارج الوجبة'], benefits: ['أقصى حرق', 'أوتوفاجي عميق'], caution: 'خطير بدون تدرج' } }];
+let selFast = null, fTimer = null, fStart = null, fRun = false, fType = null;
+function buildFastTypes() { document.getElementById('fast-types').innerHTML = FAST_TYPES.map(function(f) { return '<div class="fast-card" id="fast-' + f.id + '" onclick="selectFast(\'' + f.id + '\')"><div class="fc-row"><div class="fc-hrs">' + f.hrs + '</div><div class="fc-details"><div class="fc-dname">' + f.name + '</div><div class="fc-ddesc">' + f.desc + '</div><span class="fc-level lv-' + f.level + '">' + (f.level === 'easy' ? 'مبتدئ' : f.level === 'med' ? 'متوسط' : 'متقدم') + '</span></div></div><button class="fast-info-btn" onclick="event.stopPropagation();showFastDetails(\'' + f.id + '\')"><i class="fas fa-info-circle"></i> تفاصيل</button></div>'; }).join(''); }
+function selectFast(id) { selFast = FAST_TYPES.find(function(f) { return f.id === id; }); document.querySelectorAll('.fast-card').forEach(function(c) { c.classList.remove('sel'); }); document.getElementById('fast-' + id).classList.add('sel'); document.getElementById('timer-label').textContent = selFast.name; document.getElementById('timer-phase').textContent = '✅ تم الاختيار'; playSound('click'); }
+function showFastDetails(id) { const f = FAST_TYPES.find(function(x) { return x.id === id; }); const d = f.details; document.getElementById('fast-modal-title').textContent = '📋 ' + f.name; document.getElementById('fast-modal-body').innerHTML = '<p>' + d.intro + '</p><h4>🕐 التطبيق:</h4><ul>' + d.howto.map(function(h) { return '<li>' + h + '</li>'; }).join('') + '</ul><h4>✅ المأكولات المتاحة:</h4><ul>' + d.allowedFoods.map(function(x) { return '<li style="color:#2ec951">' + x + '</li>'; }).join('') + '</ul><h4>🚫 المأكولات المحظورة:</h4><ul>' + d.forbiddenFoods.map(function(x) { return '<li style="color:#ef5350">' + x + '</li>'; }).join('') + '</ul><h4>🌟 الفوائد:</h4><ul>' + d.benefits.map(function(x) { return '<li>' + x + '</li>'; }).join('') + '</ul><h4>⚠️ تنبيه:</h4><p style="color:#ef5350">' + d.caution + '</p>'; openModal('fast-details-modal'); }
+function openModal(id) { document.getElementById(id).classList.add('show'); } function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function startFast() { if (!selFast) { showToast('❌ اختر نوع الصيام'); return; } if (fRun) return; fStart = Date.now(); fRun = true; fType = selFast; localStorage.setItem('fast_start', fStart); localStorage.setItem('fast_type', fType.id); document.getElementById('btn-start').disabled = true; document.getElementById('btn-stop').disabled = false; document.getElementById('timer-phase').textContent = '🔥 صائم...'; fTimer = setInterval(updateTimer, 1000); updateTimer(); playSound('success'); showToast('🌿 بدأ الصيام!'); }
+function stopFast() { if (!fRun) return; const e = Date.now() - fStart; fRun = false; clearInterval(fTimer); document.getElementById('btn-start').disabled = false; document.getElementById('btn-stop').disabled = true; document.getElementById('timer-phase').textContent = '✅ انتهى'; recordFast(e); localStorage.removeItem('fast_start'); localStorage.removeItem('fast_type'); playSound('success'); showToast('✅ انتهى — ' + (e / 3600000).toFixed(1) + ' ساعة'); document.getElementById('ring-prog').style.strokeDashoffset = 565.5; }
+function resetFast() { if (fRun) stopFast(); fStart = null; fType = null; document.getElementById('timer-display').textContent = '00:00:00'; document.getElementById('timer-label').textContent = 'اختر نوع الصيام'; document.getElementById('timer-phase').textContent = '⏸️ في وضع الراحة'; document.getElementById('fast-stats-line').textContent = 'لم يبدأ بعد'; document.getElementById('ring-prog').style.strokeDashoffset = 565.5; document.querySelectorAll('.fast-card').forEach(function(c) { c.classList.remove('sel'); }); selFast = null; }
+function updateTimer() { if (!fStart || !fRun) return; const e = Date.now() - fStart; const h = Math.floor(e / 3600000), m = Math.floor((e % 3600000) / 60000), s = Math.floor((e % 60000) / 1000); document.getElementById('timer-display').textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); if (fType) { const t = parseFloat(fType.id.split('-')[0]) || 16; const p = Math.min(e / (t * 3600000), 1); document.getElementById('ring-prog').style.strokeDashoffset = 565.5 * (1 - p); document.getElementById('fast-stats-line').textContent = Math.floor(p * 100) + '% — ' + h + ' ساعة ' + m + ' دقيقة'; if (p >= 1) document.getElementById('timer-phase').textContent = '🏆 اكتمل!'; } }
+function recordFast(e) { if (!currentUser) return; const k = 'fasts_' + currentUser.username; let r = JSON.parse(localStorage.getItem(k) || '[]'); r.push({ ts: Date.now(), e: e, t: fType ? fType.id : '' }); localStorage.setItem(k, JSON.stringify(r)); loadFastStats(); }
+function loadFastStats() { if (!currentUser) return; const r = JSON.parse(localStorage.getItem('fasts_' + currentUser.username) || '[]'); const n = Date.now(), d = 86400000; document.getElementById('s-today').textContent = r.filter(function(x) { return n - x.ts < d; }).length; document.getElementById('s-week').textContent = r.filter(function(x) { return n - x.ts < d * 7; }).length; document.getElementById('s-month').textContent = r.filter(function(x) { return n - x.ts < d * 30; }).length; const ss = localStorage.getItem('fast_start'), st = localStorage.getItem('fast_type'); if (ss && st && !fRun) { fStart = parseInt(ss); fType = FAST_TYPES.find(function(f) { return f.id === st; }); selFast = fType; if (fType) { fRun = true; document.getElementById('btn-start').disabled = true; document.getElementById('btn-stop').disabled = false; document.getElementById('timer-label').textContent = fType.name; document.getElementById('timer-phase').textContent = '🔥 صائم...'; var fEl = document.getElementById('fast-' + fType.id); if (fEl) fEl.classList.add('sel'); fTimer = setInterval(updateTimer, 1000); updateTimer(); } } }
+
+// Profile
+function getBMIInfo(b) { if (!b) return { label: 'غير محسوب', cls: 'bsb-normal' }; if (b < 18.5) return { label: 'نحافة', cls: 'bsb-under' }; if (b < 25) return { label: 'وزن مثالي', cls: 'bsb-normal' }; if (b < 30) return { label: 'زيادة وزن', cls: 'bsb-over' }; if (b < 40) return { label: 'سمنة', cls: 'bsb-obese' }; return { label: 'سمنة مفرطة', cls: 'bsb-morbid' }; }
+function calcAge(d) { if (!d) return '-'; const b = new Date(d), n = new Date(); let a = n.getFullYear() - b.getFullYear(); if (n < new Date(n.getFullYear(), b.getMonth(), b.getDate())) a--; return a + ' سنة'; }
+function buildProfile() { if (!currentUser) return; const u = currentUser; document.getElementById('p-name').textContent = u.name; document.getElementById('p-name2').textContent = u.name; document.getElementById('pp-weight').textContent = u.weight ? u.weight + ' كجم' : '-'; document.getElementById('pp-height').textContent = u.height ? u.height + ' سم' : '-'; document.getElementById('pp-dob').textContent = u.dob || '-'; document.getElementById('pp-age').textContent = calcAge(u.dob); document.getElementById('pp-bmi').textContent = u.bmi || '-'; const bi = getBMIInfo(u.bmi); document.getElementById('pp-bmicat').innerHTML = '<span class="bmi-status-badge ' + bi.cls + '">' + bi.label + '</span>'; document.getElementById('p-info').textContent = (u.gender === 'male' ? '👨 ذكر' : '👩 أنثى') + ' | ' + calcAge(u.dob); const m = { sugar: '🩸 السكري', pressure: '💉 الضغط', allergy: '🌸 الحساسية', chemo: '⚕️ كيماوي', heart: '❤️ القلب', kidney: '🫘 الكلى' }; document.getElementById('pp-diseases').innerHTML = u.diseases && u.diseases.length ? u.diseases.map(function(d) { return m[d]; }).join('، ') : '✅ بصحة جيدة'; }
+function openEditProfile() { const u = currentUser; document.getElementById('e-weight').value = u.weight || ''; document.getElementById('e-height').value = u.height || ''; document.getElementById('e-dob').value = u.dob || ''; editDiseases = (u.diseases || []).slice(); buildDisGrid('dis-grid-edit', editDiseases); openModal('edit-profile-modal'); }
+async function saveEditProfile() { const w = parseFloat(document.getElementById('e-weight').value) || 0, h = parseFloat(document.getElementById('e-height').value) || 0, d = document.getElementById('e-dob').value; currentUser.weight = w; currentUser.height = h; currentUser.dob = d; currentUser.bmi = w && h ? +(w / ((h / 100) ** 2)).toFixed(1) : 0; currentUser.diseases = editDiseases.slice(); await dbSaveUser(currentUser.username, currentUser); buildProfile(); buildHomeDisTags(); buildMedicalAlerts(); buildAiPage(); closeModal('edit-profile-modal'); showToast('✅ تم تحديث البيانات'); }
+function shareWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent('🌿 نظام طيبات الصحي\nhttps://tayyibat-health.netlify.app/'), '_blank'); }
+
+// AI
+let aiHistory = [];
+const QP = ['ما أفضل أطعمة لحالتي؟', 'هل أستطيع الصيام مع مرضي؟', 'بديل صحي للدجاج؟', 'خطة غذاء يوم كامل'];
+function buildAiPage() { if (!currentUser) return; const u = currentUser, d = u.diseases || [], m = { sugar: '🩸 السكري', pressure: '💉 الضغط', allergy: '🌸 الحساسية', chemo: '⚕️ كيماوي', heart: '❤️ القلب', kidney: '🫘 الكلى' }, bi = getBMIInfo(u.bmi); document.getElementById('ai-user-context').textContent = 'الاسم: ' + u.name + ' | BMI: ' + (u.bmi || '-') + ' (' + bi.label + ') | الأمراض: ' + (d.length ? d.map(function(x) { return m[x]; }).join('، ') : 'لا يوجد'); document.getElementById('ai-dis-bar').innerHTML = d.length ? d.map(function(x) { return '<div class="dis-tag tag-' + x + '">' + m[x] + '</div>'; }).join('') : '<div class="dis-tag tag-none">✅ بصحة جيدة</div>'; document.getElementById('quick-prompts-bar').innerHTML = QP.map(function(q) { return '<button class="qprompt" onclick="document.getElementById(\'ai-msg-input\').value=\'' + q + '\'">' + q + '</button>'; }).join(''); if (!aiHistory.length) addAiMsg('assistant', 'مرحباً ' + u.name + '! 🌿\nأنا مساعدك الصحي بنظام الطيبات.\nاسألني بحرية! 🤝'); }
+function addAiMsg(r, t) { const w = document.getElementById('ai-chat-wrap'), d = document.createElement('div'); d.className = 'ai-msg ' + r; d.innerHTML = '<div class="ai-msg-label">' + (r === 'user' ? '<i class="fas fa-user"></i> أنت' : '<i class="fas fa-robot"></i> طبيبك الذكي') + '</div><div>' + t + '</div>'; w.appendChild(d); w.scrollTop = w.scrollHeight; }
+function addThink() { const w = document.getElementById('ai-chat-wrap'), d = document.createElement('div'); d.id = 'ai-thinking'; d.className = 'ai-msg assistant'; d.innerHTML = '<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري التفكير...</div>'; w.appendChild(d); w.scrollTop = w.scrollHeight; }
+function removeThink() { var el = document.getElementById('ai-thinking'); if (el) el.remove(); }
+
+const AI_APIS = [
+  { url: 'https://text.pollinations.ai/', body: function(s, h) { return JSON.stringify({ messages: [{ role: 'system', content: s }].concat(h), model: 'openai', seed: Math.floor(Math.random() * 1e4) }); }, parse: async function(r) { return await r.text(); } },
+  { url: 'https://www.blackbox.ai/api/chat', body: function(s, h) { return JSON.stringify({ messages: [{ role: 'system', content: s }].concat(h) }); }, parse: async function(r) { const d = await r.json(); return d.response || (d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : ''); } },
+  { url: 'https://api.deepinfra.com/v1/openai/chat/completions', body: function(s, h) { return JSON.stringify({ model: 'meta-llama/Meta-Llama-3-8B-Instruct', messages: [{ role: 'system', content: s }].concat(h) }); }, parse: async function(r) { const d = await r.json(); return (d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : 'عذراً لم أستطع الإجابة.'); } }
+];
+
+async function sendAiMessage() {
+  const i = document.getElementById('ai-msg-input'), t = i.value.trim(); if (!t) return;
+  addAiMsg('user', t); aiHistory.push({ role: 'user', content: t }); i.value = '';
+  document.getElementById('btn-ai-send').disabled = true; addThink();
+  const u = currentUser || {}, d = u.diseases || [], m = { sugar: 'السكري', pressure: 'الضغط', allergy: 'الحساسية', chemo: 'الكيماوي', heart: 'القلب', kidney: 'الكلى' }, bi = getBMIInfo(u.bmi);
+  const sys = 'أنت مساعد صحي بنظام الطيبات للدكتور ضياء العوضي. تتحدث بالعربية. المستخدم: ' + u.name + '، BMI: ' + (u.bmi || '-') + ' (' + bi.label + ')، الأمراض: ' + (d.length ? d.map(function(x) { return m[x]; }).join(' و ') : 'لا يوجد') + '. المسموح: لحوم، سمك، أرز، بطاطس، زيت زيتون، خضار مطبوخة، فواكه. الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر. كن موجزاً ومفيداً.';
+  let reply = '';
+  for (let idx = 0; idx < AI_APIS.length; idx++) {
+    const api = AI_APIS[idx];
+    try {
+      const r = await fetch(api.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: api.body(sys, aiHistory) });
+      if (r.ok) { reply = await api.parse(r); if (reply) break; }
+    } catch (e) { continue; }
+  }
+  removeThink();
+  if (!reply) reply = generateLocalResponse(t, u, d);
+  aiHistory.push({ role: 'assistant', content: reply }); addAiMsg('assistant', reply);
+  document.getElementById('btn-ai-send').disabled = false; document.getElementById('ai-chat-wrap').scrollTop = 9999;
+}
+function generateLocalResponse(q, u, d) { const ql = q.toLowerCase(); if (ql.includes('دجاج')) return '🚫 الدجاج ممنوع في الطيبات!\n✅ البدائل: لحم خروف، سمك، حمام.'; if (ql.includes('صيام')) return '⏱️ الصيام المتقطع مفيد! أنصح بـ 16/8.'; return '🌿 نظام الطيبات:\n✅ المسموح: لحوم، أرز، خضار مطبوخة.\n🚫 الممنوع: دجاج، دقيق، ألبان سائلة.'; }
+function clearAiChat() { aiHistory = []; document.getElementById('ai-chat-wrap').innerHTML = ''; buildAiPage(); showToast('🗑️ تم مسح المحادثة'); }
+
+if ('serviceWorker' in navigator) { window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js').catch(function() {}); }); }
+window.addEventListener('DOMContentLoaded', function() { setTimeout(autoLogin, 1000); });
 </script>
 </body>
 </html>
