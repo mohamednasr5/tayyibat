@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
   const firebaseConfig = {
-    apiKey: "FIREBASE_API_KEY",
+    apiKey: "AIzaSyBf7IUVNUr7bihe4CqtqUwd3UbNRacq2po",
     authDomain: "daybat-cfa12.firebaseapp.com",
     databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com",
     projectId: "daybat-cfa12",
@@ -43,7 +43,7 @@
   // ═══════════════════════════════════════════════
   // OpenRouter API Configuration
   // ═══════════════════════════════════════════════
-  const OPENROUTER_API_KEY = "OPENROUTER_API_KEY";
+  const OPENROUTER_API_KEY = "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";
   const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
   const OPENROUTER_MODEL = "meta-llama/llama-2-70b-chat"; // Model متقدم
 </script>
@@ -624,7 +624,7 @@ body{
     <div class="ai-chat-messages" id="ai-chat-messages"></div>
     <div class="ai-chat-input-area">
       <input type="text" class="ai-chat-input" id="ai-chat-input" 
-             placeholder="اسأل عن التغذية والصحة..." autocomplete="off">
+             placeholder="اسأل عن التغذية والصيام في نظام الطيبات..." autocomplete="off">
       <button class="ai-chat-send" id="ai-chat-send" onclick="sendAIMessage()">إرسال</button>
     </div>
   </div>
@@ -797,54 +797,6 @@ body{
 </div>
 
 <!-- ═════════════════════════════════════════════════════
-     FASTING PAGE
-════════════════════════════════════════════════════════ -->
-<div id="fasting-page" class="page">
-  <div class="section">
-    <div class="section-title">
-      <i class="fas fa-hourglass-half"></i> الصيام المتقطع
-    </div>
-    <div id="fasting-content">
-      <p style="text-align:center;color:var(--text-secondary);padding:20px">
-        🕐 سيتم تفعيل قسم الصيام قريباً
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- ═════════════════════════════════════════════════════
-     FOODS PAGE
-════════════════════════════════════════════════════════ -->
-<div id="foods-page" class="page">
-  <div class="section">
-    <div class="section-title">
-      <i class="fas fa-apple-alt"></i> الأطعمة المسموحة
-    </div>
-    <div id="foods-content">
-      <p style="text-align:center;color:var(--text-secondary);padding:20px">
-        🍎 سيتم تفعيل قسم الأطعمة قريباً
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- ═════════════════════════════════════════════════════
-     TIPS PAGE
-════════════════════════════════════════════════════════ -->
-<div id="tips-page" class="page">
-  <div class="section">
-    <div class="section-title">
-      <i class="fas fa-lightbulb"></i> النصائح الطبية
-    </div>
-    <div id="tips-content">
-      <p style="text-align:center;color:var(--text-secondary);padding:20px">
-        💡 سيتم تفعيل قسم النصائح قريباً
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- ═════════════════════════════════════════════════════
      BOTTOM NAV
 ════════════════════════════════════════════════════════ -->
 <div class="bottom-nav">
@@ -891,17 +843,27 @@ body{
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════════
-   OPENROUTER AI INTEGRATION
+   OPENROUTER AI INTEGRATION - TAYYIBAT SYSTEM
 ═══════════════════════════════════════════════════════════════════════════════ */
 
 /**
  * ✅ الدالة الرئيسية للاتصال بـ OpenRouter API
- * تستخدم Llama 2 70B أو نموذج آخر
  */
 async function callOpenRouterAPI(userMessage, systemPrompt = "") {
   try {
-    const defaultSystem = "أنت مساعد صحي متخصص في التغذية والصيام المتقطع. تقدم نصائح طبية دقيقة وآمنة. رد باللغة العربية فقط.";
-    
+    // توجيهات صارمة للذكاء الاصطناعي ليكون مبنياً حصرياً على نظام د. ضياء العوضي
+    const tayyibatSystem = `أنت مساعد صحي طبي متخصص وحصري في "نظام الطيبات" للدكتور ضياء العوضي.
+مهمتك الأساسية هي مساعدة المستخدمين بنصائح وإجابات تعتمد تماماً على مبادئ هذا النظام.
+القواعد الأساسية لنظام الطيبات التي يجب أن تبني عليها ردودك:
+1. الصيام المتقطع هو العلاج الأساسي (الامتناع عن الطعام تماماً والاكتفاء بالماء والمشروبات المسموحة بدون سكر).
+2. الممنوعات القطعية: السكر الأبيض، الدقيق الأبيض (القمح الجلوتين)، الزيوت المهدرجة، المواد الحافظة، والألبان البقرية غير الطبيعية.
+3. المسموحات (الطيبات): اللحوم الطبيعية، الدهون الطبيعية (زبدة حيوانية، زيت زيتون)، بعض أنواع الكربوهيدرات الصحية المسموحة في النظام (مثل الأرز في بعض الحالات)، والخضروات.
+4. الوجبات: التشجيع على تناول وجبة واحدة (OMAD) أو وجبتين على الأكثر في اليوم.
+5. الفواكه: التقليل منها أو منعها تماماً نظراً لاحتوائها على الفركتوز الذي يعتبره النظام ضاراً.
+6. لا تنصح أبداً بأي نظام غذائي آخر. كن مشجعاً، إيجابياً، ومباشراً. 
+إذا تم سؤالك عن شيء خارج نطاق النظام، وضح أن نظام الطيبات يركز على مسار مختلف، واشرحه.
+يجب أن يكون ردك باللغة العربية حصراً.`;
+
     const response = await fetch(OPENROUTER_API_URL, {
       method: "POST",
       headers: {
@@ -915,7 +877,7 @@ async function callOpenRouterAPI(userMessage, systemPrompt = "") {
         messages: [
           {
             role: "system",
-            content: systemPrompt || defaultSystem
+            content: systemPrompt || tayyibatSystem
           },
           {
             role: "user",
@@ -923,7 +885,7 @@ async function callOpenRouterAPI(userMessage, systemPrompt = "") {
           }
         ],
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 600,
         top_p: 0.9
       })
     });
@@ -991,12 +953,13 @@ async function sendAIMessage() {
   sendBtn.disabled = true;
   
   try {
-    // استدعاء OpenRouter API
-    let systemMsg = "أنت مساعد صحي متخصص في التغذية والصيام المتقطع.";
+    // تجهيز السياق للذكاء الاصطناعي
+    let systemMsg = `أنت مساعد صحي طبي متخصص وحصري في "نظام الطيبات" للدكتور ضياء العوضي.
+القواعد: التركيز على الصيام المتقطع، منع (السكر الأبيض، الدقيق الأبيض، الزيوت المهدرجة، الفواكه المليئة بالفركتوز)، والاعتماد على اللحوم الطبيعية والدهون الصحية (زيت زيتون، زبدة حيوانية)، وتقليل عدد الوجبات.`;
     
-    // إضافة معلومات المستخدم الحالي للـ AI
+    // إضافة معلومات المستخدم الحالي للـ AI إن وجدت
     if (currentUser && currentUser.diseases) {
-      systemMsg += `\n\nمعلومات المستخدم الحالي:\nالأمراض: ${currentUser.diseases.join(', ')}\nالوزن: ${currentUser.weight}كجم\nالطول: ${currentUser.height}سم`;
+      systemMsg += `\n\nمعلومات المستخدم الحالي الذي يتحدث معك:\nالأمراض التي يعاني منها: ${currentUser.diseases.join(', ')}\nالوزن: ${currentUser.weight || 'غير محدد'} كجم\nالطول: ${currentUser.height || 'غير محدد'} سم\nقدم له النصيحة المناسبة لحالته بناءً على قواعد نظام الطيبات حصراً.`;
     }
     
     const botResponse = await callOpenRouterAPI(message, systemMsg);
@@ -1053,15 +1016,11 @@ let currentUser = null;
 let soundEnabled = true;
 
 function goToPage(pageName) {
-  var pageEl = document.getElementById(pageName + '-page');
-  if (!pageEl) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  pageEl.classList.add('active');
+  document.getElementById(pageName + '-page').classList.add('active');
   
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (typeof event !== 'undefined' && event && event.target) {
-    event.target.closest('.nav-item')?.classList.add('active');
-  }
+  event.target.closest('.nav-item')?.classList.add('active');
 }
 
 function playSound(type) {
@@ -1078,7 +1037,7 @@ function showToast(msg) {
 
 function handleLogin() {
   showToast('✅ تم الدخول بنجاح');
-  currentUser = { name: 'محمد' };
+  currentUser = { name: 'محمد', diseases: [], weight: 75, height: 170 };
   goToPage('home');
 }
 
@@ -1121,7 +1080,7 @@ function openEditDiseases() {
 function autoLogin() {
   // يمكن إضافة logic تسجيل الدخول التلقائي هنا
   goToPage('home');
-  currentUser = { name: 'محمد', diseases: ['السكر'] };
+  currentUser = { name: 'محمد', diseases: ['مقاومة الإنسولين'], weight: 85, height: 175 };
   document.getElementById('home-name').textContent = currentUser.name;
   hideLoader();
 }
