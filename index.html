@@ -210,15 +210,19 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .sig-name{color:var(--gold2);font-weight:700}
 .dev-sig{margin-top:12px;padding-top:12px;border-top:1px solid rgba(200,150,12,.15)}
 .dev-sig-line{width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 8px}
-.dev-sig-label{font-size:.65rem;color:var(--txt3);margin-bottom:2px}
-.dev-sig-name{font-size:.8rem;font-weight:700;color:var(--txt2);margin-bottom:8px}
+.dev-sig-label{font-size:.72rem;color:var(--txt2);margin-bottom:6px; font-weight: bold;}
+.dev-sig-name{font-size:.95rem;font-weight:700;color:var(--gold2);margin-bottom:8px}
+.dev-sig-name i.fa-heart {animation: heartBeat 1s ease-in-out infinite; display: inline-block;}
+.social-links {margin-top: 10px; display: flex; justify-content: center; gap: 12px;}
+.social-icon {color: var(--txt2); font-size: 1.2rem; transition: color .3s;}
+.social-icon:hover {color: var(--blue2);}
 
 .search-wrap{padding:12px 16px}
 .search-wrap-inner{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:14px;padding:0 14px;}
 .search-wrap-inner i{color:var(--txt3)}
 .search-input{flex:1;background:none;border:none;padding:12px 0;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;}
 .search-input::placeholder{color:rgba(138,164,200,.5)}
-.food-tabs-wrap{padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.food-tabs-wrap padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .food-tabs-wrap::-webkit-scrollbar{display:none}
 .ftab{flex-shrink:0;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:rgba(255,255,255,.04);transition:all .25s;}
 .ftab.act{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border-color:transparent;box-shadow:0 4px 15px rgba(200,150,12,.3)}
@@ -416,17 +420,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">تسجيل الدخول</div>
       <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">إنشاء حساب</div>
     </div>
-
-    <div id="login-form">
-      <div class="demo-users-box">
-        <strong>🔓 حسابات توضيحية جاهزة:</strong>
-        <div class="demo-user-item">
-          <div class="demo-user-label">المستخدم الأول:</div>
-          <div class="demo-user-credentials">
-            <span onclick="copyAndFill('l-user',this)">mohamednasr</span>
-            <span onclick="copyAndFill('l-pass',this)">123456</span>
-          </div>
-        </div>
         <div class="demo-user-item">
           <div class="demo-user-label">المستخدم الثاني (مع حساسية):</div>
           <div class="demo-user-credentials">
@@ -620,9 +613,13 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="sig-text">نظام الطيبات الغذائي<br><span class="sig-name">للدكتور ضياء العوضي رحمه الله</span></div>
     <div class="dev-sig">
       <div class="dev-sig-line"></div>
-      <div class="dev-sig-label">تطوير وتحسين</div>
-      <div class="dev-sig-name">🚀 نسخة محسّنة ومصححة</div>
-      <div style="font-size:.7rem;color:var(--txt3);margin-top:8px">✅ تسجيل دخول مصحح | ✅ AI مدمج | ✅ بيانات محلية</div>
+      <div class="dev-sig-label">تطوير وبرمجة</div>
+      <div class="dev-sig-name"><i class="fas fa-heart" style="color: #e53935;"></i> المهندس محمد حماد</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="social-icon" title="فيسبوك">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -1240,36 +1237,36 @@ function nextTip() {
 
 /* ═══════════════ FOOD DATA ═══════════════ */
 const FOOD_DATA = [
-  { id:1, emoji:'🥩', name:'اللحوم الحمراء (خروف، ماعز، جمل)', cat:'بروتين', status:'allowed', desc:'أفضل مصادر البروتين في نظام الطيبات', reason:'الدكتور ضياء يُقدّم لحم الخروف والماعز كأفضل اللحوم لاحتوائها على أحماض دهنية مفيدة', ytQuery:'اللحوم الحمراء نظام الطيبات' },
-  { id:2, emoji:'🐟', name:'السمك البحري (بدون دقيق)', cat:'بروتين', status:'allowed', desc:'أسماك البحر — مشوي أو مقلي بدون دقيق', reason:'السمك البحري مسموح كبروتين أساسي — يُفضّل المشوي، ومصدر ممتاز لأوميجا 3', ytQuery:'السمك البحري نظام طيبات' },
-  { id:3, emoji:'🕊️', name:'الحمام والسمان فقط', cat:'بروتين', status:'allowed', desc:'الطيور البرية الوحيدة المسموحة', reason:'الاستثناء الوحيد من الطيور — طيور برية غير مُعلَّفة بهرمونات', ytQuery:'الحمام والسمان فوائد' },
-  { id:4, emoji:'🐔', name:'الدجاج والدواجن', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً — دجاج، ديك رومي، بط، أوز', reason:'الدواجن تُعلَّف بهرمونات مصطنعة ومضادات حيوية. الاستثناء: حمام وسمان فقط', ytQuery:'منع الدجاج نظام طيبات' },
-  { id:5, emoji:'🥚', name:'البيض بجميع أشكاله', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً — مقلي، مسلوق، أومليت', reason:'بيض الدجاج ممنوع كلياً. الاستثناء الوحيد: بيض السمان بكميات قليلة جداً', ytQuery:'منع البيض نظام طيبات' },
-  { id:6, emoji:'🍚', name:'الأرز بجميع أنواعه', cat:'نشويات', status:'allowed', desc:'الأرز الأبيض، البسمتي، الأرز البني', reason:'ركيزة نظام الطيبات الأساسية — مصدر طاقة نظيف وسهل الهضم', ytQuery:'فوائد الأرز والنشويات' },
-  { id:7, emoji:'🥔', name:'البطاطس بجميع أشكالها', cat:'نشويات', status:'allowed', desc:'مسلوقة، مشوية، مقلية، حلوة', reason:'مصدر كربوهيدرات ممتاز وغني بالبوتاسيوم والفيتامينات', ytQuery:'البطاطس والبطاطا الحلوة' },
-  { id:8, emoji:'🍞', name:'الخبز الأبيض والدقيق المكرر', cat:'نشويات', status:'forbidden', desc:'ممنوع — عيش بلدي، شامي، سوري، فرنساوي', reason:'الدقيق الأبيض المكرر ممنوع تماماً — يُسبب الالتهاب ويرفع السكر بسرعة', ytQuery:'منع الخبز الدقيق المعجنات' },
-  { id:9, emoji:'🍝', name:'المكرونة بجميع أنواعها', cat:'نشويات', status:'forbidden', desc:'ممنوعة — سباغيتي، لازانيا، حتى القمح الكامل', reason:'المكرونة ممنوعة في الطيبات — مصدر التهاب مزمن ومشكلات هضمية', ytQuery:'منع المكرونة نظام طيبات' },
-  { id:10, emoji:'🫒', name:'زيت الزيتون البكر الممتاز', cat:'دهون صحية', status:'allowed', desc:'أفضل الزيوت في نظام الطيبات', reason:'ركيزة أساسية — الدهن الأول المفضّل لمضادات الأكسدة والفوليفينول', ytQuery:'زيت الزيتون البكر الممتاز فوائد' },
-  { id:11, emoji:'🧈', name:'الزبدة والسمن البلدي', cat:'دهون صحية', status:'allowed', desc:'الزبدة الطبيعية والسمن البلدي', reason:'الدهون الحيوانية الطبيعية مسموحة — مصدر للفيتامينات الذائبة بالدهون', ytQuery:'السمن البلدي والزبدة' },
-  { id:12, emoji:'🛢️', name:'زيت الذرة وعباد الشمس', cat:'دهون', status:'forbidden', desc:'ممنوعة — زيت الذرة، عباد الشمس، فول الصويا', reason:'الزيوت النباتية المكررة ممنوعة تماماً — تحتوي على أوميجا 6 مشوّهة تُسبب الالتهاب', ytQuery:'منع الزيوت النباتية المهدرجة' },
-  { id:13, emoji:'🥛', name:'الحليب والزبادي والألبان السائلة', cat:'ألبان', status:'forbidden', desc:'ممنوع — حليب بقر، زبادي، لبن رايب', reason:'الألبان السائلة ممنوعة كلياً — من أقوى مسببات الالتهاب والمخاط', ytQuery:'منع اللبن الحليب والزبادي' },
-  { id:14, emoji:'🧀', name:'الجبن المطبوخ والمعتق', cat:'ألبان', status:'allowed', desc:'الأجبان المطبوخة والمعتقة فقط — شيدر، رومي، جبن قديم', reason:'الأجبان المعتقة والمطبوخة مسموحة — بروتينها محلّل وأسهل هضماً', ytQuery:'الجبن المطبوخ المعتق شيدر رومي' },
-  { id:15, emoji:'🫕', name:'الخضروات المطبوخة جيداً', cat:'خضروات', status:'allowed', desc:'بامية، كوسا، باذنجان، فلفل، قلقاس — مطبوخة فقط', reason:'الخضروات المطبوخة (المسبكة) فقط هي المسموحة — تليين الألياف يسهّل الهضم', ytQuery:'الخضار المطبوخ الخضروات المسبكة' },
-  { id:16, emoji:'🥗', name:'الخضروات النيئة والورقية', cat:'خضروات', status:'forbidden', desc:'ممنوع — جرجير، سبانخ، طماطم، خيار، خس نيء', reason:'الخضروات النيئة ممنوعة — الألياف النيئة الصلبة تُتعب الأمعاء وتُسبب الانتفاخ', ytQuery:'منع السلطة الخضار النيء' },
-  { id:17, emoji:'🫘', name:'البقوليات (فول، عدس، حمص)', cat:'بقوليات', status:'forbidden', desc:'ممنوعة تماماً — فول، عدس، حمص، فاصوليا', reason:'البقوليات ممنوعة — تُسبب انتفاخاً وعسر هضم وتحمل مضادات التغذية', ytQuery:'منع الفول البقوليات العدس الحمص' },
-  { id:18, emoji:'🍇', name:'العنب والتين والتمر والمانجو', cat:'فواكه', status:'allowed', desc:'فواكه حلوة صيفية مسموحة', reason:'الفواكه الحلوة الصيفية مسموحة — مصدر طبيعي للسكريات والمعادن', ytQuery:'فوائد الفواكه الحلوة الصيفية' },
-  { id:19, emoji:'🍊', name:'الحمضيات (برتقال، ليمون)', cat:'فواكه', status:'allowed', desc:'ليمون، برتقال، مندرين، جريب فروت', reason:'الحمضيات مسموحة — غنية بفيتامين C ومضادات الأكسدة', ytQuery:'فوائد الحمضيات' },
-  { id:20, emoji:'🍌', name:'الموز', cat:'فواكه', status:'allowed', desc:'الموز ناضج — مصدر ممتاز للبوتاسيوم', reason:'الموز مسموح — طاقة سريعة وبوتاسيوم للعضلات', ytQuery:'فوائد الموز' },
-  { id:21, emoji:'🍎', name:'التفاح والكمثرى', cat:'فواكه', status:'allowed', desc:'تفاح أحمر، أخضر، كمثرى', reason:'مسموح — ألياف قابلة للذوبان وفيتامينات', ytQuery:'فوائد التفاح والفواكه' },
-  { id:22, emoji:'🧂', name:'الملح المعالج باليود', cat:'توابل', status:'forbidden', desc:'ملح المائدة المعالج والمكثف', reason:'يُفضّل ملح البحر الطبيعي أو الهيمالايا — الملح المعالج يرفع الضغط', ytQuery:'الملح الصحي والملح البحري' },
-  { id:23, emoji:'🌿', name:'البهارات الطبيعية والأعشاب', cat:'توابل', status:'allowed', desc:'كركم، زنجبيل، قرفة، كمون، كزبرة', reason:'مسموحة — لها خصائص مضادة للالتهاب والأكسدة رائعة', ytQuery:'فوائد البهارات الطبيعية الكركم الزنجبيل' },
-  { id:24, emoji:'☕', name:'القهوة والشاي الطبيعي', cat:'مشروبات', status:'allowed', desc:'قهوة سادة، شاي أخضر، أعشاب', reason:'مسموحة — غنية بمضادات الأكسدة، القهوة تعزز الأوتوفاجي', ytQuery:'فوائد القهوة والشاي الطبيعي' },
-  { id:25, emoji:'🥤', name:'المشروبات الغازية والعصائر المحلاة', cat:'مشروبات', status:'forbidden', desc:'كولا، بيبسي، عصائر معبأة، مشروبات طاقة', reason:'ممنوعة تماماً — تحمّض الجسم وترفع السكر وتدمر البكتيريا النافعة', ytQuery:'منع المشروبات الغازية أضرار' },
-  { id:26, emoji:'🍯', name:'العسل الطبيعي الخام', cat:'محليات', status:'allowed', desc:'عسل خام غير مُعالج', reason:'مسموح بكميات معتدلة — مضاد حيوي طبيعي ومقوي للمناعة', ytQuery:'فوائد العسل الطبيعي الخام' },
-  { id:27, emoji:'🍬', name:'السكر الأبيض والمُكرر', cat:'محليات', status:'forbidden', desc:'سكر أبيض، بودرة، أسمر مكرر، شكولاتة', reason:'ممنوع تماماً — يُسبب الالتهاب ويرفع السكر ويُعيق الأوتوفاجي', ytQuery:'أضرار السكر الأبيض المكرر' },
-  { id:28, emoji:'🥜', name:'المكسرات الطبيعية (جوز، لوز، بندق)', cat:'مكسرات', status:'allowed', desc:'جوز، لوز، بندق، كاجو — نيء أو محمص', reason:'مسموحة — دهون صحية وبروتين ومعادن مهمة', ytQuery:'فوائد المكسرات الطبيعية' },
-  { id:29, emoji:'🫛', name:'الفول السوداني وزبدته', cat:'مكسرات', status:'forbidden', desc:'فول سوداني، زبدة الفول الصناعية', reason:'ممنوع — يحتوي على الأفلاتوكسين وكثير من الأوميجا 6 المؤذي', ytQuery:'أضرار الفول السوداني' },
-  { id:30, emoji:'🍵', name:'الشاي الأخضر والأعشاب الطبيعية', cat:'مشروبات', status:'allowed', desc:'شاي أخضر، نعناع، يانسون، حلبة', reason:'مسموحة بامتياز — مضادات أكسدة قوية وتهدئة الجهاز الهضمي', ytQuery:'فوائد الشاي الأخضر والأعشاب' },
+  { id:1, emoji:'🥩', name:'اللحوم الحمراء', cat:'بروتين', status:'allowed', desc:'أفضل مصادر البروتين في نظام الطيبات', reason:'الدكتور ضياء يُقدّم لحم الخروف والماعز كأفضل اللحوم لاحتوائها على أحماض دهنية مفيدة' },
+  { id:2, emoji:'🐟', name:'السمك البحري', cat:'بروتين', status:'allowed', desc:'أسماك البحر — مشوي أو مقلي بدون دقيق', reason:'السمك البحري مسموح كبروتين أساسي — يُفضّل المشوي، ومصدر ممتاز لأوميجا 3' },
+  { id:3, emoji:'🕊️', name:'الحمام والسمان', cat:'بروتين', status:'allowed', desc:'الطيور البرية الوحيدة المسموحة', reason:'الاستثناء الوحيد من الطيور — طيور برية غير مُعلَّفة بهرمونات' },
+  { id:4, emoji:'🐔', name:'الدجاج والدواجن', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً — دجاج، ديك رومي، بط، أوز', reason:'الدواجن تُعلَّف بهرمونات مصطنعة ومضادات حيوية. الاستثناء: حمام وسمان فقط' },
+  { id:5, emoji:'🥚', name:'البيض بجميع أشكاله', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً — مقلي، مسلوق، أومليت', reason:'بيض الدجاج ممنوع كلياً. الاستثناء الوحيد: بيض السمان بكميات قليلة جداً' },
+  { id:6, emoji:'🍚', name:'الأرز بجميع أنواعه', cat:'نشويات', status:'allowed', desc:'الأرز الأبيض، البسمتي، الأرز البني', reason:'ركيزة نظام الطيبات الأساسية — مصدر طاقة نظيف وسهل الهضم' },
+  { id:7, emoji:'🥔', name:'البطاطس بجميع أشكالها', cat:'نشويات', status:'allowed', desc:'مسلوقة، مشوية، مقلية، حلوة', reason:'مصدر كربوهيدرات ممتاز وغني بالبوتاسيوم والفيتامينات' },
+  { id:8, emoji:'🍞', name:'الخبز الأبيض والدقيق المكرر', cat:'نشويات', status:'forbidden', desc:'ممنوع — عيش بلدي، شامي، سوري، فرنساوي', reason:'الدقيق الأبيض المكرر ممنوع تماماً — يُسبب الالتهاب ويرفع السكر بسرعة' },
+  { id:9, emoji:'🍝', name:'المكرونة بجميع أنواعها', cat:'نشويات', status:'forbidden', desc:'ممنوعة — سباغيتي، لازانيا، حتى القمح الكامل', reason:'المكرونة ممنوعة في الطيبات — مصدر التهاب مزمن ومشكلات هضمية' },
+  { id:10, emoji:'🫒', name:'زيت الزيتون البكر الممتاز', cat:'دهون صحية', status:'allowed', desc:'أفضل الزيوت في نظام الطيبات', reason:'ركيزة أساسية — الدهن الأول المفضّل لمضادات الأكسدة والفوليفينول' },
+  { id:11, emoji:'🧈', name:'الزبدة والسمن البلدي', cat:'دهون صحية', status:'allowed', desc:'الزبدة الطبيعية والسمن البلدي', reason:'الدهون الحيوانية الطبيعية مسموحة — مصدر للفيتامينات الذائبة بالدهون' },
+  { id:12, emoji:'🛢️', name:'زيت الذرة وعباد الشمس', cat:'دهون', status:'forbidden', desc:'ممنوعة — زيت الذرة، عباد الشمس، فول الصويا', reason:'الزيوت النباتية المكررة ممنوعة تماماً — تحتوي على أوميجا 6 مشوّهة تُسبب الالتهاب' },
+  { id:13, emoji:'🥛', name:'الحليب والزبادي والألبان السائلة', cat:'ألبان', status:'forbidden', desc:'ممنوع — حليب بقر، زبادي، لبن رايب', reason:'الألبان السائلة ممنوعة كلياً — من أقوى مسببات الالتهاب والمخاط' },
+  { id:14, emoji:'🧀', name:'الجبن المطبوخ والمعتق', cat:'ألبان', status:'allowed', desc:'الأجبان المطبوخة والمعتقة فقط — شيدر، رومي، جبن قديم', reason:'الأجبان المعتقة والمطبوخة مسموحة — بروتينها محلّل وأسهل هضماً' },
+  { id:15, emoji:'🫕', name:'الخضروات المطبوخة جيداً', cat:'خضروات', status:'allowed', desc:'بامية، كوسا، باذنجان، فلفل، قلقاس — مطبوخة فقط', reason:'الخضروات المطبوخة (المسبكة) فقط هي المسموحة — تليين الألياف يسهّل الهضم' },
+  { id:16, emoji:'🥗', name:'الخضروات النيئة والورقية', cat:'خضروات', status:'forbidden', desc:'ممنوع — جرجير، سبانخ، طماطم، خيار، خس نيء', reason:'الخضروات النيئة ممنوعة — الألياف النيئة الصلبة تُتعب الأمعاء وتُسبب الانتفاخ' },
+  { id:17, emoji:'🫘', name:'البقوليات', cat:'بقوليات', status:'forbidden', desc:'ممنوعة تماماً — فول، عدس، حمص، فاصوليا', reason:'البقوليات ممنوعة — تُسبب انتفاخاً وعسر هضم وتحمل مضادات التغذية' },
+  { id:18, emoji:'🍇', name:'العنب والتين والتمر والمانجو', cat:'فواكه', status:'allowed', desc:'فواكه حلوة صيفية مسموحة', reason:'الفواكه الحلوة الصيفية مسموحة — مصدر طبيعي للسكريات والمعادن' },
+  { id:19, emoji:'🍊', name:'الحمضيات', cat:'فواكه', status:'allowed', desc:'ليمون، برتقال، مندرين، جريب فروت', reason:'الحمضيات مسموحة — غنية بفيتامين C ومضادات الأكسدة' },
+  { id:20, emoji:'🍌', name:'الموز', cat:'فواكه', status:'allowed', desc:'الموز ناضج — مصدر ممتاز للبوتاسيوم', reason:'الموز مسموح — طاقة سريعة وبوتاسيوم للعضلات' },
+  { id:21, emoji:'🍎', name:'التفاح والكمثرى', cat:'فواكه', status:'allowed', desc:'تفاح أحمر، أخضر، كمثرى', reason:'مسموح — ألياف قابلة للذوبان وفيتامينات' },
+  { id:22, emoji:'🧂', name:'الملح المعالج باليود', cat:'توابل', status:'forbidden', desc:'ملح المائدة المعالج والمكثف', reason:'يُفضّل ملح البحر الطبيعي أو الهيمالايا — الملح المعالج يرفع الضغط' },
+  { id:23, emoji:'🌿', name:'البهارات الطبيعية والأعشاب', cat:'توابل', status:'allowed', desc:'كركم، زنجبيل، قرفة، كمون، كزبرة', reason:'مسموحة — لها خصائص مضادة للالتهاب والأكسدة رائعة' },
+  { id:24, emoji:'☕', name:'القهوة والشاي الطبيعي', cat:'مشروبات', status:'allowed', desc:'قهوة سادة، شاي أخضر، أعشاب', reason:'مسموحة — غنية بمضادات الأكسدة، القهوة تعزز الأوتوفاجي' },
+  { id:25, emoji:'🥤', name:'المشروبات الغازية والعصائر المحلاة', cat:'مشروبات', status:'forbidden', desc:'كولا، بيبسي، عصائر معبأة، مشروبات طاقة', reason:'ممنوعة تماماً — تحمّض الجسم وترفع السكر وتدمر البكتيريا النافعة' },
+  { id:26, emoji:'🍯', name:'العسل الطبيعي الخام', cat:'محليات', status:'allowed', desc:'عسل خام غير مُعالج', reason:'مسموح بكميات معتدلة — مضاد حيوي طبيعي ومقوي للمناعة' },
+  { id:27, emoji:'🍬', name:'السكر الأبيض والمُكرر', cat:'محليات', status:'forbidden', desc:'سكر أبيض، بودرة، أسمر مكرر، شكولاتة', reason:'ممنوع تماماً — يُسبب الالتهاب ويرفع السكر ويُعيق الأوتوفاجي' },
+  { id:28, emoji:'🥜', name:'المكسرات الطبيعية', cat:'مكسرات', status:'allowed', desc:'جوز، لوز، بندق، كاجو — نيء أو محمص', reason:'مسموحة — دهون صحية وبروتين ومعادن مهمة' },
+  { id:29, emoji:'🫛', name:'الفول السوداني وزبدته', cat:'مكسرات', status:'forbidden', desc:'فول سوداني، زبدة الفول الصناعية', reason:'ممنوع — يحتوي على الأفلاتوكسين وكثير من الأوميجا 6 المؤذي' },
+  { id:30, emoji:'🍵', name:'الشاي الأخضر والأعشاب الطبيعية', cat:'مشروبات', status:'allowed', desc:'شاي أخضر، نعناع، يانسون، حلبة', reason:'مسموحة بامتياز — مضادات أكسدة قوية وتهدئة الجهاز الهضمي' },
 ];
 
 let currentCat = 'الكل', currentStatus = 'الكل';
@@ -1315,7 +1312,7 @@ function renderFood() {
       <div class="fc-expand" id="fc-exp-${f.id}">
         <div class="fc-reason ${f.status==='allowed'?'ok':'bad'}">${f.reason}</div>
         <div class="fc-toggle-row">
-          <button class="fc-youtube-btn" onclick="openYoutube('${f.ytQuery}')">
+          <button class="fc-youtube-btn" onclick="openYoutube('${f.name}')">
             <i class="fab fa-youtube"></i> شاهد على يوتيوب
           </button>
         </div>
@@ -1334,8 +1331,9 @@ function toggleFoodCard(id) {
   if (toggle) toggle.textContent = isOpen ? '▼ تفاصيل أكثر' : '▲ إخفاء';
 }
 
-function openYoutube(q) {
-  window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(q), '_blank');
+function openYoutube(foodName) {
+  const query = "الدكتور ضياء العوضي " + foodName;
+  window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(query), '_blank');
 }
 
 /* ═══════════════ FASTING PROTOCOLS ═══════════════ */
@@ -1352,7 +1350,7 @@ const FAST_TYPES = [
     benefits: ['حرق دهون أعمق', 'تحسين ملحوظ في الكوليسترول', 'ضبط الضغط بشكل طبيعي', 'تنظيف الأمعاء'],
     caution: 'تدرّج تدريجياً من 16 إلى 18 ساعة خلال أسبوعين.'
   }},
-  { id:'20-4', hrs:'20/4', name:'بروتوكول المحارب', desc:'20 ساعة صيام، 4 ساعات أكل', level:'med', details: {
+  { id:'20-4', hrs:'20/4', name:'بروتوكول المحارب', desc:'20 ساعة صيام, 4 ساعات أكل', level:'med', details: {
     intro: 'مستوحى من حياة المحاربين القدماء. نتائج ممتازة لحرق الدهون.',
     howto: ['صيام 20 ساعة كاملة', 'نافذة أكل 4 ساعات فقط (مثلاً 4-8 مساءً)', 'وجبة كبيرة رئيسية + وجبة خفيفة'],
     benefits: ['حرق دهون عميق جداً', 'تنظيف الكبد وتجديده', 'تحسين هرمون النمو', 'تطهير الجهاز الهضمي'],
