@@ -496,9 +496,64 @@ function addThink() { const w = document.getElementById('ai-chat-wrap'), d = doc
 function removeThink() { var el = document.getElementById('ai-thinking'); if (el) el.remove(); }
 
 const AI_APIS = [
-  { url: 'https://text.pollinations.ai/', body: function(s, h) { return JSON.stringify({ messages: [{ role: 'system', content: s }].concat(h), model: 'openai', seed: Math.floor(Math.random() * 1e4) }); }, parse: async function(r) { return await r.text(); } },
-  { url: 'https://www.blackbox.ai/api/chat', body: function(s, h) { return JSON.stringify({ messages: [{ role: 'system', content: s }].concat(h) }); }, parse: async function(r) { const d = await r.json(); return d.response || (d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : ''); } },
-  { url: 'https://api.deepinfra.com/v1/openai/chat/completions', body: function(s, h) { return JSON.stringify({ model: 'meta-llama/Meta-Llama-3-8B-Instruct', messages: [{ role: 'system', content: s }].concat(h) }); }, parse: async function(r) { const d = await r.json(); return (d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : 'عذراً لم أستطع الإجابة.'); } }
+  {
+    url: 'https://duckduckgo.com/duckchat/v1/chat',
+    buildPayload: function(sys, history) {
+      return { model: 'gpt-4o-mini', messages: [{ role: 'system', content: sys }].concat(history) };
+    },
+    sendRequest: async function(sys, history) {
+      try {
+        // الخطوة 1: جلب رمز الدخال من DuckDuckGo
+        const statusRes = await fetch('https://duckduckgo.com/duckchat/v1/status', {
+          headers: { 'x-vqd-accept': '1' }
+        });
+        
+        // نحاول استخراج الرمز بأي طريقة ممكنة
+        let vqd = statusRes.headers.get('x-vqd-4');
+        if (!vqd) {
+          const text = await statusRes.text();
+          try { 
+            const data = JSON.parse(text); 
+            vqd = data.vqd || data.hash || data.token; 
+          } catch(e) {}
+        }
+
+        // إذا لم نجد الرمز، نرمي خطأ لننتقل للـ Fallback المحلي
+        if (!vqd) throw new Error('VQD token not found');
+
+        // الخطوة 2: إرسال الرسالة
+        const chatRes = await fetch('https://duckduckgo.com/duckchat/v1/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-vqd-4': vqd },
+          body: JSON.stringify(this.buildPayload(sys, history))
+        });
+
+        // الخطوة 3: قراءة الرد (يدعم البث Stream)
+        const reader = chatRes.body.getReader();
+        const decoder = new TextDecoder();
+        let fullReply = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.slice(6).trim();
+              if (dataStr === '[DONE]') break;
+              try {
+                const parsed = JSON.parse(dataStr);
+                if (parsed.message) fullReply += parsed.message;
+              } catch (e) { /* تجاهل أخطاء الـ parsing */ }
+            }
+          }
+        }
+        return fullReply || 'لم أتمكن من صياغة رد مناسب.';
+      } catch(e) {
+        return null; // إرجاع null لتفعيل الرد المحلي
+      }
+    }
+  }
 ];
 
 async function sendAiMessage() {
