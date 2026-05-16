@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#0a1628">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="طيبات">
+<meta name="description" content="نظام طيبات الصحي - تغذية ذكية وصيام متقطع مع نصائح طبية مخصصة">
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+<meta name="msapplication-TileImage" content="icons/icon-144.png">
+<meta name="msapplication-TileColor" content="#0a1628">
+
+<title>طيبات | نظام صحي ذكي</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "FIREBASE_API_KEY",
+    authDomain: "daybat-cfa12.firebaseapp.com",
+    databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com",
+    projectId: "daybat-cfa12",
+    storageBucket: "daybat-cfa12.firebasestorage.app",
+    messagingSenderId: "278890052232",
+    appId: "1:278890052232:web:06d85004268fdf9f4afd3d",
+    measurementId: "G-9BYDWEMR33"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // ═══════════════════════════════════════════════
+  // OpenRouter API Configuration
+  // ═══════════════════════════════════════════════
+  const OPENROUTER_API_KEY = "OPENROUTER_API_KEY";
+  const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+  const OPENROUTER_MODEL = "meta-llama/llama-2-70b-chat"; // Model متقدم
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════════════ */
+:root {
+  --gold:#c8960c; --gold2:#f5c842; --gold3:#ffeaa0;
+  --green:#1a7a2e; --green2:#2ec951;
+  --red:#a01515; --red2:#e53935;
+  --blue:#0d47a1; --blue2:#2196f3;
+  --purple:#6c3fc9; --purple2:#9c5ffa;
+  --orange:#e65100; --orange2:#ff7043;
+  --teal:#00695c; --teal2:#26a69a;
+  --bg:#050e1f; --bg2:#0a1628; --bg3:#0f1f3a;
+  --card:#0d1e38; --card2:#112244;
+  --border:#1e3560; --border2:rgba(200,150,12,.25);
+  --txt:#e8f0fc; --txt2:#8aa4c8; --txt3:#4a6285;
+  --shadow:0 8px 32px rgba(0,0,0,.7);
+  --shadow3d:0 20px 60px rgba(0,0,0,.8), 0 0 80px rgba(200,150,12,.1);
+  --nav:68px; --r:16px;
+  --glow-gold: 0 0 30px rgba(200,150,12,.4), 0 0 60px rgba(200,150,12,.2);
+  --glow-blue: 0 0 30px rgba(33,150,243,.4);
+  --glow-green: 0 0 30px rgba(46,201,81,.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--bg);color:var(--txt);
+  min-height:100vh;overflow-x:hidden;
+  padding-bottom:var(--nav);
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+
+/* ═══════════════════════════════════════════════
+   AI CHAT MODAL
+═══════════════════════════════════════════════ */
+.ai-chat-modal{
+  position:fixed;inset:0;z-index:999;
+  background:rgba(0,0,0,.8);
+  display:flex;align-items:flex-end;opacity:0;visibility:hidden;
+  transition:all .3s;
+}
+.ai-chat-modal.show{
+  opacity:1;visibility:visible;
+}
+.ai-chat-box{
+  width:100%;max-width:600px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px 24px 0 0;
+  display:flex;flex-direction:column;
+  height:80vh;max-height:600px;
+  animation:slideUp .4s ease;
+}
+@keyframes slideUp{
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
+}
+.ai-chat-header{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;padding:16px;border-radius:24px 24px 0 0;
+  display:flex;align-items:center;justify-content:space-between;
+  font-weight:700;
+}
+.ai-chat-close{
+  background:rgba(0,0,0,.2);border:none;color:#050e1f;
+  cursor:pointer;font-size:1.2rem;border-radius:8px;
+  padding:8px 12px;transition:all .3s;
+}
+.ai-chat-close:hover{background:rgba(0,0,0,.3)}
+.ai-chat-messages{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.ai-chat-msg{
+  padding:12px 14px;border-radius:12px;max-width:90%;
+  word-wrap:break-word;animation:msgFade .3s ease;
+}
+@keyframes msgFade{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.ai-msg-user{
+  background:var(--gold);color:#050e1f;align-self:flex-start;font-weight:600;
+}
+.ai-msg-bot{
+  background:var(--blue2);color:#fff;align-self:flex-end;
+  border:1px solid var(--blue);
+}
+.ai-msg-loading{
+  background:var(--teal2);color:#fff;align-self:flex-end;
+  display:flex;align-items:center;gap:8px;
+}
+.ai-msg-loading::after{
+  content:'';width:8px;height:8px;background:#fff;
+  border-radius:50%;animation:pulse .6s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:.3}
+  50%{opacity:1}
+}
+.ai-chat-input-area{
+  border-top:1px solid var(--border);
+  padding:12px;display:flex;gap:8px;
+}
+.ai-chat-input{
+  flex:1;background:var(--bg3);border:1px solid var(--border);
+  color:var(--txt);padding:10px 12px;border-radius:8px;
+  font-family:'Tajawal',sans-serif;outline:none;
+  transition:border-color .3s;
+}
+.ai-chat-input:focus{
+  border-color:var(--gold);
+}
+.ai-chat-send{
+  background:var(--gold);color:#050e1f;border:none;
+  padding:10px 16px;border-radius:8px;cursor:pointer;
+  font-weight:700;transition:all .3s;
+}
+.ai-chat-send:hover{
+  background:var(--gold2);box-shadow:var(--glow-gold);
+}
+.ai-chat-send:disabled{
+  opacity:.5;cursor:not-allowed;
+}
+
+/* ═══════════════════════════════════════════════
+   AI BUTTON
+═══════════════════════════════════════════════ */
+.ai-button{
+  position:fixed;bottom:80px;right:16px;z-index:100;
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  border:2px solid var(--gold);
+  cursor:pointer;font-size:1.8rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(108,63,201,.5);
+  transition:all .3s;
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.ai-button:hover{
+  transform:scale(1.1);
+  box-shadow:0 6px 30px rgba(108,63,201,.8);
+}
+.ai-button:active{
+  transform:scale(.95);
+}
+
+/* ═══════════════════════════════════════════════
+   3D PARTICLE CANVAS
+═══════════════════════════════════════════════ */
+#universe-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;opacity:.85;
+}
+
+/* ═══════════════════════════════════════════════
+   PAGES
+═══════════════════════════════════════════════ */
+.page{
+  position:fixed;inset:0;z-index:1;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:var(--nav);
+  background:var(--bg);
+  opacity:0;visibility:hidden;pointer-events:none;
+}
+.page.active{
+  opacity:1;visibility:visible;pointer-events:auto;
+  animation:pageIn .4s cubic-bezier(.22,1,.36,1);
+}
+@keyframes pageIn{
+  from{opacity:0;transform:translateY(32px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ═══════════════════════════════════════════════
+   AUTH PAGE
+═══════════════════════════════════════════════ */
+#auth-page{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;min-height:100vh;
+  padding:0 12px 60px;overflow-y:auto;
+}
+.auth-hero{
+  width:100%;max-width:420px;height:220px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#02081a 0%,#050e1f 100%);
+  border-bottom:1px solid rgba(200,150,12,.2);
+}
+/* 3D DNA Helix Animation */
+.dna-stage{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+}
+.dna-wrap{position:relative;width:100%;height:180px;perspective:500px}
+.dna-strand{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotateX(15deg);
+  width:320px;height:120px;
+}
+.dna-node{
+  position:absolute;border-radius:50%;
+  animation:dnaFloat linear infinite;
+  box-shadow:0 0 12px currentColor;
+}
+@keyframes dnaFloat{
+  0%{transform:translateX(0) translateY(0) translateZ(0) scale(1)}
+  25%{transform:translateX(8px) translateY(-8px) translateZ(15px) scale(1.1)}
+  50%{transform:translateX(0) translateY(-14px) translateZ(25px) scale(1.2)}
+  75%{transform:translateX(-8px) translateY(-8px) translateZ(15px) scale(1.1)}
+  100%{transform:translateX(0) translateY(0) translateZ(0) scale(1)}
+}
+.hero-orb{
+  position:absolute;border-radius:50%;
+  filter:blur(40px);pointer-events:none;animation:orbPulse 4s ease-in-out infinite;
+}
+@keyframes orbPulse{
+  0%,100%{transform:scale(1);opacity:.5}
+  50%{transform:scale(1.3);opacity:.8}
+}
+.logo-3d{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  text-align:center;z-index:2;
+}
+.logo-3d-icon{
+  font-size:3.5rem;display:block;
+  filter:drop-shadow(0 0 20px rgba(200,150,12,.8));
+  animation:logoFloat 3s ease-in-out infinite;
+  transform-style:preserve-3d;
+}
+@keyframes logoFloat{
+  0%,100%{transform:translateY(0) rotateY(0deg);filter:drop-shadow(0 0 20px rgba(200,150,12,.8))}
+  50%{transform:translateY(-8px) rotateY(10deg);filter:drop-shadow(0 0 35px rgba(245,200,66,1))}
+}
+.logo-3d-title{
+  font-family:'Amiri',serif;font-size:1.6rem;font-weight:700;
+  background:linear-gradient(135deg,var(--gold2),var(--gold3),var(--gold2));
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 3s linear infinite;
+  text-shadow:none;
+}
+@keyframes shimmer{
+  0%{background-position:0% center}
+  100%{background-position:200% center}
+}
+.auth-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:0 0 24px 24px;
+  padding:20px 16px 24px;
+  width:100%;max-width:420px;
+  box-shadow:var(--shadow3d);
+  position:relative;z-index:2;
+}
+.auth-tabs{
+  display:flex;background:rgba(255,255,255,.04);
+  border-radius:12px;padding:3px;margin-bottom:20px;
+  border:1px solid var(--border);
+}
+.auth-tab{
+  flex:1;padding:9px;border-radius:9px;
+  text-align:center;font-size:.85rem;font-weight:700;
+  cursor:pointer;color:var(--txt2);transition:all .3s;
+}
+.auth-tab.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;
+  box-shadow:0 4px 15px rgba(200,150,12,.4);
+}
+.field{margin-bottom:14px;width:100%}
+.field label{display:block;font-size:.8rem;color:var(--gold2);font-weight:600;margin-bottom:6px}
+.input-wrap{position:relative;width:100%}
+.field input,.field select{
+  width:100%;background:rgba(255,255,255,.07);
+  border:1.5px solid var(--border);border-radius:12px;
+  padding:13px 14px;color:var(--txt);
+  font-family:'Tajawal',sans-serif;font-size:1rem;
+  outline:none;transition:border-color .3s,box-shadow .3s;
+  -webkit-appearance:none;appearance:none;min-height:48px;
+}
+.field input:focus,.field select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(200,150,12,.2), var(--glow-gold);
+}
+.field input::placeholder{color:rgba(138,164,200,.6)}
+.btn-auth{
+  width:100%;padding:13px;border:none;border-radius:12px;
+  font-weight:700;cursor:pointer;font-size:1rem;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;transition:all .3s;
+}
+.btn-auth:hover{
+  box-shadow:0 0 30px rgba(200,150,12,.5);
+  transform:translateY(-2px);
+}
+.btn-auth:disabled{opacity:.5;cursor:not-allowed}
+.btn-loading{
+  background:var(--txt3);color:var(--txt);cursor:not-allowed;
+}
+.register-extra{
+  display:none;max-height:0;overflow:hidden;
+  transition:max-height .3s ease;
+}
+.register-extra.show{
+  display:block;max-height:500px;
+}
+.age-gender-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.disease-list{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  max-height:200px;overflow-y:auto;margin:8px 0;
+  padding:8px;background:rgba(255,255,255,.02);border-radius:8px;
+}
+.dis-item{
+  padding:10px;border-radius:8px;border:2px solid var(--border);
+  cursor:pointer;text-align:center;font-size:.85rem;
+  transition:all .3s;background:rgba(255,255,255,.03);
+}
+.dis-item:hover{border-color:var(--gold2)}
+.dis-item.sel{
+  background:var(--gold);color:#050e1f;font-weight:700;
+  border-color:var(--gold2);
+}
+.toggle-register{
+  text-align:center;color:var(--txt2);font-size:.85rem;margin-top:16px;
+}
+.toggle-register a{
+  color:var(--gold2);cursor:pointer;text-decoration:underline;
+}
+.toggle-register a:hover{color:var(--gold3)}
+
+/* ═══════════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════════ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:98;
+  height:var(--nav);background:var(--card);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;align-items:center;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;
+  color:var(--txt2);cursor:pointer;padding:8px;
+  transition:all .3s;border-top:3px solid transparent;
+}
+.nav-item:hover,.nav-item.active{
+  color:var(--gold);
+  border-top-color:var(--gold);
+}
+.nav-item i{font-size:1.4rem}
+.nav-item span{font-size:.7rem;font-weight:600}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:var(--card);border:1px solid var(--gold);
+  color:var(--txt);padding:12px 20px;border-radius:12px;
+  opacity:0;pointer-events:none;transition:all .3s;
+  z-index:100;
+  font-weight:600;
+  box-shadow:var(--shadow3d);
+}
+#toast.show{
+  opacity:1;pointer-events:auto;
+}
+
+/* ═══════════════════════════════════════════════
+   LOADER
+═══════════════════════════════════════════════ */
+#loader{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);display:flex;
+  align-items:center;justify-content:center;
+}
+.loader-spinner{
+  width:60px;height:60px;border:4px solid var(--border);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════════
+   HOME PAGE BASICS
+═══════════════════════════════════════════════ */
+.home-header{
+  padding:20px 16px;
+  background:linear-gradient(135deg,rgba(200,150,12,.15),rgba(33,150,243,.1));
+  border-bottom:1px solid var(--border);
+}
+.greeting{
+  font-size:1.4rem;font-weight:700;
+  color:var(--gold2);margin-bottom:8px;
+}
+.greeting-sub{
+  font-size:.85rem;color:var(--txt2);
+}
+.home-cards{
+  padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.home-card{
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);border-radius:16px;
+  padding:16px;cursor:pointer;transition:all .3s;
+}
+.home-card:hover{
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(200,150,12,.2);
+}
+.home-card-icon{
+  font-size:2rem;margin-bottom:8px;
+}
+.home-card-title{
+  font-size:.9rem;font-weight:700;
+  color:var(--txt);margin-bottom:4px;
+}
+.home-card-val{
+  font-size:1.4rem;font-weight:700;
+  color:var(--gold2);
+}
+
+/* ═══════════════════════════════════════════════
+   ADDITIONAL STYLES (from original)
+═══════════════════════════════════════════════ */
+.modal{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,.6);display:none;
+  align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:all .3s;
+}
+.modal.show{
+  opacity:1;visibility:visible;display:flex;
+}
+.modal-content{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;width:90%;max-width:500px;
+  max-height:80vh;overflow-y:auto;padding:20px;
+  animation:modalSlide .3s ease;
+}
+@keyframes modalSlide{
+  from{transform:scale(.95);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.modal-header{
+  display:flex;justify-content:space-between;
+  align-items:center;margin-bottom:16px;
+  font-weight:700;font-size:1.1rem;
+  color:var(--gold2);
+}
+.modal-close{
+  background:none;border:none;color:var(--txt2);
+  cursor:pointer;font-size:1.4rem;transition:all .3s;
+}
+.modal-close:hover{color:var(--gold)}
+
+.btn{
+  padding:10px 16px;border-radius:8px;border:none;
+  cursor:pointer;font-weight:600;transition:all .3s;
+  font-family:'Tajawal',sans-serif;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;
+}
+.btn-primary:hover{
+  box-shadow:var(--glow-gold);
+}
+.btn-secondary{
+  background:var(--border);color:var(--txt);
+}
+.btn-secondary:hover{
+  background:var(--border2);
+}
+.btn-danger{
+  background:var(--red2);color:#fff;
+}
+.btn-danger:hover{
+  background:var(--red);
+}
+
+.section{
+  padding:16px;margin-bottom:16px;
+  background:linear-gradient(145deg,var(--card),var(--card2));
+  border:1px solid var(--border);border-radius:16px;
+}
+.section-title{
+  font-size:1.1rem;font-weight:700;
+  color:var(--gold2);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title i{
+  font-size:1.3rem;
+}
+
+.pro-row{
+  display:flex;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.pro-row:last-child{border-bottom:none}
+.pro-key{
+  color:var(--txt2);font-size:.95rem;
+}
+.pro-val{
+  color:var(--gold2);font-weight:700;
+}
+
+.pwa-banner{
+  position:fixed;bottom:var(--nav);right:0;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#050e1f;padding:12px 16px;
+  border-radius:12px 0 0 0;margin:8px;
+  z-index:90;max-width:300px;
+  opacity:0;visibility:hidden;
+  transition:all .3s;
+}
+.pwa-banner.show{
+  opacity:1;visibility:visible;
+}
+.pwa-banner-title{
+  font-weight:700;margin-bottom:8px;
+}
+.pwa-banner-btns{
+  display:flex;gap:8px;
+  font-size:.85rem;
+}
+.pwa-banner-btns button{
+  padding:6px 12px;border:none;border-radius:6px;
+  cursor:pointer;font-weight:600;transition:all .3s;
+}
+#pwa-install-btn{
+  background:#050e1f;color:var(--gold);
+}
+#pwa-install-btn:hover{
+  transform:scale(1.05);
+}
+#pwa-dismiss-btn{
+  background:rgba(0,0,0,.2);color:#050e1f;
+}
+#pwa-dismiss-btn:hover{
+  background:rgba(0,0,0,.3);
+}
+</style>
+
+</head>
+<body>
+
+<!-- ═════════════════════════════════════════════════════
+     UNIVERSE CANVAS (3D Background)
+════════════════════════════════════════════════════════ -->
+<canvas id="universe-canvas"></canvas>
+
+<!-- ═════════════════════════════════════════════════════
+     AI CHAT MODAL
+════════════════════════════════════════════════════════ -->
+<div id="ai-chat-modal" class="ai-chat-modal">
+  <div class="ai-chat-box">
+    <div class="ai-chat-header">
+      <span>🤖 مساعد طيبات الذكي</span>
+      <button class="ai-chat-close" onclick="closeAIChat()">✕</button>
+    </div>
+    <div class="ai-chat-messages" id="ai-chat-messages"></div>
+    <div class="ai-chat-input-area">
+      <input type="text" class="ai-chat-input" id="ai-chat-input" 
+             placeholder="اسأل عن التغذية والصحة..." autocomplete="off">
+      <button class="ai-chat-send" id="ai-chat-send" onclick="sendAIMessage()">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     AI FLOATING BUTTON
+════════════════════════════════════════════════════════ -->
+<button class="ai-button" onclick="openAIChat()" title="فتح مساعد طيبات">
+  <i class="fas fa-robot"></i>
+</button>
+
+<!-- ═════════════════════════════════════════════════════
+     AUTH PAGE
+════════════════════════════════════════════════════════ -->
+<div id="auth-page" class="page">
+  <div class="auth-hero">
+    <div class="dna-stage">
+      <div class="dna-wrap">
+        <div class="dna-strand">
+          <div class="dna-node" style="left:20%;top:30%;width:16px;height:16px;background:#f5c842;animation-duration:3s;animation-delay:0s"></div>
+          <div class="dna-node" style="right:20%;top:70%;width:16px;height:16px;background:#2196f3;animation-duration:3.2s;animation-delay:.3s"></div>
+          <div class="dna-node" style="left:40%;bottom:20%;width:12px;height:12px;background:#2ec951;animation-duration:2.8s;animation-delay:.6s"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-orb" style="top:10%;left:10%;width:100px;height:100px;background:var(--gold);"></div>
+    <div class="hero-orb" style="bottom:10%;right:10%;width:120px;height:120px;background:var(--blue2);"></div>
+    <div class="logo-3d">
+      <i class="logo-3d-icon fas fa-leaf"></i>
+      <div class="logo-3d-title">طيبات</div>
+    </div>
+  </div>
+  
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login', this)">دخول</div>
+      <div class="auth-tab" onclick="switchAuthTab('register', this)">تسجيل</div>
+    </div>
+    
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input id="login-email" type="email" placeholder="your@email.com">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input id="login-pass" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" id="btn-login" onclick="handleLogin()">دخول</button>
+    </div>
+    
+    <!-- REGISTER FORM -->
+    <div id="register-form" style="display:none">
+      <div class="field">
+        <label>الاسم</label>
+        <input id="reg-name" type="text" placeholder="محمد أحمد">
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input id="reg-email" type="email" placeholder="your@email.com">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input id="reg-pass" type="password" placeholder="••••••••">
+      </div>
+      
+      <div class="register-extra show">
+        <div class="age-gender-row">
+          <div class="field">
+            <label>تاريخ الميلاد</label>
+            <input id="reg-dob" type="date">
+          </div>
+          <div class="field">
+            <label>الوزن (كجم)</label>
+            <input id="reg-weight" type="number" placeholder="70">
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>الطول (سم)</label>
+          <input id="reg-height" type="number" placeholder="175">
+        </div>
+        
+        <div class="field">
+          <label>الحالات الصحية</label>
+          <div class="disease-list" id="register-disease-list"></div>
+        </div>
+      </div>
+      
+      <button class="btn-auth" id="btn-register" onclick="handleRegister()">تسجيل</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     HOME PAGE
+════════════════════════════════════════════════════════ -->
+<div id="home-page" class="page">
+  <div class="home-header">
+    <div class="greeting">مرحباً <span id="home-name">صديقي</span> 👋</div>
+    <div class="greeting-sub" id="home-sub">كن بصحة وعافية!</div>
+  </div>
+  
+  <div class="home-cards">
+    <div class="home-card" onclick="goToPage('fasting', this)">
+      <div class="home-card-icon">⏱️</div>
+      <div class="home-card-title">الصيام المتقطع</div>
+      <div class="home-card-val" id="home-fasting-state">غير نشط</div>
+    </div>
+    
+    <div class="home-card" onclick="goToPage('foods', this)">
+      <div class="home-card-icon">🍎</div>
+      <div class="home-card-title">الأطعمة</div>
+      <div class="home-card-val">قائمة المسموح</div>
+    </div>
+    
+    <div class="home-card" onclick="goToPage('tips', this)">
+      <div class="home-card-icon">💡</div>
+      <div class="home-card-title">نصائح طبية</div>
+      <div class="home-card-val">شخصية</div>
+    </div>
+    
+    <div class="home-card" onclick="goToPage('profile', this)">
+      <div class="home-card-icon">👤</div>
+      <div class="home-card-title">البيانات</div>
+      <div class="home-card-val">ملفك الشخصي</div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-heartbeat"></i> حالتك الصحية
+    </div>
+    <div id="home-dis-tags"></div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     PROFILE PAGE
+════════════════════════════════════════════════════════ -->
+<div id="profile-page" class="page">
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-user-circle"></i> ملفك الشخصي
+    </div>
+    <div id="profile-info"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-primary" onclick="openEditProfile()">تعديل</button>
+      <button class="btn btn-secondary" onclick="handleLogout()">تسجيل الخروج</button>
+    </div>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-tachometer-alt"></i> قياساتك الصحية
+    </div>
+    <div id="health-metrics"></div>
+    <button class="btn btn-secondary" onclick="openEditHealth()" style="width:100%;margin-top:12px">تحديث القياسات</button>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-disease"></i> الحالات الصحية
+    </div>
+    <div id="disease-info"></div>
+    <button class="btn btn-secondary" onclick="openEditDiseases()" style="width:100%;margin-top:12px">تحديث</button>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     BOTTOM NAV
+════════════════════════════════════════════════════════ -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="goToPage('home', this)">
+    <i class="fas fa-home"></i>
+    <span>الرئيسية</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('fasting', this)">
+    <i class="fas fa-hourglass-half"></i>
+    <span>الصيام</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('foods', this)">
+    <i class="fas fa-apple-alt"></i>
+    <span>الأطعمة</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('tips', this)">
+    <i class="fas fa-lightbulb"></i>
+    <span>نصائح</span>
+  </div>
+  <div class="nav-item" onclick="goToPage('profile', this)">
+    <i class="fas fa-user"></i>
+    <span>الملف</span>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     TOAST & LOADER
+════════════════════════════════════════════════════════ -->
+<div id="toast"></div>
+<div id="loader">
+  <div class="loader-spinner"></div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     PWA BANNER
+════════════════════════════════════════════════════════ -->
+<div id="pwa-banner" class="pwa-banner">
+  <div class="pwa-banner-title">📱 ثبت التطبيق</div>
+  <div class="pwa-banner-btns">
+    <button id="pwa-install-btn">تثبيت</button>
+    <button id="pwa-dismiss-btn" onclick="dismissPWA()">إلغاء</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   OPENROUTER AI INTEGRATION
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * ✅ الدالة الرئيسية للاتصال بـ OpenRouter API
+ * تستخدم Llama 2 70B أو نموذج آخر
+ */
+async function callOpenRouterAPI(userMessage, systemPrompt = "") {
+  try {
+    const defaultSystem = "أنت مساعد صحي متخصص في التغذية والصيام المتقطع. تقدم نصائح طبية دقيقة وآمنة. رد باللغة العربية فقط.";
+    
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": window.location.href,
+        "X-Title": "Tayyibat Health App"
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt || defaultSystem
+          },
+          {
+            role: "user",
+            content: userMessage
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+        top_p: 0.9
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("OpenRouter API Error:", error);
+      throw new Error(error.error?.message || "خطأ في الاتصال بـ API");
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("API Call Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * ✅ فتح نافذة الدردشة مع الذكاء الاصطناعي
+ */
+function openAIChat() {
+  document.getElementById('ai-chat-modal').classList.add('show');
+  document.getElementById('ai-chat-input').focus();
+  playSound('click');
+}
+
+/**
+ * ✅ إغلاق نافذة الدردشة
+ */
+function closeAIChat() {
+  document.getElementById('ai-chat-modal').classList.remove('show');
+  playSound('click');
+}
+
+/**
+ * ✅ إرسال رسالة إلى الذكاء الاصطناعي
+ */
+async function sendAIMessage() {
+  const input = document.getElementById('ai-chat-input');
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  const messagesDiv = document.getElementById('ai-chat-messages');
+  const sendBtn = document.getElementById('ai-chat-send');
+  
+  // إضافة رسالة المستخدم
+  const userMsgEl = document.createElement('div');
+  userMsgEl.className = 'ai-chat-msg ai-msg-user';
+  userMsgEl.textContent = message;
+  messagesDiv.appendChild(userMsgEl);
+  
+  // إضافة مؤشر التحميل
+  const loadingEl = document.createElement('div');
+  loadingEl.className = 'ai-chat-msg ai-msg-loading';
+  loadingEl.textContent = 'جاري الرد...';
+  messagesDiv.appendChild(loadingEl);
+  
+  // تمرير إلى الأسفل
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+  // تعطيل الزر
+  input.value = '';
+  sendBtn.disabled = true;
+  
+  try {
+    // استدعاء OpenRouter API
+    let systemMsg = "أنت مساعد صحي متخصص في التغذية والصيام المتقطع.";
+    
+    // إضافة معلومات المستخدم الحالي للـ AI
+    if (currentUser && currentUser.diseases) {
+      systemMsg += `\n\nمعلومات المستخدم الحالي:\nالأمراض: ${currentUser.diseases.join(', ')}\nالوزن: ${currentUser.weight}كجم\nالطول: ${currentUser.height}سم`;
+    }
+    
+    const botResponse = await callOpenRouterAPI(message, systemMsg);
+    
+    // إزالة مؤشر التحميل
+    messagesDiv.removeChild(loadingEl);
+    
+    // إضافة رسالة الـ AI
+    const botMsgEl = document.createElement('div');
+    botMsgEl.className = 'ai-chat-msg ai-msg-bot';
+    botMsgEl.textContent = botResponse;
+    messagesDiv.appendChild(botMsgEl);
+    
+    // تمرير إلى الأسفل
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    playSound('success');
+  } catch (error) {
+    // إزالة مؤشر التحميل
+    messagesDiv.removeChild(loadingEl);
+    
+    // إضافة رسالة خطأ
+    const errorEl = document.createElement('div');
+    errorEl.className = 'ai-chat-msg ai-msg-bot';
+    errorEl.textContent = '❌ حدث خطأ: ' + error.message;
+    messagesDiv.appendChild(errorEl);
+    
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    showToast('❌ خطأ في الاتصال');
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+
+// السماح بالإرسال بـ Enter
+document.addEventListener('DOMContentLoaded', function() {
+  const chatInput = document.getElementById('ai-chat-input');
+  if (chatInput) {
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendAIMessage();
+      }
+    });
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BASIC APP STRUCTURE (Minimal skeleton - expand as needed)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+let currentUser = null;
+let soundEnabled = true;
+
+function goToPage(pageName, clickedEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageName + '-page').classList.add('active');
+  
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  var el = clickedEl || (typeof event !== 'undefined' && event && event.target);
+  if (el) el.closest('.nav-item')?.classList.add('active');
+}
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  // يمكن إضافة أصوات هنا
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function handleLogin() {
+  showToast('✅ تم الدخول بنجاح');
+  currentUser = { name: 'محمد' };
+  goToPage('home');
+}
+
+function handleRegister() {
+  showToast('✅ تم التسجيل بنجاح');
+  handleLogin();
+}
+
+function handleLogout() {
+  showToast('✅ تم تسجيل الخروج');
+  currentUser = null;
+  goToPage('auth');
+}
+
+function switchAuthTab(tab, clickedEl) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  var el = clickedEl || (typeof event !== 'undefined' && event && event.target);
+  if (el) el.classList.add('active');
+  
+  if (tab === 'login') {
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'none';
+  } else {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'block';
+  }
+}
+
+function openEditProfile() {
+  showToast('💡 سيتم فتح تعديل الملف الشخصي');
+}
+
+function openEditHealth() {
+  showToast('💡 سيتم فتح تحديث القياسات');
+}
+
+function openEditDiseases() {
+  showToast('💡 سيتم فتح تحديث الحالات الصحية');
+}
+
+function autoLogin() {
+  // يمكن إضافة logic تسجيل الدخول التلقائي هنا
+  goToPage('home');
+  currentUser = { name: 'محمد', diseases: ['السكر'] };
+  document.getElementById('home-name').textContent = currentUser.name;
+  hideLoader();
+}
+
+function hideLoader() {
+  document.getElementById('loader').style.display = 'none';
+}
+
+function dismissPWA() {
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('pwa_dismissed', '1');
+}
+
+window.addEventListener('load', () => {
+  setTimeout(autoLogin, 900);
+});
+</script>
+
+</body>
+</html>
