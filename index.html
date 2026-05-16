@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -661,8 +661,8 @@ body{
   
   <div class="auth-card">
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick=\"switchAuthTab('login', this)\">دخول</div>
-      <div class="auth-tab" onclick=\"switchAuthTab('register', this)\">تسجيل</div>
+      <div class="auth-tab active" onclick="switchAuthTab('login', this)">دخول</div>
+      <div class="auth-tab" onclick="switchAuthTab('register', this)">تسجيل</div>
     </div>
     
     <!-- LOGIN FORM -->
@@ -731,25 +731,25 @@ body{
   </div>
   
   <div class="home-cards">
-    <div class="home-card" onclick=\"goToPage('fasting', this)\">
+    <div class="home-card" onclick="goToPage('fasting', this)">
       <div class="home-card-icon">⏱️</div>
       <div class="home-card-title">الصيام المتقطع</div>
       <div class="home-card-val" id="home-fasting-state">غير نشط</div>
     </div>
     
-    <div class="home-card" onclick=\"goToPage('foods', this)\">
+    <div class="home-card" onclick="goToPage('foods', this)">
       <div class="home-card-icon">🍎</div>
       <div class="home-card-title">الأطعمة</div>
       <div class="home-card-val">قائمة المسموح</div>
     </div>
     
-    <div class="home-card" onclick=\"goToPage('tips', this)\">
+    <div class="home-card" onclick="goToPage('tips', this)">
       <div class="home-card-icon">💡</div>
       <div class="home-card-title">نصائح طبية</div>
       <div class="home-card-val">شخصية</div>
     </div>
     
-    <div class="home-card" onclick=\"goToPage('profile', this)\">
+    <div class="home-card" onclick="goToPage('profile', this)">
       <div class="home-card-icon">👤</div>
       <div class="home-card-title">البيانات</div>
       <div class="home-card-val">ملفك الشخصي</div>
@@ -800,23 +800,23 @@ body{
      BOTTOM NAV
 ════════════════════════════════════════════════════════ -->
 <div class="bottom-nav">
-  <div class="nav-item active" onclick=\"goToPage('home', this)\">
+  <div class="nav-item active" onclick="goToPage('home', this)">
     <i class="fas fa-home"></i>
     <span>الرئيسية</span>
   </div>
-  <div class="nav-item" onclick=\"goToPage('fasting', this)\">
+  <div class="nav-item" onclick="goToPage('fasting', this)">
     <i class="fas fa-hourglass-half"></i>
     <span>الصيام</span>
   </div>
-  <div class="nav-item" onclick=\"goToPage('foods', this)\">
+  <div class="nav-item" onclick="goToPage('foods', this)">
     <i class="fas fa-apple-alt"></i>
     <span>الأطعمة</span>
   </div>
-  <div class="nav-item" onclick=\"goToPage('tips', this)\">
+  <div class="nav-item" onclick="goToPage('tips', this)">
     <i class="fas fa-lightbulb"></i>
     <span>نصائح</span>
   </div>
-  <div class="nav-item" onclick=\"goToPage('profile', this)\">
+  <div class="nav-item" onclick="goToPage('profile', this)">
     <i class="fas fa-user"></i>
     <span>الملف</span>
   </div>
@@ -1009,9 +1009,8 @@ function goToPage(pageName, clickedEl) {
   document.getElementById(pageName + '-page').classList.add('active');
   
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (clickedEl) {
-    clickedEl.closest('.nav-item')?.classList.add('active');
-  }
+  var el = clickedEl || (typeof event !== 'undefined' && event && event.target);
+  if (el) el.closest('.nav-item')?.classList.add('active');
 }
 
 function playSound(type) {
@@ -1045,7 +1044,8 @@ function handleLogout() {
 
 function switchAuthTab(tab, clickedEl) {
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  if (clickedEl) clickedEl.classList.add('active');
+  var el = clickedEl || (typeof event !== 'undefined' && event && event.target);
+  if (el) el.classList.add('active');
   
   if (tab === 'login') {
     document.getElementById('login-form').style.display = 'block';
