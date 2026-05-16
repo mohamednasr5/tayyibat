@@ -661,8 +661,8 @@ body{
   
   <div class="auth-card">
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login', this)">دخول</div>
-      <div class="auth-tab" onclick="switchAuthTab('register', this)">تسجيل</div>
+      <div class="auth-tab active" onclick="switchAuthTab('login')">دخول</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">تسجيل</div>
     </div>
     
     <!-- LOGIN FORM -->
@@ -731,25 +731,25 @@ body{
   </div>
   
   <div class="home-cards">
-    <div class="home-card" onclick="goToPage('fasting', this)">
+    <div class="home-card" onclick="goToPage('fasting')">
       <div class="home-card-icon">⏱️</div>
       <div class="home-card-title">الصيام المتقطع</div>
       <div class="home-card-val" id="home-fasting-state">غير نشط</div>
     </div>
     
-    <div class="home-card" onclick="goToPage('foods', this)">
+    <div class="home-card" onclick="goToPage('foods')">
       <div class="home-card-icon">🍎</div>
       <div class="home-card-title">الأطعمة</div>
       <div class="home-card-val">قائمة المسموح</div>
     </div>
     
-    <div class="home-card" onclick="goToPage('tips', this)">
+    <div class="home-card" onclick="goToPage('tips')">
       <div class="home-card-icon">💡</div>
       <div class="home-card-title">نصائح طبية</div>
       <div class="home-card-val">شخصية</div>
     </div>
     
-    <div class="home-card" onclick="goToPage('profile', this)">
+    <div class="home-card" onclick="goToPage('profile')">
       <div class="home-card-icon">👤</div>
       <div class="home-card-title">البيانات</div>
       <div class="home-card-val">ملفك الشخصي</div>
@@ -797,26 +797,74 @@ body{
 </div>
 
 <!-- ═════════════════════════════════════════════════════
+     FASTING PAGE
+════════════════════════════════════════════════════════ -->
+<div id="fasting-page" class="page">
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-hourglass-half"></i> الصيام المتقطع
+    </div>
+    <div id="fasting-content">
+      <p style="text-align:center;color:var(--text-secondary);padding:20px">
+        🕐 سيتم تفعيل قسم الصيام قريباً
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     FOODS PAGE
+════════════════════════════════════════════════════════ -->
+<div id="foods-page" class="page">
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-apple-alt"></i> الأطعمة المسموحة
+    </div>
+    <div id="foods-content">
+      <p style="text-align:center;color:var(--text-secondary);padding:20px">
+        🍎 سيتم تفعيل قسم الأطعمة قريباً
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
+     TIPS PAGE
+════════════════════════════════════════════════════════ -->
+<div id="tips-page" class="page">
+  <div class="section">
+    <div class="section-title">
+      <i class="fas fa-lightbulb"></i> النصائح الطبية
+    </div>
+    <div id="tips-content">
+      <p style="text-align:center;color:var(--text-secondary);padding:20px">
+        💡 سيتم تفعيل قسم النصائح قريباً
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════
      BOTTOM NAV
 ════════════════════════════════════════════════════════ -->
 <div class="bottom-nav">
-  <div class="nav-item active" onclick="goToPage('home', this)">
+  <div class="nav-item active" onclick="goToPage('home')">
     <i class="fas fa-home"></i>
     <span>الرئيسية</span>
   </div>
-  <div class="nav-item" onclick="goToPage('fasting', this)">
+  <div class="nav-item" onclick="goToPage('fasting')">
     <i class="fas fa-hourglass-half"></i>
     <span>الصيام</span>
   </div>
-  <div class="nav-item" onclick="goToPage('foods', this)">
+  <div class="nav-item" onclick="goToPage('foods')">
     <i class="fas fa-apple-alt"></i>
     <span>الأطعمة</span>
   </div>
-  <div class="nav-item" onclick="goToPage('tips', this)">
+  <div class="nav-item" onclick="goToPage('tips')">
     <i class="fas fa-lightbulb"></i>
     <span>نصائح</span>
   </div>
-  <div class="nav-item" onclick="goToPage('profile', this)">
+  <div class="nav-item" onclick="goToPage('profile')">
     <i class="fas fa-user"></i>
     <span>الملف</span>
   </div>
@@ -1004,13 +1052,16 @@ document.addEventListener('DOMContentLoaded', function() {
 let currentUser = null;
 let soundEnabled = true;
 
-function goToPage(pageName, clickedEl) {
+function goToPage(pageName) {
+  var pageEl = document.getElementById(pageName + '-page');
+  if (!pageEl) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageName + '-page').classList.add('active');
+  pageEl.classList.add('active');
   
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  var el = clickedEl || (typeof event !== 'undefined' && event && event.target);
-  if (el) el.closest('.nav-item')?.classList.add('active');
+  if (typeof event !== 'undefined' && event && event.target) {
+    event.target.closest('.nav-item')?.classList.add('active');
+  }
 }
 
 function playSound(type) {
@@ -1042,10 +1093,9 @@ function handleLogout() {
   goToPage('auth');
 }
 
-function switchAuthTab(tab, clickedEl) {
+function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  var el = clickedEl || (typeof event !== 'undefined' && event && event.target);
-  if (el) el.classList.add('active');
+  event.target.classList.add('active');
   
   if (tab === 'login') {
     document.getElementById('login-form').style.display = 'block';
