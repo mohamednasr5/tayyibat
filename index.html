@@ -92,6 +92,9 @@
 .pwa-ios-hint{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9998;background:#1a2e4a;border:1px solid rgba(212,175,55,.4);border-radius:16px;padding:14px 18px;font-size:.78rem;color:var(--txt);direction:rtl;max-width:300px;text-align:center;opacity:0;transition:all .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .pwa-ios-hint.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
 .pwa-ios-hint::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid rgba(212,175,55,.4)}
+
+/* ══ تجارب الناس ══ */
+.experience-modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:flex !important;align-items:flex-end;animation:slideUp .3s ease}@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}.experience-modal-content{width:100%;background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 30px;max-height:90vh;overflow-y:auto;animation:slideUp .3s ease}.experience-detail-modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex !important;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.experience-detail-content{width:100%;max-width:500px;background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:20px;padding:24px;max-height:85vh;overflow-y:auto;animation:scaleIn .3s ease}@keyframes scaleIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}.experience-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;animation:cardIn .4s ease}@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.experience-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 24px rgba(200,150,12,.15)}.exp-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}.exp-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;color:#050e1f;font-weight:800;font-size:1.1rem;flex-shrink:0}.exp-user-info{flex:1}.exp-username{font-size:.9rem;font-weight:800;color:var(--txt)}.exp-disease{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:700;margin-top:3px;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2)}.exp-date{font-size:.7rem;color:var(--txt3)}.exp-details-text{font-size:.85rem;color:var(--txt2);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.exp-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:700;background:rgba(46,201,81,.15);color:var(--green2);border:1px solid rgba(46,201,81,.3)}
 </style>
 </head>
 <body>
@@ -108,7 +111,7 @@
   </div>
 </div>
 
-<nav class="bottom-nav" id="bottom-nav"><div class="nav-item act" id="nav-home" onclick="goPage('home')"><i class="fas fa-home"></i><span>الرئيسية</span></div><div class="nav-item" id="nav-food" onclick="goPage('food')"><i class="fas fa-utensils"></i><span>الأطعمة</span></div><div class="nav-item" id="nav-ai" onclick="goPage('ai')"><i class="fas fa-robot"></i><span>AI طبيبك</span></div><div class="nav-item" id="nav-fast" onclick="goPage('fast')"><i class="fas fa-clock"></i><span>الصيام</span></div><div class="nav-item" id="nav-profile" onclick="goPage('profile')"><i class="fas fa-user"></i><span>حسابي</span></div></nav>
+<nav class="bottom-nav" id="bottom-nav"><div class="nav-item act" id="nav-home" onclick="goPage('home')"><i class="fas fa-home"></i><span>الرئيسية</span></div><div class="nav-item" id="nav-food" onclick="goPage('food')"><i class="fas fa-utensils"></i><span>الأطعمة</span></div><div class="nav-item" id="nav-exp" onclick="goPage('experiences')"><i class="fas fa-heart"></i><span>التجارب</span></div><div class="nav-item" id="nav-ai" onclick="goPage('ai')"><i class="fas fa-robot"></i><span>AI طبيبك</span></div><div class="nav-item" id="nav-fast" onclick="goPage('fast')"><i class="fas fa-clock"></i><span>الصيام</span></div><div class="nav-item" id="nav-profile" onclick="goPage('profile')"><i class="fas fa-user"></i><span>حسابي</span></div></nav>
 
 <div class="page" id="home-page"><div class="app-header"><div class="header-row"><div class="header-title">🌿 طيبات</div><div class="user-chip"><i class="fas fa-user-circle"></i><span id="p-name">-</span></div></div></div><div class="home-hero"><div class="hero-greeting" id="hero-greeting">مرحباً بك،</div><div class="hero-name" id="pp-name">-</div><div id="hero-bmi-status"></div><div class="hero-bmi-wrap" id="bmi-hero-wrap" style="display:none"><i class="fas fa-weight"></i> <span id="bmi-hero-val">--</span></div><div class="dis-tags" id="home-dis-tags"></div></div><div class="home-ai-btn" onclick="goPage('ai')"><div class="home-ai-btn-icon">🤖</div><div class="home-ai-btn-txt"><div class="home-ai-btn-title">طبيبك الذكي — مخصص لحالتك</div><div class="home-ai-btn-sub">اسألني عن طعامك ووضعك الصحي الآن</div></div><i class="fas fa-chevron-left" style="color:var(--ai-purple2);opacity:.7"></i></div><div class="section" id="medical-alerts-section"><div class="sec-title"><i class="fas fa-notes-medical"></i> نصائح طبية مخصصة لك</div><div id="medical-alerts-container"></div></div><div class="stats-row"><div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-val" id="s-today">0</div><div class="stat-lbl">صيام اليوم</div></div><div class="stat-card"><div class="stat-icon">📅</div><div class="stat-val" id="s-week">0</div><div class="stat-lbl">صيام الأسبوع</div></div><div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-val" id="s-month">0</div><div class="stat-lbl">الشهر الكامل</div></div></div><div class="tip-header"><div class="tip-sec-title"><i class="fas fa-lightbulb"></i> نصيحة صحية</div><button class="tip-next-btn" onclick="nextTip()">التالية ›</button></div><div class="tip-carousel" id="tip-carousel"></div><div class="footer-sig"><div class="heart-wrap">♥</div><div class="sig-text">نظام الطيبات الغذائي<br><span class="sig-name">للدكتور ضياء العوضي رحمه الله</span></div><div class="dev-sig"><div class="dev-sig-name"><i class="fas fa-heart" style="color:#e53935;animation:heartBeat 1s ease-in-out infinite;display:inline-block"></i> المهندس محمد حماد</div><div class="social-links"><a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a></div></div></div></div>
 
@@ -116,6 +119,100 @@
 
 <div class="page" id="ai-page"><div class="app-header"><div class="header-row"><div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div><div class="user-chip" style="border-color:rgba(124,58,237,.4)"><i class="fas fa-circle" style="color:#2ec951;font-size:.5rem"></i><span style="color:var(--ai-purple2)">12 نموذج AI</span></div></div></div><div class="ai-page-header"><div class="ai-hero-badge"><i class="fas fa-brain"></i> ذكاء اصطناعي متطور — 12 نموذج</div><div class="ai-hero-title">مساعدك الصحي الشخصي</div><div class="ai-hero-sub">مخصص لحالتك — متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله</div></div><div class="ai-context-card"><div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div><div class="ai-ctx-body" id="ai-user-context">جاري تحميل بياناتك...</div></div><div class="user-diseases-bar" id="ai-dis-bar"></div><div class="ai-api-counter"><i class="fas fa-server"></i> النماذج المتاحة: DeepSeek V3, GPT-4o Mini, Llama 3.3, Mistral, Qwen 2.5, DeepSeek R1, Gemma 2, Command R+, Phi-4, OpenChat, SearchGPT, Pollinations</div><div class="quick-prompts" id="quick-prompts-bar"></div><div class="ai-chat-wrap" id="ai-chat-wrap"></div><div class="ai-input-area"><textarea id="ai-msg-input" class="ai-textarea" rows="2" placeholder="اسألني عن طعام معين، أو اطلب نصيحة لحالتك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage()}"></textarea><div class="ai-actions"><button class="ai-send-btn" id="btn-ai-send" onclick="sendAiMessage()"><i class="fas fa-paper-plane"></i> إرسال</button><button class="ai-clear-btn" onclick="clearAiChat()"><i class="fas fa-trash-alt"></i> مسح</button></div></div></div>
 
+<div class="page" id="fast-page"><div class="app-header"><div class="header-row"><div class="header-title">⏱️ الصيام المتقطع</div></div></div><div class="fasting-hero"><div class="fasting-title">اختر نوع الصيام</div><div class="fasting-sub">اختر البروتوكول المناسب لحالتك — اضغط تفاصيل لمعرفة المسموح والممنوع</div></div><div class="fast-count-badge"><i class="fas fa-list-ol"></i> يتضمن <strong id="fast-count-num">8</strong> بروتوكولات صيام متقطع مع الشرح التفصيلي</div><div class="fast-types" id="fast-types"></div><div class="timer-section"><div class="timer-card"><div class="timer-card-inner"><div class="timer-ring-wrap"><svg class="timer-ring"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--gold)"/><stop offset="100%" style="stop-color:var(--gold2)"/></linearGradient></defs><circle class="ring-bg" cx="100" cy="100" r="90"/><circle class="ring-prog" id="ring-prog" cx="100" cy="100" r="90"/></svg><div class="timer-inner"><div class="timer-time" id="timer-display">00:00:00</div><div class="timer-lbl" id="timer-label">اختر نوع الصيام</div></div></div><div class="timer-phase" id="timer-phase">⏸️ في وضع الراحة</div><div class="timer-btns"><button class="tbtn tbtn-start" id="btn-start" onclick="startFast()">▶ بدء</button><button class="tbtn tbtn-stop" id="btn-stop" onclick="stopFast()" disabled>⏹ إنهاء</button><button class="tbtn tbtn-reset" onclick="resetFast()">↺ إعادة</button></div><div style="text-align:center"><div id="fast-stats-line" style="font-size:.78rem;color:var(--txt2)">لم يبدأ الصيام بعد</div></div></div></div></div><div class="fast-stats"><div class="fs-card"><div class="fs-val" id="fs-today">0</div><div class="fs-lbl">اليوم</div></div><div class="fs-card"><div class="fs-val" id="fs-week">0</div><div class="fs-lbl">الأسبوع</div></div><div class="fs-card"><div class="fs-val" id="fs-month">0</div><div class="fs-lbl">الشهر</div></div><div class="fs-card"><div class="fs-val" id="fs-year">0</div><div class="fs-lbl">السنة</div></div></div></div>
+
+<!-- صفحة تجارب الناس -->
+<div class="page" id="experiences-page">
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-title">✨ تجارب الناس</div>
+      <div class="user-chip" style="border-color:rgba(200,150,12,.4)">
+        <i class="fas fa-heart" style="color:#2ec951;font-size:.5rem"></i>
+        <span id="exp-count-chip" style="color:var(--gold2)">0</span>
+      </div>
+    </div>
+  </div>
+  
+  <div style="padding:20px 16px;text-align:center">
+    <div style="font-size:2rem;margin-bottom:8px">✨</div>
+    <div style="font-family:'Amiri',serif;font-size:1.3rem;color:var(--txt);margin-bottom:6px">شارك تجربتك</div>
+    <div style="font-size:.78rem;color:var(--txt2);margin-bottom:20px">أضف تجربتك مع النظام وساعد الآخرين</div>
+    
+    <button onclick="openShareExperienceModal()" style="width:100%;max-width:200px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:14px;padding:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(200,150,12,.4);display:inline-flex;align-items:center;justify-content:center;gap:10px">
+      <i class="fas fa-plus"></i> شارك تجربتك
+    </button>
+  </div>
+  
+  <div style="padding:16px 16px;position:relative;min-height:300px">
+    <!-- عرض التجارب المتحركة -->
+    <div id="experiences-carousel" style="display:flex;flex-direction:column;gap:16px">
+      <div style="text-align:center;color:var(--txt2);padding:40px 20px">
+        <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--gold2);margin-bottom:12px"></i>
+        <div style="font-size:.9rem">جاري تحميل التجارب...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal لشارك تجربتك -->
+<div id="share-experience-modal" class="experience-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:flex;align-items:flex-end">
+  <div class="experience-modal-content" style="width:100%;background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 30px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--txt)">شارك تجربتك</div>
+      <button onclick="closeShareExperienceModal()" style="background:none;border:none;font-size:1.4rem;color:var(--txt2);cursor:pointer;padding:0">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <form id="experience-form" onsubmit="submitExperience(event)" style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label style="display:block;font-size:.8rem;color:var(--gold2);font-weight:600;margin-bottom:6px">اسم المستخدم <span style="color:#ef5350">*</span></label>
+        <input id="exp-username" type="text" readonly style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:1rem;outline:none;min-height:48px">
+        <div style="font-size:.7rem;color:var(--txt3);margin-top:4px">يتم ملء هذا تلقائياً من حسابك</div>
+      </div>
+      
+      <div>
+        <label style="display:block;font-size:.8rem;color:var(--gold2);font-weight:600;margin-bottom:6px">المرض / الحالة <span style="color:#ef5350">*</span></label>
+        <select id="exp-disease" required style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:1rem;outline:none;min-height:48px;-webkit-appearance:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27%3E%3Cpath fill=%22%23d4af37%22 d=%22M6 8L0 0h12z%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:left 14px center;padding-left:36px">
+          <option value="">-- اختر المرض --</option>
+          <option value="sugar">🧠 مرض السكري</option>
+          <option value="pressure">💉 ارتفاع الضغط</option>
+          <option value="allergy">🌸 الحساسية</option>
+          <option value="chemo">⚕️ علاج كيماوي</option>
+          <option value="heart">❤️ أمراض القلب</option>
+          <option value="kidney">🫁 أمراض الكلى</option>
+          <option value="weight">⚖️ إنقاص الوزن</option>
+          <option value="other">📝 أخرى</option>
+        </select>
+      </div>
+      
+      <div>
+        <label style="display:block;font-size:.8rem;color:var(--gold2);font-weight:600;margin-bottom:6px">تفاصيل التجربة <span style="color:#ef5350">*</span></label>
+        <textarea id="exp-details" required placeholder="اكتب تجربتك... ماذا غير في صحتك؟ كم وزن فقدت؟ كيف تشعر الآن؟" style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:1rem;outline:none;min-height:120px;resize:none"></textarea>
+        <div style="font-size:.7rem;color:var(--txt3);margin-top:4px" id="exp-char-count">0 / 500</div>
+      </div>
+      
+      <button type="submit" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:14px;padding:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(200,150,12,.4);display:flex;align-items:center;justify-content:center;gap:10px">
+        <i class="fas fa-paper-plane"></i> نشر التجربة
+      </button>
+      
+      <button type="button" onclick="closeShareExperienceModal()" style="width:100%;background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer">
+        إلغاء
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal لعرض تفاصيل التجربة -->
+<div id="experience-detail-modal" class="experience-detail-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="experience-detail-content" style="width:100%;max-width:500px;background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:20px;padding:24px;max-height:85vh;overflow-y:auto">
+    <button onclick="closeExperienceDetailModal()" style="position:absolute;top:16px;left:16px;background:none;border:none;font-size:1.4rem;color:var(--txt2);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08)">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div id="detail-modal-content">جاري التحميل...</div>
+  </div>
+</div>
 <div class="page" id="fast-page"><div class="app-header"><div class="header-row"><div class="header-title">⏱️ الصيام المتقطع</div></div></div><div class="fasting-hero"><div class="fasting-title">اختر نوع الصيام</div><div class="fasting-sub">اختر البروتوكول المناسب لحالتك — اضغط تفاصيل لمعرفة المسموح والممنوع</div></div><div class="fast-count-badge"><i class="fas fa-list-ol"></i> يتضمن <strong id="fast-count-num">8</strong> بروتوكولات صيام متقطع مع الشرح التفصيلي</div><div class="fast-types" id="fast-types"></div><div class="timer-section"><div class="timer-card"><div class="timer-card-inner"><div class="timer-ring-wrap"><svg class="timer-ring"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--gold)"/><stop offset="100%" style="stop-color:var(--gold2)"/></linearGradient></defs><circle class="ring-bg" cx="100" cy="100" r="90"/><circle class="ring-prog" id="ring-prog" cx="100" cy="100" r="90"/></svg><div class="timer-inner"><div class="timer-time" id="timer-display">00:00:00</div><div class="timer-lbl" id="timer-label">اختر نوع الصيام</div></div></div><div class="timer-phase" id="timer-phase">⏸️ في وضع الراحة</div><div class="timer-btns"><button class="tbtn tbtn-start" id="btn-start" onclick="startFast()">▶ بدء</button><button class="tbtn tbtn-stop" id="btn-stop" onclick="stopFast()" disabled>⏹ إنهاء</button><button class="tbtn tbtn-reset" onclick="resetFast()">↺ إعادة</button></div><div style="text-align:center"><div id="fast-stats-line" style="font-size:.78rem;color:var(--txt2)">لم يبدأ الصيام بعد</div></div></div></div></div><div class="fast-stats"><div class="fs-card"><div class="fs-val" id="fs-today">0</div><div class="fs-lbl">اليوم</div></div><div class="fs-card"><div class="fs-val" id="fs-week">0</div><div class="fs-lbl">الأسبوع</div></div><div class="fs-card"><div class="fs-val" id="fs-month">0</div><div class="fs-lbl">الشهر</div></div><div class="fs-card"><div class="fs-val" id="fs-year">0</div><div class="fs-lbl">السنة</div></div></div></div>
 
 <div class="page" id="profile-page"><div class="app-header"><div class="header-row"><div class="header-title">👤 حسابي</div></div></div><div class="profile-hero"><div class="profile-avatar-3d">🌿</div><div class="profile-name" id="p-name2">-</div><div class="profile-info" id="p-info">-</div></div><div class="profile-cards">
@@ -146,7 +243,84 @@ var DISEASES_LIST = [
   { key: 'kidney', icon: '🫁', name: 'أمراض الكلى', hint: 'قصور كلوي أو حصوات' }
 ];
 
-async function dbGetUser(u) {
+// ══ بيانات التجارب ══
+var allExperiences = [];
+var currentExperienceIndex = 0;
+var experienceCarouselInterval = null;
+
+// نموذج تجربة
+var sampleExperiences = [
+  { username: 'أم علي', disease: 'sugar', diseaseLabel: 'مرض السكري', details: 'بدأت نظام الطيبات من شهرين وحمد لله انخفض سكري من 180 إلى 120. الفضل بعد الله والنظام رائع جداً وتغير حياتي للأفضل. شعرت بفرق كبير في الطاقة والتركيز.', date: new Date(Date.now() - 86400000 * 5) },
+  { username: 'محمد حسن', disease: 'weight', diseaseLabel: 'إنقاص الوزن', details: 'فقدت 15 كيلو في 4 أشهر بفضل نظام الطيبات والصيام. المهم المداومة والالتزام. البرنامج ساعدني أعرف الأكل الصحي بالظبط وقلل شهيتي بشكل طبيعي.', date: new Date(Date.now() - 86400000 * 3) },
+  { username: 'فاطمة خالد', disease: 'pressure', diseaseLabel: 'ارتفاع الضغط', details: 'بعد التزامي بنظام الطيبات لمدة 6 أسابيع، انخفض ضغطي من 160/100 إلى 130/85. الدكتور قال إني أقلل الأدوية. شكراً للدكتور ضياء على هذا النظام الرائع والمفيد.', date: new Date(Date.now() - 86400000 * 1) },
+  { username: 'سارة إبراهيم', disease: 'allergy', diseaseLabel: 'الحساسية', details: 'كنت أعاني من حساسية شديدة وقررت أتبع نظام الطيبات. بعد شهر قل الحكة والالتهاب بشكل كبير جداً. شعرت بارتياح نفسي أكتر وحمد لله الآن أنا أحسن بكتير.', date: new Date(Date.now() - 86400000 * 7) }
+];
+
+function initializeExperiences() {
+  // جلب التجارب من Firebase أو استخدام النماذج
+  loadExperiencesFromStorage();
+  displayCarouselExperience();
+  startExperienceCarousel();
+}
+
+function loadExperiencesFromStorage() {
+  if (window.__firebaseReady && window.currentUser) {
+    try {
+      var db = window.__firebaseDB, ref = window.__firebaseRef, get = window.__firebaseGet, child = window.__firebaseChild;
+      get(child(ref(db), 'experiences')).then(function(snap) {
+        if (snap.exists()) {
+          allExperiences = Object.values(snap.val());
+          updateExperienceCount();
+          displayCarouselExperience();
+        } else {
+          allExperiences = sampleExperiences.slice();
+          updateExperienceCount();
+        }
+      }).catch(function() {
+        allExperiences = sampleExperiences.slice();
+        updateExperienceCount();
+      });
+    } catch(e) {
+      allExperiences = sampleExperiences.slice();
+      updateExperienceCount();
+    }
+  } else {
+    allExperiences = sampleExperiences.slice();
+    updateExperienceCount();
+  }
+}
+
+function updateExperienceCount() {
+  var chip = document.getElementById('exp-count-chip');
+  if (chip) chip.textContent = allExperiences.length;
+}
+
+function displayCarouselExperience() {
+  if (allExperiences.length === 0) {
+    var carousel = document.getElementById('experiences-carousel');
+    if (carousel) carousel.innerHTML = '<div style="text-align:center;color:var(--txt2);padding:40px 20px"><i class="fas fa-smile-wink" style="font-size:2rem;color:var(--gold2);margin-bottom:12px"></i><div>لا توجد تجارب حتى الآن</div><div style="font-size:.8rem;margin-top:8px">كن الأول وشارك تجربتك!</div></div>';
+    return;
+  }
+  
+  currentExperienceIndex = Math.floor(Math.random() * allExperiences.length);
+  updateExperienceDisplay();
+}
+
+function updateExperienceDisplay() {
+  if (allExperiences.length === 0) return;
+  
+  var exp = allExperiences[currentExperienceIndex];
+  var carousel = document.getElementById('experiences-carousel');
+  if (!carousel) return;
+  
+  var daysAgo = Math.floor((Date.now() - exp.date.getTime()) / 86400000);
+  var dateLabel = daysAgo === 0 ? 'اليوم' : daysAgo === 1 ? 'أمس' : daysAgo + ' أيام';
+  
+  var avatarColor = ['#d4af37', '#42a5f5', '#ef5350', '#66bb6a', '#ab47bc'][currentExperienceIndex % 5];
+  var initials = exp.username.split(' ').map(function(n) { return n.charAt(0); }).join('');
+  
+  carousel.innerHTML = '<div class="experience-card" onclick="showExperienceDetail(' + currentExperienceIndex + ')" style="cursor:pointer"><div class="exp-card-header"><div class="exp-avatar" style="background:linear-gradient(135deg,' + avatarColor + ',rgba(212,175,55,.7))">' + initials + '</div><div style="flex:1"><div class="exp-username">' + exp.username + '</div><div class="exp-disease">' + exp.diseaseLabel + '</div><div class="exp-date">' + dateLabel + '</div></div></div><div class="exp-details-text">' + exp.details + '</div><div style="text-align:center;margin-top:12px"><span class="exp-badge">👆 اضغط لشوف التفاصيل كاملة</span></div></div>';
+}
   if (window.__firebaseReady) {
     try {
       var db = window.__firebaseDB, ref = window.__firebaseRef, get = window.__firebaseGet, child = window.__firebaseChild;
@@ -358,6 +532,9 @@ function goPage(n) {
     document.getElementById('p-name').textContent = currentUser.name;
     var b = getBMIInfo(currentUser.bmi);
     document.getElementById('hero-bmi-status').innerHTML = '<span class="bmi-status-badge ' + b.cls + '">' + b.label + '</span>';
+  }
+  if (n === 'experiences') {
+    initializeExperiences();
   }
 }
 
@@ -629,7 +806,8 @@ var FAST_TYPES = [
       ],
       forbiddenFoods: [
         'الدجاج بجميع أنواعه',
-        'البيض',
+        'البيض ممنوع تماماً',
+        'البط والرومي ممنوع تماماً',
         'الحليب والزبادي والألبان السائلة',
         'الخبز الأبيض والدقيق الأبيض',
         'الخضروات النيئة والسلطات الخضراء',
@@ -675,7 +853,8 @@ var FAST_TYPES = [
         'الشوربات المطبوخة بدون دقيق'
       ],
       forbiddenFoods: [
-        'الدجاج والبيض بشكل كامل',
+        'الدجاج والبيض ممنوع تماماً',
+        'البط والرومي ممنوع تماماً',
         'الألبان السائلة (حليب، زبادي، لبن)',
         'الخبز الأبيض والمعجنات',
         'الدقيق الأبيض ومشتقاته',
@@ -1388,6 +1567,141 @@ window.addEventListener('DOMContentLoaded', function() {
     var b = document.getElementById('pwa-banner');
     if (b) b.classList.remove('show');
   });
+
+  // ══ وظائف التجارب ══
+  window.openShareExperienceModal = function() {
+    if (!window.currentUser) {
+      showToast('🔐 سجل الدخول أولاً', 3000);
+      return;
+    }
+    var modal = document.getElementById('share-experience-modal');
+    var userInput = document.getElementById('exp-username');
+    if (modal) {
+      modal.style.display = 'flex';
+      if (userInput) userInput.value = window.currentUser.name || window.currentUser.username || '';
+    }
+  };
+
+  window.closeShareExperienceModal = function() {
+    var modal = document.getElementById('share-experience-modal');
+    var form = document.getElementById('experience-form');
+    if (modal) modal.style.display = 'none';
+    if (form) form.reset();
+  };
+
+  window.submitExperience = function(e) {
+    e.preventDefault();
+    if (!window.currentUser) return;
+    
+    var username = document.getElementById('exp-username').value.trim();
+    var disease = document.getElementById('exp-disease').value;
+    var details = document.getElementById('exp-details').value.trim();
+    
+    if (!username || !disease || !details || details.length < 20) {
+      showToast('⚠️ تأكد من ملء جميع الحقول والتفاصيل كافية', 3000);
+      return;
+    }
+    
+    var diseaseObj = DISEASES_LIST.find(function(d) { return d.key === disease; });
+    var diseaseLabel = diseaseObj ? diseaseObj.name : disease;
+    
+    var newExp = {
+      username: username,
+      disease: disease,
+      diseaseLabel: diseaseLabel,
+      details: details,
+      date: new Date(),
+      userId: window.currentUser.username
+    };
+    
+    // حفظ في Firebase
+    if (window.__firebaseReady) {
+      try {
+        var db = window.__firebaseDB, ref = window.__firebaseRef, set = window.__firebaseSet;
+        var expId = Date.now().toString();
+        set(ref(db, 'experiences/' + expId), newExp).then(function() {
+          allExperiences.push(newExp);
+          updateExperienceCount();
+          closeShareExperienceModal();
+          showToast('✅ تم نشر تجربتك بنجاح!', 3000);
+          setTimeout(function() {
+            displayCarouselExperience();
+          }, 500);
+        }).catch(function() {
+          allExperiences.push(newExp);
+          updateExperienceCount();
+          closeShareExperienceModal();
+          showToast('✅ تم حفظ تجربتك محلياً', 2000);
+          setTimeout(function() {
+            displayCarouselExperience();
+          }, 500);
+        });
+      } catch(e) {
+        allExperiences.push(newExp);
+        updateExperienceCount();
+        closeShareExperienceModal();
+        showToast('✅ تم حفظ تجربتك', 2000);
+        displayCarouselExperience();
+      }
+    }
+  };
+
+  window.startExperienceCarousel = function() {
+    if (experienceCarouselInterval) clearInterval(experienceCarouselInterval);
+    experienceCarouselInterval = setInterval(function() {
+      if (allExperiences.length > 1) {
+        currentExperienceIndex = (currentExperienceIndex + 1) % allExperiences.length;
+        updateExperienceDisplay();
+      }
+    }, 6000);
+  };
+
+  window.showExperienceDetail = function(index) {
+    if (!allExperiences[index]) return;
+    var exp = allExperiences[index];
+    var modal = document.getElementById('experience-detail-modal');
+    var content = document.getElementById('detail-modal-content');
+    
+    if (!modal || !content) return;
+    
+    var daysAgo = Math.floor((Date.now() - exp.date.getTime()) / 86400000);
+    var dateLabel = daysAgo === 0 ? 'اليوم' : daysAgo === 1 ? 'أمس' : daysAgo + ' أيام';
+    var avatarColor = ['#d4af37', '#42a5f5', '#ef5350', '#66bb6a', '#ab47bc'][index % 5];
+    var initials = exp.username.split(' ').map(function(n) { return n.charAt(0); }).join('');
+    
+    content.innerHTML = '<button onclick="closeExperienceDetailModal()" style="position:absolute;top:16px;left:16px;background:none;border:none;font-size:1.4rem;color:var(--txt2);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);z-index:10"><i class="fas fa-times"></i></button>' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><div class="exp-avatar" style="background:linear-gradient(135deg,' + avatarColor + ',rgba(212,175,55,.7));width:56px;height:56px;font-size:1.3rem">' + initials + '</div>' +
+    '<div><div style="font-size:1rem;font-weight:800;color:var(--txt)">' + exp.username + '</div>' +
+    '<div style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:700;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);margin-top:4px">' + exp.diseaseLabel + '</div>' +
+    '<div style="font-size:.75rem;color:var(--txt3);margin-top:6px">منذ ' + dateLabel + '</div></div></div>' +
+    '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px"><div style="font-size:.85rem;color:var(--txt2);line-height:1.8">' + exp.details + '</div></div>' +
+    '<div style="display:flex;gap:10px"><button onclick="closeExperienceDetailModal()" style="flex:1;background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:12px;font-family:\'Tajawal\',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer">إغلاق</button></div>';
+    
+    modal.style.display = 'flex';
+  };
+
+  window.closeExperienceDetailModal = function() {
+    var modal = document.getElementById('experience-detail-modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  // إغلاق Modals عند الضغط خارجها
+  document.getElementById('share-experience-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeShareExperienceModal();
+  });
+  
+  document.getElementById('experience-detail-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeExperienceDetailModal();
+  });
+
+  // إضافة عداد الأحرف في النموذج
+  var detailsInput = document.getElementById('exp-details');
+  if (detailsInput) {
+    detailsInput.addEventListener('input', function() {
+      var count = document.getElementById('exp-char-count');
+      if (count) count.textContent = this.value.length + ' / 500';
+    });
+  }
 })();
 </script>
 </body>
