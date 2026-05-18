@@ -10,11 +10,18 @@
 <title>طيبات | نظام صحي ذكي + AI</title>
 
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+<meta name="apple-mobile-web-app-title" content="نظام الطيبات">
+<meta name="application-name" content="نظام الطيبات">
+<meta name="msapplication-TileImage" content="icons/icon-144.png">
+<meta name="msapplication-TileColor" content="#0a1628">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -44,6 +51,16 @@
 .home-hero{padding:20px 16px 0;text-align:center}.hero-greeting{font-size:.85rem;color:var(--txt2);margin-bottom:4px}.hero-name{font-family:'Amiri',serif;font-size:2rem;background:linear-gradient(135deg,var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}.hero-bmi-status{display:inline-block;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:8px}.hero-bmi-wrap{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(200,150,12,.12),rgba(200,150,12,.05));border:1px solid rgba(200,150,12,.3);border-radius:20px;padding:6px 16px;font-size:.78rem;color:var(--gold2);margin-bottom:16px}.dis-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}.dis-tag{display:flex;align-items:center;gap:6px;border-radius:20px;padding:5px 12px;font-size:.72rem;font-weight:700;cursor:default}.tag-sugar{background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.4);color:#ef5350}.tag-pressure{background:rgba(66,165,245,.15);border:1px solid rgba(66,165,245,.4);color:#42a5f5}.tag-allergy{background:rgba(171,71,188,.15);border:1px solid rgba(171,71,188,.4);color:#ab47bc}.tag-chemo{background:rgba(255,112,67,.15);border:1px solid rgba(255,112,67,.4);color:#ff7043}.tag-heart{background:rgba(236,64,122,.15);border:1px solid rgba(236,64,122,.4);color:#ec407a}.tag-kidney{background:rgba(102,187,106,.15);border:1px solid rgba(102,187,106,.3);color:var(--green2)}.tag-none{background:rgba(46,201,81,.1);border:1px solid rgba(46,201,81,.3);color:var(--green2)}
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px 16px}.stat-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:14px 10px;text-align:center}.stat-icon{font-size:1.5rem;margin-bottom:6px}.stat-val{font-size:1.6rem;font-weight:900;color:var(--gold2);margin-bottom:2px}.stat-lbl{font-size:.62rem;color:var(--txt3);font-weight:600}
 .tip-header{display:flex;align-items:center;justify-content:space-between;padding:0 16px 8px}.tip-sec-title{font-size:.85rem;font-weight:800;color:var(--txt2);display:flex;align-items:center;gap:6px}.tip-next-btn{background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);border-radius:20px;padding:4px 12px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}.tip-carousel{padding:0 16px 16px;position:relative;min-height:100px}.tip-slide{display:none}.tip-slide.active{display:block;animation:tipIn .4s ease}@keyframes tipIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}.tip-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}.tip-icon-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}.tip-title{font-size:.9rem;font-weight:800;color:var(--txt)}.tip-body{font-size:.8rem;color:var(--txt2);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:10px;border-right:2px solid rgba(200,150,12,.3)}.tip-dots{display:flex;gap:6px;justify-content:center;margin-top:10px}.tip-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s;cursor:pointer}.tip-dot.on{width:20px;border-radius:3px;background:var(--gold2)}
+.smoke-carousel{padding:0 0 4px;position:relative;min-height:80px}
+.smoke-slide{display:none}
+.smoke-slide.active{display:block;animation:tipIn .4s ease}
+.smoke-tip-body{font-size:.78rem;color:var(--txt2);line-height:1.8;padding:10px 12px;background:rgba(229,57,53,.05);border-radius:10px;border-right:2px solid rgba(229,57,53,.35);margin-bottom:8px}
+.smoke-dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
+.smoke-dot{width:5px;height:5px;border-radius:50%;background:var(--border);transition:all .3s;cursor:pointer}
+.smoke-dot.on{width:16px;border-radius:3px;background:#e53935}
+.smoke-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.smoke-nav-title{font-size:.75rem;font-weight:800;color:#ef5350;display:flex;align-items:center;gap:5px}
+.smoke-next-btn{background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.3);color:#ef5350;border-radius:16px;padding:3px 10px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
 .section{padding:0 16px 16px}.sec-title{font-size:.85rem;font-weight:800;color:var(--txt2);margin-bottom:12px;display:flex;align-items:center;gap:6px}.alert-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid;border-radius:16px;padding:14px;margin-bottom:10px}.alert-card.ok{border-color:rgba(46,201,81,.3)}.alert-card.sugar{border-color:rgba(239,83,80,.3)}.alert-card.pressure{border-color:rgba(66,165,245,.3)}.alert-card.allergy{border-color:rgba(171,71,188,.3)}.alert-card.chemo{border-color:rgba(255,112,67,.3)}.alert-card.heart{border-color:rgba(236,64,122,.3)}.alert-card.kidney{border-color:rgba(102,187,106,.3)}.alert-title{font-size:.9rem;font-weight:800;color:var(--txt);margin-bottom:8px}.alert-tips{padding-right:16px}.alert-tips li{font-size:.78rem;color:var(--txt2);line-height:1.8;margin-bottom:4px;}
 .home-ai-btn{margin:0 16px 16px;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(79,70,229,.1));border:1px solid rgba(124,58,237,.4);border-radius:18px;padding:16px;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:12px}.home-ai-btn-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;animation:aiPulse 2s ease-in-out infinite}@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,.3)}50%{box-shadow:0 0 0 10px rgba(124,58,237,0)}}.home-ai-btn-txt{flex:1}.home-ai-btn-title{font-size:.95rem;font-weight:800;color:var(--ai-purple2);margin-bottom:3px}.home-ai-btn-sub{font-size:.72rem;color:var(--txt3)}
 .footer-sig{margin:20px 16px;padding:16px;background:linear-gradient(145deg,rgba(200,150,12,.05),rgba(200,150,12,.02));border:1px solid rgba(200,150,12,.15);border-radius:16px;text-align:center}.heart-wrap{font-size:1.5rem;color:var(--red2);margin-bottom:6px;animation:heartBeat 1.5s ease-in-out infinite}@keyframes heartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}.sig-text{font-family:'Amiri',serif;font-size:.95rem;color:var(--txt2);margin-bottom:4px}.sig-name{color:var(--gold2);font-weight:700}.dev-sig{margin-top:12px;padding-top:12px;border-top:1px solid rgba(200,150,12,.15)}.dev-sig-name{font-size:.95rem;font-weight:700;color:var(--gold2);margin-bottom:8px}.social-links{margin-top:10px;display:flex;justify-content:center;gap:12px}.social-icon{color:var(--txt2);font-size:1.2rem;transition:color .3s}.social-icon:hover{color:var(--blue2)}
@@ -444,15 +461,29 @@ function buildMedicalAlerts() {
     });
   }
 
-  // نصائح التدخين
+  // نصائح التدخين — carousel متحرك
   if (smoking === 'smoker_male' || smoking === 'smoker_female') {
     var sm = MEDICAL_ADVICE[smoking];
     if (sm) {
-      html += '<div class="alert-card ' + sm.cls + '"><div class="alert-title">' + sm.title + '</div>';
-      html += '<ul class="alert-tips">' + sm.tips.map(function(t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
-      // نصائح مشتركة
-      html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)"><div style="font-size:.78rem;font-weight:800;color:var(--gold2);margin-bottom:6px">💡 نصائح مشتركة للمدخنين:</div>';
-      html += '<ul class="alert-tips"><li>تقليل عدد السجائر خطوة ممتازة، لكن الإقلاع الكامل هو الأفضل صحياً.</li><li>خلال 20 دقيقة من آخر سيجارة يبدأ الجسم في التحسن تدريجياً.</li><li>بعد عدة أسابيع من الإقلاع يتحسن التنفس والدورة الدموية بشكل واضح.</li><li>الدعم النفسي من الأسرة والأصدقاء يزيد فرص النجاح بشكل كبير.</li><li>بدائل النيكوتين (اللصقات أو العلكة) قد تساعد تحت إشراف طبيب أو صيدلي.</li></ul></div>';
+      var SHARED_SMOKE = [
+        'تقليل عدد السجائر خطوة ممتازة، لكن الإقلاع الكامل هو الأفضل صحياً.',
+        'خلال 20 دقيقة من آخر سيجارة يبدأ الجسم في التحسن تدريجياً.',
+        'بعد عدة أسابيع من الإقلاع يتحسن التنفس والدورة الدموية بشكل واضح.',
+        'الدعم النفسي من الأسرة والأصدقاء يزيد فرص النجاح بشكل كبير.',
+        'بدائل النيكوتين (اللصقات أو العلكة) قد تساعد تحت إشراف طبيب أو صيدلي.'
+      ];
+      var allSmokeTips = sm.tips.concat(SHARED_SMOKE);
+      var slides = allSmokeTips.map(function(tip, i) {
+        return '<div class="smoke-slide' + (i === 0 ? ' active' : '') + '"><div class="smoke-tip-body">' + tip + '</div></div>';
+      }).join('');
+      var dots = allSmokeTips.map(function(_, i) {
+        return '<div class="smoke-dot' + (i === 0 ? ' on' : '') + '" onclick="gotoSmokeTip(' + i + ')"></div>';
+      }).join('');
+      html += '<div class="alert-card ' + sm.cls + '">';
+      html += '<div class="smoke-nav"><span class="smoke-nav-title"><i class="fas fa-smoking"></i> ' + sm.title + '</span>';
+      html += '<button class="smoke-next-btn" onclick="nextSmokeTip()">التالية ›</button></div>';
+      html += '<div class="smoke-carousel" id="smoke-carousel">' + slides + '</div>';
+      html += '<div class="smoke-dots" id="smoke-dots">' + dots + '</div>';
       html += '</div>';
     }
   } else if (smoking === 'non_smoker') {
@@ -460,6 +491,7 @@ function buildMedicalAlerts() {
   }
   
   c.innerHTML = html || '<div class="alert-card ok"><div class="alert-title">✅ أنت بصحة جيدة</div></div>';
+  buildSmokeCarouselTimer();
 }
 
 function buildHomeDisTags() {
@@ -483,6 +515,32 @@ function buildTips() {
 function gotoTip(i) { var s = document.querySelectorAll('#tip-carousel .tip-slide'), d = document.querySelectorAll('#tip-carousel .tip-dot'); s[tipIdx].classList.remove('active'); d[tipIdx].classList.remove('on'); tipIdx = i; s[tipIdx].classList.add('active'); d[tipIdx].classList.add('on'); }
 function nextTip() { gotoTip((tipIdx + 1) % ALL_TIPS.length); }
 
+var smokeIdx = 0, smokeT = null;
+function buildSmokeCarouselTimer() {
+  if (smokeT) clearInterval(smokeT);
+  var c = document.getElementById('smoke-carousel');
+  if (!c) return;
+  var slides = c.querySelectorAll('.smoke-slide');
+  if (!slides.length) return;
+  smokeIdx = 0;
+  smokeT = setInterval(nextSmokeTip, 5000);
+}
+function gotoSmokeTip(i) {
+  var slides = document.querySelectorAll('#smoke-carousel .smoke-slide');
+  var dots = document.querySelectorAll('#smoke-dots .smoke-dot');
+  if (!slides.length) return;
+  slides[smokeIdx].classList.remove('active');
+  if (dots[smokeIdx]) dots[smokeIdx].classList.remove('on');
+  smokeIdx = i % slides.length;
+  slides[smokeIdx].classList.add('active');
+  if (dots[smokeIdx]) dots[smokeIdx].classList.add('on');
+}
+function nextSmokeTip() {
+  var slides = document.querySelectorAll('#smoke-carousel .smoke-slide');
+  if (!slides.length) return;
+  gotoSmokeTip((smokeIdx + 1) % slides.length);
+}
+
 /* ══════════════════════════════════════════════════════════
    الأطعمة بتفاصيل إضافية مخصصة
    ══════════════════════════════════════════════════════════ */
@@ -498,7 +556,30 @@ var FOOD_DATA = [
   { id: 9, emoji: '🍲', name: 'الخضروات المطبوخة', cat: 'خضروات', status: 'allowed', desc: 'يجب أن تكون مسبكة ومطبوخة جيداً حتى تذوب تقريباً.', reason: 'الطبخ الجيد (التسبيك) يكسر الألياف السليولوزية القاسية ويدمر السموم النباتية (الليكتينات) الموجودة طبيعياً في النبات، مما يريح القولون تماماً ويمنع الغازات، لتستفيد من الفيتامينات بأقل جهد للمعدة.' },
   { id: 10, emoji: '🥗', name: 'الخضروات النيئة', cat: 'خضروات', status: 'forbidden', desc: 'السلطات، الخضار الطازج، الورقيات الخضراء النيئة (ممنوعة).', reason: 'الألياف النيئة القاسية تخدش جدار الأمعاء الرقيق وتجهد القولون بشكل كبير في محاولة هضمها وتفكيكها، وتسبب الغازات والانتفاخ وعسر الهضم الشديد وتهييج القولون العصبي.' },
   { id: 11, emoji: '🍇', name: 'الفواكه الحلوة', cat: 'فواكه', status: 'allowed', desc: 'مسموحة ولكن باعتدال شديد (حبة إلى حبتين يومياً بحد أقصى).', reason: 'مصدر طبيعي للفيتامينات والسكريات. القاعدة الذهبية هي أن تؤكل الفاكهة بعد الوجبة الدسمة بوقت كافٍ حتى لا تتخمر في المعدة الفارغة. المبالغة في الفواكه ترفع الدهون الثلاثية وتسبب تشحم الكبد.' },
-  { id: 12, emoji: '🥤', name: 'الغازيات', cat: 'مشروبات', status: 'forbidden', desc: 'ممنوعة كلياً وبشكل قاطع (بما فيها أنواع الدايت).', reason: 'مليئة بالسكريات الصناعية، الألوان، والأحماض التي تغير درجة حموضة المعدة والدم، وتدمر الميكروبيوم (البكتيريا النافعة) تماماً، فضلاً عن تأثيرها المباشر في هشاشة العظام وإرهاق الكلى.' }
+  { id: 12, emoji: '🥤', name: 'الغازيات', cat: 'مشروبات', status: 'forbidden', desc: 'ممنوعة كلياً وبشكل قاطع (بما فيها أنواع الدايت).', reason: 'مليئة بالسكريات الصناعية، الألوان، والأحماض التي تغير درجة حموضة المعدة والدم، وتدمر الميكروبيوم (البكتيريا النافعة) تماماً، فضلاً عن تأثيرها المباشر في هشاشة العظام وإرهاق الكلى.' },
+  { id: 13, emoji: '🥚', name: 'البيض', cat: 'بروتين', status: 'allowed', desc: 'مصدر بروتين كامل متوازن (مسموح بدون قيود).', reason: 'يعتبر البيض غذاء شامل يحتوي على جميع الأحماض الأمينية الأساسية. يسهل هضمه تماماً ويعزز الشبع لفترة طويلة. الصفار غني بمادة الكولين التي تحسن وظائف الدماغ، والبياض نقي من الدهون. يحسن صحة الجلد والشعر والعظام ولا يرفع السكر نهائياً.' },
+  { id: 14, emoji: '🦐', name: 'الجمبري والمأكولات البحرية', cat: 'بروتين', status: 'allowed', desc: 'جمبري، كالماري، محار (مسموح كلياً).', reason: 'مصادر ممتازة للبروتين الخام قليلة الدهون. غنية بالزنك والسيلينيوم اللذان يعززان المناعة. تحتوي على أحماض دهنية أوميجا 3 طبيعية تقلل الالتهاب. سهلة الهضم تماماً ولا تسبب حساسية لدى أغلب الناس.' },
+  { id: 15, emoji: '🥔', name: 'البطاطس', cat: 'نشويات', status: 'allowed', desc: 'بطاطس مسلوقة أو مشوية (ممنوع القلي بالزيوت المكررة).', reason: 'نشويات طبيعية خالية من الجلوتين. غنية بالبوتاسيوم والفيتامينات. تعطي شعوراً قوياً بالشبع وتحتوي على مادة النشا المقاوم الذي يغذي البكتيريا النافعة. يُفضل طهيها بالماء أو الشوي وإضافة زيت الزيتون بعد الطهي.' },
+  { id: 16, emoji: '🥕', name: 'الجزر المطبوخ', cat: 'خضروات', status: 'allowed', desc: 'غني بالبيتا كاروتين (يُفضل مطبوخاً وليس نيئاً).', reason: 'الطبخ يزيد من توفر البيتا كاروتين للجسم بشكل ملموس. يعزز صحة العينين والجلد والمناعة. الجزر المطبوخ آمن تماماً للأمعاء الحساسة ولا يسبب ارتشاح الأمعاء بسبب تكسر الألياف.' },
+  { id: 17, emoji: '🌽', name: 'الذرة الطازجة', cat: 'نشويات', status: 'allowed', desc: 'الذرة الطازجة مسموحة باعتدال (ليست معلبة أو معالجة).', reason: 'مصدر جيد للنشويات الطبيعية والألياف. غنية بمضادات الأكسدة والفيتامينات. الذرة الطازجة أفضل من المعالجة بكثير لأن المعالجة تضيف زيوتاً مكررة ومواد حافظة. يُفضل سلقها وإضافة زيت الزيتون والملح.' },
+  { id: 18, emoji: '🍠', name: 'البطاطا الحلوة', cat: 'نشويات', status: 'allowed', desc: 'مسموحة بسبب محتواها الغذائي العالي وفوائدها.', reason: 'نشويات طبيعية غنية جداً بالبيتا كاروتين والفيتامينات الضرورية. تحتوي على مؤشر جلايسيمي منخفض نسبياً مما يعني رفع سكر الدم ببطء. تعزز صحة الجهاز الهضمي وتغذي البكتيريا النافعة. آمنة تماماً للأمعاء الحساسة.' },
+  { id: 19, emoji: '🥬', name: 'الخضروات الورقية المطبوخة', cat: 'خضروات', status: 'allowed', desc: 'السبانخ، الملفوف، الكرنب عند طهيها (ممنوع نيئ).', reason: 'عند الطهي الجيد، تصبح سهلة الهضم جداً وآمنة تماماً. غنية بالحديد والكالسيوم والفيتامينات المتعددة. الطهي يكسر المركبات المهيجة مثل الجلوكوسينات. يُفضل طهيها بزيت الزيتون حتى تذوب تقريباً.' },
+  { id: 20, emoji: '🧅', name: 'البصل والثوم المطبوخ', cat: 'خضروات', status: 'allowed', desc: 'مسموح عند طهيه جيداً (ممنوع نيئ أو مقطع للتو).', reason: 'عند الطهي الجيد، يصبحان آمنين تماماً للأمعاء. يحتويان على مركبات كبريتية قوية مضادة للالتهاب والأكسدة. يحسنان الهضم ويعززان صحة القلب والأوعية الدموية. يُفضل إضافتهما للطعام مبكراً في الطهي.' },
+  { id: 21, emoji: '🍯', name: 'السمنة البلدي', cat: 'دهون', status: 'allowed', desc: 'السمن البلدي النقي هو الأفضل (ليس السمن الصناعي).', reason: 'دهون طبيعية مستقرة حرارياً وآمنة تماماً. تحسن امتصاص الفيتامينات الذائبة في الدهون. تعزز صحة الدماغ والقلب. الطهي بها آمن جداً بعكس الزيوت النباتية المكررة. تساعد على الشبع وتحسن طعم الطعام.' },
+  { id: 22, emoji: '🧈', name: 'الزبدة الطبيعية', cat: 'دهون', status: 'allowed', desc: 'الزبدة الحقيقية البلدية (ليست مارجرين).', reason: 'مصدر طبيعي للدهون المشبعة الآمنة والفيتامينات الذائبة في الدهون خاصة A و D و K2. تحسن صحة العظام والقلب والدماغ. سهلة الهضم وآمنة للأمعاء. يُفضل استخدامها بكميات معتدلة.' },
+  { id: 23, emoji: '🥥', name: 'زيت جوز الهند', cat: 'دهون', status: 'allowed', desc: 'زيت جوز الهند البكر (ليس المعالج كيميائياً).', reason: 'دهون صحية مستقرة جداً حرارياً وآمنة للطهي. غنية بحمض الكابريليك المضاد للفطريات والبكتيريا الضارة. تعزز صحة الدماغ وتحسن الهضم. لا ترفع السكر نهائياً وتساعد على نزول الوزن.' },
+  { id: 24, emoji: '🍖', name: 'الكبدة والأعضاء', cat: 'بروتين', status: 'allowed', desc: 'كبد البقر والضأن (من الحيوانات البلدية).', reason: 'مخزن طبيعي لجميع الفيتامينات والمعادن الضرورية. غنية بالحديد والزنك والسيلينيوم. تحتوي على جميع الأحماض الأمينية الأساسية. تحسن الدم والمناعة والطاقة. تحتوي على فيتامين A الطبيعي الذي يحسن الرؤية والجلد.' },
+  { id: 25, emoji: '🦆', name: 'البط والرومي', cat: 'بروتين', status: 'allowed', desc: 'اللحم الأحمر من البط والرومي البلدي (ليس الدجاج).', reason: 'بروتينات عالية الجودة وآمنة تماماً. أقل التهاباً من الدجاج بكثير. تهضم بسلاسة وسهولة. غنية بالفيتامينات والمعادن. لا تحتوي على الهرمونات والمضادات الحيوية الضارة.' },
+  { id: 26, emoji: '☕', name: 'القهوة السوداء', cat: 'مشروبات', status: 'allowed', desc: 'قهوة بدون سكر أو حليب (مسموح بلا قيود).', reason: 'غنية بمضادات الأكسدة القوية جداً. تحسن الطاقة والتركيز بشكل فوري. تعزز حرق الدهون وتحسن الأيض. آمنة تماماً على المعدة والأمعاء. تساعد على الصيام المتقطع دون كسره.' },
+  { id: 27, emoji: '🍵', name: 'الشاي الأخضر والأسود', cat: 'مشروبات', status: 'allowed', desc: 'مسموح بدون سكر أو حليب.', reason: 'مليء بمضادات الأكسدة والبوليفينولات المفيدة جداً. يحسن الهضم والدورة الدموية. يعزز عملية التمثيل الغذائي وحرق الدهون. آمن تماماً على الأمعاء ويساعد على الصيام.' },
+  { id: 28, emoji: '💧', name: 'الماء', cat: 'مشروبات', status: 'allowed', desc: 'الماء النقي هو الأساس (بدون أي إضافات).', reason: 'ضروري جداً لكل وظائف الجسم. يحسن الهضم والامتصاص والتمثيل الغذائي. يساعد على الشعور بالشبع. ينظف الجسم من السموم. شرب كميات كافية من الماء ضروري جداً في نظام الطيبات.' },
+  { id: 29, emoji: '🌿', name: 'الأعشاب والينسون والنعناع', cat: 'مشروبات', status: 'allowed', desc: 'جميع الأعشاب الطبيعية بدون إضافات (مسموح مطلقاً).', reason: 'آمنة تماماً وتحسن الهضم والصحة. الينسون يقلل الغازات والانتفاخ. النعناع يريح المعدة ويحسن الهضم. الأعشاب الطبيعية تعزز صحة المناعة والدورة الدموية والأعصاب.' },
+  { id: 30, emoji: '🎃', name: 'القرع والكوسة', cat: 'خضروات', status: 'allowed', desc: 'قرع العسل والكوسة المطبوخة جيداً (مسموح).', reason: 'خضروات آمنة جداً للأمعاء الحساسة. غنية بالألياف اللطيفة والفيتامينات. تحسن الهضم والشعور بالشبع. الطهي الجيد يجعلها سهلة الامتصاص جداً. آمنة للصيام المتقطع بسبب انخفاض السعرات.' },
+  { id: 31, emoji: '🫘', name: 'البامية المطبوخة', cat: 'خضروات', status: 'allowed', desc: 'البامية عند طهيها جيداً (ممنوع نيئ).', reason: 'عند الطهي الجيد، تصبح سهلة الهضم وآمنة تماماً. تحتوي على مخاط طبيعي يغلف الأمعاء بطبقة حماية. غنية بالألياف المفيدة والفيتامينات. تحسن صحة الجهاز الهضمي وتعزز البكتيريا النافعة.' },
+  { id: 32, emoji: '🍯', name: 'السكر والحلويات', cat: 'منتجات', status: 'forbidden', desc: 'السكر الأبيض والبني والحلويات والشوكولاتة (ممنوعة كلياً).', reason: 'ترفع الإنسولين بشكل مهول جداً مما يسبب تخزين الدهون والتهاب شديد. تدمر البنكرياس وتؤدي لمرض السكري. تسبب إدمان نفسي وتؤثر على صحة الدماغ والسلوك. تسرع الشيخوخة وتزيد من الالتهابات المزمنة.' },
+  { id: 33, emoji: '🌾', name: 'الزيوت النباتية المكررة', cat: 'دهون', status: 'forbidden', desc: 'زيت عباد الشمس والذرة والصويا والمارجرين (ممنوعة).', reason: 'زيوت مؤكسدة جداً وغير مستقرة حرارياً. غنية بأوميجا 6 المسبب للالتهابات الشديدة. تحتوي على دهون مهدرجة جزئياً سامة جداً. تدمر المرونة والجهاز العصبي وتسرع الشيخوخة.' },
+  { id: 34, emoji: '🥓', name: 'اللحوم المصنعة', cat: 'بروتين', status: 'forbidden', desc: 'لانشون، سجق، بسطرمة، برجر مصنع (ممنوعة كلياً).', reason: 'تحتوي على نترات وبروبيونات ومواد حافظة سامة. تحتوي على لحم منخفض الجودة وحشوات. تسبب سرطان القولون وأمراض القلب. تزيد الالتهاب والسمنة بشكل مهول.' },
+  { id: 35, emoji: '🍔', name: 'الوجبات السريعة والمصنعة', cat: 'منتجات', status: 'forbidden', desc: 'البيتزا والمعجنات والشيبسي والإندومي (ممنوعة كلياً).', reason: 'مليئة بالزيوت المكررة والمواد الحافظة والألوان الصناعية. تحتوي على جلوتين مهيج وسكريات مخفية. تسبب الإدمان والسمنة والالتهابات الشديدة. قيمتها الغذائية سلبية تماماً وضررها كبير.' }
 ];
 var curCat = 'الكل';
 function buildFoodData() {
