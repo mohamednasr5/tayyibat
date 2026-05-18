@@ -194,6 +194,7 @@ function switchAuthTab(t) {
   document.getElementById('tab-login').classList.toggle('active', t === 'login');
   document.getElementById('tab-register').classList.toggle('active', t === 'register');
   document.querySelectorAll('.auth-error').forEach(function(e) { e.classList.remove('show'); });
+  if (t === 'register') { selectedDiseases = []; buildDisGrid('dis-grid-auth', []); }
   playSound('nav');
 }
 function showAuthError(f, m) { var e = document.getElementById(f + '-error'); e.textContent = m; e.classList.add('show'); }
