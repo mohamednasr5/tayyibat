@@ -61,6 +61,20 @@
 #toast{position:fixed;bottom:calc(var(--nav)+16px);left:50%;transform:translateX(-50%) translateY(20px);background:rgba(15,31,58,.95);border:1px solid var(--border);border-radius:20px;padding:10px 20px;font-size:.82rem;font-weight:700;color:var(--txt);z-index:3000;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px)}#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.sound-btn{position:fixed;top:14px;left:14px;z-index:200;width:36px;height:36px;border-radius:50%;background:rgba(5,14,31,.8);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem;color:var(--txt2)}.fast-details-content{font-size:.85rem;line-height:1.8;color:var(--txt2)}.fast-details-content h4{color:var(--gold2);margin:14px 0 6px;font-size:.95rem}.fast-details-content ul{padding-right:16px;margin-bottom:10px}.fast-details-content li{margin-bottom:4px}.fast-details-content .fd-allowed{color:#2ec951}.fast-details-content .fd-forbidden{color:#ef5350}.fast-details-content .fd-benefit{color:#64b5f6}.fast-details-content .fd-caution{color:#ffa726}.btn-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#050e1f;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-left:6px}
 .disclaimer{background:linear-gradient(135deg,rgba(160,21,21,.15),rgba(160,21,21,.05));border:1px solid rgba(229,57,53,.3);border-radius:14px;padding:14px 16px;margin-bottom:20px}.dis-title{color:#ef5350;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:8px;margin-bottom:8px}.disclaimer p{font-size:.75rem;color:#e57373;line-height:1.65}
 .fast-count-badge{background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.25);border-radius:12px;padding:8px 14px;margin:0 16px 16px;display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--gold2);font-weight:700}
+
+/* ══ PWA Install Banner ══ */
+#pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0a1628,#0d1f3c);border-top:1px solid rgba(212,175,55,.35);padding:14px 16px;display:flex;align-items:center;gap:12px;transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);direction:rtl}
+#pwa-banner.show{transform:translateY(0)}
+.pwa-icon{width:48px;height:48px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#1a3a5c,#0d1f3c);border:1px solid rgba(212,175,55,.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+.pwa-text{flex:1;min-width:0}
+.pwa-title{font-size:.88rem;font-weight:800;color:#d4af37;margin-bottom:2px}
+.pwa-sub{font-size:.72rem;color:rgba(255,255,255,.6);line-height:1.4}
+.pwa-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.pwa-install-btn{background:linear-gradient(135deg,#d4af37,#f0c040);color:#0a1628;border:none;border-radius:10px;padding:8px 14px;font-size:.78rem;font-weight:900;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
+.pwa-dismiss-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:10px;padding:6px 14px;font-size:.72rem;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
+.pwa-ios-hint{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9998;background:#1a2e4a;border:1px solid rgba(212,175,55,.4);border-radius:16px;padding:14px 18px;font-size:.78rem;color:var(--txt);direction:rtl;max-width:300px;text-align:center;opacity:0;transition:all .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.pwa-ios-hint.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.pwa-ios-hint::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid rgba(212,175,55,.4)}
 </style>
 </head>
 <body>
@@ -73,7 +87,7 @@
   <div class="auth-card" style="width:100%;max-width:420px">
     <div class="auth-tabs"><div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">تسجيل الدخول</div><div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">إنشاء حساب</div></div>
     <div id="login-form"><div class="auth-error" id="login-error"></div><div class="field"><label>اسم المستخدم</label><div class="input-wrap"><input type="text" id="l-user" placeholder="أدخل اسم المستخدم" autocomplete="username"></div></div><div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="l-pass" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button></div></div><button class="btn btn-gold" style="margin-top:8px" id="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button></div>
-    <div id="register-form" class="hidden"><div class="auth-error" id="reg-error"></div><div class="field"><label>الاسم الكامل</label><input type="text" id="r-name" placeholder="محمد أحمد"></div><div class="field"><label>اسم المستخدم</label><input type="text" id="r-user" placeholder="username123"></div><div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="r-pass" placeholder="6 أحرف على الأقل"><button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button></div></div><div class="field"><label>تاريخ الميلاد</label><input type="date" id="r-dob"></div><div class="field"><label>الجنس</label><select id="r-gender"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div><div class="field-row"><div class="field"><label>الوزن (كجم)</label><input type="number" id="r-weight" placeholder="70" oninput="calcBMI('r')"></div><div class="field"><label>الطول (سم)</label><input type="number" id="r-height" placeholder="170" oninput="calcBMI('r')"></div></div><div class="bmi-result" id="bmi-result"></div><div class="disease-section"><div class="dis-section-title" style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i>الأمراض المزمنة (اختياري)</div><div class="dis-grid" id="dis-grid-auth"></div></div><div class="disclaimer"><div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنبيه طبي</div><p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً.</p></div><button class="btn btn-gold" id="btn-register" onclick="doRegister()"><i class="fas fa-user-plus"></i> إنشاء حساب</button></div>
+    <div id="register-form" class="hidden"><div class="auth-error" id="reg-error"></div><div class="field"><label>الاسم الكامل</label><input type="text" id="r-name" placeholder="محمد أحمد"></div><div class="field"><label>اسم المستخدم</label><input type="text" id="r-user" placeholder="username123"></div><div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="r-pass" placeholder="6 أحرف على الأقل"><button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button></div></div><div class="field"><label>تاريخ الميلاد</label><input type="date" id="r-dob"></div><div class="field"><label>الجنس</label><select id="r-gender"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div><div class="field"><label>هل أنت مدخن؟</label><select id="r-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div><div class="field-row"><div class="field"><label>الوزن (كجم)</label><input type="number" id="r-weight" placeholder="70" oninput="calcBMI('r')"></div><div class="field"><label>الطول (سم)</label><input type="number" id="r-height" placeholder="170" oninput="calcBMI('r')"></div></div><div class="bmi-result" id="bmi-result"></div><div class="disease-section"><div class="dis-section-title" style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i>الأمراض المزمنة (اختياري)</div><div class="dis-grid" id="dis-grid-auth"></div></div><div class="disclaimer"><div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنبيه طبي</div><p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً.</p></div><button class="btn btn-gold" id="btn-register" onclick="doRegister()"><i class="fas fa-user-plus"></i> إنشاء حساب</button></div>
   </div>
 </div>
 
@@ -228,7 +242,7 @@ async function doLogin() {
 
 async function doRegister() {
   document.querySelectorAll('.auth-error').forEach(function(e) { e.classList.remove('show'); });
-  var n = document.getElementById('r-name').value.trim(), u = document.getElementById('r-user').value.trim().toLowerCase(), p = document.getElementById('r-pass').value, d = document.getElementById('r-dob').value, g = document.getElementById('r-gender').value, w = parseFloat(document.getElementById('r-weight').value) || 0, h = parseFloat(document.getElementById('r-height').value) || 0;
+  var n = document.getElementById('r-name').value.trim(), u = document.getElementById('r-user').value.trim().toLowerCase(), p = document.getElementById('r-pass').value, d = document.getElementById('r-dob').value, g = document.getElementById('r-gender').value, sm = document.getElementById('r-smoking').value, w = parseFloat(document.getElementById('r-weight').value) || 0, h = parseFloat(document.getElementById('r-height').value) || 0;
   if (!n) { showAuthError('reg', '❌ أدخل الاسم'); return; }
   if (!u) { showAuthError('reg', '❌ أدخل اسم المستخدم'); return; }
   if (!p || p.length < 6) { showAuthError('reg', '❌ كلمة المرور 6 أحرف على الأقل'); return; }
@@ -238,7 +252,7 @@ async function doRegister() {
   try {
     var ex = await dbGetUser(u); if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز'); return; }
     var bmi = w && h ? +(w / ((h / 100) ** 2)).toFixed(1) : 0;
-    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), created: Date.now() };
+    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), created: Date.now() };
     await dbSaveUser(u, ud); currentUser = Object.assign({}, ud); saveSession(u); selectedDiseases = [];
     playSound('success'); showToast('✅ تم إنشاء الحساب'); bootApp();
   } catch(e) { showAuthError('reg', '❌ خطأ في الإنشاء'); }
@@ -391,7 +405,9 @@ var MEDICAL_ADVICE = {
   allergy: { title: '🌸 الحساسية', cls: 'allergy', tips: ['تجنب الدجاج والألبان السائلة تماماً (أقوى مسببات التحسس).', 'التركيز على اللحوم الحمراء الصافية كمصدر آمن للبروتين.', 'زيت الزيتون يعمل كمضاد هيستامين طبيعي بالجسم.', 'إراحة الجهاز الهضمي بالصيام يقلل من الارتكاسات المناعية.', 'الابتعاد عن الخضروات النيئة التي قد تحمل مسببات حساسية.'] },
   chemo: { title: '⚕️ الكيماوي', cls: 'chemo', tips: ['الصيام المتقطع قبل الجرعة يقلل الأعراض الجانبية والغثيان.', 'تناول وجبات غنية بالبروتين (لحم/سمك) لرفع كفاءة المناعة.', 'مرق العظام (البون برو) ممتاز لإصلاح الخلايا التالفة.', 'الابتعاد الكلي والجذري عن السكر والمخبوزات لأنها تغذي الخلايا المرضية.', 'الحفاظ على ترطيب الجسم بشرب الماء المستمر.'] },
   heart: { title: '❤️ القلب', cls: 'heart', tips: ['تجنب الزيوت النباتية المهدرجة والمقليات تماماً.', 'الاعتماد الكلي على زيت الزيتون البكر في الطبخ البارد والساخن.', 'السمك البحري مرتين أسبوعياً لخفض الكوليسترول الضار.', 'تقليل كمية النشويات لتقليل الجهد والعبء على عضلة القلب.', 'المشي الخفيف المنتظم يقوي عضلة القلب بأمان.'] },
-  kidney: { title: '🫁 الكلى', cls: 'kidney', tips: ['شرب 3 لتر من الماء النقي يومياً على الأقل لمنع الحصوات.', 'ضبط وتحديد كمية البروتين (اللحوم) حسب مرحلة القصور الكلوي وإرشادات طبيبك.', 'تجنب الفواكه الغنية بالبوتاسيوم إذا كان لديك قصور متقدم.', 'الصيام المتقطع يعطي الكلى فترة راحة فسيولوجية ممتازة.', 'تقليل الملح بشكل مدروس وتجنب المعلبات والمواد الحافظة.'] }
+  kidney: { title: '🫁 الكلى', cls: 'kidney', tips: ['شرب 3 لتر من الماء النقي يومياً على الأقل لمنع الحصوات.', 'ضبط وتحديد كمية البروتين (اللحوم) حسب مرحلة القصور الكلوي وإرشادات طبيبك.', 'تجنب الفواكه الغنية بالبوتاسيوم إذا كان لديك قصور متقدم.', 'الصيام المتقطع يعطي الكلى فترة راحة فسيولوجية ممتازة.', 'تقليل الملح بشكل مدروس وتجنب المعلبات والمواد الحافظة.'] },
+  smoker_male: { title: '🚬 نصائح طبية للمدخن', cls: 'heart', tips: ['التدخين مع القهوة الصباحية أخطر عادة: النيكوتين والكافيين معاً يرفعان ضربات القلب والضغط بسرعة.', 'التدخين يقلل التحمل والأكسجين الواصل للعضلات حتى لو كنت بصحة جيدة ظاهرياً.', 'التدخين يؤثر تدريجياً على الدورة الدموية والهرمونات الذكورية مع الوقت.', 'لا تدخن مباشرة بعد الأكل؛ امتصاص النيكوتين يكون أعلى بعد الوجبات.', 'حاول تأخير أول سيجارة صباحاً 10 دقائق يومياً — من أنجح الطرق السلوكية.', 'اشرب ماء بكثرة لأن التدخين يزيد الجفاف والإجهاد التأكسدي.', 'السعال الصباحي ببلغم يومي ليس طبيعياً — بل علامة تهيج مزمن للشعب الهوائية.', 'لا تجمع بين التدخين والسهر وقلة النوم — الثلاثي يضاعف خطر أمراض القلب.', 'اعمل فحص ضغط وسكر ووظائف رئة مرة سنوياً على الأقل.', 'خلال 20 دقيقة من آخر سيجارة يبدأ جسمك في التحسن — الإقلاع الكامل هو الأفضل.'] },
+  smoker_female: { title: '🚬 نصائح طبية للمدخنة', cls: 'allergy', tips: ['التدخين يؤثر على نضارة البشرة والكولاجين أسرع من الرجال مما يسرع ظهور التجاعيد.', 'استخدام حبوب منع الحمل مع التدخين يرفع مخاطر الجلطات بشكل ملحوظ خاصة بعد 35.', 'التدخين قد يسبب اضطراباً في الهرمونات والدورة الشهرية عند بعض النساء.', 'الشعر والأظافر يتأثران بسبب ضعف وصول الأكسجين والعناصر الغذائية.', 'التدخين قبل الحمل أو أثناءه يؤثر على الخصوبة وصحة الجنين.', 'لا تدخني داخل أماكن مغلقة مع أطفال — التدخين السلبي يضرهم بشدة.', 'استبدال السيجارة بمشروب دافئ أو علكة خالية من السكر يقلل الرغبة العصبية.', 'إذا كان التدخين مرتبطاً بالتوتر فابحثي عن بديل حقيقي كالمشي أو الكتابة.', 'اهتمي بفيتامين C والتغذية الجيدة لأن التدخين يستهلك مضادات الأكسدة بسرعة.', 'أي ضيق نفس متكرر أو ألم صدر أو كحة مستمرة يحتاج تقييماً طبياً مبكراً.'] }
 };
 
 function buildMedicalAlerts() {
@@ -399,6 +415,7 @@ function buildMedicalAlerts() {
   var u = currentUser || {};
   var d = u.diseases || [];
   var bmi = u.bmi || 0;
+  var smoking = u.smoking || '';
   var html = '';
 
   // 1) إرساء النصائح بناءً على مؤشر كتلة الجسم (BMI)
@@ -424,6 +441,21 @@ function buildMedicalAlerts() {
         html += '<div class="alert-card ' + a.cls + '"><div class="alert-title">' + a.title + '</div><ul class="alert-tips">' + a.tips.map(function(t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>';
       }
     });
+  }
+
+  // نصائح التدخين
+  if (smoking === 'smoker_male' || smoking === 'smoker_female') {
+    var sm = MEDICAL_ADVICE[smoking];
+    if (sm) {
+      html += '<div class="alert-card ' + sm.cls + '"><div class="alert-title">' + sm.title + '</div>';
+      html += '<ul class="alert-tips">' + sm.tips.map(function(t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
+      // نصائح مشتركة
+      html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)"><div style="font-size:.78rem;font-weight:800;color:var(--gold2);margin-bottom:6px">💡 نصائح مشتركة للمدخنين:</div>';
+      html += '<ul class="alert-tips"><li>تقليل عدد السجائر خطوة ممتازة، لكن الإقلاع الكامل هو الأفضل صحياً.</li><li>خلال 20 دقيقة من آخر سيجارة يبدأ الجسم في التحسن تدريجياً.</li><li>بعد عدة أسابيع من الإقلاع يتحسن التنفس والدورة الدموية بشكل واضح.</li><li>الدعم النفسي من الأسرة والأصدقاء يزيد فرص النجاح بشكل كبير.</li><li>بدائل النيكوتين (اللصقات أو العلكة) قد تساعد تحت إشراف طبيب أو صيدلي.</li></ul></div>';
+      html += '</div>';
+    }
+  } else if (smoking === 'non_smoker') {
+    html += '<div class="alert-card ok"><div class="alert-title">✅ غير مدخن — ميزة صحية كبيرة!</div><ul class="alert-tips"><li>استمر في البعد عن التدخين للحفاظ على صحة رئتيك وقلبك.</li><li>تجنب التدخين السلبي (الجلوس قرب المدخنين) قدر الإمكان.</li></ul></div>';
   }
   
   c.innerHTML = html || '<div class="alert-card ok"><div class="alert-title">✅ أنت بصحة جيدة</div></div>';
@@ -1167,6 +1199,108 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('DOMContentLoaded', function() {
   setTimeout(autoLogin, 1000);
 });
+</script>
+
+<!-- PWA Install Banner -->
+<div id="pwa-banner">
+  <div class="pwa-icon">🌿</div>
+  <div class="pwa-text">
+    <div class="pwa-title">ثبّت تطبيق طيبات</div>
+    <div class="pwa-sub">وصول سريع من شاشتك الرئيسية بدون متصفح</div>
+  </div>
+  <div class="pwa-actions">
+    <button class="pwa-install-btn" id="pwa-install-btn" onclick="pwaTriggerInstall()">تثبيت</button>
+    <button class="pwa-dismiss-btn" onclick="pwaDismiss()">لاحقاً</button>
+  </div>
+</div>
+<div class="pwa-ios-hint" id="pwa-ios-hint">
+  📲 لتثبيت التطبيق على iOS:<br>
+  اضغط <strong>مشاركة</strong> <span style="font-size:1rem">⎙</span> ثم اختر<br>
+  <strong>"إضافة إلى الشاشة الرئيسية"</strong>
+  <br><button onclick="document.getElementById('pwa-ios-hint').classList.remove('show')" style="margin-top:10px;background:rgba(212,175,55,.2);border:1px solid rgba(212,175,55,.4);color:#d4af37;border-radius:8px;padding:5px 16px;font-family:'Tajawal',sans-serif;font-size:.78rem;cursor:pointer">حسناً</button>
+</div>
+<script>
+/* ══════════════════════════════════════════════════════════
+   PWA Install Banner
+   ══════════════════════════════════════════════════════════ */
+(function() {
+  var deferredPrompt = null;
+  var DISMISS_KEY = 'pwa_banner_dismissed';
+  var INSTALL_KEY = 'pwa_installed';
+  var banner = null;
+
+  function isIOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  }
+  function isInStandaloneMode() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function isDismissed() {
+    var ts = localStorage.getItem(DISMISS_KEY);
+    if (!ts) return false;
+    // show again after 3 days
+    return (Date.now() - parseInt(ts)) < 3 * 24 * 60 * 60 * 1000;
+  }
+
+  window.pwaTriggerInstall = function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(r) {
+        if (r.outcome === 'accepted') {
+          localStorage.setItem(INSTALL_KEY, '1');
+          pwaDismissPermanent();
+        }
+        deferredPrompt = null;
+      });
+    } else if (isIOS()) {
+      document.getElementById('pwa-ios-hint').classList.add('show');
+      document.getElementById('pwa-banner').classList.remove('show');
+    }
+  };
+
+  window.pwaDismiss = function() {
+    localStorage.setItem(DISMISS_KEY, Date.now().toString());
+    var b = document.getElementById('pwa-banner');
+    if (b) b.classList.remove('show');
+  };
+
+  function pwaDismissPermanent() {
+    var b = document.getElementById('pwa-banner');
+    if (b) b.classList.remove('show');
+  }
+
+  // Listen for beforeinstallprompt (Android/Chrome)
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isInStandaloneMode() && !isDismissed() && !localStorage.getItem(INSTALL_KEY)) {
+      setTimeout(function() {
+        var b = document.getElementById('pwa-banner');
+        if (b) b.classList.add('show');
+      }, 2500);
+    }
+  });
+
+  // iOS detection
+  window.addEventListener('DOMContentLoaded', function() {
+    if (isIOS() && !isInStandaloneMode() && !isDismissed()) {
+      setTimeout(function() {
+        var b = document.getElementById('pwa-banner');
+        if (b) {
+          document.getElementById('pwa-install-btn').textContent = 'كيفية التثبيت';
+          b.classList.add('show');
+        }
+      }, 2500);
+    }
+  });
+
+  // Hide if already installed
+  window.addEventListener('appinstalled', function() {
+    localStorage.setItem(INSTALL_KEY, '1');
+    var b = document.getElementById('pwa-banner');
+    if (b) b.classList.remove('show');
+  });
+})();
 </script>
 </body>
 </html>
