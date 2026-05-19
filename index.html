@@ -171,13 +171,28 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .btn{width:100%;border:none;border-radius:14px;padding:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;box-shadow:0 4px 20px rgba(200,150,12,.4)}
 .btn-gold:disabled{opacity:.6;cursor:not-allowed}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:rgba(5,14,31,.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:none;z-index:1000}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:rgba(5,14,31,.98);backdrop-filter:blur(20px);border-top:1px solid rgba(200,150,12,.2);display:none;z-index:1000;flex-direction:row;align-items:stretch;padding:8px 0}
 .bottom-nav.show{display:flex}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--txt3);transition:all .3s;position:relative}
-.nav-item.act{color:var(--gold2)}
-.nav-item.act::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:36px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:0 0 4px 4px}
-.nav-item i{font-size:1.3rem}
-.nav-item span{font-size:.6rem;font-weight:700}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--txt3);transition:all .3s ease;position:relative;padding:8px 4px}
+.nav-item:hover{color:var(--txt2);transform:translateY(-2px)}
+.nav-item.act{color:var(--txt)}
+.nav-item.act .nav-icon-wrapper{transform:scale(1.15);box-shadow:0 8px 20px rgba(200,150,12,.4)}
+.nav-item.act::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:0 0 6px 6px;box-shadow:0 4px 12px rgba(200,150,12,.3)}
+.nav-icon-wrapper{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:14px;font-size:1.4rem;transition:all .3s ease;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.15)}
+.nav-icon-wrapper:hover{background:rgba(200,150,12,.1);border-color:rgba(200,150,12,.3)}
+.home-gradient{background:linear-gradient(135deg,rgba(13,71,161,.2),rgba(33,150,243,.1));border:1px solid rgba(33,150,243,.2)}
+.nav-item.act .home-gradient{background:linear-gradient(135deg,#0d47a1,#2196f3);color:#fff;box-shadow:0 6px 20px rgba(33,150,243,.3)}
+.food-gradient{background:linear-gradient(135deg,rgba(26,122,46,.2),rgba(46,201,81,.1));border:1px solid rgba(46,201,81,.2)}
+.nav-item.act .food-gradient{background:linear-gradient(135deg,#1a7a2e,#2ec951);color:#fff;box-shadow:0 6px 20px rgba(46,201,81,.3)}
+.experience-gradient{background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(255,193,7,.1));border:1px solid rgba(255,193,7,.2)}
+.nav-item.act .experience-gradient{background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;box-shadow:0 6px 20px rgba(255,193,7,.3)}
+.ai-gradient{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(168,85,247,.1));border:1px solid rgba(168,85,247,.2)}
+.nav-item.act .ai-gradient{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 6px 20px rgba(168,85,247,.3)}
+.fast-gradient{background:linear-gradient(135deg,rgba(229,57,53,.2),rgba(244,67,54,.1));border:1px solid rgba(244,67,54,.2)}
+.nav-item.act .fast-gradient{background:linear-gradient(135deg,#e53935,#f44336);color:#fff;box-shadow:0 6px 20px rgba(244,67,54,.3)}
+.profile-gradient{background:linear-gradient(135deg,rgba(156,39,176,.2),rgba(186,104,200,.1));border:1px solid rgba(186,104,200,.2)}
+.nav-item.act .profile-gradient{background:linear-gradient(135deg,#9c27b0,#ba68c8);color:#fff;box-shadow:0 6px 20px rgba(186,104,200,.3)}
+.nav-label{font-size:.65rem;font-weight:700;color:inherit;text-align:center;letter-spacing:.5px}
 .app-header{background:linear-gradient(180deg,rgba(10,22,40,.98),transparent);padding:14px 16px 10px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);border-bottom:1px solid rgba(30,53,96,.4)}
 .header-row{display:flex;align-items:center;justify-content:space-between}
 .header-title{font-family:'Amiri',serif;font-size:1.3rem;background:linear-gradient(135deg,var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -483,14 +498,44 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ شريط التنقل ══ -->
+<!-- ══ شريط التنقل المحسّن ══ -->
 <nav class="bottom-nav" id="bottom-nav">
-  <div class="nav-item act" id="nav-home" onclick="goPage('home')"><i class="fas fa-home"></i><span>الرئيسية</span></div>
-  <div class="nav-item" id="nav-food" onclick="goPage('food')"><i class="fas fa-utensils"></i><span>الأطعمة</span></div>
-  <div class="nav-item" id="nav-experiences" onclick="goPage('experiences')"><i class="fas fa-heart"></i><span>التجارب</span></div>
-  <div class="nav-item" id="nav-ai" onclick="goPage('ai')"><i class="fas fa-robot"></i><span>AI طبيبك</span></div>
-  <div class="nav-item" id="nav-fast" onclick="goPage('fast')"><i class="fas fa-clock"></i><span>الصيام</span></div>
-  <div class="nav-item" id="nav-profile" onclick="goPage('profile')"><i class="fas fa-user"></i><span>حسابي</span></div>
+  <div class="nav-item act" id="nav-home" onclick="goPage('home')" title="الصفحة الرئيسية">
+    <div class="nav-icon-wrapper home-gradient">
+      <i class="fas fa-house-user"></i>
+    </div>
+    <span class="nav-label">الرئيسية</span>
+  </div>
+  <div class="nav-item" id="nav-food" onclick="goPage('food')" title="قائمة الأطعمة">
+    <div class="nav-icon-wrapper food-gradient">
+      <i class="fas fa-apple-alt"></i>
+    </div>
+    <span class="nav-label">الأطعمة</span>
+  </div>
+  <div class="nav-item" id="nav-experiences" onclick="goPage('experiences')" title="تجارب المستخدمين">
+    <div class="nav-icon-wrapper experience-gradient">
+      <i class="fas fa-star"></i>
+    </div>
+    <span class="nav-label">التجارب</span>
+  </div>
+  <div class="nav-item" id="nav-ai" onclick="goPage('ai')" title="طبيبك الذكي">
+    <div class="nav-icon-wrapper ai-gradient">
+      <i class="fas fa-brain"></i>
+    </div>
+    <span class="nav-label">AI الذكي</span>
+  </div>
+  <div class="nav-item" id="nav-fast" onclick="goPage('fast')" title="متابعة الصيام">
+    <div class="nav-icon-wrapper fast-gradient">
+      <i class="fas fa-hourglass-end"></i>
+    </div>
+    <span class="nav-label">الصيام</span>
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="goPage('profile')" title="الملف الشخصي">
+    <div class="nav-icon-wrapper profile-gradient">
+      <i class="fas fa-user-circle"></i>
+    </div>
+    <span class="nav-label">حسابي</span>
+  </div>
 </nav>
 
 <!-- ══ الرئيسية ══ -->
