@@ -513,7 +513,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
   <div class="ai-context-card"><div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div><div class="ai-ctx-body" id="ai-user-context">جاري تحميل بياناتك...</div></div>
   <div class="user-diseases-bar" id="ai-dis-bar"></div>
-  <div class="ai-api-counter"><i class="fas fa-server"></i> Pollinations (12 نموذج) + OpenRouter fallback تلقائي عند التأخر</div>
+  <div class="ai-api-counter"><i class="fas fa-server"></i> OpenRouter أولاً ← Pollinations (12 نموذج) ← رد محلي تلقائي</div>
   <div class="quick-prompts" id="quick-prompts-bar"></div>
   <div class="ai-chat-wrap" id="ai-chat-wrap"></div>
   <div class="ai-input-area">
@@ -1205,26 +1205,98 @@ function buildHomeDisTags() {
    Food Data
 ══════════════════════════════════════════════════════════ */
 var FOOD_DATA = [
-  { id:1, emoji:'🥩', name:'اللحوم الحمراء', cat:'بروتين', status:'allowed', desc:'أفضل مصادر البروتين الصافي وأكثرها أماناً.', reason:'تُعتبر الركيزة الأساسية. تهضم بسلاسة ولا تسبب ارتكاسات مناعية أو التهابات.' },
-  { id:2, emoji:'🐟', name:'السمك البحري', cat:'بروتين', status:'allowed', desc:'غني بالأوميجا 3 (يُفضل مشوياً).', reason:'مصدر ممتاز للأحماض الدهنية المضادة للالتهاب. يعزز صحة القلب والدماغ.' },
-  { id:3, emoji:'🐔', name:'الدجاج', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً بجميع أنواعه.', reason:'يرفع معدلات الالتهاب بشدة ويدمر الميكروبيوم بسبب الهرمونات والمضادات الحيوية.' },
-  { id:4, emoji:'🍚', name:'الأرز', cat:'نشويات', status:'allowed', desc:'نشويات نظيفة وآمنة بجميع أنواعه.', reason:'مصدر طاقة نظيف خالٍ من الجلوتين. يعطي طاقة مستدامة ولا يسبب ارتشاح الأمعاء.' },
-  { id:5, emoji:'🥖', name:'الخبز الأبيض', cat:'نشويات', status:'forbidden', desc:'ممنوع تماماً بجميع أشكاله.', reason:'يحتوي على الجلوتين المهيج لجدار الأمعاء ويرفع سكر الدم بسرعة جنونية.' },
-  { id:6, emoji:'🫒', name:'زيت الزيتون', cat:'دهون', status:'allowed', desc:'البكر الممتاز، الدهن الأول في الطيبات.', reason:'دهون صحية مضادة للأكسدة والالتهابات. يصلح الخلايا التالفة ويحسن الهضم.' },
-  { id:7, emoji:'🥛', name:'الألبان السائلة', cat:'ألبان', status:'forbidden', desc:'حليب، زبادي، لبن رائب (ممنوعة كلياً).', reason:'تحتوي على اللاكتوز الذي يُغذي الفطريات، والكازين الصعب الهضم.' },
-  { id:8, emoji:'🧀', name:'الجبن المعتق', cat:'ألبان', status:'allowed', desc:'المطبوخ والمعتق فقط (رومي، شيدر).', reason:'التخمير يكسر بروتينات الحليب ويقضي على اللاكتوز، مما يجعله سهل الهضم.' },
-  { id:9, emoji:'🍲', name:'الخضروات المطبوخة', cat:'خضروات', status:'allowed', desc:'مسبكة ومطبوخة جيداً (أساسي جداً).', reason:'الطبخ الجيد يكسر الألياف القاسية ويدمر السموم النباتية، يريح القولون تماماً.' },
-  { id:10, emoji:'🥗', name:'الخضروات النيئة', cat:'خضروات', status:'forbidden', desc:'السلطات والخضار الطازج (ممنوعة).', reason:'الألياف النيئة تخدش جدار الأمعاء وتسبب الغازات والانتفاخ وعسر الهضم.' },
-  { id:11, emoji:'🍇', name:'الفواكه', cat:'فواكه', status:'allowed', desc:'مسموحة باعتدال شديد (حبة إلى حبتين).', reason:'مصدر طبيعي للفيتامينات. تُؤكل بعد الوجبة الدسمة لا على معدة فارغة.' },
-  { id:12, emoji:'🥤', name:'الغازيات', cat:'مشروبات', status:'forbidden', desc:'ممنوعة كلياً (بما فيها الدايت).', reason:'تدمر الميكروبيوم وتغير درجة حموضة المعدة وتسبب هشاشة العظام.' },
-  { id:13, emoji:'🥚', name:'البيض', cat:'بروتين', status:'forbidden', desc:'ممنوع في نظام الطيبات.', reason:'في نظام الطيبات البيض ممنوع. يمكن الحصول على البروتين من اللحوم والأسماك.' },
-  { id:14, emoji:'🦐', name:'الجمبري والمأكولات البحرية', cat:'بروتين', status:'allowed', desc:'جمبري، كالماري، محار (مسموح كلياً).', reason:'مصادر ممتازة للبروتين غنية بالزنك والسيلينيوم وأوميجا 3.' },
-  { id:15, emoji:'🥔', name:'البطاطس', cat:'نشويات', status:'allowed', desc:'مسلوقة أو مشوية (ممنوع القلي بالزيوت المكررة).', reason:'نشويات طبيعية خالية من الجلوتين. غنية بالبوتاسيوم والفيتامينات.' },
-  { id:16, emoji:'☕', name:'القهوة السوداء', cat:'مشروبات', status:'allowed', desc:'بدون سكر أو حليب (مسموح بلا قيود).', reason:'غنية بمضادات الأكسدة. تحسن الطاقة والتركيز وتدعم الصيام المتقطع.' },
-  { id:17, emoji:'🍵', name:'الشاي الأخضر والأسود', cat:'مشروبات', status:'allowed', desc:'مسموح بدون سكر أو حليب.', reason:'مليء بمضادات الأكسدة والبوليفينولات. يحسن الهضم والدورة الدموية.' },
-  { id:18, emoji:'💧', name:'الماء', cat:'مشروبات', status:'allowed', desc:'الماء النقي هو الأساس.', reason:'ضروري لكل وظائف الجسم. يحسن الهضم وينظف الجسم من السموم.' },
-  { id:19, emoji:'🍯', name:'السكر والحلويات', cat:'منتجات', status:'forbidden', desc:'السكر والحلويات والشوكولاتة (ممنوعة كلياً).', reason:'ترفع الإنسولين مهولاً، تدمر البنكرياس، وتسبب الإدمان والالتهابات المزمنة.' },
-  { id:20, emoji:'🍔', name:'الوجبات السريعة', cat:'منتجات', status:'forbidden', desc:'البيتزا والمعجنات والشيبسي (ممنوعة كلياً).', reason:'مليئة بالزيوت المكررة والمواد الحافظة والجلوتين المهيج. قيمتها الغذائية سلبية.' }
+  /* ══ يومياً ══ */
+  { id:1,  emoji:'🍚', name:'الأرز', cat:'نشويات', status:'allowed', freq:'daily', desc:'مسموح يومياً بجميع أنواعه.', reason:'مصدر طاقة نظيف خالٍ من الجلوتين. لا يسبب ارتشاح الأمعاء.' },
+  { id:2,  emoji:'🥔', name:'البطاطا', cat:'نشويات', status:'allowed', freq:'daily', desc:'مسلوقة أو مشوية — مسموح يومياً.', reason:'نشويات طبيعية خالية من الجلوتين، غنية بالبوتاسيوم والفيتامينات.' },
+  { id:3,  emoji:'🍠', name:'البطاطا الحلوة', cat:'نشويات', status:'allowed', freq:'daily', desc:'مسموح يومياً.', reason:'غنية بالبيتا كاروتين ومضادات الأكسدة. طاقة مستدامة ومضادة للالتهاب.' },
+  { id:4,  emoji:'🫒', name:'زيت الزيتون', cat:'دهون', status:'allowed', freq:'daily', desc:'البكر الممتاز — الدهن الأول في الطيبات.', reason:'دهون صحية مضادة للأكسدة والالتهابات. يصلح الخلايا التالفة.' },
+  { id:5,  emoji:'🧈', name:'السمن البلدي الطبيعي', cat:'دهون', status:'allowed', freq:'daily', desc:'مسموح يومياً.', reason:'دهون طبيعية مشبعة صحية. لا يحتوي على زيوت مهدرجة.' },
+  { id:6,  emoji:'🧈', name:'الزبدة البلدي', cat:'دهون', status:'allowed', freq:'daily', desc:'مسموح يومياً.', reason:'مصدر طبيعي للدهون الصحية ودعم امتصاص الفيتامينات الذائبة.' },
+  { id:7,  emoji:'🍯', name:'العسل الطبيعي', cat:'محليات', status:'allowed', freq:'daily', desc:'مسموح يومياً باعتدال.', reason:'مضاد حيوي طبيعي، يغذي البكتيريا النافعة ويقوي المناعة.' },
+  { id:8,  emoji:'🌴', name:'التمر', cat:'فواكه', status:'allowed', freq:'daily', desc:'مسموح يومياً باعتدال.', reason:'طاقة سريعة طبيعية، يحتوي على مغنيسيوم وبوتاسيوم وألياف.' },
+  { id:9,  emoji:'☕', name:'القهوة التركية', cat:'مشروبات', status:'allowed', freq:'daily', desc:'مسموح يومياً بدون حليب.', reason:'غنية بمضادات الأكسدة. تدعم الصيام المتقطع وتحسن التركيز.' },
+  { id:10, emoji:'💧', name:'الماء الدافئ صباحاً', cat:'مشروبات', status:'allowed', freq:'daily', desc:'مسموح يومياً — مستحسن جداً.', reason:'يحفز الجهاز الهضمي ويساعد على تنشيط الكبد صباحاً.' },
+  { id:11, emoji:'🍬', name:'السكر الطبيعي باعتدال', cat:'محليات', status:'allowed', freq:'daily', desc:'مسموح يومياً بكميات خفيفة جداً.', reason:'مسموح به بحدود، الإفراط يرفع الإنسولين.' },
+  { id:12, emoji:'🥛', name:'القشطة الطبيعية', cat:'ألبان', status:'allowed', freq:'daily', desc:'مسموح يومياً.', reason:'دهون طبيعية مشبعة، لا تحتوي على لاكتوز يُغذي الفطريات بنفس قدر الحليب.' },
+  { id:13, emoji:'🍫', name:'النوتيلا', cat:'محليات', status:'allowed', freq:'twice', desc:'مسموح صباحاً ومساءً فقط.', reason:'مسموح بحدود الاعتدال مرتين يومياً فقط.' },
+  /* ══ أسبوعياً ══ */
+  { id:14, emoji:'🐐', name:'لحم الماعز', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'بروتين طبيعي نظيف، دهون صحية، أقل التهاباً من الدجاج التجاري.' },
+  { id:15, emoji:'🥩', name:'لحم البتلو (العجل)', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'غني بالبروتين والحديد. يُعتبر الركيزة الأساسية في النظام.' },
+  { id:16, emoji:'🐑', name:'لحم الضأن', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'لحوم حمراء طبيعية غنية بالحديد والزنك وأحماض أمينية ضرورية.' },
+  { id:17, emoji:'🐪', name:'لحم الإبل', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'يُعدّ طعاماً طبياً في التراث. دهونه مفيدة وبروتينه سهل الهضم.' },
+  { id:18, emoji:'🐇', name:'الأرانب', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'بروتين خفيف ونظيف، منخفض الدهون الضارة ومناسب لكثير من الحالات.' },
+  { id:19, emoji:'🫀', name:'الكبدة', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'كثافة غذائية عالية جداً. غنية بالحديد والفيتامينات B.' },
+  { id:20, emoji:'🐟', name:'السمك البحري الطبيعي', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً (يُفضل مشوياً).', reason:'أوميجا 3 مضادة للالتهاب. يعزز القلب والدماغ والمناعة.' },
+  { id:21, emoji:'🐟', name:'السردين', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'من أغنى الأسماك بالأوميجا 3 والكالسيوم والفيتامين D.' },
+  { id:22, emoji:'🕊️', name:'الحمام', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'بروتين طبيعي نظيف، يُعتبر بديلاً صحياً عن الدجاج التجاري.' },
+  { id:23, emoji:'🦅', name:'السمان', cat:'بروتين', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'بروتين طبيعي عالي الجودة، يختلف في تربيته عن الدجاج الصناعي.' },
+  { id:24, emoji:'🍎', name:'التفاح المقشر', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً (مقشراً).', reason:'التقشير يزيل الألياف القاسية. غني بالبكتين وفيتامين C.' },
+  { id:25, emoji:'🍎', name:'الرمان', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'مضاد أكسدة قوي جداً. يحارب الالتهابات ويدعم القلب والمناعة.' },
+  { id:26, emoji:'🍇', name:'العنب', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً باعتدال.', reason:'غني بالريسفيراترول المضاد للأكسدة والالتهاب.' },
+  { id:27, emoji:'🍓', name:'الفراولة', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'منخفضة السكر مقارنة بالفواكه الأخرى. غنية بفيتامين C ومضادات الأكسدة.' },
+  { id:28, emoji:'🍑', name:'التين', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'غني بالكالسيوم والبوتاسيوم والألياف الطبيعية.' },
+  { id:29, emoji:'🍒', name:'الكرز', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'مضاد التهاب قوي. يحتوي على ميلاتونين طبيعي يحسن النوم.' },
+  { id:30, emoji:'🍑', name:'المشمش', cat:'فواكه', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'غني بالبيتا كاروتين وفيتامين A. يدعم الجهاز المناعي.' },
+  { id:31, emoji:'🌰', name:'المكسرات', cat:'دهون', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً — نيئة وغير مملحة.', reason:'دهون صحية غير مشبعة، بروتين نباتي، ومغنيسيوم مفيد للخلايا.' },
+  { id:32, emoji:'🍵', name:'الشاي الأخضر', cat:'مشروبات', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً بدون سكر.', reason:'غني بمضادات الأكسدة EGCG. يحسن الهضم ويحرق الدهون.' },
+  { id:33, emoji:'🌿', name:'الزعتر', cat:'أعشاب', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'مضاد ميكروبي طبيعي. يدعم المناعة ويحسن الجهاز التنفسي.' },
+  { id:34, emoji:'🌿', name:'الأعشاب الطبيعية', cat:'أعشاب', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'أدوية طبيعية تدعم وظائف الجسم المختلفة بدون آثار جانبية.' },
+  { id:35, emoji:'🧀', name:'جبنة الجودة (رومي)', cat:'ألبان', status:'allowed', freq:'weekly', desc:'مسموحة أسبوعياً — معتقة فقط.', reason:'التعتيق يكسر اللاكتوز ويجعل البروتين سهل الهضم.' },
+  { id:36, emoji:'🧀', name:'جبنة الشيدر', cat:'ألبان', status:'allowed', freq:'weekly', desc:'مسموحة أسبوعياً.', reason:'جبن معتق غني بالكالسيوم والبروتين، منخفض اللاكتوز نسبياً.' },
+  { id:37, emoji:'🧀', name:'جبنة الموتزاريلا', cat:'ألبان', status:'allowed', freq:'weekly', desc:'مسموحة أسبوعياً (طازجة مطبوخة).', reason:'مسموح عند طهيها. الحرارة تُغير تركيبها البروتيني.' },
+  { id:38, emoji:'🧀', name:'جبنة الفلمنك', cat:'ألبان', status:'allowed', freq:'weekly', desc:'مسموحة أسبوعياً.', reason:'جبن شبه معتق، منخفض اللاكتوز، غني بالكالسيوم.' },
+  { id:39, emoji:'🌿', name:'الطحينة الطبيعية', cat:'دهون', status:'allowed', freq:'weekly', desc:'مسموحة أسبوعياً.', reason:'غنية بالكالسيوم والمغنيسيوم والدهون الصحية. تدعم صحة العظام.' },
+  { id:40, emoji:'💎', name:'اللبان الذكر', cat:'أعشاب', status:'allowed', freq:'weekly', desc:'مسموح أسبوعياً.', reason:'مضاد التهاب قوي جداً. يدعم صحة الكبد والمفاصل والأمعاء.' },
+  { id:41, emoji:'🪨', name:'المستكة', cat:'أعشاب', status:'allowed', freq:'weekly', desc:'مسموحة أسبوعياً.', reason:'تحمي جدار المعدة وتعالج الهيليكوباكتر. مضادة للالتهاب والجراثيم.' },
+  /* ══ أحياناً ══ */
+  { id:42, emoji:'🍫', name:'الشوكولاتة الداكنة', cat:'محليات', status:'allowed', freq:'sometimes', desc:'مسموحة أحياناً (70%+ كاكاو).', reason:'مضاد أكسدة قوي. يحفز هرمونات السعادة ويدعم القلب بكميات معتدلة.' },
+  { id:43, emoji:'🫕', name:'المحشي بالأرز واللحم', cat:'نشويات', status:'allowed', freq:'sometimes', desc:'مسموح أحياناً.', reason:'مجمع بين الأرز واللحم وهما من المسموحات. يُحضر بزيت زيتون فقط.' },
+  { id:44, emoji:'🍓', name:'المربى الطبيعية', cat:'محليات', status:'allowed', freq:'sometimes', desc:'مسموحة أحياناً — بدون مواد حافظة.', reason:'طبيعية بدون محليات صناعية. كميات صغيرة مقبولة.' },
+  { id:45, emoji:'🍈', name:'الجوافة', cat:'فواكه', status:'allowed', freq:'sometimes', desc:'مسموحة أحياناً.', reason:'غنية بفيتامين C والألياف. مسموح بكميات محدودة.' },
+  /* ══ ممنوع ══ */
+  { id:46, emoji:'🥚', name:'البيض بكل أنواعه', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً في نظام الطيبات.', reason:'في نظام الطيبات البيض ممنوع بكافة أنواعه. البروتين يُؤخذ من اللحوم والأسماك.' },
+  { id:47, emoji:'🐔', name:'الدجاج والفراخ', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً بجميع أنواعه.', reason:'يرفع الالتهاب بشدة بسبب الهرمونات والمضادات الحيوية في التربية الصناعية.' },
+  { id:48, emoji:'🦆', name:'البط والأوز', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً.', reason:'مصنف ضمن الدواجن التجارية. نفس أسباب منع الدجاج.' },
+  { id:49, emoji:'🦃', name:'الديك الرومي', cat:'بروتين', status:'forbidden', desc:'ممنوع تماماً.', reason:'داجنة تجارية ترتبط بنفس إشكاليات الدجاج من مضادات حيوية وهرمونات.' },
+  { id:50, emoji:'🥛', name:'اللبن بكل أنواعه', cat:'ألبان', status:'forbidden', desc:'الحليب السائل ممنوع كلياً.', reason:'اللاكتوز يغذي الفطريات الضارة، والكازين صعب الهضم ومسبب للالتهاب.' },
+  { id:51, emoji:'🥛', name:'الزبادي', cat:'ألبان', status:'forbidden', desc:'ممنوع تماماً.', reason:'رغم التخمير يبقى اللاكتوز والكازين مصدر إشكال في النظام.' },
+  { id:52, emoji:'🥛', name:'اللبنة', cat:'ألبان', status:'forbidden', desc:'ممنوعة تماماً.', reason:'مصنوعة من الزبادي — نفس أسباب المنع.' },
+  { id:53, emoji:'🥛', name:'اللبن البودرة', cat:'ألبان', status:'forbidden', desc:'ممنوع تماماً.', reason:'حليب مكثف صناعياً ومعالج. أشد ضرراً من الحليب الطازج.' },
+  { id:54, emoji:'🧀', name:'الجبنة البيضاء', cat:'ألبان', status:'forbidden', desc:'ممنوعة تماماً.', reason:'جبن طازج غير معتق. يحتوي على لاكتوز وكازين بصورة كاملة.' },
+  { id:55, emoji:'🧀', name:'الجبن القريش', cat:'ألبان', status:'forbidden', desc:'ممنوع تماماً.', reason:'جبن طازج غير معتق يحتوي على كميات عالية من اللاكتوز.' },
+  { id:56, emoji:'🧀', name:'الجبن الكريمي', cat:'ألبان', status:'forbidden', desc:'ممنوع تماماً.', reason:'جبن معالج صناعياً يحتوي على إضافات ومستحلبات ضارة.' },
+  { id:57, emoji:'🌾', name:'الدقيق الأبيض', cat:'نشويات', status:'forbidden', desc:'ممنوع تماماً بجميع الأشكال.', reason:'جلوتين عالٍ يهيج جدار الأمعاء ويرفع الإنسولين بسرعة كبيرة.' },
+  { id:58, emoji:'🍝', name:'المكرونة', cat:'نشويات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'مصنوعة من الدقيق الأبيض المكرر. تسبب ارتشاح الأمعاء وارتفاع السكر.' },
+  { id:59, emoji:'🥖', name:'العيش البلدي والفينو والشامي', cat:'نشويات', status:'forbidden', desc:'ممنوع تماماً بجميع أنواعه.', reason:'جلوتين مركّز يهيج القولون ويسبب الانتفاخ والارتشاح المعوي.' },
+  { id:60, emoji:'🥐', name:'الكرواسون والمعجنات', cat:'نشويات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'دقيق أبيض + زيوت مهدرجة + سكر = ثلاثية الالتهاب الأسوأ.' },
+  { id:61, emoji:'🍪', name:'البسكويت والكوكيز', cat:'منتجات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'سكر ودقيق أبيض وزيوت مهدرجة. لا قيمة غذائية حقيقية.' },
+  { id:62, emoji:'🍕', name:'البيتزا', cat:'منتجات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'عجينة جلوتين + جبن طازج + صلصات معالجة = ثلاثية التهاب خطيرة.' },
+  { id:63, emoji:'🧆', name:'الكنافة والزلابية والحلويات', cat:'محليات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'سكر مكثف + دقيق أبيض + سمن صناعي. أشد أنواع الالتهاب الغذائي.' },
+  { id:64, emoji:'🥘', name:'الكسكسي', cat:'نشويات', status:'forbidden', desc:'ممنوع تماماً.', reason:'مصنوع من القمح (سميد) الغني بالجلوتين.' },
+  { id:65, emoji:'🌾', name:'الكينوا', cat:'نشويات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'رغم شهرتها الصحية، تُصنَّف ضمن الممنوعات في نظام الطيبات.' },
+  { id:66, emoji:'🍪', name:'بسكويت الشوفان والدايجستف', cat:'منتجات', status:'forbidden', desc:'ممنوع تماماً.', reason:'يحتوي على شوفان وجلوتين وسكر وزيوت مكررة.' },
+  { id:67, emoji:'🥤', name:'المياه الغازية', cat:'مشروبات', status:'forbidden', desc:'ممنوعة كلياً بما فيها الدايت.', reason:'تدمر الميكروبيوم وتغير حموضة المعدة وتسبب هشاشة العظام.' },
+  { id:68, emoji:'⚡', name:'مشروبات الطاقة', cat:'مشروبات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'سكر عالٍ ومواد منبهة اصطناعية تضغط على القلب والكبد.' },
+  { id:69, emoji:'🫖', name:'الشاي الأحمر', cat:'مشروبات', status:'forbidden', desc:'ممنوع تماماً.', reason:'يُصنف في الطيبات ضمن الممنوعات لتأثيره على امتصاص الحديد ومهيجات القولون.' },
+  { id:70, emoji:'🍺', name:'البيرة ومشروبات الشعير', cat:'مشروبات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'كحول + شعير (جلوتين) + سكر = ثلاثية التدمير للكبد والأمعاء.' },
+  { id:71, emoji:'🫘', name:'الفول', cat:'بقوليات', status:'forbidden', desc:'ممنوع تماماً.', reason:'بقوليات ثقيلة الهضم تسبب تخمراً وغازات وتهيج القولون.' },
+  { id:72, emoji:'🫘', name:'العدس', cat:'بقوليات', status:'forbidden', desc:'ممنوع تماماً.', reason:'يحتوي على حمض الفيتيك الذي يعيق امتصاص المعادن ويهيج الأمعاء.' },
+  { id:73, emoji:'🫘', name:'الحمص', cat:'بقوليات', status:'forbidden', desc:'ممنوع تماماً.', reason:'بقوليات تسبب تخمراً وانتفاخاً وتعيق هضم البروتين.' },
+  { id:74, emoji:'🫘', name:'الفاصوليا', cat:'بقوليات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'عالية الليكتينات التي تهيج جدار الأمعاء وتسبب الارتشاح المعوي.' },
+  { id:75, emoji:'🥬', name:'الجرجير والخس والبقدونس', cat:'خضروات', status:'forbidden', desc:'ممنوعة (نيئة).', reason:'الألياف النيئة القاسية تهيج جدار الأمعاء وتسبب الغازات والانتفاخ.' },
+  { id:76, emoji:'🥦', name:'السبانخ والكرنب وورق العنب', cat:'خضروات', status:'forbidden', desc:'ممنوعة نيئة أو مطبوخة خاماً.', reason:'عالية الأوكسالات والمركبات المضادة للغذاء. تهيج الأمعاء وتعيق الامتصاص.' },
+  { id:77, emoji:'🥗', name:'السلطات النيئة', cat:'خضروات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'الخضار النيئة تخدش الغشاء المخاطي للأمعاء وتسبب الارتشاح المعوي.' },
+  { id:78, emoji:'🍉', name:'البطيخ والشمام', cat:'فواكه', status:'forbidden', desc:'ممنوع تماماً.', reason:'سكر فركتوز عالٍ جداً يرفع الإنسولين بشكل مفاجئ.' },
+  { id:79, emoji:'🍊', name:'البرتقال والليمون والكيوي', cat:'فواكه', status:'forbidden', desc:'ممنوعة تماماً.', reason:'حمضية عالية تهيج جدار المعدة والأمعاء وتسبب الارتداد.' },
+  { id:80, emoji:'🥑', name:'الأفوكادو', cat:'فواكه', status:'forbidden', desc:'ممنوع تماماً.', reason:'مصنف ضمن الممنوعات في نظام الطيبات رغم فوائده المعروفة.' },
+  { id:81, emoji:'🍈', name:'البابايا', cat:'فواكه', status:'forbidden', desc:'ممنوعة تماماً.', reason:'مصنفة ضمن الممنوعات في الطيبات.' },
+  { id:82, emoji:'🧅', name:'البصل والثوم النيء', cat:'خضروات', status:'forbidden', desc:'ممنوع نيئاً تماماً.', reason:'مهيج قوي للغشاء المخاطي للأمعاء عند تناوله نيئاً.' },
+  { id:83, emoji:'🥒', name:'الخيار', cat:'خضروات', status:'forbidden', desc:'ممنوع تماماً.', reason:'خضار نيء مبرّد يهيج الأمعاء ويسبب الغازات عند بعض الحالات.' },
+  { id:84, emoji:'🥒', name:'الكوسة', cat:'خضروات', status:'forbidden', desc:'ممنوعة نيئة.', reason:'تُصنف نيئاً ضمن الممنوعات لمحتواها من الألياف القاسية.' },
+  { id:85, emoji:'🥕', name:'الجزر', cat:'خضروات', status:'forbidden', desc:'ممنوع نيئاً.', reason:'ألياف صلبة نيئة تهيج القولون. مسموح فقط عند طهيه جيداً.' },
+  { id:86, emoji:'💊', name:'المكملات الصناعية', cat:'منتجات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'تحتوي على مواد رابطة وإضافات اصطناعية تحمل على الكبد وتهيج الأمعاء.' },
+  { id:87, emoji:'💊', name:'المضادات الحيوية بدون ضرورة', cat:'منتجات', status:'forbidden', desc:'ممنوعة بدون إشراف طبي.', reason:'تدمر الميكروبيوم وتقضي على البكتيريا النافعة وتضعف المناعة.' },
+  { id:88, emoji:'🌱', name:'بذور الشيا والكتان والسيليوم', cat:'منتجات', status:'forbidden', desc:'ممنوعة تماماً.', reason:'ألياف ضخمة تمتص الماء بقوة وقد تسبب انسداداً معوياً أو تهيجاً شديداً.' }
 ];
 
 var curCat = 'الكل';
@@ -1232,7 +1304,7 @@ var curCat = 'الكل';
 function buildFoodData() {
   var t = document.getElementById('food-tabs');
   if (!t) return;
-  var cats = ['الكل', 'مسموح', 'ممنوع'].concat(
+  var cats = ['الكل', 'مسموح', 'ممنوع', 'يومياً', 'أسبوعياً', 'أحياناً'].concat(
     FOOD_DATA.map(function(f) { return f.cat; }).filter(function(v, i, a) { return a.indexOf(v) === i; })
   );
   t.innerHTML = cats.map(function(x) {
@@ -1259,13 +1331,18 @@ function renderFood() {
   var data = FOOD_DATA.slice();
   if (curCat === 'مسموح') data = data.filter(function(f) { return f.status === 'allowed'; });
   else if (curCat === 'ممنوع') data = data.filter(function(f) { return f.status === 'forbidden'; });
+  else if (curCat === 'يومياً') data = data.filter(function(f) { return f.freq === 'daily' || f.freq === 'twice'; });
+  else if (curCat === 'أسبوعياً') data = data.filter(function(f) { return f.freq === 'weekly'; });
+  else if (curCat === 'أحياناً') data = data.filter(function(f) { return f.freq === 'sometimes'; });
   else if (curCat !== 'الكل') data = data.filter(function(f) { return f.cat === curCat; });
   if (q) data = data.filter(function(f) { return f.name.includes(q) || f.desc.includes(q); });
+  var freqLabel = { daily:'🟢 يومياً', weekly:'🟡 أسبوعياً', twice:'🟠 مرتان يومياً', sometimes:'🟠 أحياناً' };
   g.innerHTML = data.map(function(f) {
+    var freq = f.freq ? '<span style="font-size:.65rem;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--txt2);margin-right:4px">' + (freqLabel[f.freq]||'') + '</span>' : '';
     return '<div class="food-card ' + f.status + '">' +
       '<div class="fc-top"><div class="fc-emoji">' + f.emoji + '</div><div class="fc-info">' +
       '<div class="fc-name">' + f.name + '</div>' +
-      '<div class="fc-badge ' + f.status + '">' + (f.status === 'allowed' ? '✅ مسموح' : '🚫 ممنوع') + '</div>' +
+      '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:4px"><div class="fc-badge ' + f.status + '">' + (f.status === 'allowed' ? '✅ مسموح' : '🚫 ممنوع') + '</div>' + freq + '</div>' +
       '<div class="fc-desc">' + f.desc + '</div></div></div>' +
       '<div class="fc-expand" id="fc-exp-' + f.id + '">' +
       '<div class="fc-reason ' + (f.status === 'allowed' ? 'ok' : 'bad') + '"><strong>التفاصيل الطبية:</strong><br/>' + f.reason + '</div>' +
@@ -1591,7 +1668,7 @@ async function tryOpenRouter(modelId, sysPrompt, userMsg) {
   } catch(e) { clearTimeout(tid); return null; }
 }
 
-/* ── المحرك الرئيسي: يجرّب Pollinations 5ث — إذا فشل يتحول لـ OpenRouter ── */
+/* ── المحرك الرئيسي: OpenRouter أولاً ← Pollinations ← رد محلي ── */
 async function sendAiMessage() {
   var inp = document.getElementById('ai-msg-input');
   var txt = (inp.value || '').trim();
@@ -1604,26 +1681,10 @@ async function sendAiMessage() {
   var sysPrompt = buildUserContext();
   var reply = null, usedModel = null, usedSource = null;
 
-  /* المرحلة 1: جرّب Pollinations مع كل نموذج (timeout 5 ثواني لكل واحد) */
-  var polModels = (window.__aiModels && window.__aiModels.length) ? window.__aiModels : AI_MODELS;
-  for (var i = 0; i < polModels.length; i++) {
-    var pidx = (currentModelIdx + i) % polModels.length;
-    var pm = polModels[pidx];
-    try {
-      var pRes = await tryPollinations(pm.id, sysPrompt, txt);
-      if (pRes) {
-        reply = pRes.text;
-        usedModel = pm;
-        usedSource = 'pollinations';
-        currentModelIdx = (pidx + 1) % polModels.length;
-        break;
-      }
-    } catch(e) { continue; }
-  }
-
-  /* المرحلة 2: إذا فشلت Pollinations — تحول تلقائي لـ OpenRouter */
-  if (!reply) {
-    updateThinkText('⚡ التحويل إلى OpenRouter...');
+  /* المرحلة 1: جرّب OpenRouter أولاً (الأولوية القصوى) */
+  var orKey = window.__OR_KEY_FB;
+  if (orKey) {
+    updateThinkText('🌐 OpenRouter — جاري البحث...');
     for (var j = 0; j < OR_MODELS.length; j++) {
       var oidx = (currentORIdx + j) % OR_MODELS.length;
       var om = OR_MODELS[oidx];
@@ -1640,12 +1701,32 @@ async function sendAiMessage() {
     }
   }
 
+  /* المرحلة 2: إذا فشل OpenRouter — جرّب Pollinations (12 نموذج) */
+  if (!reply) {
+    updateThinkText('🌸 Pollinations — جاري التجربة...');
+    var polModels = (window.__aiModels && window.__aiModels.length) ? window.__aiModels : AI_MODELS;
+    for (var i = 0; i < polModels.length; i++) {
+      var pidx = (currentModelIdx + i) % polModels.length;
+      var pm = polModels[pidx];
+      try {
+        var pRes = await tryPollinations(pm.id, sysPrompt, txt);
+        if (pRes) {
+          reply = pRes.text;
+          usedModel = pm;
+          usedSource = 'pollinations';
+          currentModelIdx = (pidx + 1) % polModels.length;
+          break;
+        }
+      } catch(e) { continue; }
+    }
+  }
+
   removeThink();
 
   if (reply) {
     var srcBadge = usedSource === 'openrouter'
       ? '<span class="ai-model-badge or-badge">🌐 ' + usedModel.icon + ' ' + usedModel.name + ' · OpenRouter</span>'
-      : '<span class="ai-model-badge">' + usedModel.icon + ' ' + usedModel.name + '</span>';
+      : '<span class="ai-model-badge">' + usedModel.icon + ' ' + usedModel.name + ' · Pollinations</span>';
     addAiMsg('assistant', reply + '\n\n' + srcBadge);
   } else {
     addAiMsg('assistant', generateLocalResponse(txt) + '\n\n<span class="ai-model-badge">📱 رد محلي</span>');
@@ -1656,14 +1737,81 @@ async function sendAiMessage() {
 
 function generateLocalResponse(q) {
   var ql = q.toLowerCase();
-  if (ql.includes('دجاج')) return '🚫 الدجاج ممنوع تماماً في نظام الطيبات!\n✅ البدائل: لحم خروف، سمك بحري، حمام، أرنب.';
+
+  /* ── ما أفضل أطعمة لحالتي؟ ── */
+  if (ql.includes('أفضل أطعمة') || ql.includes('افضل اطعمة')) {
+    var u = currentUser || {}, d = u.diseases || [], bmi = u.bmi || 0;
+    var base = '🌿 أفضل أطعمة لحالتك في نظام الطيبات:\n\n';
+    base += '✅ الأساسيات اليومية:\n• الأرز والبطاطا والبطاطا الحلوة (طاقة نظيفة)\n• زيت الزيتون البكر (الدهن الأول)\n• السمن البلدي الطبيعي\n• الماء الدافئ صباحاً\n\n';
+    base += '✅ البروتين الأسبوعي:\n• لحم الماعز أو البتلو أو الضأن\n• سمك بحري طبيعي أو سردين\n• حمام أو سمان\n\n';
+    if (d.includes('sugar')) base += '⚠️ تنبيه لمرضى السكر: قلّل الأرز، مارس 16/8، ابتعد عن الفواكه الحلوة.\n';
+    if (d.includes('kidney')) base += '⚠️ تنبيه الكلى: ضبط كمية البروتين، اشرب 3 لتر ماء.\n';
+    if (bmi >= 30) base += '⚠️ السمنة: قلّل النشويات، طبّق صيام 18/6 أو OMAD.\n';
+    return base;
+  }
+
+  /* ── هل أستطيع الصيام مع مرضي؟ ── */
+  if (ql.includes('أستطيع الصيام') || ql.includes('استطيع الصيام') || ql.includes('صيام مع مرضي') || (ql.includes('صيام') && ql.includes('مرض'))) {
+    var u2 = currentUser || {}, d2 = u2.diseases || [];
+    var msg = '⏱️ الصيام في نظام الطيبات — حسب حالتك:\n\n';
+    if (!d2.length) {
+      msg += '✅ أنت بصحة جيدة — الصيام مفيد جداً لك!\n• ابدأ بـ 12/12 ثم انتقل لـ 16/8\n• خلال الصيام: ماء + قهوة سوداء + شاي أخضر\n• وجباتك في نافذة الأكل: التزم بأطعمة الطيبات.';
+    } else {
+      if (d2.includes('sugar'))    msg += '🧠 السكري: الصيام مفيد جداً لمقاومة الإنسولين، لكن بإشراف طبي. يُنصح بـ 16/8.\n';
+      if (d2.includes('pressure')) msg += '💉 الضغط: الصيام آمن غالباً. 16/8 يساعد في إدرار السوائل الزائدة.\n';
+      if (d2.includes('chemo'))    msg += '⚕️ الكيماوي: الصيام قبل الجرعة يقلل الأعراض الجانبية — استشر طبيبك أولاً.\n';
+      if (d2.includes('kidney'))   msg += '🫁 الكلى: الصيام يعطي الكلى راحة فسيولوجية، لكن أبقِ الترطيب عالياً.\n';
+      if (d2.includes('heart'))    msg += '❤️ القلب: الصيام الخفيف (12/12 أو 16/8) مفيد، تجنب OMAD بدون إشراف.\n';
+      if (d2.includes('allergy'))  msg += '🌸 الحساسية: الصيام يُريح المناعة ويقلل الارتكاسات. 16/8 مثالي.\n';
+    }
+    msg += '\n📌 البروتوكول الأنسب للمبتدئ: ابدأ بـ 12/12 لأسبوعين، ثم ارفع لـ 16/8.';
+    return msg;
+  }
+
+  /* ── بديل صحي للدجاج؟ ── */
+  if (ql.includes('بديل') && (ql.includes('دجاج') || ql.includes('فراخ'))) {
+    return '🔄 البدائل الصحية للدجاج في الطيبات:\n\n🥇 الأفضل:\n• السمك البحري الطبيعي أو السردين (أسبوعياً)\n• لحم الماعز أو البتلو أو الضأن\n• الحمام والسمان (طبيعي 100%)\n• لحم الإبل\n\n🥈 جيد أيضاً:\n• الأرانب\n• الكبدة (مرة أسبوعياً)\n\n🚫 لماذا الدجاج ممنوع؟\nالدجاج التجاري مليء بالهرمونات والمضادات الحيوية وعلف صناعي يرفع الأوميجا 6 الالتهابية. الدجاج البلدي 100% هو الاستثناء الوحيد المقبول أحياناً.';
+  }
+
+  /* ── خطة غذاء يوم كامل ── */
+  if (ql.includes('خطة غذاء') || ql.includes('يوم كامل') || (ql.includes('خطة') && ql.includes('غذاء'))) {
+    var u3 = currentUser || {}, bmi3 = u3.bmi || 0;
+    var plan = '📅 خطة غذاء يوم كامل على نظام الطيبات:\n\n';
+    plan += '🌅 الإفطار (12 ظهراً — نافذة 16/8):\n• أرز بسمتي + لحم مشوي أو سمك\n• خضار مطبوخة مسبكة بزيت الزيتون\n• كوب قهوة تركية بلا سكر\n\n';
+    plan += '🌙 العشاء (7 مساءً):\n• لحم خروف مع بطاطا مسلوقة\n• خضروات مطبوخة\n• ملعقتان زيت زيتون\n• كوب ماء دافئ\n\n';
+    plan += '🚫 الممنوع طوال اليوم:\n• دجاج — بيض — خبز — حليب — سلطات نيئة — غازيات\n\n';
+    if (bmi3 >= 30) plan += '⚖️ لحالة السمنة: قلّل الأرز وزد البروتين. فكّر في OMAD (وجبة واحدة).';
+    else plan += '💡 يمكنك إضافة حفنة مكسرات أو قطعة فاكهة مسموحة كسناك خفيف.';
+    return plan;
+  }
+
+  /* ── هل الموز مسموح؟ ── */
+  if (ql.includes('موز')) {
+    var u4 = currentUser || {}, d4 = u4.diseases || [];
+    var mozMsg = '🍌 الموز في نظام الطيبات:\n\n';
+    if (d4.includes('sugar')) {
+      mozMsg += '⚠️ لمرضى السكري: الموز مقيّد بشدة — حمله السكري عالٍ ويرفع الإنسولين.\n✅ البديل: فراولة، رمان، تفاح مقشر — أقل تأثيراً على السكر.\n';
+    } else {
+      mozMsg += '🟡 الموز مسموح أحياناً بكميات محدودة:\n• نصف موزة بعد وجبة دسمة (لا على معدة فارغة)\n• يُفضل تجنبه عند السمنة\n• الرياضيون ومن لديهم نقص وزن: مسموح أكثر\n\n';
+    }
+    mozMsg += '✅ الفواكه الأفضل بديلاً: فراولة، كرز، تفاح مقشر، رمان، مشمش.';
+    return mozMsg;
+  }
+
+  /* ── أضرار الدجاج ── */
+  if (ql.includes('أضرار الدجاج') || ql.includes('اضرار الدجاج') || (ql.includes('دجاج') && (ql.includes('ضرر') || ql.includes('لماذا') || ql.includes('سبب')))) {
+    return '🚫 لماذا الدجاج ممنوع في الطيبات؟\n\nالمشكلة في الدجاج التجاري الحديث — ليس الدجاج الأصلي:\n\n🔴 أسباب المنع:\n1. هرمونات النمو الصناعية → تضطرب الهرمونات وتؤثر على المناعة\n2. مضادات حيوية مزمنة → تدمر الميكروبيوم وتضعف الأمعاء\n3. علف صناعي → ترفع نسبة أوميجا 6 الالتهابية جداً\n4. دهون رديئة → تراكم في الكبد واضطراب في استقلاب الدهون\n5. تربية مكثفة مضغوطة → مستويات كورتيزول عالية في اللحم\n\n✅ الاستثناء الوحيد: الدجاج البلدي (تربية طبيعية حرة) أحياناً — بدون جلد وغير مقلي.\n\n🔄 البدائل: لحم الضأن، السمك البحري، الحمام، الأرانب، السمان.';
+  }
+
+  /* ── ردود عامة ── */
+  if (ql.includes('دجاج') || ql.includes('فراخ')) return '🚫 الدجاج ممنوع تماماً في نظام الطيبات!\n✅ البدائل: لحم خروف، سمك بحري، حمام، أرنب، سمان.';
   if (ql.includes('صيام') || ql.includes('صوم')) return '⏱️ الصيام المتقطع مفيد جداً!\nأنصح بالبدء ببروتوكول 16/8.\n🌿 خلال فترة الأكل: التزم بأطعمة الطيبات المسموحة.';
-  if (ql.includes('حليب') || ql.includes('لبن') || ql.includes('زبادي')) return '🚫 الألبان السائلة ممنوعة.\n✅ مسموح: الجبن المعتق المطبوخ فقط.';
-  if (ql.includes('خبز') || ql.includes('عيش')) return '🚫 الخبز الأبيض ممنوع تماماً.\n✅ البديل: أرز أو بطاطس.';
+  if (ql.includes('حليب') || ql.includes('لبن') || ql.includes('زبادي')) return '🚫 الألبان السائلة ممنوعة.\n✅ مسموح: الجبن المعتق (رومي، شيدر، فلمنك، موتزاريلا مطبوخة) والقشطة الطبيعية.';
+  if (ql.includes('خبز') || ql.includes('عيش')) return '🚫 الخبز الأبيض ممنوع تماماً.\n✅ البديل: أرز أو بطاطا أو بطاطا حلوة.';
   if (ql.includes('بيض')) return '🚫 البيض ممنوع في نظام الطيبات.\n✅ احصل على البروتين من اللحوم والأسماك.';
-  if (ql.includes('سكر') || ql.includes('حلو')) return '🚫 السكر والحلويات ممنوعة.\n✅ البديل: فواكه طبيعية باعتدال.';
-  if (ql.includes('خضار') || ql.includes('سلطة')) return '🚫 الخضروات النيئة والسلطات ممنوعة!\n✅ مسموح: الخضروات المطبوخة المسبكة جيداً فقط.';
-  return '🌿 نظام الطيبات للدكتور ضياء العوضي رحمه الله:\n\n✅ المسموح: لحوم حمراء، سمك بحري، أرز، بطاطس، زيت زيتون، خضار مطبوخة، فواكه، جبن معتق.\n🚫 الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات.\n\nاسألني عن أي طعام محدد!';
+  if (ql.includes('سكر') || ql.includes('حلو')) return '🚫 السكر المكرر والحلويات ممنوعة.\n✅ البديل: عسل طبيعي، تمر، شوكولاتة داكنة (70%+) أحياناً.';
+  if (ql.includes('خضار') || ql.includes('سلطة')) return '🚫 الخضروات النيئة والسلطات ممنوعة!\n✅ مسموح: الخضروات المطبوخة المسبكة جيداً بزيت الزيتون فقط.';
+  return '🌿 نظام الطيبات للدكتور ضياء العوضي رحمه الله:\n\n✅ يومياً: أرز، بطاطا، زيت زيتون، سمن بلدي، عسل، تمر، قهوة تركية.\n✅ أسبوعياً: لحوم حمراء، سمك، حمام، سمان، مكسرات، فواكه مسموحة، جبن معتق.\n✅ أحياناً: شوكولاتة داكنة، مربى طبيعية، محشي.\n🚫 ممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات.\n\nاسألني عن أي طعام محدد!';
 }
 
 function addAiMsg(role, text) {
@@ -1706,7 +1854,7 @@ function buildAiPage() {
   if (qp) qp.innerHTML = QP.map(function(q){ return '<button class="qprompt" onclick="document.getElementById(\'ai-msg-input\').value=\'' + q + '\'">' + q + '</button>'; }).join('');
   var chatWrap = document.getElementById('ai-chat-wrap');
   if (chatWrap && !chatWrap.children.length) {
-    addAiMsg('assistant', 'مرحباً ' + u.name + '! 🌿\nأنا مساعدك الصحي بنظام الطيبات.\nأمتلك 24 نموذجاً (Pollinations + OpenRouter) للرد عليك.\nاسألني بحرية! 🤝');
+    addAiMsg('assistant', 'مرحباً ' + u.name + '! 🌿\nأنا مساعدك الصحي بنظام الطيبات.\n🌐 OpenRouter أولاً ← 🌸 Pollinations (12 نموذج) ← 📱 رد محلي\nاسألني بحرية! 🤝');
   }
 }
 
