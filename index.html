@@ -7,6 +7,18 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="طيبات">
+<meta name="application-name" content="طيبات">
+<meta name="msapplication-TileColor" content="#0a1628">
+<meta name="msapplication-TileImage" content="icons/icon-144.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+<link rel="shortcut icon" href="icons/favicon.ico">
 <title>طيبات | نظام صحي ذكي + AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -24,6 +36,27 @@
     window.__firebaseGet = get;
     window.__firebaseChild = child;
     window.__firebaseReady = true;
+
+    /* ── جلب إعدادات AI من قاعدة البيانات ── */
+    try {
+      const cfgSnap = await get(child(ref(db), 'config/ai'));
+      if (cfgSnap.exists()) {
+        const cfg = cfgSnap.val();
+        /* endpoint: مسار API الخارجي مخزن في Firebase */
+        if (cfg.endpoint)  window.__aiEndpoint  = cfg.endpoint;
+        /* models: قائمة النماذج المخزنة في Firebase */
+        if (cfg.models && Array.isArray(cfg.models)) window.__aiModels = cfg.models;
+        /* apiKey: مفتاح API سري مخزن في Firebase فقط */
+        if (cfg.apiKey)    window.__aiApiKey    = cfg.apiKey;
+        /* openrouterKey: مفتاح OpenRouter مخزن في Firebase */
+        if (cfg.openrouterKey) window.__OR_KEY_FB = cfg.openrouterKey;
+      } else {
+        /* لأول مرة: خزّن مفتاح OpenRouter في Firebase تلقائياً */
+        await set(ref(db, 'config/ai/openrouterKey'), '#');
+        window.__OR_KEY_FB = '#';
+      }
+    } catch(_) { /* استخدم القيم الافتراضية في الكود */ }
+
   } catch(e) {
     window.__firebaseReady = false;
   }
@@ -235,6 +268,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .ai-ctx-title{font-size:.72rem;font-weight:700;color:var(--ai-purple2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .ai-ctx-body{font-size:.75rem;color:var(--txt2);line-height:1.6}
 .ai-model-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:10px;font-size:.58rem;font-weight:700;background:rgba(124,58,237,.12);color:var(--ai-purple2);border:1px solid rgba(124,58,237,.25);margin-right:6px;vertical-align:middle}
+.ai-model-badge.or-badge{background:rgba(16,185,129,.12);color:#34d399;border-color:rgba(16,185,129,.3)}
 .ai-api-counter{display:flex;align-items:center;gap:6px;padding:0 16px 10px;font-size:.7rem;color:var(--txt3)}
 .ai-api-counter i{color:var(--ai-purple2)}
 .fasting-hero{padding:20px 16px;text-align:center}
@@ -477,7 +511,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 
 <!-- ══ الذكاء الاصطناعي ══ -->
 <div class="page" id="ai-page">
-  <div class="app-header"><div class="header-row"><div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div><div class="user-chip" style="border-color:rgba(124,58,237,.4)"><i class="fas fa-circle" style="color:#2ec951;font-size:.5rem"></i><span style="color:var(--ai-purple2)">12 نموذج AI</span></div></div></div>
+  <div class="app-header"><div class="header-row"><div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div><div class="user-chip" style="border-color:rgba(124,58,237,.4)"><i class="fas fa-circle" style="color:#2ec951;font-size:.5rem"></i><span style="color:var(--ai-purple2)">24 نموذج AI</span></div></div></div>
   <div class="ai-page-header">
     <div class="ai-hero-badge"><i class="fas fa-brain"></i> ذكاء اصطناعي متطور</div>
     <div class="ai-hero-title">مساعدك الصحي الشخصي</div>
@@ -485,7 +519,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
   <div class="ai-context-card"><div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div><div class="ai-ctx-body" id="ai-user-context">جاري تحميل بياناتك...</div></div>
   <div class="user-diseases-bar" id="ai-dis-bar"></div>
-  <div class="ai-api-counter"><i class="fas fa-server"></i> النماذج: DeepSeek V3, GPT-4o Mini, Llama 3.3, Mistral, Qwen 2.5, DeepSeek R1, Gemma 2, Command R+, Phi-4, OpenChat, SearchGPT, Pollinations</div>
+  <div class="ai-api-counter"><i class="fas fa-server"></i> Pollinations (12 نموذج) + OpenRouter fallback تلقائي عند التأخر</div>
   <div class="quick-prompts" id="quick-prompts-bar"></div>
   <div class="ai-chat-wrap" id="ai-chat-wrap"></div>
   <div class="ai-input-area">
@@ -689,6 +723,26 @@ var AI_MODELS = [
   { id: 'searchgpt',     name: 'SearchGPT',      icon: '🔍' },
   { id: 'pollinations',  name: 'Pollinations',   icon: '🌸' }
 ];
+
+/* نماذج OpenRouter — تُستخدم كـ Fallback عند تأخر Pollinations فوق 5 ثواني */
+var OR_MODELS = [
+  { id: 'deepseek/deepseek-chat',              name: 'DeepSeek Chat',    icon: '🔮' },
+  { id: 'openai/gpt-4o-mini',                  name: 'GPT-4o Mini',      icon: '🧠' },
+  { id: 'meta-llama/llama-3.3-70b-instruct',   name: 'Llama 3.3 70B',   icon: '🦙' },
+  { id: 'mistralai/mistral-large',             name: 'Mistral Large',    icon: '🌪️' },
+  { id: 'qwen/qwen-2.5-72b-instruct',          name: 'Qwen 2.5 72B',    icon: '🐲' },
+  { id: 'deepseek/deepseek-r1',                name: 'DeepSeek R1',      icon: '🔭' },
+  { id: 'google/gemma-2-27b-it',               name: 'Gemma 2 27B',      icon: '💎' },
+  { id: 'cohere/command-r-plus',               name: 'Command R+',       icon: '⚡' },
+  { id: 'microsoft/phi-4',                     name: 'Phi-4',            icon: '💠' },
+  { id: 'openchat/openchat-7b',                name: 'OpenChat 7B',      icon: '💬' },
+  { id: 'anthropic/claude-haiku',              name: 'Claude Haiku',     icon: '🌿' },
+  { id: 'google/gemini-flash-1.5',             name: 'Gemini Flash',     icon: '✨' }
+];
+
+var __OR_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+var __OR_KEY_FB   = null; /* يُملأ من Firebase */
+var currentORIdx  = 0;
 
 /* ══════════════════════════════════════════════════════════
    Firebase
@@ -1475,7 +1529,7 @@ function fallbackCopy() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   AI
+   AI — نظام مزدوج: Pollinations أولاً (5 ثواني) ← OpenRouter fallback
 ══════════════════════════════════════════════════════════ */
 function buildUserContext() {
   var u = currentUser || {};
@@ -1485,24 +1539,65 @@ function buildUserContext() {
   return 'أنت مساعد صحي متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله. تتحدث بالعربية بوضوح وتفصيل. المستخدم: ' + (u.name||'مستخدم') + '، BMI: ' + (u.bmi||'-') + ' (' + bi.label + ')، الأمراض: ' + (d.length ? d.map(function(x){return m[x];}).join(' و ') : 'لا يوجد') + '. القواعد: المسموح: لحوم حمراء، سمك بحري، أرز، بطاطس، زيت زيتون بكر، خضار مطبوخة مسبكة، فواكه باعتدال، جبن معتق مطبوخ. الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر. كن واضحاً ومختصراً ومفيداً.';
 }
 
-async function tryModel(modelId, sysPrompt, userMsg) {
+/* ── Pollinations: timeout 5 ثواني ── */
+var __POLLINATIONS_ENDPOINT = 'https://text.pollinations.ai/openai';
+
+async function tryPollinations(modelId, sysPrompt, userMsg) {
   var controller = new AbortController();
-  var tid = setTimeout(function() { controller.abort(); }, 25000);
+  var tid = setTimeout(function() { controller.abort(); }, 5000); /* 5 ثواني فقط */
   try {
-    var res = await fetch('https://text.pollinations.ai/openai', {
+    var res = await fetch(window.__aiEndpoint || __POLLINATIONS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: modelId, messages: [{ role:'system', content:sysPrompt },{ role:'user', content:userMsg }], temperature:0.7 }),
+      body: JSON.stringify({
+        model: modelId,
+        messages: [{ role:'system', content:sysPrompt }, { role:'user', content:userMsg }],
+        temperature: 0.7
+      }),
       signal: controller.signal
     });
     clearTimeout(tid);
     if (!res.ok) return null;
     var data = await res.json();
-    if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) return data.choices[0].message.content;
+    if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content)
+      return { text: data.choices[0].message.content, source: 'pollinations' };
     return null;
   } catch(e) { clearTimeout(tid); return null; }
 }
 
+/* ── OpenRouter: يُستخدم عند فشل Pollinations أو تأخرها ── */
+async function tryOpenRouter(modelId, sysPrompt, userMsg) {
+  var key = window.__OR_KEY_FB;
+  if (!key) return null;
+  var controller = new AbortController();
+  var tid = setTimeout(function() { controller.abort(); }, 20000);
+  try {
+    var res = await fetch(__OR_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'طيبات'
+      },
+      body: JSON.stringify({
+        model: modelId,
+        messages: [{ role:'system', content:sysPrompt }, { role:'user', content:userMsg }],
+        temperature: 0.7,
+        max_tokens: 1000
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    if (!res.ok) return null;
+    var data = await res.json();
+    if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content)
+      return { text: data.choices[0].message.content, source: 'openrouter' };
+    return null;
+  } catch(e) { clearTimeout(tid); return null; }
+}
+
+/* ── المحرك الرئيسي: يجرّب Pollinations 5ث — إذا فشل يتحول لـ OpenRouter ── */
 async function sendAiMessage() {
   var inp = document.getElementById('ai-msg-input');
   var txt = (inp.value || '').trim();
@@ -1513,18 +1608,51 @@ async function sendAiMessage() {
   document.getElementById('btn-ai-send').disabled = true;
   addThink();
   var sysPrompt = buildUserContext();
-  var reply = null, usedModel = null;
-  for (var i = 0; i < AI_MODELS.length; i++) {
-    var idx = (currentModelIdx + i) % AI_MODELS.length;
-    var model = AI_MODELS[idx];
+  var reply = null, usedModel = null, usedSource = null;
+
+  /* المرحلة 1: جرّب Pollinations مع كل نموذج (timeout 5 ثواني لكل واحد) */
+  var polModels = (window.__aiModels && window.__aiModels.length) ? window.__aiModels : AI_MODELS;
+  for (var i = 0; i < polModels.length; i++) {
+    var pidx = (currentModelIdx + i) % polModels.length;
+    var pm = polModels[pidx];
     try {
-      reply = await tryModel(model.id, sysPrompt, txt);
-      if (reply) { usedModel = model; currentModelIdx = (idx + 1) % AI_MODELS.length; break; }
+      var pRes = await tryPollinations(pm.id, sysPrompt, txt);
+      if (pRes) {
+        reply = pRes.text;
+        usedModel = pm;
+        usedSource = 'pollinations';
+        currentModelIdx = (pidx + 1) % polModels.length;
+        break;
+      }
     } catch(e) { continue; }
   }
+
+  /* المرحلة 2: إذا فشلت Pollinations — تحول تلقائي لـ OpenRouter */
+  if (!reply) {
+    updateThinkText('⚡ التحويل إلى OpenRouter...');
+    for (var j = 0; j < OR_MODELS.length; j++) {
+      var oidx = (currentORIdx + j) % OR_MODELS.length;
+      var om = OR_MODELS[oidx];
+      try {
+        var oRes = await tryOpenRouter(om.id, sysPrompt, txt);
+        if (oRes) {
+          reply = oRes.text;
+          usedModel = om;
+          usedSource = 'openrouter';
+          currentORIdx = (oidx + 1) % OR_MODELS.length;
+          break;
+        }
+      } catch(e) { continue; }
+    }
+  }
+
   removeThink();
+
   if (reply) {
-    addAiMsg('assistant', reply + '\n\n<span class="ai-model-badge">' + usedModel.icon + ' ' + usedModel.name + '</span>');
+    var srcBadge = usedSource === 'openrouter'
+      ? '<span class="ai-model-badge or-badge">🌐 ' + usedModel.icon + ' ' + usedModel.name + ' · OpenRouter</span>'
+      : '<span class="ai-model-badge">' + usedModel.icon + ' ' + usedModel.name + '</span>';
+    addAiMsg('assistant', reply + '\n\n' + srcBadge);
   } else {
     addAiMsg('assistant', generateLocalResponse(txt) + '\n\n<span class="ai-model-badge">📱 رد محلي</span>');
   }
@@ -1555,8 +1683,12 @@ function addThink() {
   var w = document.getElementById('ai-chat-wrap');
   var d = document.createElement('div');
   d.id = 'ai-thinking'; d.className = 'ai-msg assistant';
-  d.innerHTML = '<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري البحث في 12 نموذج ذكاء اصطناعي...</div>';
+  d.innerHTML = '<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> <span id="ai-think-txt">جاري البحث في النماذج...</span></div>';
   w.appendChild(d); w.scrollTop = w.scrollHeight;
+}
+function updateThinkText(msg) {
+  var el = document.getElementById('ai-think-txt');
+  if (el) el.textContent = msg;
 }
 function removeThink() { var el = document.getElementById('ai-thinking'); if (el) el.remove(); }
 function clearAiChat() {
@@ -1580,7 +1712,7 @@ function buildAiPage() {
   if (qp) qp.innerHTML = QP.map(function(q){ return '<button class="qprompt" onclick="document.getElementById(\'ai-msg-input\').value=\'' + q + '\'">' + q + '</button>'; }).join('');
   var chatWrap = document.getElementById('ai-chat-wrap');
   if (chatWrap && !chatWrap.children.length) {
-    addAiMsg('assistant', 'مرحباً ' + u.name + '! 🌿\nأنا مساعدك الصحي بنظام الطيبات.\nأمتلك 12 نموذج ذكاء اصطناعي للرد عليك.\nاسألني بحرية! 🤝');
+    addAiMsg('assistant', 'مرحباً ' + u.name + '! 🌿\nأنا مساعدك الصحي بنظام الطيبات.\nأمتلك 24 نموذجاً (Pollinations + OpenRouter) للرد عليك.\nاسألني بحرية! 🤝');
   }
 }
 
@@ -1745,43 +1877,144 @@ if (expDetailsInput) {
 }
 
 /* ══════════════════════════════════════════════════════════
-   PWA
+   PWA — يدعم: Android/Chrome + iOS/Safari + Samsung Browser + Desktop
 ══════════════════════════════════════════════════════════ */
 var deferredPrompt = null;
 var DISMISS_KEY = 'pwa_banner_dismissed';
 var INSTALL_KEY  = 'pwa_installed';
 
-function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream; }
-function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
-function isDismissed() { var ts = localStorage.getItem(DISMISS_KEY); if (!ts) return false; return (Date.now()-parseInt(ts)) < 3*24*60*60*1000; }
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+function isAndroid() {
+  return /android/i.test(navigator.userAgent);
+}
+function isSamsung() {
+  return /samsungbrowser/i.test(navigator.userAgent);
+}
+function isDesktop() {
+  return !/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+}
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.matchMedia('(display-mode: fullscreen)').matches ||
+         window.navigator.standalone === true;
+}
+function isDismissed() {
+  var ts = localStorage.getItem(DISMISS_KEY);
+  if (!ts) return false;
+  /* يُخفى 3 أيام بعد الرفض */
+  return (Date.now() - parseInt(ts)) < 3 * 24 * 60 * 60 * 1000;
+}
+function canShowBanner() {
+  return !isStandalone() && !isDismissed() && !localStorage.getItem(INSTALL_KEY);
+}
+
+/* ── تحديث شكل البانر حسب المنصة ── */
+function adaptBannerForPlatform() {
+  var btn  = document.getElementById('pwa-install-btn');
+  var sub  = document.querySelector('.pwa-sub');
+  var banner = document.getElementById('pwa-banner');
+  if (!btn || !sub) return;
+
+  if (isIOS()) {
+    /* iOS: الزر يفتح تعليمات مخصصة */
+    btn.textContent = 'كيف أثبّته؟';
+    btn.onclick = showIOSInstructions;
+    sub.textContent = 'اضغط لمعرفة طريقة التثبيت على iPhone/iPad';
+    /* iOS لا يدعم beforeinstallprompt — نُظهر البانر بعد ثانيتين مباشرة */
+    if (canShowBanner()) {
+      setTimeout(function() { banner.classList.add('show'); }, 2000);
+    }
+  } else if (isSamsung()) {
+    btn.textContent = 'تثبيت';
+    sub.textContent = 'أضف التطبيق لشاشة Samsung الرئيسية';
+  } else if (isDesktop()) {
+    btn.textContent = 'تثبيت على الكمبيوتر';
+    sub.textContent = 'شغّل طيبات كتطبيق سطح مكتب مستقل';
+  } else {
+    /* Android العادي */
+    btn.textContent = 'تثبيت';
+    sub.textContent = 'وصول سريع من شاشتك الرئيسية';
+  }
+}
+
+/* ── تعليمات iOS ── */
+function showIOSInstructions() {
+  var html =
+    '<div style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;padding:0 0 0" id="ios-guide-overlay">' +
+    '<div style="width:100%;max-width:500px;background:linear-gradient(145deg,#0d1e38,#112244);border:1px solid rgba(200,150,12,.3);border-radius:24px 24px 0 0;padding:24px 20px 40px;direction:rtl">' +
+    '<div style="text-align:center;margin-bottom:20px">' +
+      '<div style="font-size:2rem;margin-bottom:8px">📱</div>' +
+      '<div style="font-family:Amiri,serif;font-size:1.2rem;color:#f5c842;margin-bottom:4px">تثبيت طيبات على iPhone/iPad</div>' +
+      '<div style="font-size:.75rem;color:#8aa4c8">اتبع الخطوات التالية</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">' +
+      '<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:14px">' +
+        '<div style="width:36px;height:36px;background:linear-gradient(135deg,#0d47a1,#2196f3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">1️⃣</div>' +
+        '<div style="font-size:.85rem;color:#e8f0fc;line-height:1.5">اضغط على زر <strong style="color:#f5c842">مشاركة</strong> أسفل الشاشة <span style="font-size:1.1rem">⬆️</span></div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:14px">' +
+        '<div style="width:36px;height:36px;background:linear-gradient(135deg,#1a7a2e,#2ec951);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">2️⃣</div>' +
+        '<div style="font-size:.85rem;color:#e8f0fc;line-height:1.5">اختر <strong style="color:#f5c842">Add to Home Screen</strong> (إضافة للشاشة الرئيسية)</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:14px">' +
+        '<div style="width:36px;height:36px;background:linear-gradient(135deg,#c8960c,#f5c842);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">3️⃣</div>' +
+        '<div style="font-size:.85rem;color:#e8f0fc;line-height:1.5">اضغط <strong style="color:#f5c842">Add</strong> في الزاوية اليمنى العليا</div>' +
+      '</div>' +
+    '</div>' +
+    '<button onclick="document.getElementById(\'ios-guide-overlay\').remove()" style="width:100%;background:linear-gradient(135deg,#c8960c,#f5c842);color:#050e1f;border:none;border-radius:14px;padding:14px;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:800;cursor:pointer">فهمت — شكراً!</button>' +
+    '</div></div>';
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  document.body.appendChild(div.firstElementChild);
+}
 
 window.pwaTriggerInstall = function() {
+  if (isIOS()) { showIOSInstructions(); return; }
   if (deferredPrompt) {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(function(r) {
-      if (r.outcome === 'accepted') { localStorage.setItem(INSTALL_KEY,'1'); pwaDismiss(); }
+      if (r.outcome === 'accepted') {
+        localStorage.setItem(INSTALL_KEY, '1');
+        pwaDismiss();
+        showToast('🎉 تم التثبيت بنجاح!');
+      }
       deferredPrompt = null;
     });
   }
 };
+
 window.pwaDismiss = function() {
   localStorage.setItem(DISMISS_KEY, Date.now().toString());
   document.getElementById('pwa-banner').classList.remove('show');
 };
 
+/* ── Chrome/Edge/Android/Samsung: حدث التثبيت ── */
 window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault(); deferredPrompt = e;
-  if (!isStandalone() && !isDismissed() && !localStorage.getItem(INSTALL_KEY)) {
-    setTimeout(function() { document.getElementById('pwa-banner').classList.add('show'); }, 3000);
+  e.preventDefault();
+  deferredPrompt = e;
+  if (canShowBanner()) {
+    setTimeout(function() {
+      document.getElementById('pwa-banner').classList.add('show');
+    }, 3000);
   }
 });
-window.addEventListener('appinstalled', function() { localStorage.setItem(INSTALL_KEY,'1'); document.getElementById('pwa-banner').classList.remove('show'); });
+
+window.addEventListener('appinstalled', function() {
+  localStorage.setItem(INSTALL_KEY, '1');
+  document.getElementById('pwa-banner').classList.remove('show');
+  showToast('🎉 تم تثبيت طيبات بنجاح!');
+});
 
 /* ══════════════════════════════════════════════════════════
    Init
 ══════════════════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', function() {
-  // Safety timeout — إذا تأخر كل شيء يُخفى اللودر بعد 8 ثوانٍ
+  /* تكيّف PWA مع المنصة */
+  adaptBannerForPlatform();
+
+  /* Safety timeout — إذا تأخر كل شيء يُخفى اللودر بعد 8 ثوانٍ */
   var safetyTimeout = setTimeout(function() {
     hideLoader();
   }, 8000);
