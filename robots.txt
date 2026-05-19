@@ -1,0 +1,43 @@
+# Robots.txt for نظام طيبات - Tayyibat System
+# تم التحسين لأغراض السيو
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /icons/
+Allow: /manifest.json
+Allow: /sw.js
+
+Disallow: 
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Yandex
+User-agent: Yandexbot
+Allow: /
+
+# Baidu
+User-agent: Baiduspider
+Allow: /
+
+# دعم محركات البحث العربية
+User-agent: DuckDuckBot
+Allow: /
+
+# Sitemap location
+Sitemap: https://tayyibatsys.netlify.app/sitemap.xml
+
+# Security headers
+# تجاهل طلبات معينة
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*?*sort=
