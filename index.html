@@ -26,10 +26,10 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="نظام طيبات الصحي الذكي + AI | الدكتور ضياء العوضي">
 <meta property="og:description" content="تطبيق صحي ذكي يستخدم الذكاء الاصطناعي لتقديم استشارات صحية متخصصة. توصيات غذائية، تتبع الصحة، ومراقبة شاملة من الدكتور ضياء العوضي.">
-<meta property="og:url" content="https://tayyibatsys.netlify.app/">
+<meta property="og:url" content="https://mohamednasr5.github.io/tayyibat/">
 <meta property="og:site_name" content="نظام طيبات">
 <meta property="og:locale" content="ar_AE">
-<meta property="og:image" content="https://tayyibatsys.netlify.app/icons/icon-512.png">
+<meta property="og:image" content="https://mohamednasr5.github.io/tayyibat/icons/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:image:type" content="image/png">
@@ -39,7 +39,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="نظام طيبات الصحي الذكي + AI | الدكتور ضياء العوضي">
 <meta name="twitter:description" content="استشارات صحية ذكية مع الذكاء الاصطناعي. نصائح غذائية وتتبع صحي متقدم من الدكتور ضياء العوضي.">
-<meta name="twitter:image" content="https://tayyibatsys.netlify.app/icons/icon-512.png">
+<meta name="twitter:image" content="https://mohamednasr5.github.io/tayyibat/icons/icon-512.png">
 <meta name="twitter:image:alt" content="شعار نظام طيبات">
 <meta name="twitter:creator" content="@tayyibatsys">
 
@@ -51,7 +51,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
 <!-- ========== Canonical URL ========== -->
-<link rel="canonical" href="https://tayyibatsys.netlify.app/">
+<link rel="canonical" href="https://mohamednasr5.github.io/tayyibat/">
 
 <!-- ========== Icons and Manifests ========== -->
 <link rel="manifest" href="manifest.json">
@@ -246,17 +246,20 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .dev-sig{margin-top:12px;padding-top:12px;border-top:1px solid rgba(200,150,12,.15)}
 .dev-sig-name{font-size:.95rem;font-weight:700;color:var(--gold2);margin-bottom:8px}
 .social-links{margin-top:10px;display:flex;justify-content:center;gap:12px}
-.social-icon{color:var(--txt2);font-size:1.2rem;transition:color .3s}
-.social-icon:hover{color:var(--blue2)}
+.social-icon{color:var(--txt2);font-size:1.2rem;transition:all .3s;border-radius:8px}
+.social-icon:hover{color:var(--blue2);transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.3)}
 .search-wrap{padding:12px 16px}
 .search-wrap-inner{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:14px;padding:0 14px}
 .search-wrap-inner i{color:var(--txt3)}
 .search-input{flex:1;background:none;border:none;padding:12px 0;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none}
 .food-tabs-wrap{padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .food-tabs-wrap::-webkit-scrollbar{display:none}
-.ftab{flex-shrink:0;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:rgba(255,255,255,.04);transition:all .25s}
-.ftab.act{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border-color:transparent}
-.ftab.act-red{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;border-color:transparent}
+.ftab{flex-shrink:0;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:rgba(255,255,255,.04);transition:all .25s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.ftab:hover{background:rgba(200,150,12,.1);color:var(--txt);transform:translateY(-1px);box-shadow:0 4px 12px rgba(200,150,12,.15)}
+.ftab.act{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border-color:transparent;box-shadow:0 4px 20px rgba(200,150,12,.3);font-weight:800}
+.ftab.act-red{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;border-color:transparent;box-shadow:0 4px 20px rgba(229,57,53,.3);font-weight:800}
+.ftab-icon{font-size:1.1rem;display:inline-block}
+.ftab-text{display:inline-block}
 .food-grid{padding:0 16px 16px}
 .food-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;transition:transform .3s;position:relative;overflow:hidden}
 .food-card:hover{transform:translateY(-3px)}
@@ -526,11 +529,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       </div>
       <div class="dev-sig-name" style="margin-top:8px">المهندس محمد حماد</div>
       <div class="social-links">
-        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="social-icon" title="فيسبوك">
-          <i class="fab fa-facebook"></i>
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="social-icon" title="فيسبوك" style="background:linear-gradient(135deg,#1877f2,#0a66c2);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .3s;box-shadow:0 4px 12px rgba(24,119,242,.3)">
+          <i class="fab fa-facebook-f"></i>
         </a>
-        <a href="https://elmashaher.com/characters/mohamed-nasr-hammad" target="_blank" class="social-icon" title="البروفايل" style="background:linear-gradient(135deg,#1a7a2e,#2ec951);color:#fff;width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center">
-          <span style="font-weight:800;font-size:1.2rem">M</span>
+        <a href="https://elmashaher.com/characters/mohamed-nasr-hammad" target="_blank" class="social-icon" title="البروفايل" style="background:linear-gradient(135deg,#1a7a2e,#2ec951);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;transition:all .3s;box-shadow:0 4px 12px rgba(46,201,81,.3)">
+          <span>M</span>
         </a>
       </div>
     </div>
@@ -1364,6 +1367,26 @@ var FOOD_DATA = [
 
 var curCat = 'الكل';
 
+// خريطة الأيقونات الاحترافية للفئات
+var catIcons = {
+  'الكل': '🎯',
+  'مسموح': '✅',
+  'ممنوع': '🚫',
+  'يومياً': '🟢',
+  'أسبوعياً': '🟡',
+  'أحياناً': '🟠',
+  'لحوم': '🍖',
+  'أسماك': '🐟',
+  'خضار': '🥬',
+  'فواكه': '🍎',
+  'ألبان': '🧀',
+  'منتجات': '📦',
+  'أرز وحبوب': '🍚',
+  'زيوت': '🫒',
+  'بهارات': '🌶️',
+  'مشروبات': '☕'
+};
+
 function buildFoodData() {
   var t = document.getElementById('food-tabs');
   if (!t) return;
@@ -1371,7 +1394,8 @@ function buildFoodData() {
     FOOD_DATA.map(function(f) { return f.cat; }).filter(function(v, i, a) { return a.indexOf(v) === i; })
   );
   t.innerHTML = cats.map(function(x) {
-    return '<div class="ftab' + (x === 'الكل' ? ' act' : '') + '" onclick="filterCat(\'' + x + '\')">' + x + '</div>';
+    var icon = catIcons[x] || '📌';
+    return '<div class="ftab' + (x === 'الكل' ? ' act' : '') + '" onclick="filterCat(\'' + x + '\')" title="' + x + '"><span class="ftab-icon">' + icon + '</span> <span class="ftab-text">' + x + '</span></div>';
   }).join('');
   renderFood();
 }
