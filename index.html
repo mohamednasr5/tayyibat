@@ -37,25 +37,19 @@
     window.__firebaseChild = child;
     window.__firebaseReady = true;
 
-    /* ── جلب إعدادات AI من قاعدة البيانات ── */
+    /* ── جلب إعدادات AI من Firebase فقط — لا يوجد أي مفتاح في الكود ── */
     try {
       const cfgSnap = await get(child(ref(db), 'config/ai'));
       if (cfgSnap.exists()) {
         const cfg = cfgSnap.val();
-        /* endpoint: مسار API الخارجي مخزن في Firebase */
-        if (cfg.endpoint)  window.__aiEndpoint  = cfg.endpoint;
-        /* models: قائمة النماذج المخزنة في Firebase */
+        if (cfg.endpoint)      window.__aiEndpoint = cfg.endpoint;
         if (cfg.models && Array.isArray(cfg.models)) window.__aiModels = cfg.models;
-        /* apiKey: مفتاح API سري مخزن في Firebase فقط */
-        if (cfg.apiKey)    window.__aiApiKey    = cfg.apiKey;
-        /* openrouterKey: مفتاح OpenRouter مخزن في Firebase */
-        if (cfg.openrouterKey) window.__OR_KEY_FB = cfg.openrouterKey;
-      } else {
-        /* لأول مرة: خزّن مفتاح OpenRouter في Firebase تلقائياً */
-        await set(ref(db, 'config/ai/openrouterKey'), '#');
-        window.__OR_KEY_FB = '#';
+        if (cfg.apiKey)        window.__aiApiKey   = cfg.apiKey;
+        /* مفتاح OpenRouter — يُقرأ من Firebase فقط، لا يُذكر في الكود أبداً */
+        if (cfg.openrouterKey) window.__OR_KEY_FB  = cfg.openrouterKey;
       }
-    } catch(_) { /* استخدم القيم الافتراضية في الكود */ }
+      /* بدون config في Firebase → OpenRouter معطّل، Pollinations فقط تعمل */
+    } catch(_) { /* Firebase غير متاح — Pollinations فقط */ }
 
   } catch(e) {
     window.__firebaseReady = false;
