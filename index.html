@@ -392,6 +392,53 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .bsb-morbid{background:rgba(183,28,28,.15);color:#ef5350;border:1px solid rgba(183,28,28,.4)}
 .btn-logout{width:100%;border:none;border-radius:14px;padding:12px;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.3);color:#ef5350;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-edit{background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:inline-flex;align-items:center;gap:4px}
+/* ══════════════════ PRO STYLES ══════════════════ */
+.pro-banner { margin: 0 16px 16px; background: linear-gradient(135deg, rgba(255,193,7,.12), rgba(255,140,0,.06)); border: 2px solid rgba(255,193,7,.5); border-radius: 20px; padding: 20px 16px; position: relative; overflow: hidden; cursor: pointer; transition: all .3s; }
+.pro-banner:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,193,7,.25); }
+.pro-banner::before { content: ''; position: absolute; top: -30px; left: -30px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,193,7,.15), transparent 70%); border-radius: 50%; }
+.pro-banner-crown { font-size: 2.5rem; text-align: center; display: block; margin-bottom: 8px; filter: drop-shadow(0 0 12px rgba(255,193,7,.8)); animation: crownPulse 2s ease-in-out infinite; }
+@keyframes crownPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.pro-banner-title { font-family: 'Amiri', serif; font-size: 1.3rem; color: #ffc107; text-align: center; margin-bottom: 6px; font-weight: 700; }
+.pro-banner-features { list-style: none; margin: 12px 0; }
+.pro-banner-features li { font-size: .82rem; color: #e8d5a3; padding: 5px 0; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+.pro-banner-features li::before { content: '✨'; flex-shrink: 0; }
+.pro-banner-price { text-align: center; margin: 14px 0 4px; }
+.pro-price-amount { font-size: 1.5rem; font-weight: 900; color: #ffc107; }
+.pro-price-period { font-size: .8rem; color: #e8d5a3; }
+.pro-banner-btn { width: 100%; background: linear-gradient(135deg, #ffc107, #ff8c00); color: #050e1f; border: none; border-radius: 14px; padding: 14px; font-family: 'Tajawal', sans-serif; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all .3s; margin-top: 12px; }
+.pro-banner-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,193,7,.4); }
+.pro-whatsapp-btn { width: 100%; background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; border: none; border-radius: 14px; padding: 12px; font-family: 'Tajawal', sans-serif; font-size: .95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all .3s; margin-top: 8px; text-decoration: none; }
+.pro-whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,211,102,.4); }
+
+/* Pro modal */
+.pro-modal-overlay { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,.85); backdrop-filter: blur(12px); display: none; align-items: flex-end; justify-content: center; }
+.pro-modal-overlay.show { display: flex; }
+.pro-modal-box { width: 100%; max-width: 500px; background: linear-gradient(145deg, #0f2848, #112244); border: 2px solid rgba(255,193,7,.4); border-radius: 28px 28px 0 0; padding: 28px 20px 40px; max-height: 90vh; overflow-y: auto; text-align: center; }
+.pro-modal-icon { font-size: 4rem; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(255,193,7,.8)); animation: crownPulse 2s ease-in-out infinite; }
+.pro-modal-title { font-family: 'Amiri', serif; font-size: 1.6rem; color: #ffc107; margin-bottom: 6px; }
+.pro-modal-sub { font-size: .82rem; color: #b0c4de; margin-bottom: 20px; }
+.pro-modal-features { text-align: right; margin: 16px 0; }
+.pro-modal-feature { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: rgba(255,193,7,.06); border: 1px solid rgba(255,193,7,.15); border-radius: 12px; margin-bottom: 10px; }
+.pro-modal-feature-icon { font-size: 1.5rem; flex-shrink: 0; }
+.pro-modal-feature-text { font-size: .82rem; color: #e8f0fc; line-height: 1.6; }
+.pro-modal-feature-title { font-weight: 800; color: #ffc107; margin-bottom: 2px; font-size: .9rem; }
+.pro-modal-price-box { background: linear-gradient(135deg, rgba(255,193,7,.15), rgba(255,140,0,.08)); border: 2px solid rgba(255,193,7,.4); border-radius: 16px; padding: 16px; margin: 16px 0; }
+.pro-modal-price-main { font-size: 2.2rem; font-weight: 900; color: #ffc107; }
+.pro-modal-price-desc { font-size: .8rem; color: #e8d5a3; margin-top: 4px; }
+.pro-modal-whatsapp { width: 100%; background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; border: none; border-radius: 14px; padding: 16px; font-family: 'Tajawal', sans-serif; font-size: 1.1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all .3s; text-decoration: none; }
+.pro-modal-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,.5); }
+.pro-modal-close-btn { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #8aa4c8; border-radius: 14px; padding: 12px; font-family: 'Tajawal', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
+
+/* Pro user indicator in profile */
+.pro-user-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(255,193,7,.2), rgba(255,140,0,.12)); border: 1.5px solid rgba(255,193,7,.6); border-radius: 20px; padding: 6px 14px; font-size: .82rem; font-weight: 800; color: #ffc107; margin-top: 8px; }
+.pro-expiry-info { font-size: .75rem; color: #e8d5a3; margin-top: 4px; text-align: center; }
+.pro-whatsapp-contact { margin: 0 16px 16px; }
+
+/* Pro crown in experiences */
+.exp-pro-crown { cursor: pointer; position: relative; display: inline-block; }
+.exp-pro-crown .crown-tooltip { position: absolute; bottom: 120%; right: 50%; transform: translateX(50%); background: rgba(15,31,58,.97); border: 1px solid rgba(255,193,7,.5); color: #ffc107; padding: 6px 12px; border-radius: 10px; font-size: .72rem; font-weight: 700; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.exp-pro-crown:hover .crown-tooltip { opacity: 1; }
+
 .share-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .share-btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;padding:14px 12px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer;transition:all .3s;text-decoration:none}
 .share-btn:active{transform:scale(.96)}
@@ -818,7 +865,42 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="profile-name" id="p-name2">-</div>
     <div class="profile-info" id="p-info">-</div>
   </div>
+  <!-- Pro User Status (shown when pro) -->
+  <div id="pro-user-status-bar" style="display:none;padding:0 16px 8px">
+    <div style="background:linear-gradient(135deg,rgba(255,193,7,.15),rgba(255,140,0,.08));border:2px solid rgba(255,193,7,.5);border-radius:16px;padding:14px 16px;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:4px">👑</div>
+      <div style="font-size:.9rem;font-weight:800;color:#ffc107;margin-bottom:2px">مستخدم برو</div>
+      <div class="pro-expiry-info" id="pro-expiry-text"></div>
+    </div>
+  </div>
+
+  <!-- Pro WhatsApp Contact (shown when pro) -->
+  <div id="pro-whatsapp-contact" style="display:none;padding:0 16px 8px">
+    <a href="https://wa.me/201279934735" target="_blank" rel="noopener" class="pro-whatsapp-btn">
+      <i class="fab fa-whatsapp" style="font-size:1.3rem"></i>
+      تواصل مباشر مع الفريق عبر واتساب
+    </a>
+  </div>
+
   <div class="profile-cards">
+    <!-- Pro Banner (shown when NOT pro) -->
+    <div id="pro-upgrade-banner" class="pro-banner" onclick="openProModal()" style="display:none">
+      <span class="pro-banner-crown">👑</span>
+      <div class="pro-banner-title">اشترِ النسخة البرو</div>
+      <ul class="pro-banner-features">
+        <li>متابعة مستمر عبر الواتساب يومياً بنظام صحي متوافق مع نظام الطيبات</li>
+        <li>دعم سريع — وصول أسرع لكامل مميزات التطبيق</li>
+      </ul>
+      <div class="pro-banner-price">
+        <span class="pro-price-amount">100 جنيه</span>
+        <span class="pro-price-period"> / شهرياً فقط</span>
+      </div>
+      <button class="pro-banner-btn">
+        <i class="fab fa-whatsapp"></i>
+        اشترك الآن عبر واتساب
+      </button>
+    </div>
+
     <div class="prof-card">
       <div class="prof-card-title"><span><i class="fas fa-share-alt" style="color:var(--whatsapp)"></i> مشاركة البرنامج</span></div>
       <div class="share-buttons">
@@ -1355,6 +1437,18 @@ function doLogout() {
    Boot App
 ══════════════════════════════════════════════════════════ */
 function bootApp() {
+  /* Auto-expire pro if time has passed */
+  if (currentUser && currentUser.pro && currentUser.pro.active && currentUser.pro.expiresAt) {
+    if (Date.now() > currentUser.pro.expiresAt) {
+      currentUser.pro = { active: false };
+      /* Optionally sync to Firebase */
+      if (window.__firebaseReady) {
+        var db = window.__firebaseDB;
+        var uRef = window.__firebaseRef(db, 'users/' + (currentUser.id || currentUser.username));
+        window.__firebaseSet(uRef, Object.assign({}, currentUser)).catch(function(){});
+      }
+    }
+  }
   buildDisGrid('dis-grid-auth', []);
   buildFoodData();
   buildFastTypes();
@@ -1920,9 +2014,32 @@ function loadFastStats() {
 /* ══════════════════════════════════════════════════════════
    Profile
 ══════════════════════════════════════════════════════════ */
+function isProActive(user) {
+  if (!user || !user.pro || !user.pro.active) return false;
+  if (user.pro.expiresAt && Date.now() > user.pro.expiresAt) return false;
+  return true;
+}
+
 function buildProfile() {
   if (!currentUser) return;
   var u = currentUser;
+
+  /* Pro status check */
+  var proActive = isProActive(u);
+  var proStatusBar = document.getElementById('pro-user-status-bar');
+  var proWaBtn = document.getElementById('pro-whatsapp-contact');
+  var proBanner = document.getElementById('pro-upgrade-banner');
+  if (proStatusBar) proStatusBar.style.display = proActive ? 'block' : 'none';
+  if (proWaBtn) proWaBtn.style.display = proActive ? 'block' : 'none';
+  if (proBanner) proBanner.style.display = proActive ? 'none' : 'block';
+
+  /* Pro expiry text */
+  if (proActive && u.pro.expiresAt) {
+    var daysLeft = Math.ceil((u.pro.expiresAt - Date.now()) / 86400000);
+    var expiryEl = document.getElementById('pro-expiry-text');
+    if (expiryEl) expiryEl.textContent = 'النسخة البرو نشطة — يتبقى ' + daysLeft + ' يوم';
+  }
+
   var nameEls = ['p-name','p-name2'];
   nameEls.forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = u.name; });
   var setVal = function(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
@@ -1941,6 +2058,16 @@ function buildProfile() {
   var smLabels = { smoker_male:'🚬 مدخن', smoker_female:'🚬 مدخنة', non_smoker:'✅ غير مدخن', '':'— غير محدد' };
   setVal('pp-smoking', smLabels[u.smoking || ''] || '— غير محدد');
 }
+
+/* Pro Modal functions */
+function openProModal() {
+  document.getElementById('pro-modal').classList.add('show');
+}
+function closeProModal() {
+  document.getElementById('pro-modal').classList.remove('show');
+}
+window.openProModal = openProModal;
+window.closeProModal = closeProModal;
 
 function openEditProfile() {
   var u = currentUser;
@@ -2282,9 +2409,10 @@ function renderExperiences() {
     var dateLabel = daysAgo === 0 ? 'اليوم' : daysAgo === 1 ? 'أمس' : daysAgo + ' أيام';
     var initials = exp.username.split(' ').map(function(n) { return n.charAt(0); }).join('').slice(0,2);
     var color = colors[i % colors.length];
+    var proCrown = exp.isPro ? '<span class="exp-pro-crown"><span style="font-size:1rem;filter:drop-shadow(0 0 5px rgba(255,193,7,.8))">👑</span><span class="crown-tooltip">هذا المستخدم مشترك في النسخة البرو</span></span>' : '';
     return '<div class="experience-card" onclick="showExpDetail(' + i + ')">' +
       '<div class="exp-card-header"><div class="exp-avatar" style="background:linear-gradient(135deg,' + color + ',rgba(212,175,55,.6))">' + initials + '</div>' +
-      '<div><div class="exp-username">' + exp.username + '</div><div class="exp-disease">' + exp.disease + '</div><div class="exp-date">منذ ' + dateLabel + '</div></div></div>' +
+      '<div><div class="exp-username" style="display:flex;align-items:center;gap:6px">' + exp.username + ' ' + proCrown + '</div><div class="exp-disease">' + exp.disease + '</div><div class="exp-date">منذ ' + dateLabel + '</div></div></div>' +
       '<div class="exp-details-text">' + exp.details + '</div>' +
       '<div style="text-align:center"><span class="exp-badge">👆 اضغط لرؤية التفاصيل</span></div></div>';
   }).join('');
@@ -2298,9 +2426,10 @@ function showExpDetail(i) {
   var initials = exp.username.split(' ').map(function(n) { return n.charAt(0); }).join('').slice(0,2);
   var colors = ['#d4af37','#42a5f5','#ef5350','#66bb6a','#ab47bc'];
   var color = colors[i % colors.length];
+  var proCrownDetail = exp.isPro ? '<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(255,193,7,.2),rgba(255,140,0,.12));border:1.5px solid rgba(255,193,7,.5);border-radius:20px;padding:5px 14px;font-size:.78rem;font-weight:800;color:#ffc107">👑 مستخدم برو</span></div>' : '';
   document.getElementById('exp-detail-body').innerHTML =
     '<div style="text-align:center;margin-bottom:20px"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,' + color + ',rgba(212,175,55,.6));display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#050e1f;margin:0 auto 10px">' + initials + '</div>' +
-    '<div style="font-size:1.1rem;font-weight:800;color:var(--txt)">' + exp.username + '</div>' +
+    '<div style="font-size:1.1rem;font-weight:800;color:var(--txt)">' + exp.username + '</div>' + proCrownDetail +
     '<div style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:700;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);margin:6px 0">' + exp.disease + '</div>' +
     '<div style="font-size:.75rem;color:var(--txt3)">منذ ' + dateLabel + '</div></div>' +
     '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:.88rem;color:var(--txt2);line-height:1.8;margin-bottom:16px">' + exp.details + '</div>' +
@@ -2333,7 +2462,7 @@ async function submitExperience() {
   if (!disease) { showToast('⚠️ اختر المرض / الحالة'); return; }
   if (!details || details.length < 20) { showToast('⚠️ اكتب تفاصيل كافية (20 حرف على الأقل)'); return; }
   var expId = Date.now().toString();
-  var newExp = { id: expId, username: currentUser.name || currentUser.username, disease: disease, details: details, date: Date.now(), userId: currentUser.username };
+  var newExp = { id: expId, username: currentUser.name || currentUser.username, disease: disease, details: details, date: Date.now(), userId: currentUser.username, isPro: isProActive(currentUser) };
   await dbSaveExperience(expId, newExp);
   allExperiences.unshift(Object.assign({}, newExp, { date: new Date(newExp.date) }));
   var chip = document.getElementById('exp-count-chip');
@@ -2504,6 +2633,7 @@ document.querySelectorAll('.modal-overlay').forEach(function(o) {
 });
 document.getElementById('share-exp-modal').addEventListener('click', function(e) { if (e.target === this) closeShareExpModal(); });
 document.getElementById('exp-detail-modal').addEventListener('click', function(e) { if (e.target === this) closeExpDetail(); });
+document.getElementById('pro-modal').addEventListener('click', function(e) { if (e.target === this) closeProModal(); });
 
 /* char counter */
 var expDetailsInput = document.getElementById('exp-details');
@@ -2877,6 +3007,43 @@ window.doLogin = function() {
   }, 500);
 };
 
+
+<!-- ══ مودال النسخة البرو ══ -->
+<div class="pro-modal-overlay" id="pro-modal">
+  <div class="pro-modal-box">
+    <div class="pro-modal-icon">👑</div>
+    <div class="pro-modal-title">النسخة البرو — طيبات</div>
+    <div class="pro-modal-sub">احصل على متابعة شخصية ودعم فوري</div>
+
+    <div class="pro-modal-features">
+      <div class="pro-modal-feature">
+        <div class="pro-modal-feature-icon">📱</div>
+        <div class="pro-modal-feature-text">
+          <div class="pro-modal-feature-title">متابعة يومية عبر واتساب</div>
+          متابعة مستمر يومياً بنظام صحي متوافق مع نظام الطيبات
+        </div>
+      </div>
+      <div class="pro-modal-feature">
+        <div class="pro-modal-feature-icon">⚡</div>
+        <div class="pro-modal-feature-text">
+          <div class="pro-modal-feature-title">دعم سريع</div>
+          وصول أسرع لكامل مميزات التطبيق مع دعم فوري متخصص
+        </div>
+      </div>
+    </div>
+
+    <div class="pro-modal-price-box">
+      <div class="pro-modal-price-main">100 جنيه</div>
+      <div class="pro-modal-price-desc">شهرياً فقط — لشراء النسخة البرو تواصل معنا</div>
+    </div>
+
+    <a href="https://wa.me/201279934735" target="_blank" rel="noopener" class="pro-modal-whatsapp">
+      <i class="fab fa-whatsapp" style="font-size:1.5rem"></i>
+      تواصل معنا عبر واتساب
+    </a>
+    <button class="pro-modal-close-btn" onclick="closeProModal()">إغلاق</button>
+  </div>
+</div>
 
 </body>
 </html>
