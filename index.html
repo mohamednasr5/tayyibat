@@ -404,6 +404,25 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .modal-overlay.show .modal-box{transform:translateY(0)}
 .modal-title{font-family:'Amiri',serif;font-size:1.2rem;color:var(--gold2);text-align:center;margin-bottom:20px}
 .modal-close{width:100%;border:none;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:10px}
+/* ══ Welcome Videos Modal ══ */
+#welcome-videos-modal .modal-box{max-height:90vh;padding:20px 14px 24px}
+.wvm-header{text-align:center;margin-bottom:16px}
+.wvm-icon{font-size:2.2rem;display:block;margin-bottom:6px}
+.wvm-headline{font-family:'Amiri',serif;font-size:1.05rem;color:var(--gold2);line-height:1.6;margin-bottom:4px}
+.wvm-sub{font-size:.78rem;color:var(--txt3);line-height:1.5}
+.wvm-video-title{font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:800;color:var(--txt);text-align:center;margin-bottom:10px;min-height:2.4em;line-height:1.4}
+.wvm-player-wrap{position:relative;width:100%;border-radius:14px;overflow:hidden;background:#000;margin-bottom:14px}
+.wvm-player-wrap video{width:100%;height:auto;display:block;max-height:280px;outline:none}
+.wvm-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);color:var(--gold2);font-size:.85rem;font-family:'Tajawal',sans-serif;pointer-events:none;opacity:0;transition:opacity .2s}
+.wvm-loading.show{opacity:1}
+.wvm-counter{text-align:center;font-size:.75rem;color:var(--txt3);margin-bottom:10px}
+.wvm-nav{display:flex;gap:10px;margin-bottom:12px}
+.wvm-btn{flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:6px}
+.wvm-btn:disabled{opacity:.35;cursor:not-allowed}
+.wvm-btn.next-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border-color:transparent}
+.wvm-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
+.wvm-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s;cursor:pointer}
+.wvm-dot.active{background:var(--gold);width:22px;border-radius:4px}
 #toast{position:fixed;bottom:calc(var(--nav)+16px);left:50%;transform:translateX(-50%) translateY(20px);background:rgba(15,31,58,.95);border:1px solid var(--border);border-radius:20px;padding:10px 20px;font-size:.82rem;font-weight:700;color:var(--txt);z-index:3000;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .sound-btn{position:fixed;top:14px;left:14px;z-index:200;width:36px;height:36px;border-radius:50%;background:rgba(5,14,31,.8);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem;color:var(--txt2)}
@@ -703,6 +722,36 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 </div>
 
 <!-- ══ مودال تفاصيل الصيام ══ -->
+<!-- ══ مودال فيديوهات الترحيب ══ -->
+<div class="modal-overlay" id="welcome-videos-modal">
+  <div class="modal-box">
+    <div class="wvm-header">
+      <span class="wvm-icon">🎯</span>
+      <div class="wvm-headline">لو حضرتك من الناس اللي بتشكك في نظام الطيبات</div>
+      <div class="wvm-sub">ننصحك بمشاهدة هذه الحالات التي تم شفائها بالفعل 👇</div>
+    </div>
+    <div class="wvm-video-title" id="wvm-title"></div>
+    <div class="wvm-player-wrap">
+      <video id="wvm-video" controls playsinline preload="metadata"
+             style="width:100%;height:auto;display:block;max-height:280px;outline:none">
+        متصفحك لا يدعم تشغيل الفيديو
+      </video>
+      <div class="wvm-loading" id="wvm-loading">⏳ جاري تحميل الفيديو...</div>
+    </div>
+    <div class="wvm-counter" id="wvm-counter"></div>
+    <div class="wvm-dots" id="wvm-dots"></div>
+    <div class="wvm-nav">
+      <button class="wvm-btn" id="wvm-prev" onclick="wvmGo(-1)">
+        <i class="fas fa-chevron-right"></i> السابق
+      </button>
+      <button class="wvm-btn next-btn" id="wvm-next" onclick="wvmGo(1)">
+        التالي <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+    <button class="modal-close" onclick="closeWelcomeModal()">✅ شكراً، تابع للتطبيق</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="fast-details-modal">
   <div class="modal-box">
     <div class="modal-title" id="fast-modal-title">📋 تفاصيل بروتوكول الصيام</div>
@@ -1119,6 +1168,7 @@ function bootApp() {
   document.getElementById('bottom-nav').classList.add('show');
   goPage('home');
   hideLoader();
+  setTimeout(showWelcomeModal, 600);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2131,6 +2181,84 @@ async function submitExperience() {
     requestAnimationFrame(d);
   } d();
 })();
+
+/* ══════════════════════════════════════════════════════════
+   Welcome Videos Modal
+══════════════════════════════════════════════════════════ */
+var wvmVideos = [
+  { title: 'من أنقذ لسان شيماء ؟', src: '1.mp4' },
+  { title: 'شهادة حق من مريضة شُفيت من نظام الطيبات', src: '2.mp4' },
+  { title: 'مريض سكر بعد جلطات بالقلب وبتر جرب', src: '3.mp4' },
+  { title: 'مهندس مريض سكر type 2 وضغط وسمنة مفرطة', src: '4.mp4' },
+  { title: 'مريض قلب مفتوح يحكي تجربة نظام الطيبات', src: '5.mp4' },
+  { title: 'مريضة ضغط والعصب السابع من مجربات نظام الطيبات', src: '6.mp4' }
+];
+var wvmCurrent = 0;
+
+function showWelcomeModal() {
+  wvmCurrent = 0;
+  buildWvmDots();
+  wvmRender();
+  document.getElementById('welcome-videos-modal').classList.add('show');
+}
+
+function closeWelcomeModal() {
+  var vid = document.getElementById('wvm-video');
+  vid.pause();
+  vid.src = '';
+  document.getElementById('welcome-videos-modal').classList.remove('show');
+}
+
+function wvmRender() {
+  var v = wvmVideos[wvmCurrent];
+  var vid = document.getElementById('wvm-video');
+  var loading = document.getElementById('wvm-loading');
+
+  vid.pause();
+  loading.classList.add('show');
+  loading.textContent = '⏳ جاري تحميل الفيديو...';
+  vid.src = v.src;
+  vid.load();
+
+  vid.oncanplay = function() { loading.classList.remove('show'); };
+  vid.onerror   = function() { loading.textContent = '⚠️ تعذّر تحميل الفيديو'; };
+
+  document.getElementById('wvm-title').textContent = v.title;
+  document.getElementById('wvm-counter').textContent =
+    'فيديو ' + (wvmCurrent + 1) + ' من ' + wvmVideos.length;
+  document.getElementById('wvm-prev').disabled = wvmCurrent === 0;
+
+  var nextBtn = document.getElementById('wvm-next');
+  if (wvmCurrent === wvmVideos.length - 1) {
+    nextBtn.innerHTML = '✅ إنهاء';
+    nextBtn.onclick = function() { closeWelcomeModal(); };
+  } else {
+    nextBtn.innerHTML = 'التالي <i class="fas fa-chevron-left"></i>';
+    nextBtn.onclick = function() { wvmGo(1); };
+  }
+
+  document.querySelectorAll('.wvm-dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === wvmCurrent);
+  });
+}
+
+function buildWvmDots() {
+  var c = document.getElementById('wvm-dots');
+  c.innerHTML = '';
+  wvmVideos.forEach(function(_, i) {
+    var d = document.createElement('div');
+    d.className = 'wvm-dot' + (i === 0 ? ' active' : '');
+    d.onclick = function() { wvmCurrent = i; wvmRender(); };
+    c.appendChild(d);
+  });
+}
+
+function wvmGo(dir) {
+  var next = wvmCurrent + dir;
+  if (next < 0 || next >= wvmVideos.length) return;
+  wvmCurrent = next;
+  wvmRender();
+}
 
 /* ══════════════════════════════════════════════════════════
    Modals close on backdrop click
