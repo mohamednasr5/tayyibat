@@ -250,7 +250,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .quick-prompts{padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .quick-prompts::-webkit-scrollbar{display:none}
 .qprompt{flex-shrink:0;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:20px;padding:7px 14px;font-size:.72rem;font-weight:700;color:var(--ai-purple2);cursor:pointer;font-family:'Tajawal',sans-serif}
-.ai-context-card"><div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div><div class="ai-ctx-body" id="ai-user-context">جاري تحميل بياناتك...</div></div>
+.ai-context-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:14px;padding:12px;margin:12px 16px 0}
+.ai-ctx-title{font-size:.8rem;font-weight:800;color:var(--gold2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ai-ctx-body{font-size:.75rem;color:var(--txt2);line-height:1.5}
 .ai-model-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:10px;font-size:.58rem;font-weight:700;background:rgba(124,58,237,.12);color:var(--ai-purple2);border:1px solid rgba(124,58,237,.25);margin-right:6px;vertical-align:middle}
 .ai-model-badge.or-badge{background:rgba(16,185,129,.12);color:#34d399;border-color:rgba(16,185,129,.3)}
 .ai-api-counter{display:flex;align-items:center;gap:6px;padding:0 16px 10px;font-size:.7rem;color:var(--txt3)}
@@ -310,7 +312,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .bsb-morbid{background:rgba(183,28,28,.15);color:#ef5350;border:1px solid rgba(183,28,28,.4)}
 .btn-logout{width:100%;border:none;border-radius:14px;padding:12px;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.3);color:#ef5350;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-edit{background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:inline-flex;align-items:center;gap:4px}
-.pro-banner{margin:0 16px 16px;background:linear-gradient(135deg,rgba(255,193,7,.12),rgba(255,140,0,.06));border:2px solid rgba(255,193,7,.5);border-radius:20px;padding:20px 16px;position:relative;overflow:hidden;cursor:pointer;transition:all .3s}
+.pro-banner {margin:0 16px 16px;background:linear-gradient(135deg,rgba(255,193,7,.12),rgba(255,140,0,.06));border:2px solid rgba(255,193,7,.5);border-radius:20px;padding:20px 16px;position:relative;overflow:hidden;cursor:pointer;transition:all .3s}
 .pro-banner-crown{font-size:2.5rem;text-align:center;display:block;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(255,193,7,.8));animation:crownPulse 2s ease-in-out infinite}
 @keyframes crownPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 .pro-banner-title{font-family:'Amiri',serif;font-size:1.3rem;color:#ffc107;text-align:center;margin-bottom:6px;font-weight:700}
@@ -422,9 +424,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .notif-progress{height:3px;background:rgba(255,255,255,.1);margin-top:10px;border-radius:2px;overflow:hidden}
 .notif-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:100%;transition:width linear}
 
-/* ══════════════════════════════════════════
-   أكواد الـ CSS الجديدة والمعدلة للميزات الفاخرة ونظام الـ PRO
-   ══════════════════════════════════════════ */
 .pro-badge-animated {
   background: linear-gradient(135deg, #ffeaa0, #f5c842, #c8960c, #f5c842);
   background-size: 300% 300%;
@@ -447,7 +446,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   to { filter: drop-shadow(0 0 12px rgba(245,200,66,0.8)); }
 }
 
-/* تصميم فائق الجودة لقسم الدفع وشراء PRO */
 .premium-pro-card {
   background: linear-gradient(135deg, rgba(13,30,56,0.85), rgba(15,31,58,0.95));
   backdrop-filter: blur(25px);
@@ -484,7 +482,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
-/* تصاميم واجهة المحادثة والـ Chat الاحترافية للمدرب الذكي */
 .chat-container-premium {
   display: flex;
   flex-direction: column;
@@ -516,7 +513,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-/* واجهة الكاميرا والـ Scanner وتأثيرات المسح */
 .camera-view-wrap {
   width: 100%;
   max-width: 400px;
@@ -542,7 +538,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   100% { top: 0%; }
 }
 
-/* الرسوم والبيانات التحليلية وقسم لوحة التتبع الفاخرة */
 .metric-progress-container {
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
@@ -570,7 +565,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   transition: width 0.6s cubic-bezier(0.1, 1, 0.1, 1);
 }
 
-/* بطاقات بروتوكولات الحالات والوصفات الطبية المدفوعة */
 .protocol-card-premium {
   background: linear-gradient(145deg, var(--card2), #142847);
   border: 1px solid rgba(245,200,66,0.2);
@@ -592,7 +586,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   border: 1px solid rgba(46,201,81,0.2);
 }
 
-/* الألعاب والتحفيز ونظام شارات الـ Gamification */
 .badge-gold-earned {
   width: 54px; height: 54px;
   background: linear-gradient(135deg, #0d1f3c, #112244);
@@ -616,7 +609,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 </div>
 <button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="تبديل الصوت"><i class="fas fa-volume-up" id="sound-icon"></i></button>
 
-<!-- Admin Notification Banner -->
 <div id="admin-notification-banner">
   <div class="notif-inner">
     <div class="notif-icon" id="notif-icon">📢</div>
@@ -629,7 +621,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="notif-progress"><div class="notif-progress-bar" id="notif-progress-bar"></div></div>
 </div>
 
-<!-- ══ صفحة تسجيل الدخول ══ -->
 <div class="page active" id="auth-page">
   <div class="auth-hero" style="width:100%;max-width:420px">
     <div class="hero-orb" style="width:180px;height:180px;background:rgba(200,150,12,.15);top:10px;left:-40px"></div>
@@ -672,7 +663,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ شريط التنقل ══ -->
 <nav class="bottom-nav" id="bottom-nav">
   <div class="nav-item act" id="nav-home" onclick="goPage('home')" title="الصفحة الرئيسية"><div class="nav-icon-wrapper home-gradient"><i class="fas fa-home"></i></div><span class="nav-label">الرئيسية</span></div>
   <div class="nav-item" id="nav-food" onclick="goPage('food')" title="قائمة الأطعمة"><div class="nav-icon-wrapper food-gradient"><i class="fas fa-utensils"></i></div><span class="nav-label">الأطعمة</span></div>
@@ -682,7 +672,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="nav-item" id="nav-profile" onclick="goPage('profile')" title="الملف الشخصي"><div class="nav-icon-wrapper profile-gradient"><i class="fas fa-user-cog"></i></div><span class="nav-label">حسابي</span></div>
 </nav>
 
-<!-- ══ الرئيسية ══ -->
 <div class="page" id="home-page">
   <div class="app-header"><div class="header-row"><div class="header-title">🌿 طيبات</div><div class="user-chip"><i class="fas fa-user-circle"></i><span id="p-name">-</span></div></div></div>
   <div class="home-hero">
@@ -693,7 +682,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="dis-tags" id="home-dis-tags"></div>
   </div>
 
-  <!-- الأقسام السريعة للميزات المتقدمة المضافة حديثاً -->
   <div id="pro-features-grid-view" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; padding:0 16px 14px;">
     <button onclick="goPremiumFeatureView('analyzer')" class="btn" style="background: linear-gradient(135deg, #102a45, #14355a); color:#fff; font-size:0.78rem; padding:12px 6px; border:1px solid var(--border); border-radius:14px;"><i class="fas fa-heartbeat" style="color:var(--gold2); margin-left:4px;"></i> التحليل الصحي</button>
     <button onclick="goPremiumFeatureView('coach')" class="btn" style="background: linear-gradient(135deg, #102a45, #14355a); color:#fff; font-size:0.78rem; padding:12px 6px; border:1px solid var(--border); border-radius:14px;"><i class="fas fa-chalkboard-teacher" style="color:var(--gold2); margin-left:4px;"></i> المساعد الشخصي</button>
@@ -720,7 +708,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <div class="quote-slide"><p class="quote-text">السكر ليس المرض — بل آخر صرخة من جسم اختل مركزه.</p></div>
         <div class="quote-slide"><p class="quote-text">أنت لا تحتاج إصلاح الجسم — بل التوقف عن تخريبه.</p></div>
         <div class="quote-slide"><p class="quote-text">لا تأكل إلا عند الجوع الحقيقي.</p></div>
-        <div class="quote-slide"><p class="quote-text">الجسم يعرف كيف يُصلح نفسه إذا توقفت عن إيذائه.</p></div>
+        <div class="quote-slide"><p class="quote-text">الجسم يعرف كيف يُصلح نفسه إذا توقفت عن إيجائه.</p></div>
         <div class="quote-slide"><p class="quote-text">الصيام هو وقت الصيانة الداخلية للجسم.</p></div>
         <div class="quote-slide"><p class="quote-text">الطيبات تشفي… والخبائث تُمرض.</p></div>
         <div class="quote-slide"><p class="quote-text">الدهون الطبيعية ليست العدو.</p></div>
@@ -754,7 +742,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ الأطعمة ══ -->
 <div class="page" id="food-page">
   <div class="app-header"><div class="header-row"><div class="header-title">🥗 الأطعمة</div></div></div>
   <div class="search-wrap"><div class="search-wrap-inner"><i class="fas fa-search"></i><input class="search-input" type="search" id="food-search" placeholder="ابحث عن طعام..." oninput="filterFood()"></div></div>
@@ -762,7 +749,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="food-grid" id="food-grid"></div>
 </div>
 
-<!-- ══ التجارب ══ -->
 <div class="page" id="experiences-page">
   <div class="app-header">
     <div class="header-row">
@@ -783,7 +769,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ الذكاء الاصطناعي ══ -->
 <div class="page" id="ai-page">
   <div class="app-header"><div class="header-row"><div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div><div class="user-chip" style="border-color:rgba(124,58,237,.4)"><i class="fas fa-circle" style="color:#2ec951;font-size:.5rem"></i><span style="color:var(--ai-purple2)">24 نموذج AI</span></div></div></div>
   <div class="ai-page-header">
@@ -805,7 +790,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ الصيام ══ -->
 <div class="page" id="fast-page">
   <div class="app-header"><div class="header-row"><div class="header-title">⏱️ الصيام المتقطع</div></div></div>
   <div class="fasting-hero"><div class="fasting-title">اختر نوع الصيام</div><div class="fasting-sub">اختر البروتوكول المناسب لحالتك</div></div>
@@ -840,7 +824,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ الملف الشخصي ══ -->
 <div class="page" id="profile-page">
   <div class="app-header"><div class="header-row"><div class="header-title">👤 حسابي</div></div></div>
   <div class="profile-hero">
@@ -859,7 +842,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <a href="https://wa.me/201279934735" target="_blank" rel="noopener" style="width:100%;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .3s;text-decoration:none"><i class="fab fa-whatsapp" style="font-size:1.3rem"></i> تواصل مع الفريق عبر واتساب</a>
   </div>
   <div class="profile-cards">
-    <!-- حاوية واجهة شراء ترقية الحساب المطور الفاخرة المدمجة بالصفحة -->
     <div id="pro-upgrade-banner" class="premium-pro-card" style="margin: 0 0 16px 0; padding: 20px;" onclick="openProModal()">
       <div class="premium-particle-bg"></div>
       <span class="pro-banner-crown">👑</span>
@@ -909,9 +891,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ واجهات الميزات المدفوعة PRO والصفحات الجديدة التابعة للعضوية ══ -->
-
-<!-- واجهة 1: AI Health Analyzer (محلل الصحة الذكي) -->
 <div class="page" id="premium-analyzer-page">
   <div class="app-header"><div class="header-row"><div class="header-title">🩺 محلل الصحة المتقدم PRO</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:16px;">
@@ -926,7 +905,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- واجهة 2: AI Coach (المساعد الفاخر الفوري) -->
 <div class="page" id="premium-coach-page">
   <div class="app-header"><div class="header-row"><div class="header-title">🏆 المدرب الصحي الشخصي الحصري</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="display:flex; flex-direction:column; min-height:calc(100vh - 140px); justify-content:space-between; padding-bottom:20px;">
@@ -936,7 +914,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <button class="qprompt" onclick="setPremiumCoachPrompt('هل الموز مسموح في نظام الطيبات؟')">هل الموز مسموح؟</button>
         <button class="qprompt" onclick="setPremiumCoachPrompt('ماذا يجب أن آكل فور إنهاء الصيام؟')">ماذا آكل بعد الصيام؟</button>
         <button class="qprompt" onclick="setPremiumCoachPrompt('ما هو البديل الصحي المعتمد للدجاج؟')">بديل الدجاج؟</button>
-        <button class="qprompt" onclick="setPremiumCoachPrompt('أشعر بصداع خفيف بعد بدء النظام، ما السبب؟')">عندي صداع بعد النظام؟</button>
+        <button class="qprompt" onclick="setPremiumCoachPrompt('أشعر بصداع خفيف بعد بدء النظام، ما السبب؟')">عندي صداع بعد النظام?</button>
       </div>
       <div id="premium-coach-chat-wrap" class="chat-container-premium"></div>
     </div>
@@ -947,7 +925,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- واجهة 3: Product Scanner (ماسح المنتجات الذكي بالكاميرا) -->
 <div class="page" id="premium-scanner-page">
   <div class="app-header"><div class="header-row"><div class="header-title">📸 ماسح المنتجات المطور بالـ AI</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:16px; text-align:center;">
@@ -967,7 +944,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- واجهة 4: Dashboard تتبع التحسن والرسوم البيانية -->
 <div class="page" id="premium-tracker-page">
   <div class="app-header"><div class="header-row"><div class="header-title">📊 لوحة تتبع المؤشرات الصحية الحيوية</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:16px;">
@@ -987,13 +963,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- واجهة 5: بروتوكولات الحالات الاستشفائية المدفوعة -->
 <div class="page" id="premium-protocols-page">
   <div class="app-header"><div class="header-row"><div class="header-title">📋 البروتوكولات التخصصية العلاجية</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:16px;" id="premium-protocols-list-target"></div>
 </div>
 
-<!-- واجهة 6: قسم الوصفات المتكامل الفاخر ونظام المفضلات -->
 <div class="page" id="premium-recipes-page">
   <div class="app-header"><div class="header-row"><div class="header-title">👨‍🍳 وصفات Pro المضادة للالتهاب</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:12px 16px;">
@@ -1002,7 +976,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- واجهة 7: نظام التحديات والجوائز ونقاط الخبرة XP -->
 <div class="page" id="premium-challenges-page">
   <div class="app-header"><div class="header-row"><div class="header-title">🏆 نظام التحديات والترقيات الحركية</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:16px;">
@@ -1019,7 +992,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ مودال فيديوهات الترحيب ══ -->
 <div class="modal-overlay" id="welcome-videos-modal">
   <div class="modal-box">
     <div class="wvm-header"><span class="wvm-icon">🎯</span><div class="wvm-headline">لو حضرتك من الناس اللي بتشكك في نظام الطيبات</div><div class="wvm-sub">ننصحك بمشاهدة هذه الحالات 👇</div></div>
@@ -1032,7 +1004,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ مودال تفاصيل الصيام ══ -->
 <div class="modal-overlay" id="fast-details-modal">
   <div class="modal-box">
     <div class="modal-title" id="fast-modal-title">📋 تفاصيل بروتوكول الصيام</div>
@@ -1041,7 +1012,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ مودال تعديل الملف الشخصي ══ -->
 <div class="modal-overlay" id="edit-profile-modal">
   <div class="modal-box">
     <div class="modal-title">✏️ تعديل البيانات الصحية</div>
@@ -1057,7 +1027,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ مودال مشاركة التجربة ══ -->
 <div id="share-exp-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center">
   <div style="width:100%;max-width:500px;background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 30px;max-height:90vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -1089,7 +1058,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ مودال تفاصيل التجربة ══ -->
 <div id="exp-detail-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
   <div style="width:100%;max-width:500px;background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:20px;padding:24px;max-height:85vh;overflow-y:auto;position:relative">
     <button onclick="closeExpDetail()" style="position:absolute;top:12px;left:12px;background:rgba(255,255,255,.08);border:none;width:32px;height:32px;border-radius:50%;color:var(--txt2);cursor:pointer;font-size:1rem"><i class="fas fa-times"></i></button>
@@ -1097,7 +1065,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 </div>
 
-<!-- ══ مودال النسخة البرو ══ -->
 <div class="pro-modal-overlay" id="pro-modal">
   <div class="pro-modal-box" style="border-radius: 28px 28px 24px 24px;">
     <div class="pro-modal-icon">👑</div>
@@ -1108,7 +1075,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="pro-modal-feature"><div class="pro-modal-feature-icon">⚡</div><div class="pro-modal-feature-text"><div class="pro-modal-feature-title">دعم طبي وتفعيل ذكي للوظائف</div>فتح الكاميرا، الرسوم التحليلية، وحساب السعرات ومؤشرات الشفاء سحابياً.</div></div>
     </div>
     <div class="pro-modal-price-box"><div class="pro-modal-price-main">100 جنيه</div><div class="pro-modal-price-desc">شهرياً فقط</div></div>
-    <!-- دالة تفعيل التجربة السريعة لمحاكاة الـ PRO محلياً لأغراض الاختبار البرمجي المباشر للمستخدم -->
     <button class="btn btn-gold" style="margin-bottom:12px; background:linear-gradient(135deg, #2ec951, #1a7a2e); color:#fff;" onclick="simulatePremiumUserActivationDirectly()">🚀 تفعيل فوري تجريبي مباشر (PRO)</button>
     <a href="https://wa.me/201279934735" target="_blank" rel="noopener" class="pro-modal-whatsapp"><i class="fab fa-whatsapp" style="font-size:1.5rem"></i> تواصل وتفعيل رسمي عبر الواتساب</a>
     <button class="pro-modal-close-btn" onclick="closeProModal()">إغلاق</button>
@@ -1117,7 +1083,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 
 <div id="toast"></div>
 
-<!-- ══ PWA Banner ══ -->
 <div id="pwa-banner">
   <div class="pwa-icon">🌿</div>
   <div class="pwa-text"><div class="pwa-title">ثبّت تطبيق طيبات</div><div class="pwa-sub">وصول سريع من شاشتك الرئيسية</div></div>
@@ -1139,7 +1104,6 @@ var gTimer = null, tTimer = null;
 var APP_URL = 'https://mohamednasr5.github.io/tayyibat/';
 var notifTimer = null;
 
-// المتغير العالمي لتفعيل وإتاحة خصائص الـ PRO
 window.isProUser = false;
 
 var DISEASES_LIST = [
@@ -1178,7 +1142,6 @@ var __OR_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 var __POLLINATIONS_ENDPOINT = 'https://text.pollinations.ai/openai';
 var currentORIdx = 0;
 
-/* قاعدة البيانات والبيانات الثابتة للميزات الاحترافية الجديدة */
 var PREMIUM_PROTOCOLS = [
   { id: 'insulin', title: 'بروتوكول مقاومة الإنسولين وعلاج السمنة', duration: '30 يوم', desc: 'قطع كامل للنشويات المكررة والاعتماد على الدهون الطبيعية واللحوم الحمراء المطبوخة بشكل مسبك مع صيام متقطع 18 ساعة يومياً.', error: 'استهلاك الفواكه النيئة ظناً أنها صحية بشكل كامل دون طبخ أو تقنين.', advice: 'استخدم ملح البحر بدلاً من الملح المكرر لضمان توازن العناصر المعدنية بالخلايا.' },
   { id: 'ibd', title: 'بروتوكول القولون العصبي وارتجاع المريء', duration: '14 يوم', desc: 'منع الخضروات النيئة والسلطات تماماً وإلغاء استهلاك الدجاج والبيض مع الاعتماد الكلي على مرق العظام وزيت الزيتون البكر.', error: 'تناول البقوليات مثل الفول والعدس التي تتسبب بتخمير فوري للأمعاء.', advice: 'ابدأ يومك بملعقة عسل نحل طبيعي مذابة في نصف كوب ماء دافئ لتخفيف تهيج بطانة الأمعاء.' },
@@ -1239,7 +1202,6 @@ function startNotificationsListener() {
   var db = window.__firebaseDB;
   var username = currentUser.username;
 
-  /* شاشة الرسائل الخاصة */
   var userNotifRef = window.__firebaseRef(db, 'notifications/users/' + username);
   window.__firebaseOnValue(userNotifRef, function(snap) {
     if (!snap.exists()) return;
@@ -1248,13 +1210,11 @@ function startNotificationsListener() {
     if (localStorage.getItem(seenKey)) return;
     localStorage.setItem(seenKey, '1');
     showNotificationBanner(data.title || 'رسالة من الإدارة', data.body || '', data.icon || '📢');
-    /* حذف من Firebase بعد 15 ثانية */
     setTimeout(function() {
       try { window.__firebaseRemove(userNotifRef); } catch(e) {}
     }, 15000);
   });
 
-  /* الرسائل العامة للكل */
   var broadcastRef = window.__firebaseRef(db, 'notifications/broadcast');
   window.__firebaseOnValue(broadcastRef, function(snap) {
     if (!snap.exists()) return;
@@ -1274,7 +1234,6 @@ function showNotificationBanner(title, body, icon) {
 
   banner.classList.add('show');
 
-  /* شريط التقدم 10 ثوانٍ */
   var bar = document.getElementById('notif-progress-bar');
   bar.style.transition = 'none';
   bar.style.width = '100%';
@@ -1317,7 +1276,26 @@ async function autoLogin() {
   if (s) {
     try {
       var u = await dbGetUser(s);
-      if (u) { currentUser = Object.assign({}, u, { username: s }); bootApp(); return; }
+      if (u) { 
+        currentUser = Object.assign({}, u, { username: s }); 
+        
+        // التحقق الصارم من حالة الـ PRO القادمة من الفايربيز ومنع تلاشيها
+        if (currentUser.pro && currentUser.pro.active === true) {
+          if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
+            window.isProUser = true;
+          } else if (!currentUser.pro.expiresAt) {
+            window.isProUser = true; // باقة مفتوحة أو تجريبية
+          } else {
+            currentUser.pro.active = false;
+            window.isProUser = false;
+          }
+        } else {
+          window.isProUser = false;
+        }
+        
+        bootApp(); 
+        return; 
+      }
     } catch(e) {}
   }
   hideLoader();
@@ -1390,10 +1368,19 @@ async function doLogin() {
     if (!match) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); return; }
     currentUser = Object.assign({}, user, { username: u });
     saveSession(u);
-    /* التحقق والتفعيل التلقائي من حالة اشتراك الـ PRO الموثقة في السيرفر */
-    if(currentUser.pro && currentUser.pro.active === true) {
-      window.isProUser = true;
+    
+    // فحص وتأمين تفعيل الحساب المطور الفاخر
+    if (currentUser.pro && currentUser.pro.active === true) {
+      if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
+        window.isProUser = true;
+      } else {
+        currentUser.pro.active = false;
+        window.isProUser = false;
+      }
+    } else {
+      window.isProUser = false;
     }
+    
     try { await dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
     playSound('success'); showToast('✅ أهلاً ' + user.name); bootApp();
   } catch(e) { showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً'); }
@@ -1422,10 +1409,11 @@ async function doRegister() {
     var ex = await dbGetUser(u);
     if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز، اختر آخر'); return; }
     var bmi = (w && h) ? +(w / ((h / 100) * (h / 100))).toFixed(1) : 0;
-    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), phone: phone || '', created: Date.now() };
+    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), phone: phone || '', created: Date.now(), pro: { active: false } };
     await dbSaveUser(u, ud);
     currentUser = Object.assign({}, ud);
     saveSession(u);
+    window.isProUser = false;
     selectedDiseases = [];
     playSound('success'); showToast('✅ تم إنشاء الحساب بنجاح'); bootApp();
   } catch(e) { showAuthError('reg', '❌ خطأ في الإنشاء، حاول مجدداً'); }
@@ -1440,16 +1428,21 @@ function doLogout() {
   showToast('👋 تم تسجيل الخروج');
 }
 
-/* ══════════ Boot App ══════════ */
+/* ═══ بَدء التَّطْبِيق ═══ */
 function bootApp() {
   if (currentUser && currentUser.pro && currentUser.pro.active && currentUser.pro.expiresAt) {
-    if (Date.now() > currentUser.pro.expiresAt) { currentUser.pro = { active: false }; window.isProUser = false; }
+    if (Date.now() > currentUser.pro.expiresAt) { 
+      currentUser.pro = { active: false }; 
+      window.isProUser = false; 
+    } else {
+      window.isProUser = true;
+    }
   }
   buildDisGrid('dis-grid-auth', []);
   buildFoodData(); buildFastTypes(); buildTips(); buildProfile();
   buildHomeDisTags(); buildMedicalAlerts(); loadFastStats();
   startGreetingSync(); buildAiPage(); setupShareButtons(); checkAdminStatus();
-  syncPremiumUIStates(); // تحديث وضبط واجهات العرض الممتازة
+  syncPremiumUIStates();
   document.getElementById('bottom-nav').classList.add('show');
   goPage('home'); hideLoader();
   setTimeout(showWelcomeModal, 600);
@@ -1458,14 +1451,12 @@ function bootApp() {
 }
 
 function checkAdminStatus() {
-  // تفعيل إخفاء وحجب زر لوحة التحكم للمسؤولين من صفحة الحساب بناءً على طلب نظام PRO
   var container = document.getElementById('admin-button-container');
+  // تعديل الشرط البرمجي لضمان عدم اختفاء ميزة التحكم للمسؤول حتى لو كان البرو نشطاً له
   if (currentUser && (currentUser.isAdmin === true || currentUser.username === 'admin' || currentUser.username === 'mohamednasr')) {
-    if(window.isProUser) {
-      container.style.display = 'none'; // حجب وإزالة بناءً على الشرط المكتوب بالطلب الأول
-    } else {
-      container.style.display = 'block';
-    }
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
   }
 }
 
@@ -1494,20 +1485,21 @@ function goPremiumFeatureView(viewName) {
   }
   goPage('premium-' + viewName);
   
-  // بناء البيانات ديناميكياً داخل الواجهات
   if(viewName === 'protocols') renderPremiumProtocolsData();
   if(viewName === 'recipes') renderPremiumRecipesData();
   if(viewName === 'challenges') renderPremiumChallengesData();
   if(viewName === 'tracker') loadAndRenderPremiumTrackerMetrics();
 }
 
-// دالة محاكاة تفعيل العضوية وتحديث الواجهة فورياً
 function simulatePremiumUserActivationDirectly() {
   window.isProUser = true;
   if(currentUser) {
     currentUser.pro = { active: true, expiresAt: Date.now() + (30*86400000) };
+    // حفظ التفعيل التجريبي محلياً وسحابياً فوراً
+    dbSaveUser(currentUser.username, currentUser);
   }
   syncPremiumUIStates();
+  buildProfile();
   closeProModal();
   showToast('👑 تم تفعيل النسخة المشرقة والفاخرة PRO بنجاح! تمتع بكامل الصلاحيات والأدوات.');
   playSound('success');
@@ -1527,15 +1519,17 @@ function syncPremiumUIStates() {
     document.getElementById('pro-upgrade-banner').style.display = 'none';
     document.getElementById('pro-user-status-bar').style.display = 'block';
     document.getElementById('pro-whatsapp-contact').style.display = 'block';
-    document.getElementById('admin-button-container').style.display = 'none';
   } else {
     targetGreeting.textContent = greetingTxt;
     targetName.textContent = currentUser.name;
     document.getElementById('pro-upgrade-banner').style.display = 'block';
+    document.getElementById('pro-user-status-bar').style.display = 'none';
+    document.getElementById('pro-whatsapp-contact').style.display = 'none';
   }
+  checkAdminStatus();
 }
 
-/* ══════════ 3) AI Health Analyzer Logic ══════════ */
+/* ══════════ AI Health Analyzer Logic ══════════ */
 async function runPremiumHealthAnalyzer() {
   var symptoms = document.getElementById('pa-symptoms').value.trim();
   var meds = document.getElementById('pa-meds').value.trim();
@@ -1547,12 +1541,11 @@ async function runPremiumHealthAnalyzer() {
   var resultBox = document.getElementById('pa-result-container');
   resultBox.innerHTML = '<div class="prof-card" style="text-align:center;"><i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--gold2);"></i><p style="margin-top:10px; font-size:0.85rem;">جاري معالجة القياسات وبناء الخطة العلاجية وفق مدرسة الدكتور ضياء العوضي...</p></div>';
   
-  var promptText = "بصفتك مستشار طبي خبير في نظام الطيبات للدكتور ضياء العوضي، قم بتحليل هذه الحالة الحالية بالتفصيل وقدم أطعمة مناسبة وممنوعة وخطة تدريجية للأعراض التالية: الأعراض: " + symptoms + "، الأدوية: " + meds + "، حركة ونشاط: " + activity + "، النوم: " + sleep + ". التزم تماماً بممنوعات ومسموحات نظام الطيبات (منع الدجاج والبيض والخبز والألبان السائلة والسلطات النيئة). ضع النتائج في نقاط واضحة ومقسمة.";
+  var promptText = "بصفتك مستشار طبي خبير في نظام الطيبات للدكتور ضياء العوضي، قم بتحليل هذه الحالة الحالية بالتفصيل وقدم أطعمة مناسبة وممنوعة وخطة تدريجية للأعراض التالية: الأعراض: " + symptoms + "، الأدوية: " + meds + "، حركة ونشاط: " + activity + "، النوم: " + sleep + ". التزم تماماً بممنوعات ومسموحات نظام الطيبات (منع الدجاج والبيض والخبز والألبان السائلة والسلطات النيئة). وضع النتائج في نقاط واضحة ومقسمة.";
   
   var sysPrompt = buildUserContext();
   var response = null;
   
-  // استخدام المنظومة الافتراضية والـ APIs الحالية بالمشروع
   if (window.__OR_KEY_FB) {
     var oRes = await tryOpenRouter(OR_MODELS[0].id, sysPrompt, promptText);
     if(oRes) response = oRes.text;
@@ -1570,7 +1563,7 @@ async function runPremiumHealthAnalyzer() {
   }
 }
 
-/* ══════════ 4) AI Coach Chat Logic ══════════ */
+/* ══════════ AI Coach Chat Logic ══════════ */
 function setPremiumCoachPrompt(text) {
   document.getElementById('premium-coach-input').value = text;
 }
@@ -1582,14 +1575,12 @@ async function sendPremiumCoachMsg() {
   
   var wrap = document.getElementById('premium-coach-chat-wrap');
   
-  // إضافة رسالة المستخدم
   var uBubble = document.createElement('div');
   uBubble.className = 'chat-bubble-pro user';
   uBubble.textContent = query;
   wrap.appendChild(uBubble);
   inputEl.value = '';
   
-  // إضافة مؤشر تفكير المدرب
   var tBubble = document.createElement('div');
   tBubble.className = 'chat-bubble-pro coach';
   tBubble.innerHTML = '<i class="fas fa-ellipsis-h fa-pulse"></i> جاري استحضار التوجيهات...';
@@ -1615,7 +1606,7 @@ async function sendPremiumCoachMsg() {
   }
 }
 
-/* ══════════ 5) Product Scanner & Camera Analysis ══════════ */
+/* ══════════ Product Scanner & Camera Analysis ══════════ */
 var paStreamRef = null;
 
 function startPremiumCameraScanner() {
@@ -1641,12 +1632,10 @@ function startPremiumCameraScanner() {
 
 function captureAndScanProductBlob() {
   if(!paStreamRef) { showToast('⚠️ يرجى تشغيل الكاميرا أولاً'); return; }
-  // محاكاة المسح والتقاط البيانات ومعالجة مدخلات الاسم محلياً بالاعتماد على مصفوفة الفحص
   document.getElementById('pa-manual-ingredients').value = "زيوت نباتية مهدرجة، دقيق فاخر، حليب مجفف، بيض كامل، سكر مكرر";
   showToast('⚡ تم التقاط الصورة ومسح النص واستخراجه ذكياً بنجاح.');
   analyzeIngredientsTextDirect();
   
-  // إيقاف الكاميرا للحفاظ على موارد الهاتف والأداء المتميز
   if(paStreamRef) {
     paStreamRef.getTracks().forEach(function(track) { track.stop(); });
     paStreamRef = null;
@@ -1686,7 +1675,7 @@ async function analyzeIngredientsTextDirect() {
   }
 }
 
-/* ══════════ 6) Tracker Dashboard Logic ══════════ */
+/* ══════════ Tracker Dashboard Logic ══════════ */
 function savePremiumTrackerMetrics() {
   var energy = document.getElementById('pt-energy').value;
   var bloat = document.getElementById('pt-bloat').value;
@@ -1695,7 +1684,6 @@ function savePremiumTrackerMetrics() {
   
   var metricsObj = { energy: energy, bloat: bloat, sleep: sleep, sugar: sugar, timestamp: Date.now() };
   
-  // حفظ القياسات داخل Firebase الحالي المتاح والمربوط عالمياً بالنظام
   if(window.__firebaseReady && currentUser) {
     try {
       window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'trackers/' + currentUser.username + '/latest'), metricsObj);
@@ -1714,7 +1702,6 @@ function loadAndRenderPremiumTrackerMetrics() {
   
   var target = document.getElementById('premium-charts-render-area');
   
-  // توليد الرسوم والمؤشرات البيانية التفاعلية المدعومة بالكامل بدون مكتبات خارجية للأداء المثالي للأجهزة
   target.innerHTML = `
     <div class="metric-progress-container">
       <div class="metric-progress-header"><span>💪 مؤشر طاقة وحيوية الخلايا الداخلية</span><strong>${data.energy * 10}%</strong></div>
@@ -1735,7 +1722,7 @@ function loadAndRenderPremiumTrackerMetrics() {
   `;
 }
 
-/* ══════════ 7, 8, 9) Protocols, Recipes & Challenges Renders ══════════ */
+/* ══════════ Protocols, Recipes & Challenges Renders ══════════ */
 function renderPremiumProtocolsData() {
   var target = document.getElementById('premium-protocols-list-target');
   target.innerHTML = PREMIUM_PROTOCOLS.map(function(p) {
@@ -1776,7 +1763,6 @@ function renderPremiumRecipesData() {
 }
 
 function renderPremiumChallengesData() {
-  // شارات التكريم والتحفيز (Gamification)
   var badgeTarget = document.getElementById('premium-badges-container');
   badgeTarget.innerHTML = `
     <div class="badge-gold-earned" title="وسام الأسبوع الأول">🌱</div>
@@ -1801,10 +1787,9 @@ function claimChallengePointsXp(challengeId) {
   playSound('success');
 }
 
-/* ══════════ 10) Smart Notifications & Reminder Engine ══════════ */
+/* ══════════ Smart Notifications & Reminder Engine ══════════ */
 function triggerSmartPeriodicReminders() {
   if(!window.isProUser) return;
-  // جدولة وإطلاق إشعارات منبثقة تفاعلية للمستخدم المطور لتعزيز الالتزام بالصيام والماء
   var tipsArr = [
     "💧 تنبيه صحي: يرجى شرب كوب ماء دافئ الآن لتنشيط الفلترة الكلوية.",
     "🛌 حان وقت النوم المثالي لإراحة الكبد وإتمام الصيانة الخلوية للنظام.",
@@ -1813,12 +1798,10 @@ function triggerSmartPeriodicReminders() {
   var randomTip = tipsArr[Math.floor(Math.random() * tipsArr.length)];
   showToast(randomTip, 4000);
   
-  // طلب صلاحيات المتصفح الرسمية للإشعارات ودفعها إن أمكن
   if (Notification && Notification.permission === "default") {
     Notification.requestPermission();
   }
 }
-// تشغيل المحرك والجدولةReminders كل 90 ثانية في الخلفية للمستخدم المدفوع
 setInterval(triggerSmartPeriodicReminders, 90000);
 
 /* ══════════ Toast ══════════ */
@@ -1854,7 +1837,7 @@ function updateGreeting() {
   var e = document.getElementById('hero-greeting'); if (!e) return;
   var h = getEgyptHour();
   e.textContent = h >= 5 && h < 12 ? '☀️ صباح الخير،' : h >= 12 && h < 17 ? '🌤️ مساء الخير،' : h >= 17 && h < 21 ? '🌆 مساء النور،' : '🌙 تصبح على خير،';
-  if (currentUser) { var el = document.getElementById('pp-name'); if (el) syncPremiumUIStates(); }
+  if (currentUser) { syncPremiumUIStates(); }
 }
 function startGreetingSync() {
   updateGreeting();
@@ -1919,7 +1902,7 @@ var MEDICAL_ADVICE = {
 
 function buildMedicalAlerts() {
   var c = document.getElementById('medical-alerts-container'); if (!c) return;
-  var u = currentUser || {}, d = u.diseases || [], bmi = u.bmi || 0, smoking = u.smoking || '';
+  var u = currentUser || {}, d = u.diseases || [], bmi = u.bmi || 0;
   var html = '';
   if (bmi >= 25 && bmi < 30) html += '<div class="alert-card ok"><div class="alert-title">⚖️ زيادة وزن</div><ul class="alert-tips"><li>بروتوكول 16/8 مثالي.</li><li>اكتفِ بكوب أرز في الوجبة.</li></ul></div>';
   else if (bmi >= 30) html += '<div class="alert-card sugar"><div class="alert-title">⚖️ سمنة</div><ul class="alert-tips"><li>الصيام 18/6 أو OMAD سيحدث فارقاً.</li><li>قلل النشويات لكسر مقاومة الإنسولين.</li></ul></div>';
@@ -1936,7 +1919,7 @@ function buildHomeDisTags() {
   c.innerHTML = d.map(function(k) { return '<div class="dis-tag tag-' + k + '">' + (m[k] || k) + '</div>'; }).join('');
 }
 
-/* ══════════ Food Data ══════════ */
+/* ══════════ KITCHEN DATA ══════════ */
 var FOOD_DATA = [
   { id:1, emoji:'🍚', name:'الأرز', cat:'نشويات', status:'allowed', freq:'daily', desc:'مسموح يومياً.', reason:'مصدر طاقة نظيف خالٍ من الجلوتين.' },
   { id:2, emoji:'🥔', name:'البطاطا', cat:'نشويات', status:'allowed', freq:'daily', desc:'مسلوقة أو مشوية — مسموح يومياً.', reason:'نشويات طبيعية خالية من الجلوتين.' },
@@ -2063,7 +2046,7 @@ function showFastDetails(id) {
 }
 
 function openModal(id) { document.getElementById(id).classList.add('show'); }
-function closeModal(id) { document.getElementById(id).remove('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
 function startFast() {
   if (!selFast) { showToast('❌ اختر نوع الصيام'); return; }
@@ -2562,35 +2545,55 @@ var allQuotes = document.querySelectorAll('.quote-slide');
 
 function startQuotesAnimation() {
   if (quoteInterval) clearInterval(quoteInterval);
-  currentQuoteIdx = 0; showNextQuote();var progress = ((currentQuoteIdx + 1) / allQuotes.length) * 100;
-  var progressBar = document.getElementById('quote-progress'); if (progressBar) progressBar.style.width = progress + '%';
-  currentQuoteIdx = (currentQuoteIdx + 1) % allQuotes.length;
+  currentQuoteIdx = 0; showNextQuote();
+  quoteInterval = setInterval(showNextQuote, 5000);
 }
 
 function showNextQuote() {
   allQuotes.forEach(function(q) { q.classList.remove('active'); });
   if (allQuotes[currentQuoteIdx]) allQuotes[currentQuoteIdx].classList.add('active');
-  var progress = ((currentQuoteIdx + 1) / allQuotes.length) * 100;
-  var progressBar = document.getElementById('quote-progress'); if (progressBar) progressBar.style.width = progress + '%';
+  var progress = ((currentQuoteIdx + 1) / allQuotes.length) * 10var progress = ((currentQuoteIdx + 1) / allQuotes.length) * 100;
+  var pb = document.getElementById('quote-progress');
+  if (pb) pb.style.width = progress + '%';
   currentQuoteIdx = (currentQuoteIdx + 1) % allQuotes.length;
 }
 
-/* ══════════ PWA ══════════ */
+/* ══════════ PWA ENGINE ══════════ */
 var deferredPrompt = null;
-var DISMISS_KEY = 'pwa_banner_dismissed', INSTALL_KEY = 'pwa_installed';
-function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream; }
-function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
-function isDismissed() { var ts = localStorage.getItem(DISMISS_KEY); if (!ts) return false; return (Date.now() - parseInt(ts)) < 3 * 24 * 60 * 60 * 1000; }
-function canShowBanner() { return !isStandalone() && !isDismissed() && !localStorage.getItem(INSTALL_KEY); }
+var DISMISS_KEY = 'pwa_banner_dismissed_at';
+var INSTALL_KEY = 'pwa_installed_status';
+
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
+function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone; }
+
+function canShowBanner() {
+  if (isStandalone()) return false;
+  if (localStorage.getItem(INSTALL_KEY)) return false;
+  var dismissedAt = localStorage.getItem(DISMISS_KEY);
+  if (dismissedAt) {
+    var diff = Date.now() - parseInt(dismissedAt, 10);
+    if (diff < 86400000 * 3) return false; // إخفاء لمدة 3 أيام عند الإغلاق
+  }
+  return true;
+}
 
 function adaptBannerForPlatform() {
-  var btn = document.getElementById('pwa-install-btn'), sub = document.querySelector('.pwa-sub'), banner = document.getElementById('pwa-banner');
-  if (!btn || !sub) return;
-  if (isIOS()) { btn.textContent = 'كيف أثبّته؟'; btn.onclick = showIOSInstructions; sub.textContent = 'اضغط لمعرفة طريقة التثبيت على iPhone/iPad'; if (canShowBanner()) setTimeout(function() { banner.classList.add('show'); }, 2000); }
+  if (isIOS()) {
+    var btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.textContent = 'شرح التثبيت';
+  }
 }
 
 function showIOSInstructions() {
-  var html = '<div style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center" id="ios-guide-overlay"><div style="width:100%;max-width:500px;background:linear-gradient(145deg,#0d1e38,#112244);border-radius:24px 24px 0 0;padding:24px 20px 40px"><div style="text-align:center;margin-bottom:20px"><div style="font-size:2rem">📱</div><div style="font-family:Amiri,serif;font-size:1.2rem;color:#f5c842">تثبيت طيبات على iPhone/iPad</div></div><div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px"><div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:14px"><div style="font-size:1.2rem">1️⃣</div><div style="font-size:.85rem;color:#e8f0fc">اضغط على زر <strong style="color:#f5c842">مشاركة</strong> ⬆️</div></div><div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:14px"><div style="font-size:1.2rem">2️⃣</div><div style="font-size:.85rem;color:#e8f0fc">اختر <strong style="color:#f5c842">Add to Home Screen</strong></div></div><div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border-radius:14px;padding:14px"><div style="font-size:1.2rem">3️⃣</div><div style="font-size:.85rem;color:#e8f0fc">اضغط <strong style="color:#f5c842">Add</strong></div></div></div><button onclick="document.getElementById(\'ios-guide-overlay\').remove()" style="width:100%;background:linear-gradient(135deg,#c8960c,#f5c842);color:#050e1f;border:none;border-radius:14px;padding:14px;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:800;cursor:pointer">فهمت</button></div></div>';
+  var html = '<div class="pro-modal-overlay show" id="ios-pwa-modal" style="z-index:99999;"><div class="pro-modal-box" style="text-align:center; padding:24px;">' +
+    '<div style="font-size:3rem; margin-bottom:12px;">🍏</div>' +
+    '<div class="pro-modal-title" style="font-size:1.2rem;">تثبيت التطبيق على هواتف iPhone</div>' +
+    '<p style="font-size:0.85rem; color:var(--txt2); margin:12px 0; line-height:1.7;">' +
+    '1. اضغط على زر <strong>مشاركة (Share)</strong> في أسفل متصفح Safari.<br/>' +
+    '2. مرر القائمة للأسفل واختر <strong>إضافة إلى الشاشة الرئيسية (Add to Home Screen)</strong>.<br/>' +
+    '3. اضغط على <strong>إضافة (Add)</strong> في أعلى اليمين.' +
+    '</p>' +
+    '<button class="btn btn-gold" onclick="this.closest(\'.pro-modal-overlay\').remove();" style="font-size:1rem; font-weight:800; cursor:pointer">فهمت</button></div></div>';
   var div = document.createElement('div'); div.innerHTML = html; document.body.appendChild(div.firstElementChild);
 }
 
@@ -2621,7 +2624,7 @@ window.addEventListener('DOMContentLoaded', function() {
   adaptBannerForPlatform();
   startQuotesAnimation();
   var safetyTimeout = setTimeout(function() { hideLoader(); }, 8000);
-  autoLogin().then(function() { clearTimeout(safetyTimeout); }).catch(function() { clearTimeout(safetyTimeout); hideLoader(); });
+  autoLogin().then(function() { clearTimeout(safetyTimeout); });
 });
 </script>
 </body>
