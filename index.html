@@ -613,7 +613,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .gemini-quick-row::-webkit-scrollbar{display:none}
 .gemini-qbtn{flex-shrink:0;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.28);border-radius:20px;padding:7px 14px;font-size:.72rem;font-weight:700;color:var(--ai-purple2);cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap;transition:all .2s}
 .gemini-qbtn:active{background:rgba(124,58,237,.25)}
-
 </style>
 </head>
 <body>
@@ -791,7 +790,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 <div class="page" id="ai-page">
   <div class="app-header">
     <div class="header-row">
-      <div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div>
+      <div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">&#x1F916; طبيبك الذكي</div>
       <div class="user-chip" style="border-color:rgba(124,58,237,.4);font-size:.68rem;gap:7px">
         <span class="gemini-status-dot off" id="gemini-dot"></span>
         <span id="gemini-status-txt" style="color:var(--ai-purple2)">AI جاري التحميل...</span>
@@ -799,40 +798,40 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     </div>
   </div>
   <div class="ai-page-header" style="padding:16px 16px 0">
-    <div class="ai-hero-badge"><i class="fas fa-brain"></i> ✨ Puter.js + Mistral + Z.ai</div>
+    <div class="ai-hero-badge"><i class="fas fa-brain"></i> Puter.js + Mistral + Z.ai</div>
     <div class="ai-hero-title">مساعدك الصحي الذكي</div>
-    <div class="ai-hero-sub">مخصص لحالتك — اسألني عن صحتك أو الذكاء الاصطناعي</div>
+    <div class="ai-hero-sub">مخصص لحالتك - اسألني عن صحتك او الذكاء الاصطناعي</div>
   </div>
   <div class="ai-context-card">
     <div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div>
     <div class="ai-ctx-body" id="gemini-ctx-body">جاري تحميل بياناتك...</div>
   </div>
   <div class="gemini-quick-row">
-    <button class="gemini-qbtn" onclick="geminiQuick('ما أفضل الأطعمة لحالتي؟')">🍽️ أطعمة لحالتي</button>
-    <button class="gemini-qbtn" onclick="geminiQuick('كيف يعمل نظام الطيبات دكتور ضياء العوضي؟')">🤖 شرح AI</button>
-    <button class="gemini-qbtn" onclick="geminiQuick('نصائح لتحسين النوم')">😴 النوم</button>
-    <button class="gemini-qbtn" onclick="geminiQuick('ما هو مؤشر BMI المثالي؟')">📊 BMI</button>
-    <button class="gemini-qbtn" onclick="geminiQuick('فوائد الصيام المتقطع')">⏰ الصيام</button>
-    <button class="gemini-qbtn" onclick="geminiQuick('هل الدجاج مسموح في نظام الطيبات؟')">🍗 الطيبات</button>
-    <button class="gemini-qbtn" onclick="geminiQuick('خطة غذاء صحية ليوم كامل')">📋 خطة غذائية</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('ما افضل الاطعمة لحالتي؟')">&#x1F37D; اطعمة لحالتي</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('كيف يعمل الذكاء الاصطناعي؟')">&#x1F916; شرح AI</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('نصائح لتحسين النوم')">&#x1F634; النوم</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('ما هو مؤشر BMI المثالي؟')">&#x1F4CA; BMI</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('فوائد الصيام المتقطع')">&#x23F0; الصيام</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('هل الدجاج مسموح في نظام الطيبات؟')">&#x1F357; الطيبات</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('خطة غذاء صحية ليوم كامل')">&#x1F4CB; خطة غذائية</button>
   </div>
   <div class="ai-chat-wrap" id="gemini-chat-wrap">
     <div class="ai-msg assistant" id="gemini-welcome-msg">
       <div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI <span class="ai-model-badge">Puter + Mistral + Z.ai</span></div>
-      <div>أهلاً! 🌿 أنا مساعد <strong>طيبات الذكي</strong> مدعوم بثلاثة أنظمة AI.<br>
-      • 🥗 الأطعمة المسموحة والممنوعة في الطيبات<br>
-      • 💊 نصائح صحية مخصصة لحالتك<br>
-      • 🤖 شرح مفاهيم الذكاء الاصطناعي<br>
-      • 📊 تحليل مؤشراتك الصحية<br><br>
-      <em style="font-size:.73rem;opacity:.65">⚕️ توصياتي توعوية ولا تُغني عن استشارة الطبيب.</em></div>
+      <div>اهلا! مساعد طيبات الذكي مدعوم بثلاثة انظمة AI.<br>
+      - الاطعمة المسموحة والممنوعة في الطيبات<br>
+      - نصائح صحية مخصصة لحالتك<br>
+      - شرح مفاهيم الذكاء الاصطناعي<br>
+      - تحليل مؤشراتك الصحية<br><br>
+      <em style="font-size:.73rem;opacity:.65">توصياتي توعوية ولا تغني عن استشارة الطبيب.</em></div>
     </div>
   </div>
   <div class="ai-input-area">
     <textarea id="gemini-input" class="ai-textarea" rows="2"
-      placeholder="اسألني عن طعام، حالة صحية، أو الذكاء الاصطناعي..."
+      placeholder="اسالني عن طعام او حالة صحية او الذكاء الاصطناعي..."
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();geminiSend()}"></textarea>
     <div class="ai-actions">
-      <button class="ai-send-btn" id="gemini-send-btn" onclick="geminiSend()"><i class="fas fa-paper-plane"></i> إرسال</button>
+      <button class="ai-send-btn" id="gemini-send-btn" onclick="geminiSend()"><i class="fas fa-paper-plane"></i> ارسال</button>
       <button class="ai-clear-btn" onclick="geminiClear()"><i class="fas fa-trash-alt"></i> مسح</button>
     </div>
   </div>
@@ -2790,11 +2789,11 @@ window.addEventListener('DOMContentLoaded', function() {
   function _buildPrompt() {
     var u = window.currentUser || {};
     var dm = {sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
-    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join("، ")||"لا يوجد";
+    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
     var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "غير محدد";
-    var gender = u.gender==="male" ? "ذكر" : "أنثى";
-    return "أنت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله، وفي الصحة والتغذية والذكاء الاصطناعي.\n"
-      + "أجب باللغة العربية الفصحى بأسلوب ودود ومنظم ومختصر.\n\n"
+    var gender = u.gender==="male" ? "ذكر" : "انثى";
+    return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله، وفي الصحة والتغذية والذكاء الاصطناعي.\n"
+      + "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n"
       + "بيانات المستخدم:\n"
       + "- الاسم: "+(u.name||"مستخدم")+"\n"
       + "- العمر: "+age+" سنة | الجنس: "+gender+"\n"
@@ -2809,7 +2808,7 @@ window.addEventListener('DOMContentLoaded', function() {
   function _buildMessages(msg) {
     var msgs = [{role:"system", content:_buildPrompt()}];
     _history.forEach(function(m) {
-      msgs.push({role: m.role==="assistant"?"assistant":"user", content: m.text});
+      msgs.push({role: m.role==="assistant" ? "assistant" : "user", content: m.text});
     });
     msgs.push({role:"user", content:msg});
     return msgs;
@@ -2864,7 +2863,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var name = (window.currentUser && window.currentUser.name) || "صديقي";
     var tips = [
       "انا هنا معك "+name+"! الاتصال غير متاح الان.\n\nالمسموح: لحم الخروف، السمك، الارز، البطاطس، العسل، التمر.\nالممنوع: الدجاج، البيض، الدقيق الابيض، الالبان السائلة.\n\nاعد المحاولة بعد لحظات.",
-      "مرحبا "+name+"! الخادم مشغول لثوان.\n\nنصيحة: اشرب 8 اكواب ماء يوميا وامش 30 دقيقة.\n\naضغط ارسال مرة اخرى.",
+      "مرحبا "+name+"! الخادم مشغول لثوان.\n\nنصيحة: اشرب 8 اكواب ماء يوميا وامش 30 دقيقة.\n\nاضغط ارسال مرة اخرى.",
       "اعتذر "+name+"، الشبكة غير مستقرة.\n\nوجبة مثالية: ارز بسمتي + سمك مشوي + زيت زيتون + تمر.\n\nحاول مجددا."
     ];
     return {text: tips[Math.floor(Math.random()*tips.length)], source: "محلي"};
@@ -2873,7 +2872,7 @@ window.addEventListener('DOMContentLoaded', function() {
   async function _smartSend(msg) {
     try { return await _tryPuter(msg, 0); } catch(e) {}
     try { return await _tryMistral(msg); } catch(e) {}
-    try { return await _tryZai(msg); }    catch(e) {}
+    try { return await _tryZai(msg);     } catch(e) {}
     await new Promise(function(r){ setTimeout(r, 1500); });
     try { return await _tryPuter(msg, 0); } catch(e) {}
     return _localFallback();
@@ -2882,10 +2881,10 @@ window.addEventListener('DOMContentLoaded', function() {
   function _updateCtx() {
     var u = window.currentUser || {};
     var dm = {sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
-    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join("، ")||"لا يوجد";
+    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
     var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "؟";
     var el = document.getElementById("gemini-ctx-body");
-    if (el) el.innerHTML = "👤 "+(u.name||"مستخدم")+" | 🎂 "+age+" سنة | BMI: "+(u.bmi||"؟")+" | "+diseases;
+    if (el) el.innerHTML = "👤 "+(u.name||"مستخدم")+" | "+age+" سنة | BMI: "+(u.bmi||"؟")+" | "+diseases;
   }
 
   function _setStatus(ready, source) {
@@ -2951,7 +2950,7 @@ window.addEventListener('DOMContentLoaded', function() {
     } catch(e) {
       clearTimeout(t1); clearTimeout(t2);
       _removeTyping();
-      _appendMsg("assistant", "حدث خطا غير متوقع. حاول مرة اخرى.");
+      _appendMsg("assistant", "حدث خطا. حاول مرة اخرى.");
     }
     sendBtn.disabled = false;
     sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ارسال';
@@ -2977,10 +2976,10 @@ window.addEventListener('DOMContentLoaded', function() {
     _setStatus(true, "Puter / Mistral / Z.ai");
   }
 
-  window.geminiSend      = geminiSend;
-  window.geminiClear     = geminiClear;
-  window.geminiQuick     = geminiQuick;
-  window.initGeminiPage  = initGeminiPage;
+  window.geminiSend     = geminiSend;
+  window.geminiClear    = geminiClear;
+  window.geminiQuick    = geminiQuick;
+  window.initGeminiPage = initGeminiPage;
 
   var _orig = null;
   function _patch() {
