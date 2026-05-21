@@ -651,7 +651,36 @@
 
         <div class="form-group">
           <label>اسم المستخدم</label>
-          <input type="text" id="editUsername" disabled>
+          <input type="text" id="editUsername">
+        </div>
+
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input type="text" id="editPassword">
+        </div>
+
+        <div class="form-group">
+          <label>تاريخ الميلاد</label>
+          <input type="date" id="editDOB">
+        </div>
+
+        <div class="form-group">
+          <label>الجنس</label>
+          <select id="editGender" style="width: 100%; background: #0d1f3c; border: 1.5px solid rgba(200,150,12,.2); border-radius: 10px; padding: 10px; color: #e8f0fc; font-family: 'Tajawal', sans-serif;">
+            <option value="">-- اختر --</option>
+            <option value="male">👨 ذكر</option>
+            <option value="female">👩 أنثى</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>حالة التدخين</label>
+          <select id="editSmoking" style="width: 100%; background: #0d1f3c; border: 1.5px solid rgba(200,150,12,.2); border-radius: 10px; padding: 10px; color: #e8f0fc; font-family: 'Tajawal', sans-serif;">
+            <option value="">-- اختر --</option>
+            <option value="smoker_male">🚬 مدخن (ذكر)</option>
+            <option value="smoker_female">🚬 مدخنة (أنثى)</option>
+            <option value="non_smoker">✅ غير مدخن</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -665,12 +694,17 @@
         </div>
 
         <div class="user-detail-label" style="margin-top: 15px; margin-bottom: 8px;">
+          <i class="fas fa-notes-medical"></i> الأمراض المزمنة
+        </div>
+        <div id="diseasesCheckbox" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: rgba(200,150,12,.05); border: 1px solid rgba(200,150,12,.15); border-radius: 10px; padding: 12px;"></div>
+
+        <div class="user-detail-label" style="margin-top: 15px; margin-bottom: 8px;">
           <i class="fas fa-flask-vial"></i> التجارب المسجلة
         </div>
         <div class="experiences-section" id="experiencesDisplay">لا توجد تجارب</div>
 
         <button class="save-btn" onclick="saveUserChanges()">
-          <i class="fas fa-save"></i> حفظ التعديلات
+          <i class="fas fa-save"></i> حفظ جميع التعديلات
         </button>
       </div>
     </div>
@@ -799,11 +833,20 @@
       document.getElementById('detailCreated').textContent = created;
       document.getElementById('passwordDisplay').value = user.password || '------';
 
+      // ملء حقول التعديل
       document.getElementById('editName').value = user.name || '';
       document.getElementById('editUsername').value = user.username || '';
+      document.getElementById('editPassword').value = user.password || '';
+      document.getElementById('editDOB').value = user.dob || '';
+      document.getElementById('editGender').value = user.gender || '';
+      document.getElementById('editSmoking').value = user.smoking || '';
       document.getElementById('editWeight').value = user.weight || '';
       document.getElementById('editHeight').value = user.height || '';
 
+      // بناء قائمة الأمراض
+      buildDiseasesCheckbox(user.diseases || {});
+
+      // عرض التجارب
       if (user.experiences && Object.keys(user.experiences).length > 0) {
         let expHtml = '';
         Object.keys(user.experiences).forEach(key => {
@@ -821,6 +864,31 @@
       document.getElementById('userModal').classList.add('show');
     };
 
+    function buildDiseasesCheckbox(selectedDiseases) {
+      const diseases = [
+        { id: 'sugar', label: '🧠 السكري', name: 'sugar' },
+        { id: 'pressure', label: '💉 ارتفاع الضغط', name: 'pressure' },
+        { id: 'allergy', label: '🌸 الحساسية', name: 'allergy' },
+        { id: 'chemo', label: '⚕️ علاج كيماوي', name: 'chemo' },
+        { id: 'heart', label: '❤️ أمراض القلب', name: 'heart' },
+        { id: 'kidney', label: '🫁 أمراض الكلى', name: 'kidney' }
+      ];
+
+      const container = document.getElementById('diseasesCheckbox');
+      container.innerHTML = '';
+
+      diseases.forEach(disease => {
+        const isChecked = selectedDiseases[disease.name] ? 'checked' : '';
+        const html = `
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 8px; background: rgba(200,150,12,.05); transition: all .3s;">
+            <input type="checkbox" value="${disease.name}" ${isChecked} style="cursor: pointer; width: 18px; height: 18px;">
+            <span style="color: #e8f0fc; font-weight: 600;">${disease.label}</span>
+          </label>
+        `;
+        container.innerHTML += html;
+      });
+    }
+
     window.closeUserModal = function() {
       document.getElementById('userModal').classList.remove('show');
       selectedUser = null;
@@ -837,8 +905,14 @@
 
       const updates = {
         name: document.getElementById('editName').value,
+        username: document.getElementById('editUsername').value,
+        password: document.getElementById('editPassword').value,
+        dob: document.getElementById('editDOB').value,
+        gender: document.getElementById('editGender').value,
+        smoking: document.getElementById('editSmoking').value,
         weight: parseInt(document.getElementById('editWeight').value) || 0,
-        height: parseInt(document.getElementById('editHeight').value) || 0
+        height: parseInt(document.getElementById('editHeight').value) || 0,
+        diseases: getSelectedDiseases()
       };
 
       const userRef = ref(db, 'users/' + selectedUser.id);
@@ -852,6 +926,15 @@
           showToast('❌ خطأ: ' + err.message);
         });
     };
+
+    function getSelectedDiseases() {
+      const checked = document.querySelectorAll('#diseasesCheckbox input[type="checkbox"]:checked');
+      const diseases = {};
+      checked.forEach(ch => {
+        diseases[ch.value] = true;
+      });
+      return diseases;
+    }
 
     function showToast(message) {
       const toast = document.getElementById('toast');
