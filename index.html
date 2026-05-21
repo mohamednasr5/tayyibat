@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -521,37 +521,37 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 <nav class="bottom-nav" id="bottom-nav">
   <div class="nav-item act" id="nav-home" onclick="goPage('home')" title="الصفحة الرئيسية">
     <div class="nav-icon-wrapper home-gradient">
-      <i class="fas fa-house-user"></i>
+      <i class="fas fa-home"></i>
     </div>
     <span class="nav-label">الرئيسية</span>
   </div>
   <div class="nav-item" id="nav-food" onclick="goPage('food')" title="قائمة الأطعمة">
     <div class="nav-icon-wrapper food-gradient">
-      <i class="fas fa-apple-alt"></i>
+      <i class="fas fa-utensils"></i>
     </div>
     <span class="nav-label">الأطعمة</span>
   </div>
   <div class="nav-item" id="nav-experiences" onclick="goPage('experiences')" title="تجارب المستخدمين">
     <div class="nav-icon-wrapper experience-gradient">
-      <i class="fas fa-star"></i>
+      <i class="fas fa-comments"></i>
     </div>
     <span class="nav-label">التجارب</span>
   </div>
   <div class="nav-item" id="nav-ai" onclick="goPage('ai')" title="طبيبك الذكي">
     <div class="nav-icon-wrapper ai-gradient">
-      <i class="fas fa-brain"></i>
+      <i class="fas fa-robot"></i>
     </div>
     <span class="nav-label">AI الذكي</span>
   </div>
   <div class="nav-item" id="nav-fast" onclick="goPage('fast')" title="متابعة الصيام">
     <div class="nav-icon-wrapper fast-gradient">
-      <i class="fas fa-hourglass-end"></i>
+      <i class="fas fa-moon"></i>
     </div>
     <span class="nav-label">الصيام</span>
   </div>
   <div class="nav-item" id="nav-profile" onclick="goPage('profile')" title="الملف الشخصي">
     <div class="nav-icon-wrapper profile-gradient">
-      <i class="fas fa-user-circle"></i>
+      <i class="fas fa-user-cog"></i>
     </div>
     <span class="nav-label">حسابي</span>
   </div>
@@ -2195,7 +2195,19 @@ var wvmVideos = [
 ];
 var wvmCurrent = 0;
 
+function wvmTodayKey() {
+  var today = new Date();
+  var d = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+  var u = (currentUser && currentUser.username) ? currentUser.username : 'guest';
+  return 'wvm_shown_' + u + '_' + d;
+}
+
 function showWelcomeModal() {
+  /* show only once per day per user */
+  try {
+    if (localStorage.getItem(wvmTodayKey())) return;
+    localStorage.setItem(wvmTodayKey(), '1');
+  } catch(e) {}
   wvmCurrent = 0;
   buildWvmDots();
   wvmRender();
@@ -2205,8 +2217,16 @@ function showWelcomeModal() {
 function closeWelcomeModal() {
   var vid = document.getElementById('wvm-video');
   vid.pause();
+  vid.removeEventListener('ended', wvmAutoNext);
   vid.src = '';
   document.getElementById('welcome-videos-modal').classList.remove('show');
+}
+
+function wvmAutoNext() {
+  if (wvmCurrent < wvmVideos.length - 1) {
+    wvmCurrent++;
+    wvmRender();
+  }
 }
 
 function wvmRender() {
@@ -2215,13 +2235,21 @@ function wvmRender() {
   var loading = document.getElementById('wvm-loading');
 
   vid.pause();
+  vid.removeEventListener('ended', wvmAutoNext);
   loading.classList.add('show');
   loading.textContent = '⏳ جاري تحميل الفيديو...';
   vid.src = v.src;
   vid.load();
 
-  vid.oncanplay = function() { loading.classList.remove('show'); };
-  vid.onerror   = function() { loading.textContent = '⚠️ تعذّر تحميل الفيديو'; };
+  vid.oncanplay = function() {
+    loading.classList.remove('show');
+    vid.play().catch(function(){});
+  };
+  vid.onerror = function() {
+    loading.textContent = '⚠️ تعذّر تحميل الفيديو';
+  };
+  /* auto-advance to next video when current ends */
+  vid.addEventListener('ended', wvmAutoNext);
 
   document.getElementById('wvm-title').textContent = v.title;
   document.getElementById('wvm-counter').textContent =
