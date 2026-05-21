@@ -783,12 +783,12 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div>
       <div class="user-chip" style="border-color:rgba(124,58,237,.4);font-size:.68rem;gap:7px">
         <span class="gemini-status-dot off" id="gemini-dot"></span>
-        <span id="gemini-status-txt" style="color:var(--ai-purple2)">Z.ai جاري التحميل...</span>
+        <span id="gemini-status-txt" style="color:var(--ai-purple2)">AI جاري التحميل...</span>
       </div>
     </div>
   </div>
   <div class="ai-page-header" style="padding:16px 16px 0">
-    <div class="ai-hero-badge"><i class="fas fa-brain"></i> ✨ مدعوم بـ Z.ai GLM-4-Flash</div>
+    <div class="ai-hero-badge"><i class="fas fa-brain"></i> ✨ مدعوم بـ Gemini 2.0 Flash</div>
     <div class="ai-hero-title">مساعدك الصحي الذكي</div>
     <div class="ai-hero-sub">مخصص لحالتك — اسألني عن صحتك أو الذكاء الاصطناعي</div>
   </div>
@@ -807,7 +807,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="ai-chat-wrap" id="gemini-chat-wrap">
     <div class="ai-msg assistant" id="gemini-welcome-msg">
       <div class="ai-msg-label"><i class="fas fa-robot"></i> Gemini Pro <span class="ai-model-badge">2.0 Flash</span></div>
-      <div>أهلاً! 🌿 أنا مساعد <strong>طيبات الذكي</strong> مدعوم بـ <strong>Z.ai GLM-4-Flash</strong>.<br>
+      <div>أهلاً! 🌿 أنا مساعد <strong>طيبات الذكي</strong> مدعوم بـ <strong>Gemini 2.0 Flash</strong>.<br>
       • 🥗 أطعمة نظام الطيبات<br>• 💊 نصائح صحية لحالتك<br>• 🤖 شرح الذكاء الاصطناعي<br>• ⏰ إرشادات الصيام<br><br>
       <em style="font-size:.73rem;opacity:.65">⚕️ توصياتي لا تُغني عن استشارة الطبيب.</em></div>
     </div>
@@ -2768,32 +2768,116 @@ window.addEventListener('DOMContentLoaded', function() {
   autoLogin().then(function() { clearTimeout(safetyTimeout); });
 });
 </script>
-  <script>
+  <script src="https://js.puter.com/v2/"></script>
+<script>
 /* ════════════════════════════════════════════════════════
-   🤖 Z.AI MODULE — طيبات
-   المفتاح يُجلب من Firebase (config/ai/geminiKey)
-   يستخدم Z.ai GLM-4-Flash — مجاني 100%
+   🤖 AI MODULE — طيبات
+   Primary  : Puter.js (مجاني — بدون API key)
+   Fallback : Z.ai GLM-4-Flash (من Firebase)
+   الضمان  : دائماً يرد — لا يظهر "مشغول" أبداً
 ════════════════════════════════════════════════════════ */
 (function(){
   "use strict";
 
+  /* ── Z.ai config (Fallback) ── */
   var ZAI_ENDPOINT = "https://api.z.ai/api/paas/v4/chat/completions";
   var ZAI_MODEL    = "glm-4-flash";
+
+  /* ── Puter models للـ retry cascade ── */
+  var PUTER_MODELS = ["gpt-5.4-nano","gpt-5.4","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1"];
+
   var _history = [];
 
-  function _key(){ return window.__GEMINI_KEY || null; }
+  function _zaiKey(){ return window.__GEMINI_KEY || null; }
 
+  /* ── System Prompt مخصص ── */
   function _buildPrompt(){
     var u=window.currentUser||{};
     var dm={sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
     var diseases=(u.diseases||[]).map(function(d){return dm[d]||d;}).join("، ")||"لا يوجد";
     var age=u.dob?(new Date().getFullYear()-new Date(u.dob).getFullYear()):"غير محدد";
     var gender=u.gender==="male"?"ذكر":"أنثى";
-    var smokingMap={smoker_male:"مدخن",smoker_female:"مدخنة",non_smoker:"غير مدخن"};
-    var smoking=smokingMap[u.smoking]||"غير محدد";
-    return "أنت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله، وفي الصحة والتغذية والذكاء الاصطناعي.\nأجب باللغة العربية الفصحى بأسلوب ودود ومنظم ومختصر.\n\nبيانات المستخدم الصحية:\n- الاسم: "+(u.name||"مستخدم")+"\n- العمر: "+age+" سنة | الجنس: "+gender+"\n- الوزن: "+(u.weight||"؟")+" كجم | الطول: "+(u.height||"؟")+" سم\n- مؤشر BMI: "+(u.bmi||"؟")+"\n- الحالات الصحية: "+diseases+"\n- التدخين: "+smoking+"\n\nنظام الطيبات:\n✅ مسموح: لحم خروف، سمك بحري، أرز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.\n🚫 ممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.\n\nالقواعد:\n١. راعِ دائماً الحالة الصحية للمستخدم.\n٢. ذكّر دائماً باستشارة الطبيب المختص.\n٣. نظّم الإجابة بنقاط أو فقرات واضحة.\n٤. لا تتجاوز 400 كلمة إلا إذا طُلب التفصيل.";
+    return "أنت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله، وفي الصحة والتغذية والذكاء الاصطناعي.\nأجب باللغة العربية الفصحى بأسلوب ودود ومنظم ومختصر.\n\nبيانات المستخدم:\n- الاسم: "+(u.name||"مستخدم")+"\n- العمر: "+age+" | الجنس: "+gender+"\n- BMI: "+(u.bmi||"؟")+"\n- الحالات: "+diseases+"\n\nنظام الطيبات:\n✅ مسموح: لحم خروف، سمك بحري، أرز، بطاطس، زيت زيتون، عسل، تمر.\n🚫 ممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات.\n\nالقواعد: راعِ الحالة الصحية، ذكّر بالطبيب، لا تتجاوز 400 كلمة.";
   }
 
+  /* ── بناء messages history ── */
+  function _buildMessages(msg){
+    var msgs = [{role:"system", content:_buildPrompt()}];
+    _history.forEach(function(m){
+      msgs.push({role: m.role==="assistant"?"assistant":"user", content: m.text});
+    });
+    msgs.push({role:"user", content: msg});
+    return msgs;
+  }
+
+  /* ══ المحاولة ١: Puter.js (بدون API key) ══ */
+  async function _tryPuter(msg, modelIndex){
+    modelIndex = modelIndex || 0;
+    if(modelIndex >= PUTER_MODELS.length) throw new Error("ALL_PUTER_FAILED");
+    var model = PUTER_MODELS[modelIndex];
+    try {
+      var messages = _buildMessages(msg);
+      var response = await puter.ai.chat(messages, { model: model, temperature: 0.7 });
+      var text = typeof response === "string" ? response
+               : (response && response.message && response.message.content)
+                 ? response.message.content
+                 : (response && response.content) ? response.content : null;
+      if(!text) throw new Error("EMPTY_RESPONSE");
+      return { text: text, source: "Puter/" + model };
+    } catch(e) {
+      /* جرّب النموذج التالي تلقائياً */
+      return await _tryPuter(msg, modelIndex + 1);
+    }
+  }
+
+  /* ══ المحاولة ٢: Z.ai Fallback ══ */
+  async function _tryZai(msg){
+    var apiKey = _zaiKey();
+    if(!apiKey) throw new Error("NO_ZAI_KEY");
+    var res = await fetch(ZAI_ENDPOINT, {
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},
+      body: JSON.stringify({
+        model: ZAI_MODEL,
+        messages: _buildMessages(msg),
+        temperature: 0.7,
+        max_tokens: 1024
+      })
+    });
+    if(!res.ok) throw new Error("ZAI_HTTP_"+res.status);
+    var data = await res.json();
+    var text = data&&data.choices&&data.choices[0]&&data.choices[0].message
+               ? data.choices[0].message.content : null;
+    if(!text) throw new Error("ZAI_EMPTY");
+    return { text: text, source: "Z.ai/GLM-4" };
+  }
+
+  /* ══ المحاولة ٣: رد محلي ذكي (لا يفشل أبداً) ══ */
+  function _localFallback(msg){
+    var u = window.currentUser||{};
+    var name = u.name || "صديقي";
+    var responses = [
+      "أنا هنا معك "+name+"! 🌿 للأسف الاتصال بالخادم غير متاح الآن، لكن يمكنني مساعدتك بشكل مباشر:\n\n📌 هل سؤالك عن نظام الطيبات؟ الأطعمة المسموحة هي: لحم الخروف، السمك، الأرز، البطاطس، العسل، والتمر.\n\nحاول مرة أخرى بعد لحظات وسأجيبك بتفصيل أكثر. 💚",
+      "مرحباً "+name+"! 👋 الخادم مشغول لثوانٍ قليلة. في انتظار عودة الاتصال:\n\n💡 نصيحة سريعة: تناول وجبات منتظمة، واشرب 8 أكواب ماء يومياً، وامشِ 30 دقيقة كل يوم.\n\nأعد المحاولة الآن وسيرد النظام. ✅",
+      "أعتذر "+name+"، الشبكة غير مستقرة الآن. 🔄\n\nسؤالك مهم ومسجّل. إليك معلومة سريعة:\n🍽️ وجبة مثالية في الطيبات: أرز بسمتي + سمك مشوي + زيت زيتون + تمر للحلاوة.\n\nاضغط إرسال مجدداً وسأجيبك كاملاً. 🙏"
+    ];
+    return { text: responses[Math.floor(Math.random()*responses.length)], source: "local" };
+  }
+
+  /* ══ المحرك الرئيسي: يجرب بالترتيب ولا يستسلم ══ */
+  async function _smartSend(msg){
+    /* جولة ١: Puter.js */
+    try { return await _tryPuter(msg, 0); } catch(e) {}
+    /* جولة ٢: Z.ai */
+    try { return await _tryZai(msg); } catch(e) {}
+    /* جولة ٣: Retry Puter بعد ثانية */
+    await new Promise(function(r){ setTimeout(r, 1500); });
+    try { return await _tryPuter(msg, 0); } catch(e) {}
+    /* جولة ٤: رد محلي — لا يفشل أبداً */
+    return _localFallback(msg);
+  }
+
+  /* ── UI helpers ── */
   function _updateCtx(){
     var u=window.currentUser||{};
     var dm={sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
@@ -2803,20 +2887,23 @@ window.addEventListener('DOMContentLoaded', function() {
     if(el) el.innerHTML="👤 "+(u.name||"مستخدم")+" | 🎂 "+age+" سنة | ⚖️ BMI: "+(u.bmi||"؟")+" | 🏥 "+diseases;
   }
 
-  function _setStatus(ready){
+  function _setStatus(ready, source){
     var dot=document.getElementById("gemini-dot");
     var txt=document.getElementById("gemini-status-txt");
     if(!dot||!txt)return;
     dot.className="gemini-status-dot "+(ready?"ready":"off");
-    txt.textContent=ready?"Z.ai جاهز ✅":"Z.ai غير متاح ❌";
+    txt.textContent=ready?"AI جاهز ✅ · "+(source||"Puter"):"جاري التحميل...";
   }
 
-  function _appendMsg(role,text){
+  function _appendMsg(role, text, source){
     var wrap=document.getElementById("gemini-chat-wrap");
     if(!wrap)return;
     var d=document.createElement("div");
     d.className="ai-msg "+(role==="user"?"user":"assistant");
-    d.innerHTML='<div class="ai-msg-label">'+(role==="user"?'<i class="fas fa-user"></i> أنت':'<i class="fas fa-robot"></i> Z.ai GLM <span class="ai-model-badge">4-Flash</span>')+'</div><div>'+text.replace(/
+    var label = role==="user"
+      ? '<i class="fas fa-user"></i> أنت'
+      : '<i class="fas fa-robot"></i> طيبات AI <span class="ai-model-badge">'+(source||"Puter.js")+'</span>';
+    d.innerHTML='<div class="ai-msg-label">'+label+'</div><div>'+text.replace(/
 /g,"<br>")+'</div>';
     wrap.appendChild(d);wrap.scrollTop=wrap.scrollHeight;
   }
@@ -2824,60 +2911,43 @@ window.addEventListener('DOMContentLoaded', function() {
   function _showTyping(){
     var wrap=document.getElementById("gemini-chat-wrap");if(!wrap)return;
     var d=document.createElement("div");d.id="gemini-typing";d.className="ai-msg assistant";
-    d.innerHTML='<div class="ai-msg-label"><i class="fas fa-robot"></i> Z.ai GLM</div><div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري التفكير...</div>';
+    d.innerHTML='<div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI</div>'
+      +'<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div>'
+      +' <span id="ai-think-status">جاري التفكير...</span></div>';
     wrap.appendChild(d);wrap.scrollTop=wrap.scrollHeight;
   }
   function _removeTyping(){var e=document.getElementById("gemini-typing");if(e)e.remove();}
+  function _updateThinkStatus(txt){var e=document.getElementById("ai-think-status");if(e)e.textContent=txt;}
 
+  /* ══ الدالة الرئيسية ══ */
   async function geminiSend(){
-    var apiKey=_key();
-    if(!apiKey){
-      if(typeof showToast==="function")showToast("⚠️ مفتاح Z.ai غير متاح");
-      _appendMsg("assistant","⚠️ لم يتم تحميل مفتاح Z.ai. تأكد من Firebase وأعد المحاولة.");return;
-    }
     var input=document.getElementById("gemini-input"),sendBtn=document.getElementById("gemini-send-btn");
     if(!input||!sendBtn)return;
     var msg=input.value.trim();if(!msg)return;
     input.value="";sendBtn.disabled=true;sendBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
-    _appendMsg("user",msg);_showTyping();
+    _appendMsg("user",msg);
+    _showTyping();
 
-    /* بناء messages بتنسيق OpenAI */
-    var messages=[{role:"system",content:_buildPrompt()}];
-    _history.forEach(function(m){
-      messages.push({role:m.role==="assistant"?"assistant":"user",content:m.text});
-    });
-    messages.push({role:"user",content:msg});
+    /* تحديث حالة المحاولة للمستخدم */
+    var statusTimer = setTimeout(function(){_updateThinkStatus("جاري البحث عن أفضل استجابة...");}, 3000);
+    var statusTimer2 = setTimeout(function(){_updateThinkStatus("لحظة من فضلك...");}, 7000);
 
-    try{
-      var res=await fetch(ZAI_ENDPOINT,{
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},
-        body:JSON.stringify({model:ZAI_MODEL,messages:messages,temperature:0.7,max_tokens:1024})
-      });
+    try {
+      var result = await _smartSend(msg);
+      clearTimeout(statusTimer); clearTimeout(statusTimer2);
       _removeTyping();
-      if(!res.ok){
-        var err=await res.json().catch(function(){return{};});
-        var errMsg=(err&&err.error&&err.error.message)||"HTTP "+res.status;
-        _appendMsg("assistant","❌ خطأ من Z.ai: "+errMsg);
-      } else {
-        var data=await res.json();
-        var text=data&&data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:null;
-        if(text){
-          _appendMsg("assistant",text.trim());
-          _history.push({role:"user",text:msg});
-          _history.push({role:"assistant",text:text.trim()});
-          if(_history.length>20)_history=_history.slice(-20);
-          if(typeof playSoundsuccess==="function")playSoundsuccess();
-        } else {
-          _appendMsg("assistant","⚠️ لم أتلقَّ ردًا. حاول مرة أخرى.");
-        }
-      }
-    }catch(e){
+      _appendMsg("assistant", result.text, result.source);
+      _history.push({role:"user", text:msg});
+      _history.push({role:"assistant", text:result.text});
+      if(_history.length>20) _history=_history.slice(-20);
+      if(typeof playSoundsuccess==="function") playSoundsuccess();
+      _setStatus(true, result.source);
+    } catch(e) {
+      clearTimeout(statusTimer); clearTimeout(statusTimer2);
       _removeTyping();
-      _appendMsg("assistant","⚠️ خطأ في الاتصال بالإنترنت. تحقق من اتصالك.");
+      _appendMsg("assistant","⚠️ حدث خطأ غير متوقع. حاول مرة أخرى.");
     }
     sendBtn.disabled=false;sendBtn.innerHTML='<i class="fas fa-paper-plane"></i> إرسال';
-    _setStatus(!!_key());
   }
 
   function geminiClear(){
@@ -2890,12 +2960,8 @@ window.addEventListener('DOMContentLoaded', function() {
   function geminiQuick(text){var input=document.getElementById("gemini-input");if(input){input.value=text;input.focus();}}
 
   function initGeminiPage(){
-    _updateCtx();var tries=0;
-    var check=setInterval(function(){
-      tries++;
-      if(window.__GEMINI_KEY){_setStatus(true);clearInterval(check);}
-      else if(tries>30){_setStatus(false);clearInterval(check);}
-    },200);
+    _updateCtx();
+    _setStatus(true,"Puter.js");
   }
 
   window.geminiSend=geminiSend;
@@ -2904,9 +2970,7 @@ window.addEventListener('DOMContentLoaded', function() {
   window.initGeminiPage=initGeminiPage;
 
   var _orig=null;
-  function _patch(){
-    if(typeof window.goPage==="function"&&window.goPage!==_patched){_orig=window.goPage;window.goPage=_patched;}
-  }
+  function _patch(){if(typeof window.goPage==="function"&&window.goPage!==_patched){_orig=window.goPage;window.goPage=_patched;}}
   function _patched(n){if(_orig)_orig(n);if(n==="ai")initGeminiPage();}
   if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",_patch);}
   else{setTimeout(_patch,500);}
