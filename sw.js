@@ -2,7 +2,7 @@
    Service Worker — طيبات PWA
    يدعم: Android/Chrome + iOS/Safari + Samsung + Desktop
 ══════════════════════════════════════════════════════════ */
-const CACHE_NAME = 'tayyibat-v3';
+const CACHE_NAME = 'tayyibat-v4';
 const STATIC_ASSETS = [
   './',
   './index.html',
