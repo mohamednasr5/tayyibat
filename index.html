@@ -42,6 +42,7 @@
         if (cfg.models && Array.isArray(cfg.models)) window.__aiModels = cfg.models;
         if (cfg.apiKey)        window.__aiApiKey   = cfg.apiKey;
         if (cfg.openrouterKey) window.__OR_KEY_FB  = cfg.openrouterKey;
+        if (cfg.geminiKey) { window.__GEMINI_KEY = cfg.geminiKey; window.__geminiReady = true;}
       }
     } catch(_) {}
   } catch(e) {
@@ -595,6 +596,13 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   font-size: 1.4rem;
   box-shadow: 0 0 15px rgba(245,200,66,0.2);
 }
+  /* ══ Gemini AI Styles ══ */
+.gemini-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;transition:background .4s;flex-shrink:0}
+.gemini-status-dot.ready{background:#2ec951;box-shadow:0 0 7px #2ec951}
+.gemini-status-dot.off{background:#ef5350}
+.gemini-quick-row{padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.gemini-quick-row::-webkit-scrollbar{display:none}
+.gemini-qbtn{flex-shrink:0;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.28);border-radius:20px;padding:7px 14px;font-size:.72rem;font-weight:700;color:var(--ai-purple2);cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -770,22 +778,47 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 </div>
 
 <div class="page" id="ai-page">
-  <div class="app-header"><div class="header-row"><div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div><div class="user-chip" style="border-color:rgba(124,58,237,.4)"><i class="fas fa-circle" style="color:#2ec951;font-size:.5rem"></i><span style="color:var(--ai-purple2)">24 نموذج AI</span></div></div></div>
-  <div class="ai-page-header">
-    <div class="ai-hero-badge"><i class="fas fa-brain"></i> ذكاء اصطناعي متطور</div>
-    <div class="ai-hero-title">مساعدك الصحي الشخصي</div>
-    <div class="ai-hero-sub">مخصص لحالتك — متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله</div>
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-title" style="background:linear-gradient(135deg,var(--ai-purple2),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🤖 طبيبك الذكي</div>
+      <div class="user-chip" style="border-color:rgba(124,58,237,.4);font-size:.68rem;gap:7px">
+        <span class="gemini-status-dot off" id="gemini-dot"></span>
+        <span id="gemini-status-txt" style="color:var(--ai-purple2)">Gemini جاري التحميل...</span>
+      </div>
+    </div>
   </div>
-  <div class="ai-context-card"><div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div><div class="ai-ctx-body" id="ai-user-context">جاري تحميل بياناتك...</div></div>
-  <div class="user-diseases-bar" id="ai-dis-bar"></div>
-  <div class="ai-api-counter"><i class="fas fa-server"></i> OpenRouter أولاً ← Pollinations (12 نموذج) ← رد محلي تلقائي</div>
-  <div class="quick-prompts" id="quick-prompts-bar"></div>
-  <div class="ai-chat-wrap" id="ai-chat-wrap"></div>
+  <div class="ai-page-header" style="padding:16px 16px 0">
+    <div class="ai-hero-badge"><i class="fas fa-brain"></i> ✨ مدعوم بـ Gemini 2.0 Flash</div>
+    <div class="ai-hero-title">مساعدك الصحي الذكي</div>
+    <div class="ai-hero-sub">مخصص لحالتك — اسألني عن صحتك أو الذكاء الاصطناعي</div>
+  </div>
+  <div class="ai-context-card">
+    <div class="ai-ctx-title"><i class="fas fa-user-md"></i> حالتك الصحية:</div>
+    <div class="ai-ctx-body" id="gemini-ctx-body">جاري تحميل بياناتك...</div>
+  </div>
+  <div class="gemini-quick-row">
+    <button class="gemini-qbtn" onclick="geminiQuick('ما أفضل الأطعمة لحالتي؟')">🍽️ أطعمة لحالتي</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('كيف يعمل الذكاء الاصطناعي؟')">🤖 شرح AI</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('نصائح لتحسين النوم')">😴 النوم</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('ما هو مؤشر BMI المثالي؟')">📊 BMI</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('فوائد الصيام المتقطع')">⏰ الصيام</button>
+    <button class="gemini-qbtn" onclick="geminiQuick('هل الدجاج مسموح في نظام الطيبات؟')">🍗 الطيبات</button>
+  </div>
+  <div class="ai-chat-wrap" id="gemini-chat-wrap">
+    <div class="ai-msg assistant" id="gemini-welcome-msg">
+      <div class="ai-msg-label"><i class="fas fa-robot"></i> Gemini Pro <span class="ai-model-badge">2.0 Flash</span></div>
+      <div>أهلاً! 🌿 أنا مساعد <strong>طيبات الذكي</strong> مدعوم بـ <strong>Gemini 2.0 Flash</strong>.<br>
+      • 🥗 أطعمة نظام الطيبات<br>• 💊 نصائح صحية لحالتك<br>• 🤖 شرح الذكاء الاصطناعي<br>• ⏰ إرشادات الصيام<br><br>
+      <em style="font-size:.73rem;opacity:.65">⚕️ توصياتي لا تُغني عن استشارة الطبيب.</em></div>
+    </div>
+  </div>
   <div class="ai-input-area">
-    <textarea id="ai-msg-input" class="ai-textarea" rows="2" placeholder="اسألني عن طعام معين، أو اطلب نصيحة لحالتك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage()}"></textarea>
+    <textarea id="gemini-input" class="ai-textarea" rows="2"
+      placeholder="اسألني عن طعام، حالة صحية، أو الذكاء الاصطناعي..."
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();geminiSend()}"></textarea>
     <div class="ai-actions">
-      <button class="ai-send-btn" id="btn-ai-send" onclick="sendAiMessage()"><i class="fas fa-paper-plane"></i> إرسال</button>
-      <button class="ai-clear-btn" onclick="clearAiChat()"><i class="fas fa-trash-alt"></i> مسح</button>
+      <button class="ai-send-btn" id="gemini-send-btn" onclick="geminiSend()"><i class="fas fa-paper-plane"></i> إرسال</button>
+      <button class="ai-clear-btn" onclick="geminiClear()"><i class="fas fa-trash-alt"></i> مسح</button>
     </div>
   </div>
 </div>
@@ -2734,6 +2767,96 @@ window.addEventListener('DOMContentLoaded', function() {
   var safetyTimeout = setTimeout(function() { hideLoader(); }, 8000);
   autoLogin().then(function() { clearTimeout(safetyTimeout); });
 });
+</script>
+  <script>
+(function(){
+  "use strict";
+  var GEMINI_API="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
+  var _history=[];
+  function _key(){return window.__GEMINI_KEY||null;}
+  function _buildPrompt(){
+    var u=window.currentUser||{};
+    var dm={sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
+    var diseases=(u.diseases||[]).map(function(d){return dm[d]||d;}).join("، ")||"لا يوجد";
+    var age=u.dob?(new Date().getFullYear()-new Date(u.dob).getFullYear()):"غير محدد";
+    return "أنت مساعد صحي ذكي لتطبيق طيبات، متخصص في نظام الطيبات للدكتور ضياء العوضي.\nأجب بالعربية بأسلوب ودود ومنظم.\n\nبيانات المستخدم:\n- الاسم: "+(u.name||"مستخدم")+"\n- العمر: "+age+" سنة\n- BMI: "+(u.bmi||"؟")+"\n- الحالات: "+diseases+"\n\n✅ مسموح: لحم خروف، سمك، أرز، بطاطس، زيت زيتون، عسل، تمر.\n🚫 ممنوع: دجاج، بيض، دقيق، ألبان سائلة، بقوليات.\n\nالقواعد: راعِ الحالة الصحية، ذكّر بالطبيب، لا تتجاوز 400 كلمة.";
+  }
+  function _updateCtx(){
+    var u=window.currentUser||{};
+    var dm={sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
+    var diseases=(u.diseases||[]).map(function(d){return dm[d]||d;}).join("، ")||"لا يوجد";
+    var age=u.dob?(new Date().getFullYear()-new Date(u.dob).getFullYear()):"؟";
+    var el=document.getElementById("gemini-ctx-body");
+    if(el) el.innerHTML="👤 "+(u.name||"مستخدم")+" | 🎂 "+age+" سنة | ⚖️ BMI: "+(u.bmi||"؟")+" | 🏥 "+diseases;
+  }
+  function _setStatus(ready){
+    var dot=document.getElementById("gemini-dot");
+    var txt=document.getElementById("gemini-status-txt");
+    if(!dot||!txt)return;
+    dot.className="gemini-status-dot "+(ready?"ready":"off");
+    txt.textContent=ready?"Gemini جاهز ✅":"Gemini غير متاح ❌";
+  }
+  function _appendMsg(role,text){
+    var wrap=document.getElementById("gemini-chat-wrap");
+    if(!wrap)return;
+    var d=document.createElement("div");
+    d.className="ai-msg "+(role==="user"?"user":"assistant");
+    d.innerHTML='<div class="ai-msg-label">'+(role==="user"?'<i class="fas fa-user"></i> أنت':'<i class="fas fa-robot"></i> Gemini Pro <span class="ai-model-badge">2.0 Flash</span>')+'</div><div>'+text.replace(/\n/g,"<br>")+'</div>';
+    wrap.appendChild(d);wrap.scrollTop=wrap.scrollHeight;
+  }
+  function _showTyping(){
+    var wrap=document.getElementById("gemini-chat-wrap");if(!wrap)return;
+    var d=document.createElement("div");d.id="gemini-typing";d.className="ai-msg assistant";
+    d.innerHTML='<div class="ai-msg-label"><i class="fas fa-robot"></i> Gemini Pro</div><div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> جاري التفكير...</div>';
+    wrap.appendChild(d);wrap.scrollTop=wrap.scrollHeight;
+  }
+  function _removeTyping(){var e=document.getElementById("gemini-typing");if(e)e.remove();}
+  async function geminiSend(){
+    var apiKey=_key();
+    if(!apiKey){
+      if(typeof showToast==="function")showToast("⚠️ مفتاح Gemini غير متاح");
+      _appendMsg("assistant","⚠️ لم يتم تحميل مفتاح Gemini. انتظر ثم حاول مجدداً.");return;
+    }
+    var input=document.getElementById("gemini-input"),sendBtn=document.getElementById("gemini-send-btn");
+    if(!input||!sendBtn)return;
+    var msg=input.value.trim();if(!msg)return;
+    input.value="";sendBtn.disabled=true;sendBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    _appendMsg("user",msg);_showTyping();
+    var contents=[];
+    if(_history.length===0){contents.push({role:"user",parts:[{text:"مرحباً"}]});contents.push({role:"model",parts:[{text:"أهلاً! كيف أساعدك؟"}]});}
+    _history.forEach(function(m){contents.push({role:m.role==="user"?"user":"model",parts:[{text:m.text}]});});
+    contents.push({role:"user",parts:[{text:msg}]});
+    try{
+      var res=await fetch(GEMINI_API+apiKey,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:_buildPrompt()}]},contents:contents,generationConfig:{temperature:0.7,topK:40,topP:0.95,maxOutputTokens:1024},safetySettings:[{category:"HARM_CATEGORY_HARASSMENT",threshold:"BLOCK_MEDIUM_AND_ABOVE"},{category:"HARM_CATEGORY_HATE_SPEECH",threshold:"BLOCK_MEDIUM_AND_ABOVE"},{category:"HARM_CATEGORY_SEXUALLY_EXPLICIT",threshold:"BLOCK_MEDIUM_AND_ABOVE"},{category:"HARM_CATEGORY_DANGEROUS_CONTENT",threshold:"BLOCK_MEDIUM_AND_ABOVE"}]})});
+      _removeTyping();
+      if(!res.ok){var err=await res.json().catch(function(){return{};});_appendMsg("assistant","❌ خطأ: "+((err&&err.error&&err.error.message)||"HTTP "+res.status));}
+      else{
+        var data=await res.json();
+        var text=data&&data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]?data.candidates[0].content.parts[0].text:null;
+        if(text){_appendMsg("assistant",text.trim());_history.push({role:"user",text:msg});_history.push({role:"assistant",text:text.trim()});if(_history.length>20)_history=_history.slice(-20);if(typeof playSoundsuccess==="function")playSoundsuccess();}
+        else{_appendMsg("assistant","⚠️ لم أتلقَّ ردًا. حاول مرة أخرى.");}
+      }
+    }catch(e){_removeTyping();_appendMsg("assistant","⚠️ خطأ في الاتصال.");}
+    sendBtn.disabled=false;sendBtn.innerHTML='<i class="fas fa-paper-plane"></i> إرسال';
+    _setStatus(!!_key());
+  }
+  function geminiClear(){
+    _history=[];
+    var wrap=document.getElementById("gemini-chat-wrap"),welcome=document.getElementById("gemini-welcome-msg");
+    if(!wrap)return;wrap.innerHTML="";if(welcome)wrap.appendChild(welcome);
+    if(typeof showToast==="function")showToast("🗑️ تم مسح المحادثة");
+  }
+  function geminiQuick(text){var input=document.getElementById("gemini-input");if(input){input.value=text;input.focus();}}
+  function initGeminiPage(){
+    _updateCtx();var tries=0;
+    var check=setInterval(function(){tries++;if(window.__GEMINI_KEY){_setStatus(true);clearInterval(check);}else if(tries>30){_setStatus(false);clearInterval(check);}},200);
+  }
+  window.geminiSend=geminiSend;window.geminiClear=geminiClear;window.geminiQuick=geminiQuick;window.initGeminiPage=initGeminiPage;
+  var _orig=null;
+  function _patch(){if(typeof window.goPage==="function"&&window.goPage!==_patched){_orig=window.goPage;window.goPage=_patched;}}
+  function _patched(n){if(_orig)_orig(n);if(n==="ai")initGeminiPage();}
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",_patch);}else{setTimeout(_patch,500);}
+})();
 </script>
 </body>
 </html>
