@@ -22,10 +22,20 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-  const firebaseConfig = { databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com" };
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+  const firebaseConfig = { 
+    apiKey: "AIzaSyDFnhTl0p8kM_example_change_this",
+    authDomain: "daybat-cfa12.firebaseapp.com",
+    projectId: "daybat-cfa12",
+    storageBucket: "daybat-cfa12.appspot.com",
+    messagingSenderId: "111111111111",
+    appId: "1:111111111111:web:xxxxxxxxxxxxxxxx",
+    databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com"
+  };
   try {
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getDatabase(firebaseApp);
+    const auth = getAuth(firebaseApp);
     window.__firebaseDB = db;
     window.__firebaseRef = ref;
     window.__firebaseSet = set;
@@ -33,6 +43,10 @@
     window.__firebaseChild = child;
     window.__firebaseOnValue = onValue;
     window.__firebaseRemove = remove;
+    window.__firebaseAuth = auth;
+    window.__firebaseGoogleAuth = new GoogleAuthProvider();
+    window.__firebaseSignInWithPopup = signInWithPopup;
+    window.__firebaseSignOut = signOut;
     window.__firebaseReady = true;
     try {
       const cfgSnap = await get(child(ref(db), 'config/ai'));
@@ -114,6 +128,15 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .btn{width:100%;border:none;border-radius:14px;padding:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;box-shadow:0 4px 20px rgba(200,150,12,.4)}
 .btn-gold:disabled{opacity:.6;cursor:not-allowed}
+.btn-google{background:linear-gradient(135deg,#4285f4,#357ae8);color:#fff;box-shadow:0 4px 20px rgba(66,133,244,.4);display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-google:hover{box-shadow:0 6px 25px rgba(66,133,244,.5);transform:translateY(-2px)}
+.btn-secondary{background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--txt2);box-shadow:none}
+.btn-secondary:hover{background:rgba(255,255,255,.12);border-color:var(--gold)}
+footer{position:fixed;bottom:0;left:0;right:0;height:auto;background:rgba(5,14,31,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(200,150,12,.2);padding:12px 16px;text-align:center;font-size:0.75rem;color:var(--txt3);z-index:100;display:flex;align-items:center;justify-content:center;gap:6px}
+footer a{color:var(--gold2);text-decoration:none;transition:all .3s}
+footer a:hover{color:var(--gold3)}
+.heart{display:inline-block;animation:heartbeat 1.2s ease-in-out infinite;color:#e53935}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:rgba(5,14,31,.98);backdrop-filter:blur(20px);border-top:1px solid rgba(200,150,12,.2);display:none;z-index:1000;flex-direction:row;align-items:stretch;padding:8px 0}
 .bottom-nav.show{display:flex}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--txt3);transition:all .3s ease;position:relative;padding:8px 4px}
@@ -659,30 +682,63 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     </div>
     <div id="login-form">
       <div class="auth-error" id="login-error"></div>
+      <button class="btn btn-google" onclick="doGoogleLogin()" style="width:100%;margin-bottom:14px"><i class="fab fa-google"></i> تسجيل دخول بـ جوجل</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0"><div style="flex:1;height:1px;background:var(--border)"></div><div style="color:var(--txt3);font-size:0.8rem">أو</div><div style="flex:1;height:1px;background:var(--border)"></div></div>
       <div class="field"><label>اسم المستخدم</label><div class="input-wrap"><input type="text" id="l-user" placeholder="أدخل اسم المستخدم" autocomplete="username"></div></div>
       <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="l-pass" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button></div></div>
       <button class="btn btn-gold" style="margin-top:8px" id="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
     </div>
     <div id="register-form" class="hidden">
-      <div class="auth-error" id="reg-error"></div>
-      <div class="field"><label>الاسم الكامل</label><input type="text" id="r-name" placeholder="محمد أحمد"></div>
-      <div class="field"><label>اسم المستخدم</label><input type="text" id="r-user" placeholder="username123"></div>
-      <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="r-pass" placeholder="6 أحرف على الأقل"><button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button></div></div>
-      <div class="field"><label>تاريخ الميلاد</label><input type="date" id="r-dob"></div>
-      <div class="field"><label>الجنس</label><select id="r-gender"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div>
-      <div class="field"><label>هل أنت مدخن؟</label><select id="r-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
-      <div class="field-row">
-        <div class="field"><label>الوزن (كجم)</label><input type="number" id="r-weight" placeholder="70" oninput="calcBMI('r')"></div>
-        <div class="field"><label>الطول (سم)</label><input type="number" id="r-height" placeholder="170" oninput="calcBMI('r')"></div>
+      <div id="google-reg-form" class="hidden">
+        <div class="auth-error" id="google-reg-error"></div>
+        <div style="background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.2);border-radius:12px;padding:12px;margin-bottom:14px">
+          <div style="font-size:0.85rem;color:var(--txt2);margin-bottom:8px"><i class="fas fa-info-circle" style="color:var(--gold2);margin-left:8px"></i>تم التحقق من بيانات جوجل</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
+            <img id="google-profile-pic" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+            <div><div id="google-email" style="font-size:0.9rem;color:var(--gold2);font-weight:600"></div><div id="google-name" style="font-size:0.8rem;color:var(--txt3)"></div></div>
+          </div>
+        </div>
+        <div class="field"><label>اسم المستخدم</label><input type="text" id="r-user-google" placeholder="username123"></div>
+        <div class="field"><label>تاريخ الميلاد</label><input type="date" id="r-dob-google"></div>
+        <div class="field"><label>الجنس</label><select id="r-gender-google"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div>
+        <div class="field"><label>هل أنت مدخن؟</label><select id="r-smoking-google"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
+        <div class="field-row">
+          <div class="field"><label>الوزن (كجم)</label><input type="number" id="r-weight-google" placeholder="70" oninput="calcBMI('r-google')"></div>
+          <div class="field"><label>الطول (سم)</label><input type="number" id="r-height-google" placeholder="170" oninput="calcBMI('r-google')"></div>
+        </div>
+        <div class="field"><label>رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label><input type="tel" id="r-phone-google" placeholder="966501234567" dir="ltr" style="text-align:right"></div>
+        <div class="bmi-result" id="bmi-result-google"></div>
+        <div class="disease-section">
+          <div style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i>الأمراض المزمنة (اختياري)</div>
+          <div class="dis-grid" id="dis-grid-google"></div>
+        </div>
+        <div class="disclaimer" style="margin-top:14px"><div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنبيه طبي</div><p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً.</p></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" style="flex:1" onclick="cancelGoogleReg()"><i class="fas fa-arrow-left"></i> رجوع</button>
+          <button class="btn btn-gold" style="flex:1" id="btn-register-google" onclick="doGoogleRegister()"><i class="fas fa-user-plus"></i> إكمال</button>
+        </div>
       </div>
-      <div class="field"><label>رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label><input type="tel" id="r-phone" placeholder="966501234567" dir="ltr" style="text-align:right"></div>
-      <div class="bmi-result" id="bmi-result"></div>
-      <div class="disease-section">
-        <div style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i>الأمراض المزمنة (اختياري)</div>
-        <div class="dis-grid" id="dis-grid-auth"></div>
+      <div id="manual-reg-form">
+        <div class="auth-error" id="reg-error"></div>
+        <div class="field"><label>الاسم الكامل</label><input type="text" id="r-name" placeholder="محمد أحمد"></div>
+        <div class="field"><label>اسم المستخدم</label><input type="text" id="r-user" placeholder="username123"></div>
+        <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="r-pass" placeholder="6 أحرف على الأقل"><button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button></div></div>
+        <div class="field"><label>تاريخ الميلاد</label><input type="date" id="r-dob"></div>
+        <div class="field"><label>الجنس</label><select id="r-gender"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div>
+        <div class="field"><label>هل أنت مدخن؟</label><select id="r-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
+        <div class="field-row">
+          <div class="field"><label>الوزن (كجم)</label><input type="number" id="r-weight" placeholder="70" oninput="calcBMI('r')"></div>
+          <div class="field"><label>الطول (سم)</label><input type="number" id="r-height" placeholder="170" oninput="calcBMI('r')"></div>
+        </div>
+        <div class="field"><label>رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label><input type="tel" id="r-phone" placeholder="966501234567" dir="ltr" style="text-align:right"></div>
+        <div class="bmi-result" id="bmi-result"></div>
+        <div class="disease-section">
+          <div style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i>الأمراض المزمنة (اختياري)</div>
+          <div class="dis-grid" id="dis-grid-auth"></div>
+        </div>
+        <div class="disclaimer" style="margin-top:14px"><div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنبيه طبي</div><p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً.</p></div>
+        <button class="btn btn-gold" id="btn-register" onclick="doRegister()"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
       </div>
-      <div class="disclaimer" style="margin-top:14px"><div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنبيه طبي</div><p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً.</p></div>
-      <button class="btn btn-gold" id="btn-register" onclick="doRegister()"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
     </div>
   </div>
 </div>
@@ -1511,7 +1567,11 @@ function switchAuthTab(t) {
   playSound('nav');
 }
 
-function showAuthError(f, m) { var e = document.getElementById(f + '-error'); e.textContent = m; e.classList.add('show'); }
+function showAuthError(f, m) {
+  var e = document.getElementById(f + '-error');
+  if (!e && f === 'google-reg') e = document.getElementById('google-reg-error');
+  if (e) { e.textContent = m; e.classList.add('show'); }
+}
 function togglePass(i, b) { var inp = document.getElementById(i); var show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; b.innerHTML = '<i class="fas fa-' + (show ? 'eye-slash' : 'eye') + '"></i>'; }
 
 function buildDisGrid(cId, arr) {
@@ -1548,6 +1608,113 @@ function calcBMI(p) {
   else if (bmi < 40) { c = 'bmi-obese'; t = 'سمنة — BMI: ' + bmi; }
   else { c = 'bmi-morbid'; t = 'سمنة مفرطة — BMI: ' + bmi; }
   el.className = 'bmi-result show ' + c; el.textContent = t;
+}
+
+/* ══════════ Google OAuth ══════════ */
+var googleUserData = null;
+
+async function doGoogleLogin() {
+  if (!window.__firebaseAuth) { showAuthError('login', '❌ خطأ في تهيئة الخدمة'); return; }
+  var b = event.target.closest('.btn');
+  b.disabled = true;
+  b.innerHTML = '<span class="btn-spinner"></span> جاري الاتصال بجوجل...';
+  try {
+    const result = await window.__firebaseSignInWithPopup(window.__firebaseAuth, window.__firebaseGoogleAuth);
+    const user = result.user;
+    var existingUser = await dbGetUser(user.email);
+    if (existingUser) {
+      currentUser = Object.assign({}, existingUser, { username: user.email });
+      saveSession(user.email);
+      if (currentUser.pro && currentUser.pro.active === true) {
+        window.isProUser = (Date.now() < (currentUser.pro.expiresAt || 0));
+      } else {
+        window.isProUser = false;
+      }
+      try { await dbSaveUser(user.email, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
+      playSound('success');
+      showToast('✅ أهلاً ' + user.displayName);
+      bootApp();
+    } else {
+      googleUserData = {
+        email: user.email,
+        name: user.displayName,
+        photoURL: user.photoURL
+      };
+      document.getElementById('google-email').textContent = user.email;
+      document.getElementById('google-name').textContent = user.displayName;
+      if (user.photoURL) document.getElementById('google-profile-pic').src = user.photoURL;
+      buildDisGrid('dis-grid-google', []);
+      document.getElementById('manual-reg-form').classList.add('hidden');
+      document.getElementById('google-reg-form').classList.remove('hidden');
+      switchAuthTab('register');
+    }
+  } catch(e) {
+    console.error('Google login error:', e);
+    showAuthError('login', '❌ فشل تسجيل الدخول، حاول مجدداً');
+  }
+  finally { b.disabled = false; b.innerHTML = '<i class="fab fa-google"></i> تسجيل دخول بـ جوجل'; }
+}
+
+function cancelGoogleReg() {
+  googleUserData = null;
+  document.getElementById('google-reg-form').classList.add('hidden');
+  document.getElementById('manual-reg-form').classList.remove('hidden');
+  switchAuthTab('login');
+}
+
+async function doGoogleRegister() {
+  if (!googleUserData) return;
+  document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+  var u = document.getElementById('r-user-google').value.trim().toLowerCase();
+  var d = document.getElementById('r-dob-google').value;
+  var g = document.getElementById('r-gender-google').value;
+  var sm = document.getElementById('r-smoking-google').value;
+  var w = parseFloat(document.getElementById('r-weight-google').value) || 0;
+  var h = parseFloat(document.getElementById('r-height-google').value) || 0;
+  var phone = document.getElementById('r-phone-google').value.trim();
+  if (!u || u.length < 3) { showAuthError('google-reg', '❌ اسم المستخدم 3 أحرف على الأقل'); return; }
+  if (!d) { showAuthError('google-reg', '❌ أدخل تاريخ الميلاد'); return; }
+  if (!g) { showAuthError('google-reg', '❌ اختر الجنس'); return; }
+  var b = document.getElementById('btn-register-google');
+  b.disabled = true;
+  b.innerHTML = '<span class="btn-spinner"></span> جاري الإكمال...';
+  try {
+    var ex = await dbGetUser(u);
+    if (ex) { showAuthError('google-reg', '❌ اسم المستخدم محجوز، اختر آخر'); return; }
+    var bmi = (w && h) ? +(w / ((h / 100) * (h / 100))).toFixed(1) : 0;
+    var selectedDis = Array.from(document.querySelectorAll('#dis-grid-google .dis-item.sel')).map(el => el.dataset.disease || '');
+    var ud = {
+      name: googleUserData.name,
+      username: u,
+      email: googleUserData.email,
+      password: '__google_oauth__',
+      dob: d,
+      gender: g,
+      smoking: sm,
+      weight: w,
+      height: h,
+      bmi: bmi,
+      diseases: selectedDis,
+      phone: phone || '',
+      created: Date.now(),
+      pro: { active: false }
+    };
+    await dbSaveUser(u, ud);
+    currentUser = Object.assign({}, ud);
+    saveSession(u);
+    window.isProUser = false;
+    googleUserData = null;
+    playSound('success');
+    showToast('✅ تم إنشاء الحساب بنجاح');
+    bootApp();
+  } catch(e) {
+    console.error('Google register error:', e);
+    showAuthError('google-reg', '❌ خطأ في الإنشاء، حاول مجدداً');
+  }
+  finally {
+    b.disabled = false;
+    b.innerHTML = '<i class="fas fa-user-plus"></i> إكمال';
+  }
 }
 
 /* ══════════ Login / Register ══════════ */
@@ -3091,5 +3258,9 @@ window.addEventListener('DOMContentLoaded', function() {
   if (document.readyState==="loading") { document.addEventListener("DOMContentLoaded",_patch); } else { setTimeout(_patch,500); }
 })();
 </script>
+<footer>
+  برمجة وتطوير بكل <span class="heart">❤️</span> المهندس محمد حماد
+  <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener noreferrer" title="تابعنا على فيسبوك"><i class="fab fa-facebook-f"></i></a>
+</footer>
 </body>
 </html>
