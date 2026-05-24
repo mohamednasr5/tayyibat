@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml"
-  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-  xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
-  <!-- الصفحة الرئيسية / Home -->
   <url>
     <loc>https://tayyibat.online/</loc>
     <lastmod>2025-05-24</lastmod>
@@ -16,104 +12,8 @@
     <image:image>
       <image:loc>https://tayyibat.online/icons/og-image.png</image:loc>
       <image:title>نظام طيبات الصحي الذكي - الدكتور ضياء العوضي</image:title>
-      <image:caption>نظام غذائي ذكي مدعوم بالذكاء الاصطناعي من الدكتور ضياء العوضي</image:caption>
+      <image:caption>تطبيق الدايت والحمية الغذائية والصيام المتقطع بالذكاء الاصطناعي</image:caption>
     </image:image>
-  </url>
-
-  <!-- قائمة الأطعمة / Food List -->
-  <url>
-    <loc>https://tayyibat.online/#food</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- الطبيب الذكي AI / Smart AI Doctor -->
-  <url>
-    <loc>https://tayyibat.online/#ai</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- متابعة الصيام / Fasting Tracker -->
-  <url>
-    <loc>https://tayyibat.online/#fast</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- تجارب المستخدمين / User Experiences -->
-  <url>
-    <loc>https://tayyibat.online/#experiences</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- الملف الشخصي / Profile -->
-  <url>
-    <loc>https://tayyibat.online/#profile</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- محلل التغذية المتقدم / Premium Analyzer -->
-  <url>
-    <loc>https://tayyibat.online/#premium-analyzer</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- المدرب الذكي / Premium AI Coach -->
-  <url>
-    <loc>https://tayyibat.online/#premium-coach</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- ماسح الأطعمة / Food Scanner -->
-  <url>
-    <loc>https://tayyibat.online/#premium-scanner</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- متتبع التقدم / Progress Tracker -->
-  <url>
-    <loc>https://tayyibat.online/#premium-tracker</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- بروتوكولات صحية / Health Protocols -->
-  <url>
-    <loc>https://tayyibat.online/#premium-protocols</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- وصفات صحية / Healthy Recipes -->
-  <url>
-    <loc>https://tayyibat.online/#premium-recipes</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- تحديات صحية / Health Challenges -->
-  <url>
-    <loc>https://tayyibat.online/#premium-challenges</loc>
-    <lastmod>2025-05-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
 
 </urlset>
