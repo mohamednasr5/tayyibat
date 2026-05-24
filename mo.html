@@ -275,6 +275,7 @@
     .act-type-input { border-color: rgba(255,167,38,0.3) !important; }
     .act-type-analysis { border-color: rgba(171,71,188,0.3) !important; }
     .act-type-navigation { border-color: rgba(38,198,218,0.3) !important; }
+    .act-type-share { border-color: rgba(37,211,102,0.4) !important; background: rgba(37,211,102,0.03) !important; }
     .act-detail { font-size: 0.75rem; color: var(--txt3); margin-top: 3px; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 4px 8px; word-break: break-all; }
   </style>
 </head>
@@ -324,6 +325,7 @@
       <div class="stat-card red"><div class="stat-icon">⌛</div><div class="stat-value" id="expiredCount">0</div><div class="stat-label">منتهو الاشتراك</div></div>
       <div class="stat-card purple"><div class="stat-icon">🎁</div><div class="stat-value" id="giftsCount">0</div><div class="stat-label">إجمالي الهدايا الممنوحة</div></div>
       <div class="stat-card cyan"><div class="stat-icon">🔥</div><div class="stat-value" id="streakCount">0</div><div class="stat-label">أعلى سلسلة حضور (أيام)</div></div>
+      <div class="stat-card green"><div class="stat-icon">📤</div><div class="stat-value" id="sharesCount">0</div><div class="stat-label">إجمالي المشاركات</div></div>
     </div>
 
     <!-- MAIN LAYOUT -->
@@ -421,6 +423,7 @@
                 <button class="act-filter-btn" onclick="filterActivityLog('input',this)">✏️ إدخالات</button>
                 <button class="act-filter-btn" onclick="filterActivityLog('analysis',this)">🔬 تحليلات</button>
                 <button class="act-filter-btn" onclick="filterActivityLog('navigation',this)">📱 تنقل</button>
+                <button class="act-filter-btn" onclick="filterActivityLog('share',this)">📤 مشاركات</button>
               </div>
               <div class="activity-list" id="activityLog"></div>
             </div>
@@ -801,12 +804,25 @@
       const totalGifts = allUsers.reduce((s, u) => s + (u.gifts ? Object.keys(u.gifts).length : 0), 0);
       const maxStreak = allUsers.reduce((s, u) => Math.max(s, getConsecutiveStreak(u.loginHistory)), 0);
 
+      // احسب إجمالي المشاركات من activityLog
+      let totalShares = 0;
+      try {
+        const sharesSnap = await get(child(ref(db), 'shares'));
+        if (sharesSnap.exists()) {
+          const sharesData = sharesSnap.val();
+          Object.values(sharesData).forEach(userShares => {
+            totalShares += Object.keys(userShares).length;
+          });
+        }
+      } catch(e) {}
+
       document.getElementById('totalCount').textContent = allUsers.length;
       document.getElementById('activeCount').textContent = allUsers.filter(u => u.lastLogin && Date.now() - u.lastLogin < 86400000).length;
       document.getElementById('proCount').textContent = allUsers.filter(u => isProActive(u)).length;
       document.getElementById('expiredCount').textContent = allUsers.filter(u => isProExpired(u)).length;
       document.getElementById('giftsCount').textContent = totalGifts;
       document.getElementById('streakCount').textContent = maxStreak;
+      document.getElementById('sharesCount').textContent = totalShares;
 
       renderUsersList(allUsers);
     } catch(e) { showToast('❌ تعذر الاتصال بقاعدة البيانات.'); }
@@ -892,14 +908,15 @@
     let freshExperiences = {}, freshQuestions = {}, freshActivities = [];
     try {
       const safeUsername = u.username || id;
-      const [expSnap, qGlobalSnap, actSnap, logSnap, actUserSnap, qUserSnap, chatSnap] = await Promise.all([
+      const [expSnap, qGlobalSnap, actSnap, logSnap, actUserSnap, qUserSnap, chatSnap, sharesUserSnap] = await Promise.all([
         get(child(ref(db), 'experiences')),
         get(child(ref(db), 'questions')),
         get(child(ref(db), 'activityLog/' + id)),
         get(child(ref(db), 'adminLogs/' + id)),
         get(child(ref(db), 'users/' + id + '/activityLog')),
         get(child(ref(db), 'users/' + id + '/questions')),
-        get(child(ref(db), 'users/' + id + '/chatHistory'))
+        get(child(ref(db), 'users/' + id + '/chatHistory')),
+        get(child(ref(db), 'shares/' + safeUsername))
       ]);
 
       // ─ التجارب ─
@@ -949,6 +966,21 @@
           // أضفه للأسئلة أيضاً إن لم يكن موجوداً
           const qk = 'chat_' + (c.ts||c.timestamp||Math.random());
           if (!freshQuestions[qk]) freshQuestions[qk] = { question: c.content||c.text||'', ts: c.ts||c.timestamp||0, type: 'ai' };
+        });
+      }
+
+      // ─ أحداث المشاركة من /shares/{username} ─
+      if (sharesUserSnap && sharesUserSnap.exists()) {
+        const sharesRaw = sharesUserSnap.val();
+        Object.values(sharesRaw).forEach(s => {
+          const platformLabel = s.platform === 'whatsapp' ? 'واتساب' : s.platform === 'copy' ? 'نسخ الرابط' : s.platform || 'غير محدد';
+          freshActivities.push({
+            type: 'share',
+            ts: s.ts || 0,
+            text: 'شارك البرنامج عبر ' + platformLabel,
+            dot: '#25D366',
+            detail: 'platform:' + (s.platform || '-')
+          });
         });
       }
 
@@ -1024,7 +1056,8 @@
         question: { dot:'var(--blue)', label:'سؤال' },
         input: { dot:'#ffa726', label:'إدخال' },
         analysis: { dot:'var(--purple)', label:'تحليل' },
-        navigation: { dot:'#26c6da', label:'تنقل' }
+        navigation: { dot:'#26c6da', label:'تنقل' },
+        share: { dot:'#25D366', label:'مشاركة' }
       };
       const t = a.type || (a.question ? 'question' : a.action ? 'input' : 'input');
       const info = typeMap[t] || { dot:'var(--txt3)', label:'نشاط' };
@@ -1084,16 +1117,21 @@
     if (!qKeys.length) {
       document.getElementById('questionsList').innerHTML = '<div class="no-data-msg">لا توجد أسئلة مسجلة</div>';
     } else {
-      document.getElementById('questionsList').innerHTML = qKeys.slice(-20).reverse().map(k => {
+      document.getElementById('questionsList').innerHTML = qKeys.slice(-30).reverse().map(k => {
         const q = freshQuestions[k];
-        const typeColor = { nutrition:'#42a5f5', health:'#66bb6a', general:'#ffa726' }[q.type] || 'var(--txt3)';
+        const typeLabels = { nutrition:'🥗 تغذية', health:'💊 صحة', general:'💬 عام', ai:'🤖 ذكاء اصطناعي' };
+        const typeColors = { nutrition:'#42a5f5', health:'#66bb6a', general:'#ffa726', ai:'#ab47bc' };
+        const typeKey = q.type || 'general';
+        const typeColor = typeColors[typeKey] || 'var(--txt3)';
+        const typeLabel = typeLabels[typeKey] || typeKey;
         return `<div class="q-item">
           <div class="q-text">${q.question || q.text || q.content || 'سؤال بدون نص'}</div>
           <div class="q-meta">
-            <span class="q-type-badge" style="background:rgba(66,165,245,0.1);color:${typeColor}">${q.type||'عام'}</span>
+            <span class="q-type-badge" style="background:rgba(66,165,245,0.1);color:${typeColor}">${typeLabel}</span>
+            ${q.model ? `<span style="font-size:0.65rem;color:var(--txt3)">🧠 ${q.model}</span>` : ''}
             <span>${formatDateTime(q.ts||q.timestamp||q.created)}</span>
           </div>
-          ${q.answer ? `<div style="margin-top:6px;padding:8px;background:rgba(46,201,81,0.05);border-radius:8px;font-size:0.78rem;color:var(--green);line-height:1.4;">↩ ${q.answer.substring(0,150)}${q.answer.length>150?'...':''}</div>` : ''}
+          ${q.answer ? `<div style="margin-top:6px;padding:8px;background:rgba(46,201,81,0.05);border-radius:8px;font-size:0.78rem;color:var(--green);line-height:1.5;">↩ ${q.answer.substring(0,200)}${q.answer.length>200?'...':''}</div>` : ''}
         </div>`;
       }).join('');
     }
@@ -1134,6 +1172,7 @@
 
     const totalLogins = loginHistory.length;
     const firstLogin = loginHistory.length ? new Date(Math.min(...loginHistory)).toLocaleDateString('ar-EG') : 'غير معروف';
+    const sharesN = (window._allActivityItems||[]).filter(a => a.type === 'share').length;
     document.getElementById('usageStats').innerHTML = `
       عدد مرات الدخول الإجمالية: <strong style="color:var(--gold2)">${totalLogins}</strong><br>
       أول دخول مسجّل: <strong style="color:var(--gold2)">${firstLogin}</strong><br>
@@ -1141,7 +1180,8 @@
       سلسلة الحضور المتواصل: <strong style="color:#ffa726">🔥 ${streak} يوم</strong><br>
       عدد الأسئلة المُرسَلة: <strong style="color:var(--blue)">${qCount}</strong><br>
       عدد التجارب/التحليلات: <strong style="color:var(--green)">${analysisCount}</strong><br>
-      الهدايا الممنوحة: <strong style="color:var(--purple)">🎁 ${giftsN}</strong>`;
+      الهدايا الممنوحة: <strong style="color:var(--purple)">🎁 ${giftsN}</strong><br>
+      المشاركات: <strong style="color:#25D366">📤 ${sharesN}</strong>`;
 
     const diseases = Array.isArray(u.diseases) ? u.diseases : [];
     const diseaseNames = { sugar:'السكري', pressure:'ارتفاع الضغط', allergy:'الحساسية', chemo:'علاج كيماوي', heart:'أمراض القلب', kidney:'أمراض الكلى' };
