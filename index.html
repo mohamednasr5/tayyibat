@@ -278,7 +278,62 @@ html{scroll-behavior:smooth}
 body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 .hidden{display:none!important}
-/* ══ Google AdSense Containers ══ */
+/* ══ APK Download Button ══ */
+.btn-apk-download{
+  position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  width:100%;margin-top:10px;padding:0;height:52px;
+  background:linear-gradient(135deg,#1a7a2e,#2ec951,#1a9e36);
+  background-size:200% 200%;
+  border:none;border-radius:14px;text-decoration:none;cursor:pointer;
+  box-shadow:0 4px 20px rgba(46,201,81,.35),0 0 0 0 rgba(46,201,81,.4);
+  animation:apkGreenPulse 2.5s ease-in-out infinite, apkBgShift 3s ease infinite;
+  transition:transform .2s,box-shadow .2s;
+  font-family:'Tajawal',sans-serif;
+}
+.btn-apk-download:active{transform:scale(.97)}
+@keyframes apkGreenPulse{
+  0%,100%{box-shadow:0 4px 20px rgba(46,201,81,.35),0 0 0 0 rgba(46,201,81,.3)}
+  50%{box-shadow:0 6px 28px rgba(46,201,81,.55),0 0 0 8px rgba(46,201,81,.0)}
+}
+@keyframes apkBgShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.apk-btn-content{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:0 16px;z-index:1;position:relative}
+.apk-android-icon{font-size:1.7rem;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));animation:apkAndroidBounce 2s ease-in-out infinite}
+@keyframes apkAndroidBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.apk-text-wrap{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.apk-label{font-size:1rem;font-weight:800;color:#fff;letter-spacing:.3px}
+.apk-sublabel{font-size:.65rem;color:rgba(255,255,255,.75);font-weight:600}
+.apk-arrow{font-size:1rem;color:#fff;opacity:.85;animation:apkArrowBounce 1.2s ease-in-out infinite}
+@keyframes apkArrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+/* loading state */
+.apk-loading-content{display:flex;align-items:center;justify-content:center;gap:10px;position:relative;z-index:1}
+.apk-loader-ring{width:22px;height:22px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:apkSpin .7s linear infinite;flex-shrink:0}
+@keyframes apkSpin{to{transform:rotate(360deg)}}
+.apk-loading-text{font-size:.9rem;font-weight:700;color:#fff}
+/* progress bar overlay */
+.apk-progress-bar{
+  position:absolute;bottom:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,rgba(255,255,255,.5),rgba(255,255,255,.9));
+  border-radius:0 0 14px 14px;
+  transition:width .3s ease;
+  box-shadow:0 0 8px rgba(255,255,255,.6);
+}
+/* shimmer overlay */
+.btn-apk-download::after{
+  content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.18),transparent);
+  animation:apkShimmer 2.5s ease-in-out infinite;pointer-events:none;
+}
+@keyframes apkShimmer{0%{left:-75%}100%{left:125%}}
+/* success state */
+.btn-apk-download.apk-done{
+  background:linear-gradient(135deg,#0d5e21,#1a7a2e)!important;
+  animation:none!important;
+}
+
 .ads-container{width:100%;overflow:hidden;text-align:center;margin:10px 0;padding:0 16px}
 .ads-container ins.adsbygoogle{display:block;border-radius:12px;overflow:hidden}
 .ads-banner{padding:0 16px;margin:12px 0}
@@ -915,6 +970,21 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="field"><label>اسم المستخدم</label><div class="input-wrap"><input type="text" id="l-user" placeholder="أدخل اسم المستخدم" autocomplete="username"></div></div>
       <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="l-pass" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button></div></div>
       <button class="btn btn-gold" style="margin-top:8px" id="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
+      <a id="btn-download-apk" href="https://tayyibat.online/tayyibat.apk" class="btn-apk-download" onclick="startApkDownloadAnim(event)">
+        <span class="apk-btn-content" id="apk-btn-content">
+          <span class="apk-android-icon"><i class="fab fa-android"></i></span>
+          <span class="apk-text-wrap">
+            <span class="apk-label">حمل التطبيق</span>
+            <span class="apk-sublabel">Android APK</span>
+          </span>
+          <span class="apk-arrow"><i class="fas fa-download"></i></span>
+        </span>
+        <span class="apk-loading-content hidden" id="apk-loading-content">
+          <span class="apk-loader-ring"></span>
+          <span class="apk-loading-text" id="apk-loading-text">جاري التحميل...</span>
+        </span>
+        <span class="apk-progress-bar" id="apk-progress-bar"></span>
+      </a>
     </div>
     <div id="register-form" class="hidden">
       <div class="auth-error" id="reg-error"></div>
@@ -1791,6 +1861,54 @@ function saveSession(u) { localStorage.setItem('tayyibat_session', u); }
 function clearSession() { localStorage.removeItem('tayyibat_session'); }
 function encodePass(p) { return btoa(unescape(encodeURIComponent(p))); }
 function decodePass(e) { try { return decodeURIComponent(escape(atob(e))); } catch(x) { return e; } }
+
+/* ══ APK Download Animation ══ */
+function startApkDownloadAnim(e) {
+  var btn    = document.getElementById('btn-download-apk');
+  var main   = document.getElementById('apk-btn-content');
+  var load   = document.getElementById('apk-loading-content');
+  var txt    = document.getElementById('apk-loading-text');
+  var bar    = document.getElementById('apk-progress-bar');
+  if (!btn || btn.classList.contains('apk-done')) return;
+
+  main.classList.add('hidden');
+  load.classList.remove('hidden');
+  btn.style.pointerEvents = 'none';
+
+  var steps = ['جاري التحضير...', 'يتم التحميل...', 'اكتمل التحميل ✅'];
+  var prog  = [0, 35, 70, 100];
+  var i = 0;
+
+  function step() {
+    if (i < steps.length) {
+      txt.textContent = steps[i];
+      bar.style.width = prog[i + 1] + '%';
+      i++;
+      setTimeout(step, i === steps.length ? 900 : 700);
+    } else {
+      /* Done state */
+      btn.classList.add('apk-done');
+      load.classList.add('hidden');
+      main.classList.remove('hidden');
+      btn.querySelector('.apk-label').textContent = 'تم بدء التحميل ✅';
+      btn.querySelector('.apk-sublabel').textContent = 'تحقق من مجلد التنزيلات';
+      btn.querySelector('.apk-arrow').innerHTML = '<i class="fas fa-check"></i>';
+      btn.querySelector('.apk-android-icon').style.animation = 'none';
+      bar.style.width = '100%';
+      /* reset after 5s */
+      setTimeout(function() {
+        btn.classList.remove('apk-done');
+        btn.querySelector('.apk-label').textContent = 'حمل التطبيق';
+        btn.querySelector('.apk-sublabel').textContent = 'Android APK';
+        btn.querySelector('.apk-arrow').innerHTML = '<i class="fas fa-download"></i>';
+        btn.querySelector('.apk-android-icon').style.animation = '';
+        bar.style.width = '0%';
+        btn.style.pointerEvents = '';
+      }, 5000);
+    }
+  }
+  step();
+}
 
 /* ══════════ Loader ══════════ */
 function hideLoader() {
