@@ -175,7 +175,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .section{padding:0 16px 16px}
 .sec-title{font-size:.85rem;font-weight:800;color:var(--txt2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .alert-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid;border-radius:16px;padding:14px;margin-bottom:10px}
-.alert-card.ok{border-color:rgba(46,201,81,.3)}.alert-card.sugar{border-color:rgba(239,83,80,.3)}.alert-card.pressure{border-color:rgba(66,165,245,.3)}.alert-card.allergy{border-color:rgba(171,71,188,.3)}.alert-card.chemo{border-color:rgba(255,112,67,.3)}.alert-card.heart{border-color:rgba(236,64,122,.3)}.alert-card.kidney{border-color:rgba(102,187,106,.3)}
+.alert-card.ok{border-color:rgba(46,201,81,.3)}.alert-card.sugar{border-color:rgba(239,83,80,.3)}.alert-card.pressure覆{border-color:rgba(66,165,245,.3)}.alert-card.allergy{border-color:rgba(171,71,188,.3)}.alert-card.chemo{border-color:rgba(255,112,67,.3)}.alert-card.heart{border-color:rgba(236,64,122,.3)}.alert-card.kidney{border-color:rgba(102,187,106,.3)}
 .alert-title{font-size:.9rem;font-weight:800;color:var(--txt);margin-bottom:8px}
 .alert-tips{padding-right:16px}
 .alert-tips li{font-size:.78rem;color:var(--txt2);line-height:1.8;margin-bottom:4px}
@@ -188,7 +188,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .footer-sig{margin:20px 16px;padding:16px;background:linear-gradient(145deg,rgba(200,150,12,.05),rgba(200,150,12,.02));border:1px solid rgba(200,150,12,.15);border-radius:16px;text-align:center}
 .heart-wrap{font-size:1.5rem;color:var(--red2);margin-bottom:6px;animation:heartBeat 1.5s ease-in-out infinite}
 @keyframes heartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-.sig-text{font-family:'Amiri',serif;font-size:.95rem;color:var(--txt2);margin-bottom:4px}
+.sig-text{font-family:'Tajawal',sans-serif;font-size:.95rem;color:var(--txt2);margin-bottom:4px}
 .sig-name{color:var(--gold2);font-weight:700}
 .dev-sig{margin-top:12px;padding-top:12px;border-top:1px solid rgba(200,150,12,.15)}
 .dev-sig-name{font-size:.95rem;font-weight:700;color:var(--gold2);margin-bottom:8px}
@@ -231,7 +231,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .ai-chat-wrap{padding:0 16px;display:flex;flex-direction:column;gap:10px;min-height:200px;padding-bottom:20px}
 .ai-msg{padding:12px 14px;border-radius:14px;font-size:.85rem;line-height:1.8;animation:msgIn .3s ease}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.ai-msg.user{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(79,70,229,.08));border:1px solid rgba(124,58,237,.3);color:#c4b5fd;text-align:right;border-radius:14px 14px 4px 14px}
+.ai-msg.user {background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(79,70,229,.08));border:1px solid rgba(124,58,237,.3);color:#c4b5fd;text-align:right;border-radius:14px 14px 4px 14px}
 .ai-msg.assistant{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--txt);border-radius:14px 14px 14px 4px;white-space:pre-wrap;word-wrap:break-word}
 .ai-msg-label{font-size:.65rem;font-weight:700;margin-bottom:6px;opacity:.7;display:flex;align-items:center;gap:5px}
 .ai-msg.user .ai-msg-label{color:var(--ai-purple2);justify-content:flex-end}
@@ -413,7 +413,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .quotes-progress{height:3px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:16px;overflow:hidden}
 .progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0%;transition:width .3s ease;border-radius:3px}
 
-/* ══ Admin Notification Banner ══ */
 #admin-notification-banner{position:fixed;top:0;left:0;right:0;z-index:99999;transform:translateY(-100%);transition:transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-height:none;overflow:visible}
 #admin-notification-banner.show{transform:translateY(0);pointer-events:auto}
 .notif-inner{background:linear-gradient(135deg,#0d47a1,#1565c0);border-bottom:3px solid var(--gold);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
@@ -598,7 +597,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   font-size: 1.4rem;
   box-shadow: 0 0 15px rgba(245,200,66,0.2);
 }
-  /* ══ Gemini AI Styles ══ */
 .gemini-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;transition:background .4s;flex-shrink:0}
 .gemini-status-dot.ready{background:#2ec951;box-shadow:0 0 7px #2ec951}
 .gemini-status-dot.off{background:#ef5350}
@@ -606,18 +604,169 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .gemini-quick-row::-webkit-scrollbar{display:none}
 .gemini-qbtn{flex-shrink:0;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.28);border-radius:20px;padding:7px 14px;font-size:.72rem;font-weight:700;color:var(--ai-purple2);cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
 
-/* ══ AI Cascade + Scanner Styles ══ */
-.gemini-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;transition:background .4s;flex-shrink:0}
-.gemini-status-dot.ready{background:#2ec951;box-shadow:0 0 7px #2ec951}
-.gemini-status-dot.off{background:#ef5350}
-.gemini-quick-row{padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
-.gemini-quick-row::-webkit-scrollbar{display:none}
-.gemini-qbtn{flex-shrink:0;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.28);border-radius:20px;padding:7px 14px;font-size:.72rem;font-weight:700;color:var(--ai-purple2);cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap;transition:all .2s}
-.gemini-qbtn:active{background:rgba(124,58,237,.25)}
 .scan-result-allowed{background:rgba(46,201,81,.1);border:1.5px solid rgba(46,201,81,.4);border-radius:14px;padding:14px;margin-top:10px}
 .scan-result-forbidden{background:rgba(229,57,53,.1);border:1.5px solid rgba(229,57,53,.4);border-radius:14px;padding:14px;margin-top:10px}
 .scan-result-unknown{background:rgba(255,160,0,.08);border:1.5px solid rgba(255,160,0,.4);border-radius:14px;padding:14px;margin-top:10px}
 .scan-ai-badge{font-size:.62rem;font-weight:700;background:rgba(124,58,237,.15);color:var(--ai-purple2);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:2px 8px}
+
+/* Floating Login Reward Widget Styles */
+.reward-floating-btn {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  box-shadow: 0 4px 20px rgba(200,150,12,.6), 0 0 15px rgba(255,255,255,.3);
+  z-index: 2500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  cursor: pointer;
+  border: 2px solid #fff;
+  animation: rewardPulse 2s infinite alternate;
+}
+@keyframes rewardPulse {
+  from { transform: translateY(-50%) scale(1); box-shadow: 0 4px 20px rgba(200,150,12,.6); }
+  to { transform: translateY(-50%) scale(1.1); box-shadow: 0 4px 25px rgba(200,150,12,.9), 0 0 25px var(--gold3); }
+}
+.reward-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,14,31,.95);
+  backdrop-filter: blur(15px);
+  z-index: 3100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  direction: rtl;
+}
+.reward-box {
+  background: linear-gradient(145deg, var(--card), var(--card2));
+  border: 2px solid var(--gold);
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow3d);
+  text-align: center;
+  position: relative;
+}
+.reward-close-x {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  color: var(--txt2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: all 0.25s;
+}
+.reward-close-x:hover {
+  background: var(--red);
+  color: #fff;
+  border-color: transparent;
+}
+.reward-title {
+  font-family: 'Amiri', serif;
+  font-size: 1.4rem;
+  color: var(--gold2);
+  margin-bottom: 6px;
+}
+.reward-desc {
+  font-size: 0.8rem;
+  color: var(--txt2);
+  margin-bottom: 20px;
+}
+.reward-days-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.reward-day-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+.reward-day-card.completed {
+  border-color: var(--green);
+  background: rgba(26,122,46,.1);
+  opacity: 0.7;
+}
+.reward-day-card.completed::after {
+  content: '✓';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: var(--green2);
+  font-weight: 900;
+  font-size: 0.7rem;
+}
+.reward-day-card.expired {
+  border-color: rgba(229,57,53,.3);
+  background: rgba(229,57,53,.05);
+  opacity: 0.5;
+}
+.reward-day-card.active {
+  border-color: var(--gold);
+  background: rgba(200,150,12,.1);
+  box-shadow: 0 0 10px rgba(200,150,12,.3);
+}
+.reward-day-num {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--txt2);
+}
+.reward-day-card.active .reward-day-num {
+  color: var(--gold2);
+}
+.reward-day-prize {
+  font-size: 0.62rem;
+  color: var(--txt3);
+}
+.reward-day-card.active .reward-day-prize {
+  color: var(--txt);
+}
+.reward-claim-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--green), var(--green2));
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(46,201,81,.4);
+  transition: all 0.3s;
+}
+.reward-claim-btn:disabled {
+  background: rgba(255,255,255,.06);
+  color: var(--txt3);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  cursor: not-allowed;
+}
 </style>
 </head>
 <body>
@@ -643,6 +792,19 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <button class="notif-close-btn" onclick="document.getElementById('admin-notification-banner').classList.remove('show');clearInterval(notifTimer);" title="إغلاق">✕</button>
   </div>
   <div class="notif-progress"><div class="notif-progress-bar" id="notif-progress-bar"></div></div>
+</div>
+
+<div class="reward-floating-btn" id="reward-floating-trigger" onclick="openRewardModal()" title="المكافأة اليومية">🎁</div>
+
+<div class="reward-modal" id="reward-modal-container">
+  <div class="reward-box">
+    <div class="reward-close-x" onclick="closeRewardModal()">✕</div>
+    <div style="font-size: 2.5rem; margin-bottom: 6px;">🎉</div>
+    <div class="reward-title">برنامج الجوائز والهدايا اليومية المتتالية</div>
+    <div class="reward-desc">سجل حضورك اليومي المتتالي لفتح ميزات باقة PRO الاحترافية مجاناً! الانقطاع يعيد العداد لليوم الأول.</div>
+    <div class="reward-days-grid" id="reward-days-target-grid"></div>
+    <button class="reward-claim-btn" id="reward-claim-action-btn" onclick="executeClaimDailyReward()">الحصول على هدية اليوم</button>
+  </div>
 </div>
 
 <div class="page active" id="auth-page">
@@ -751,11 +913,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="tip-header"><div class="tip-sec-title"><i class="fas fa-lightbulb"></i> نصيحة صحية</div><button class="tip-next-btn" onclick="nextTip()">التالية ›</button></div>
   <div class="tip-carousel" id="tip-carousel"></div>
   <div class="footer-sig">
-    <div class="heart-wrap">♥</div>
-    <div class="sig-text">نظام الطيبات الغذائي<br><span class="sig-name">للدكتور ضياء العوضي رحمه الله</span></div>
+    <div class="heart-wrap">❤️</div>
+    <div class="sig-text">برمجة وتطوير بكل ❤️ المهندس محمد حماد</div>
     <div class="dev-sig">
-      <div class="dev-sig-name" style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="color:#e53935;animation:heartBeat 1s ease-in-out infinite;display:inline-block;font-size:1.1rem">❤️</span><span>برمجة وتطوير</span></div>
-      <div class="dev-sig-name" style="margin-top:8px">المهندس محمد حماد</div>
       <div class="social-links">
         <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="social-icon" style="background:linear-gradient(135deg,#1877f2,#0a66c2);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .3s"><i class="fab fa-facebook-f"></i></a>
       </div>
@@ -961,7 +1121,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div style="padding:12px 16px; font-size:0.75rem; color:var(--gold2); background:rgba(245,200,66,0.05); border-bottom:1px solid var(--border);"><i class="fas fa-info-circle"></i> مدربك الذكي لحفظ المحادثات والبروتوكولات التوجيهية للشفاء الذاتي.</div>
       <div class="quick-prompts" style="margin-top:10px;">
         <button class="qprompt" onclick="setPremiumCoachPrompt('هل الموز مسموح في نظام الطيبات؟')">هل الموز مسموح؟</button>
-        <button class="qprompt" onclick="setPremiumCoachPrompt('ماذا يجب أن آكل فور إنهاء الصيام؟')">ماذا آكل بعد الصيام؟</button>
+        <button class="qprompt" onclick="setPremiumCoachPrompt('ماذا يجب أن آكل فور إنهاء الصيام؟')">ماذا آكل بعد الصيام?</button>
         <button class="qprompt" onclick="setPremiumCoachPrompt('ما هو البديل الصحي المعتمد للدجاج؟')">بديل الدجاج؟</button>
         <button class="qprompt" onclick="setPremiumCoachPrompt('أشعر بصداع خفيف بعد بدء النظام، ما السبب؟')">عندي صداع بعد النظام?</button>
       </div>
@@ -983,21 +1143,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
   <div style="padding:12px 16px 0;text-align:center">
     <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(46,201,81,.15),rgba(0,201,167,.1));border-color:rgba(46,201,81,.4)">
-      <i class="fas fa-brain"></i> AI Vision - يتعرف على أي طعام أمامه
+      <i class="fas fa-brain"></i> Puter Vision + Mistral + Z.ai
     </div>
-    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 4px;line-height:1.6">صور أي طعام أو علبة منتج - الذكاء الاصطناعي يتعرف ويحلل فورًا</p>
+    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 4px;line-height:1.6">صور علبة المنتج أو أي طعام أمام الكاميرا للتعرف الفوري عليه وتحليله</p>
   </div>
-
-  <!-- Camera Mode Tabs -->
-  <div style="padding:8px 16px 0;display:flex;gap:8px">
-    <button id="scan-tab-product" onclick="setScanMode('product')" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1));color:#2ec951;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
-      <i class="fas fa-barcode"></i> مكونات العلبة
-    </button>
-    <button id="scan-tab-food" onclick="setScanMode('food')" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(200,150,12,.3);background:rgba(200,150,12,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
-      <i class="fas fa-utensils"></i> التعرف على الطعام
-    </button>
-  </div>
-
   <div style="padding:12px 16px">
     <div class="camera-view-wrap" id="pa-camera-viewport">
       <div class="scanner-laser-line" id="pa-laser" style="display:none"></div>
@@ -1012,23 +1161,23 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <i class="fas fa-camera"></i> فتح الكاميرا
       </button>
       <button class="btn" style="width:auto;padding:10px 18px;font-size:.82rem;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;border:none" onclick="captureAndScanProductBlob()">
-        <i class="fas fa-search"></i> التقط وحلل
+        <i class="fas fa-search"></i> التقط وحلل بالذكاء الاصطناعي
       </button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">
       <div style="flex:1;height:1px;background:var(--border)"></div>
-      <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
+      <span style="font-size:.7rem;color:var(--txt3)">أو أدخل المكونات يدوياً</span>
       <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
     <div class="field">
-      <label>المكونات أو اسم الطعام</label>
+      <label>اسم الطعام أو المكونات المكتوبة</label>
       <input type="text" id="pa-manual-ingredients"
-        placeholder="مثال: دقيق قمح، سكر... أو: تفاحة، خبز، دجاج..."
+        placeholder="مثال: دقيق قمح، زيوت نباتية، تفاح، خبز، دجاج"
         onkeydown="if(event.key==='Enter') analyzeIngredientsTextDirect()">
     </div>
     <div style="display:flex;justify-content:center;margin-bottom:4px">
       <button class="btn" style="background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;width:auto;padding:12px 32px;border-radius:14px;display:flex;align-items:center;gap:8px;font-size:.9rem" onclick="analyzeIngredientsTextDirect()">
-        <i class="fas fa-robot"></i> تحليل بالذكاء الاصطناعي
+        <i class="fas fa-robot"></i> تحليل المكونات والنظام
       </button>
     </div>
     <div id="pa-scan-result" style="text-align:right"></div>
@@ -1234,127 +1383,58 @@ var __POLLINATIONS_ENDPOINT = 'https://text.pollinations.ai/openai';
 var currentORIdx = 0;
 
 var PREMIUM_PROTOCOLS = [
-
 { id: 'insulin', title: 'بروتوكول مقاومة الإنسولين وعلاج السمنة', duration: '30 يوم', desc: 'قطع كامل للنشويات المكررة والاعتماد على الدهون الطبيعية واللحوم الحمراء المطبوخة بشكل مسبك مع صيام متقطع 18 ساعة يومياً.', error: 'استهلاك الفواكه النيئة بكميات كبيرة ظناً أنها صحية بالكامل.', advice: 'استخدم ملح البحر الطبيعي للحفاظ على توازن المعادن أثناء الصيام.' },
-
 { id: 'ibd', title: 'بروتوكول القولون العصبي وارتجاع المريء', duration: '14 يوم', desc: 'منع الخضروات النيئة والسلطات وتقليل التخمر المعوي عبر الاعتماد على مرق العظام والخضروات المطبوخة والدهون الطبيعية.', error: 'تناول البقوليات والمقليات التي تسبب تهيجاً فورياً للأمعاء.', advice: 'ابدأ يومك بماء دافئ مع عسل طبيعي لتخفيف تهيج بطانة المعدة.' },
-
 { id: 'candida', title: 'بروتوكول مكافحة الكانديدا وتنظيف الفطريات', duration: '21 يوم', desc: 'إلغاء السكريات واللاكتوز والنشويات المكررة لمنع تغذية الفطريات مع الاعتماد على الدهون الصحية والصيام المتقطع.', error: 'تناول الزبادي أو الفاكهة الحلوة أثناء مرحلة التطهير.', advice: 'أكثر من زيت الزيتون والثوم الطبيعي لدعم مقاومة الفطريات.' },
-
 { id: 'fatty_liver', title: 'بروتوكول الكبد الدهني وتنظيف الكبد', duration: '45 يوم', desc: 'تقليل الفركتوز والسكر الصناعي والزيوت النباتية مع التركيز على البروتين الطبيعي والصيام التدريجي لتحسين وظائف الكبد.', error: 'الإفراط في العصائر الطبيعية والفواكه العالية بالسكر.', advice: 'المشي اليومي بعد الوجبات يساعد على تحسين حساسية الإنسولين وتقليل دهون الكبد.' },
-
 { id: 'diabetes', title: 'بروتوكول السكري وضبط الجلوكوز', duration: '60 يوم', desc: 'تقليل الكربوهيدرات لأقصى حد مع الاعتماد على الدهون الطبيعية والوجبات المشبعة لمنع ارتفاعات السكر الحادة.', error: 'إيقاف أدوية السكر أو الإنسولين دون متابعة طبية.', advice: 'راقب مستوى السكر بشكل يومي خصوصاً خلال أول أسبوعين.' },
-
 { id: 'hypertension', title: 'بروتوكول ضغط الدم المرتفع', duration: '30 يوم', desc: 'خفض الالتهاب الغذائي وتقليل السكريات والأطعمة المصنعة مع التركيز على الطعام الطبيعي والأملاح المتوازنة.', error: 'الإفراط في الصيام مع قلة شرب الماء والأملاح.', advice: 'احرص على شرب الماء بكميات كافية طوال نافذة الصيام.' },
-
 { id: 'thyroid', title: 'بروتوكول الغدة الدرقية', duration: '60 يوم', desc: 'تقليل الالتهابات الغذائية وتحسين امتصاص المعادن عبر منع السكر والزيوت النباتية والأطعمة المصنعة.', error: 'الصيام الطويل المرهق للجسم دون تدرج.', advice: 'النوم العميق وتقليل التوتر عنصران أساسيان لتحسين وظائف الغدة.' },
-
 { id: 'psoriasis', title: 'بروتوكول الصدفية والأمراض الجلدية', duration: '45 يوم', desc: 'تقليل الالتهاب الداخلي عبر منع السكر والزيوت المهدرجة والتركيز على الدهون الطبيعية والطعام المطبوخ.', error: 'تناول الحلويات والمخبوزات خلال فترة الالتهاب النشط.', advice: 'التعرض المعتدل للشمس صباحاً قد يساعد على تحسين الجلد.' },
-
 { id: 'arthritis', title: 'بروتوكول التهاب المفاصل والروماتيزم', duration: '45 يوم', desc: 'إلغاء الأغذية الالتهابية مثل السكر والزيوت النباتية والتركيز على مرق العظام والأسماك والدهون الطبيعية.', error: 'الإفراط في تناول النشويات والوجبات السريعة.', advice: 'الحركة الخفيفة اليومية تساعد على تقليل التيبس وتحسين الدورة الدموية.' },
-
 { id: 'autoimmune', title: 'بروتوكول أمراض المناعة الذاتية', duration: '90 يوم', desc: 'إراحة الجهاز المناعي عبر إزالة الأطعمة الالتهابية وتحسين صحة الأمعاء بالصيام التدريجي والطعام الطبيعي.', error: 'الاعتماد على المنتجات المصنعة المكتوب عليها صحية أو دايت.', advice: 'مرق العظام والنوم المنتظم من أهم عناصر دعم التعافي.' },
-
 { id: 'fasting', title: 'بروتوكول الصيام العلاجي', duration: '14 يوم', desc: 'الاعتماد على الصيام التدريجي لتحفيز الراحة الأيضية وتقليل الالتهاب وتحسين حساسية الإنسولين.', error: 'الصيام الطويل المفاجئ دون تعويض الأملاح والسوائل.', advice: 'ابدأ تدريجياً من 12 ساعة ثم زد المدة حسب قدرة الجسم.' },
-
 { id: 'depression', title: 'بروتوكول تحسين المزاج والطاقة النفسية', duration: '30 يوم', desc: 'تقليل السكر والطعام المصنع لتحسين استقرار الطاقة ودعم توازن الجهاز العصبي والهرمونات.', error: 'الإفراط في الكافيين ومشروبات الطاقة والسهر.', advice: 'التعرض للشمس صباحاً يساعد على تحسين المزاج والنوم.' },
-
 { id: 'migraine', title: 'بروتوكول الصداع النصفي والصداع المزمن', duration: '21 يوم', desc: 'تقليل مسببات الالتهاب وتقلبات السكر عبر منع السكر الصناعي والأطعمة المصنعة والزيوت النباتية.', error: 'تخطي الوجبات مع الإفراط في القهوة.', advice: 'حافظ على الترطيب الجيد وتوازن الأملاح يومياً.' },
-
 { id: 'acne', title: 'بروتوكول حب الشباب والبشرة الدهنية', duration: '30 يوم', desc: 'تقليل السكريات والألبان المصنعة لتحسين توازن الهرمونات وتقليل التهابات الجلد.', error: 'الإفراط في الحلويات ومنتجات الوجبات السريعة.', advice: 'النوم الكافي وتقليل السكر ينعكس مباشرة على البشرة.' },
-
 { id: 'gut', title: 'بروتوكول تحسين صحة الأمعاء', duration: '30 يوم', desc: 'إراحة الجهاز الهضمي عبر منع الأطعمة المهيجة والتركيز على الطعام المطبوخ ومرق العظام.', error: 'الإفراط في الألياف النيئة والسلطات خلال فترات الالتهاب.', advice: 'امضغ الطعام ببطء شديد لتحسين الهضم وتقليل التخمر.' },
-
 { id: 'detox', title: 'بروتوكول تنظيف الجسم وتقليل الالتهاب', duration: '14 يوم', desc: 'إزالة السكريات والزيوت المهدرجة والأطعمة المصنعة مع الاعتماد على الماء والدهون الطبيعية والطعام البسيط.', error: 'الاعتماد على العصائر فقط لفترات طويلة.', advice: 'شرب الماء والنوم الجيد أهم من أي مكمل غذائي.' }
-
 ];
 
 var PREMIUM_RECIPES = [
-
 { title: 'كبسة لحم الضأن المسبكة', calories: '620 سعرة', time: '45 دقيقة', tags: ['غنية بالحديد', 'مطبوخة ببطء', 'صديقة للصيام'], desc: 'قطع من لحم الضأن الطبيعي مطهوة ببطء مع أرز بسمتي أبيض نقي وسمن بلدي وبهارات دافئة دون أي زيوت نباتية.' },
-
 { title: 'شوربة مرق العظام المرممة للأمعاء', calories: '210 سعرة', time: '120 دقيقة', tags: ['مرممة للأمعاء', 'غنية بالكولاجين', 'بدون زيوت نباتية'], desc: 'عظام بقري طبيعية تغلى لساعات طويلة لاستخراج المعادن والجيلاتين لدعم بطانة الأمعاء والمفاصل.' },
-
 { title: 'كبدة الخروف بالسمن البلدي', calories: '430 سعرة', time: '20 دقيقة', tags: ['غنية بالحديد', 'طاقة عالية', 'بدون نشويات'], desc: 'كبدة خروف طبيعية مطهوة بالسمن البلدي والثوم الطبيعي مع رشة كمون خفيف.' },
-
 { title: 'طاجن اللحم بالكوسة المطهوة', calories: '510 سعرة', time: '50 دقيقة', tags: ['صديق للقولون', 'مطهو ببطء', 'مضاد للالتهاب'], desc: 'لحم بقري طبيعي مطهو مع الكوسة والمرق الطبيعي لتقليل التخمر وتهيج الأمعاء.' },
-
 { title: 'بيض بلدي بالسمن الطبيعي', calories: '320 سعرة', time: '10 دقائق', tags: ['فطور مشبع', 'غني بالبروتين', 'صديق للصيام'], desc: 'بيض بلدي طبيعي مطهو بالسمن البلدي مع رشة زعتر بري طبيعي.' },
-
 { title: 'سمك مشوي بزيت الزيتون', calories: '540 سعرة', time: '30 دقيقة', tags: ['أوميجا 3', 'مضاد للالتهاب', 'خفيف على المعدة'], desc: 'سمك طبيعي مشوي بزيت الزيتون البكر والأعشاب الطبيعية دون أي تتبيلات صناعية.' },
-
 { title: 'لحم مفروم مسبك بالسمن', calories: '470 سعرة', time: '35 دقيقة', tags: ['قليل الكربوهيدرات', 'مشبع', 'بدون دقيق'], desc: 'لحم مفروم طبيعي مطهو بالسمن البلدي والطماطم المطهوة جيداً مع بهارات دافئة.' },
-
 { title: 'شوربة الجزر والكوسة المطهوة', calories: '260 سعرة', time: '25 دقيقة', tags: ['مريحة للأمعاء', 'خفيفة', 'مطهوة بالكامل'], desc: 'جزر وكوسة مطهوات جيداً في مرق طبيعي لتقليل تهيج القولون وتحسين الهضم.' },
-
 { title: 'طاجن الكوارع والمرق المركز', calories: '690 سعرة', time: '180 دقيقة', tags: ['غني بالكولاجين', 'مرمم للمفاصل', 'مشبع جداً'], desc: 'كوارع طبيعية مطهوة لساعات طويلة لاستخراج الجيلاتين الطبيعي والمعادن المفيدة.' },
-
 { title: 'أرز بسمتي بالسمن البلدي', calories: '410 سعرة', time: '25 دقيقة', tags: ['طاقة مستقرة', 'سهل الهضم', 'بدون زيوت مهدرجة'], desc: 'أرز بسمتي أبيض مطهو بالسمن البلدي الطبيعي مع القرفة الخفيفة.' },
-
 { title: 'شاورما اللحم المنزلية', calories: '560 سعرة', time: '35 دقيقة', tags: ['بروتين عالي', 'بدون زيوت نباتية', 'مشبعة'], desc: 'شرائح لحم طبيعية مطهوة بزيت الزيتون مع بهارات طبيعية دون صلصات صناعية.' },
-
 { title: 'كفتة الضأن المشوية', calories: '530 سعرة', time: '30 دقيقة', tags: ['غنية بالبروتين', 'مشبعة', 'بدون إضافات'], desc: 'كفتة ضأن طبيعية مشوية مع البقدونس والبهارات دون بقسماط أو دقيق.' },
-
 { title: 'مرق اللحم الدافئ بعد الصيام', calories: '190 سعرة', time: '90 دقيقة', tags: ['مثالي لكسر الصيام', 'غني بالمعادن', 'خفيف'], desc: 'مرق لحم طبيعي مطهو ببطء لدعم الترطيب وتخفيف إجهاد الجهاز الهضمي.' },
-
 { title: 'خضار مطهوة بزيت الزيتون', calories: '240 سعرة', time: '15 دقيقة', tags: ['غنية بالألياف', 'خفيفة', 'صديقة للقولون'], desc: 'كوسة وجزر مطهوات بخفة بزيت الزيتون البكر الممتاز دون قلي أو تحمير قوي.' },
-
 { title: 'طاجن البامية باللحم البلدي', calories: '570 سعرة', time: '60 دقيقة', tags: ['غني بالألياف', 'مشبع', 'مطهو ببطء'], desc: 'بامية طازجة مطهوة مع اللحم البلدي والمرق الطبيعي والسمن البلدي.' },
-
 { title: 'فتة مرق العظام بالثوم', calories: '640 سعرة', time: '40 دقيقة', tags: ['غنية بالكولاجين', 'مناسبة بعد الصيام', 'دافئة'], desc: 'مرق عظام مركز مع الثوم الطبيعي وقطع اللحم المطهوة ببطء.' },
-
 { title: 'بطاطس فرن بالسمن البلدي', calories: '350 سعرة', time: '35 دقيقة', tags: ['بدون قلي', 'طاقة معتدلة', 'مناسبة للأطفال'], desc: 'بطاطس مخبوزة بالسمن البلدي الطبيعي دون أي زيوت نباتية أو إضافات صناعية.' },
-
 { title: 'لحم مشوي بزبدة طبيعية', calories: '610 سعرة', time: '25 دقيقة', tags: ['بروتين عالي', 'دهون طبيعية', 'مشبع'], desc: 'شريحة لحم طبيعية مشوية مع زبدة طبيعية وأعشاب خفيفة.' },
-
 { title: 'شوربة الكوسة بالكريمة الطبيعية', calories: '340 سعرة', time: '20 دقيقة', tags: ['قليلة الكربوهيدرات', 'مشبعة', 'خفيفة على المعدة'], desc: 'كوسة مطهوة بالكريمة الطبيعية والزبدة دون دقيق أو نشويات مضافة.' },
-
 { title: 'لحم الضأن بمرق الخضار المطهوة', calories: '590 سعرة', time: '70 دقيقة', tags: ['غني بالمعادن', 'مطهو ببطء', 'صديق للأمعاء'], desc: 'لحم ضأن طبيعي مطهو لساعات مع خضار مطهوة جيداً ومرق طبيعي مركز.' }
-
 ];
 
 var PREMIUM_CHALLENGES = [
-
 { id: 'sugar_free', title: 'تحدي 7 أيام بدون سكر أو دقيق مكرر', xp: '100 XP', desc: 'الامتناع الكامل عن السكر الأبيض والحلويات والمخبوزات الصناعية والاعتماد على الطعام الطبيعي فقط.' },
-
 { id: 'fasting_pro', title: 'تحدي الصيام 18/6 لمدة أسبوع', xp: '150 XP', desc: 'الالتزام بصيام 18 ساعة يومياً مع التركيز على الترطيب الجيد وتناول الطعام الطبيعي خلال نافذة الأكل.' },
-
 { id: 'oil_free', title: 'تحدي التخلص من الزيوت النباتية', xp: '120 XP', desc: 'إيقاف جميع الزيوت المهدرجة والزيوت النباتية المكررة واستخدام السمن البلدي وزيت الزيتون فقط.' },
-
 { id: 'processed_food', title: 'تحدي بدون أطعمة مصنعة', xp: '130 XP', desc: 'الاعتماد الكامل على الطعام الحقيقي والطهي المنزلي ومنع أي منتجات صناعية أو وجبات سريعة.' },
-
 { id: 'bone_broth', title: 'تحدي مرق العظام اليومي', xp: '90 XP', desc: 'تناول كوب يومي من مرق العظام الطبيعي لدعم الأمعاء والمفاصل وتحسين الشبع.' },
-
 { id: 'water_balance', title: 'تحدي الترطيب وتوازن الأملاح', xp: '80 XP', desc: 'شرب كمية كافية من الماء يومياً مع الحفاظ على توازن الأملاح الطبيعية خلال الصيام.' },
-
 { id: 'sleep_reset', title: 'تحدي النوم المبكر', xp: '110 XP', desc: 'النوم قبل منتصف الليل يومياً لتحسين الهرمونات وتقليل الالتهابات والإجهاد.' },
-
 { id: 'walking', title: 'تحدي المشي بعد الوجبات', xp: '70 XP', desc: 'المشي لمدة 15 دقيقة بعد الوجبات لتحسين حساسية الإنسولين والهضم.' },
-
 { id: 'gut_reset', title: 'تحدي راحة الجهاز الهضمي', xp: '140 XP', desc: 'منع السلطات والخضار النيئة والبقوليات والتركيز على الطعام المطهو جيداً لمدة أسبوع.' },
-
-{ id: 'anti_inflammation', title: 'تحدي مقاومة الالتهاب', xp: '160 XP', desc: 'منع السكر والزيوت النباتية والوجبات السريعة بالكامل لمدة 10 أيام.' },
-
-{ id: 'natural_fats', title: 'تحدي الدهون الطبيعية', xp: '100 XP', desc: 'استخدام السمن البلدي والزبدة الطبيعية وزيت الزيتون فقط كمصادر للدهون.' },
-
-{ id: 'no_snacking', title: 'تحدي إيقاف السناكات', xp: '120 XP', desc: 'منع الأكل بين الوجبات لتقليل ارتفاعات الإنسولين وتحسين الشبع.' },
-
-{ id: 'early_dinner', title: 'تحدي العشاء المبكر', xp: '90 XP', desc: 'تناول آخر وجبة قبل النوم بـ4 ساعات على الأقل لتحسين الهضم والنوم.' },
-
-{ id: 'soup_reset', title: 'تحدي الشوربات العلاجية', xp: '95 XP', desc: 'إدخال الشوربات الطبيعية ومرق العظام ضمن النظام اليومي لمدة أسبوع.' },
-
-{ id: 'mindful_eating', title: 'تحدي الأكل ببطء', xp: '60 XP', desc: 'مضغ الطعام ببطء شديد وتقليل التشتت أثناء الأكل لتحسين الهضم والشبع.' },
-
-{ id: 'sunlight', title: 'تحدي شمس الصباح', xp: '75 XP', desc: 'التعرض اليومي لشمس الصباح لمدة 15 دقيقة لدعم الطاقة وتحسين النوم.' },
-
-{ id: 'clean_kitchen', title: 'تحدي تنظيف المطبخ', xp: '130 XP', desc: 'التخلص من السكر والزيوت النباتية والمشروبات الغازية والمخبوزات من المنزل بالكامل.' },
-
-{ id: 'no_soft_drinks', title: 'تحدي بدون مشروبات غازية', xp: '85 XP', desc: 'إيقاف جميع المشروبات الغازية والعصائر الصناعية لمدة 14 يوماً.' },
-
-{ id: 'real_food', title: 'تحدي الطعام الحقيقي', xp: '170 XP', desc: 'تناول مكونات طبيعية بسيطة فقط دون أي منتجات تحتوي على إضافات صناعية أو مواد حافظة.' },
-
-{ id: 'fasting_beginner', title: 'تحدي الصيام التدريجي للمبتدئين', xp: '110 XP', desc: 'البدء بصيام 12 ساعة يومياً ثم زيادة المدة تدريجياً لتحسين مرونة الجسم الأيضية.' }
-
+{ id: 'anti_inflammation', title: 'تحدي مقاومة الالتهاب', xp: '160 XP', desc: 'منع السكر والزيوت النباتية والوجبات السريعة بالكامل لمدة 10 أيام.' }
 ];
 
 /* ══════════ Firebase ══════════ */
@@ -1433,7 +1513,6 @@ function showNotificationBanner(title, body, icon) {
 
   banner.classList.add('show');
 
-  // push pages down to show full banner
   setTimeout(function() {
     var h = banner.offsetHeight;
     document.querySelectorAll('.page').forEach(function(p) {
@@ -1489,12 +1568,11 @@ async function autoLogin() {
       if (u) { 
         currentUser = Object.assign({}, u, { username: s }); 
         
-        // التحقق الصارم من حالة الـ PRO القادمة من الفايربيز ومنع تلاشيها
         if (currentUser.pro && currentUser.pro.active === true) {
           if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
             window.isProUser = true;
           } else if (!currentUser.pro.expiresAt) {
-            window.isProUser = true; // باقة مفتوحة أو تجريبية
+            window.isProUser = true;
           } else {
             currentUser.pro.active = false;
             window.isProUser = false;
@@ -1579,7 +1657,6 @@ async function doLogin() {
     currentUser = Object.assign({}, user, { username: u });
     saveSession(u);
     
-    // فحص وتأمين تفعيل الحساب المطور الفاخر
     if (currentUser.pro && currentUser.pro.active === true) {
       if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
         window.isProUser = true;
@@ -1633,10 +1710,7 @@ async function doRegister() {
 function doLogout() {
   clearSession(); currentUser = null; window.isProUser = false;
   document.getElementById('bottom-nav').classList.remove('show');
-  var fab = document.getElementById('daily-reward-fab');
-  if (fab) fab.style.display = 'none';
-  var panel = document.getElementById('daily-reward-panel');
-  if (panel) panel.classList.remove('open');
+  document.getElementById('reward-floating-trigger').style.display = 'none';
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.getElementById('auth-page').classList.add('active');
   showToast('👋 تم تسجيل الخروج');
@@ -1658,9 +1732,10 @@ function bootApp() {
   startGreetingSync(); buildAiPage(); setupShareButtons(); checkAdminStatus();
   syncPremiumUIStates();
   document.getElementById('bottom-nav').classList.add('show');
-  var fab = document.getElementById('daily-reward-fab');
-  if (fab) fab.style.display = 'flex';
-  if (typeof window._initDailyRewardBadge === 'function') window._initDailyRewardBadge();
+  if (currentUser) {
+    document.getElementById('reward-floating-trigger').style.display = 'flex';
+    syncInternetTimeAndRewardData();
+  }
   goPage('home'); hideLoader();
   setTimeout(showWelcomeModal, 600);
   startNotificationsListener();
@@ -1669,11 +1744,10 @@ function bootApp() {
 
 function checkAdminStatus() {
   var container = document.getElementById('admin-button-container');
-  // تعديل الشرط البرمجي لضمان عدم اختفاء ميزة التحكم للمسؤول حتى لو كان البرو نشطاً له
   if (currentUser && (currentUser.isAdmin === true || currentUser.username === 'admin' || currentUser.username === 'mohamednasr')) {
-    container.style.display = 'block';
+    if (container) container.style.display = 'block';
   } else {
-    container.style.display = 'none';
+    if (container) container.style.display = 'none';
   }
 }
 
@@ -1712,7 +1786,6 @@ function simulatePremiumUserActivationDirectly() {
   window.isProUser = true;
   if(currentUser) {
     currentUser.pro = { active: true, expiresAt: Date.now() + (1*3600000) };
-    // حفظ التفعيل التجريبي محلياً وسحابياً فوراً
     dbSaveUser(currentUser.username, currentUser);
   }
   syncPremiumUIStates();
@@ -1731,17 +1804,17 @@ function syncPremiumUIStates() {
   var greetingTxt = h >= 5 && h < 12 ? '☀️ صباح الخير،' : h >= 12 && h < 17 ? '🌤️ مساء الخير،' : h >= 17 && h < 21 ? '🌆 مساء النور،' : '🌙 تصبح على خير،';
   
   if(window.isProUser) {
-    targetGreeting.textContent = greetingTxt;
-    targetName.innerHTML = currentUser.name + ' <span class="pro-badge-animated">👑 PRO</span>';
-    document.getElementById('pro-upgrade-banner').style.display = 'none';
-    document.getElementById('pro-user-status-bar').style.display = 'block';
-    document.getElementById('pro-whatsapp-contact').style.display = 'block';
+    if (targetGreeting) targetGreeting.textContent = greetingTxt;
+    if (targetName) targetName.innerHTML = currentUser.name + ' <span class="pro-badge-animated">👑 PRO</span>';
+    if (document.getElementById('pro-upgrade-banner')) document.getElementById('pro-upgrade-banner').style.display = 'none';
+    if (document.getElementById('pro-user-status-bar')) document.getElementById('pro-user-status-bar').style.display = 'block';
+    if (document.getElementById('pro-whatsapp-contact')) document.getElementById('pro-whatsapp-contact').style.display = 'block';
   } else {
-    targetGreeting.textContent = greetingTxt;
-    targetName.textContent = currentUser.name;
-    document.getElementById('pro-upgrade-banner').style.display = 'block';
-    document.getElementById('pro-user-status-bar').style.display = 'none';
-    document.getElementById('pro-whatsapp-contact').style.display = 'none';
+    if (targetGreeting) targetGreeting.textContent = greetingTxt;
+    if (targetName) targetName.textContent = currentUser.name;
+    if (document.getElementById('pro-upgrade-banner')) document.getElementById('pro-upgrade-banner').style.display = 'block';
+    if (document.getElementById('pro-user-status-bar')) document.getElementById('pro-user-status-bar').style.display = 'none';
+    if (document.getElementById('pro-whatsapp-contact')) document.getElementById('pro-whatsapp-contact').style.display = 'none';
   }
   checkAdminStatus();
 }
@@ -1851,54 +1924,25 @@ async function captureAndScanProductBlob() {
   var video  = document.getElementById("pa-video-stream");
   var resBox = document.getElementById("pa-scan-result");
   if (!video || video.readyState < 2 || video.style.display === "none") {
-    if (resBox) resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">افتح الكاميرا اولا ثم اضغط تحليل.</p>';
+    if (resBox) resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">افتح الكاميرا أولاً ثم اضغط تحليل.</p>';
     return;
   }
   var canvas = document.createElement("canvas");
   canvas.width  = video.videoWidth  || 640;
   canvas.height = video.videoHeight || 480;
   canvas.getContext("2d").drawImage(video, 0, 0);
-  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري تحليل الصورة بالذكاء الاصطناعي...</span></div>';
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري التعرف على الكادر بالذكاء الاصطناعي...</span></div>';
 
-  var isFoodMode = (_scanMode === 'food');
-
-  /* BarcodeDetector - only for product mode */
-  if (!isFoodMode && "BarcodeDetector" in window) {
-    try {
-      var det = new BarcodeDetector({formats:["qr_code","ean_13","ean_8","code_128","code_39","upc_a","upc_e"]});
-      var barcodes = await det.detect(canvas);
-      if (barcodes.length > 0) {
-        var code = barcodes[0].rawValue;
-        resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>تم قراءة الباركود ' + code + ' - جاري التحليل...</span></div>';
-        await _scanAnalyzeAI("باركود المنتج: " + code + " - قم بتحليل هذا المنتج حسب نظام الطيبات.");
-        return;
-      }
-    } catch(e) {}
-  }
-
-  /* Puter Vision - AI food/product recognition */
   try {
     if (typeof puter !== "undefined" && puter.ai) {
       var imgData = canvas.toDataURL("image/jpeg", 0.85);
-      var vPrompt;
-      if (isFoodMode) {
-        vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
-          + "انظر للصورة وتعرف على الطعام او الشيء الذي امامك (فاكهة، خبز، وجبة، مشروب، اي طعام).\n"
-          + "لا يلزم ان تكون هناك علبة او مكونات مكتوبة - فقط تعرف على ما تراه.\n"
-          + "ثم احكم: هل هو مسموح او ممنوع في نظام الطيبات؟\n"
-          + "نظام الطيبات:\n"
-          + "مسموح: لحم خروف، سمك، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
-          + "ممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات، سكر مكرر، زيوت مهدرجة، خضار نيئة بعض انواعها.\n"
-          + "الرد مختصر 100 كلمة: اذكر ما تراه، ثم الحكم والسبب. بدون **";
-      } else {
-        vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
-          + "انظر الى الصورة وافعل:\n"
-          + "1. اقرا قائمة المكونات المكتوبة على علبة المنتج.\n"
-          + "2. احكم: مسموح ام ممنوع في الطيبات؟\n"
-          + "3. اذكر المكونات الممنوعة (دجاج/بيض/دقيق ابيض/البان/بقوليات/سكر مكرر/زيوت مهدرجة).\n"
-          + "4. اقترح بديلا ان وجد.\n"
-          + "اذا لم تتضح الصورة اطلب ادخال المكونات يدويا. الرد مختصر 120 كلمة بدون **";
-      }
+      var vPrompt = "أنت خبير تغذية أول في نظام الطيبات الطبي للدكتور ضياء العوضي.\n"
+        + "تعرف على أي شيء أمامك في الصورة (سواء كان ثمرة فاكهة، خبز، طبق طعام، علبة منتج، خضراوات، إلخ) ثم اتبع الشروط الآتية بدقة شديدة دون استخدام أي علامات نجمية (**) في النص النهائي:\n"
+        + "1. اذكر بوضوح اسم الطعام أو الشيء الذي تم قراءته والتعرف عليه.\n"
+        + "2. أصدر حكماً صريحاً ومباشراً في أول التقرير بواحدة من هذه العبارات الثلاثة فقط: (مسموح في الطيبات) أو (ممنوع في الطيبات) أو (تحت الدراسة).\n"
+        + "3. اكتب المكونات أو العناصر الممنوعة أو الالتهابية إن وجدت (مثل الجلوتين، زيوت نباتية مكررة، سكر مكرر، حليب سائل، بيض، دجاج).\n"
+        + "4. قدم الشرح التفصيلي والبدائل المعتمدة في مدرسة الطيبات.\n"
+        + "تذكر: لا تستخدم النجوم والتزم بالاختصار الواضح.";
       var res = await puter.ai.chat([
         {role:"user", content:[
           {type:"text", text: vPrompt},
@@ -1912,48 +1956,32 @@ async function captureAndScanProductBlob() {
     }
   } catch(e) {}
 
-  resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">تعذر قراءة الصورة تلقائيا.<br>الرجاء ادخال اسم الطعام او المكونات في الحقل ادناه.</p>';
+  resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">تعذر قراءة الكادر تلقائياً.<br>الرجاء استخدام حقل الإدخال النصي وكتابة اسم الطعام.</p>';
 }
 
 async function analyzeIngredientsTextDirect() {
   var input = document.getElementById("pa-manual-ingredients");
   if (!input) return;
   var text = input.value.trim();
-  if (!text) { if (typeof showToast==="function") showToast("ادخل المكونات او اسم الطعام اولا"); return; }
+  if (!text) { if (typeof showToast==="function") showToast("ادخل المكونات اولا"); return; }
   await _scanAnalyzeAI(text);
 }
 
 async function _scanAnalyzeAI(ingredients) {
   var resBox = document.getElementById("pa-scan-result");
   if (!resBox) return;
-  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري تحليل المنتج بالذكاء الاصطناعي...</span></div>';
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري تحليل البيانات بالذكاء الاصطناعي...</span></div>';
 
-  var isFoodMode = (_scanMode === 'food');
-  var prompt;
-
-  if (isFoodMode) {
-    prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
-      + "تعرف على هذا الطعام او المنتج: " + ingredients + "\n\n"
-      + "نظام الطيبات:\n"
-      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
-      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة بعض انواعها، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
-      + "اعطني:\n1. التعريف بهذا الطعام ومكوناته الاساسية\n2. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
-      + "3. السبب\n4. البديل الصحي ان كان ممنوعا\n"
-      + "الرد مختصر لا يتجاوز 150 كلمة. لا تستخدم ** في ردك.";
-  } else {
-    prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
-      + "حلل هذه المكونات:\n" + ingredients + "\n\n"
-      + "نظام الطيبات:\n"
-      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n"
-      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
-      + "اعطني:\n1. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
-      + "2. المكونات الممنوعة ان وجدت\n3. البديل الصحي ان وجد\n"
-      + "الرد مختصر لا يتجاوز 150 كلمة. لا تستخدم ** في ردك.";
-  }
+  var prompt = "أنت خبير تغذية أول في نظام الطيبات الطبي للدكتور ضياء العوضي.\n"
+    + "حلل الطعام أو المكونات التالية دون استخدام أي علامات نجمية (**) في ردك نهائياً:\n" + ingredients + "\n\n"
+    + "محددات نظام الطيبات:\n"
+    + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n"
+    + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
+    + "يجب أن يتضمن الرد نصاً صريحاً بالحكم في البداية: (مسموح في الطيبات) أو (ممنوع في الطيبات) أو (تحت الدراسة).\n"
+    + "اذكر الأسباب والبدائل دون استعمال رموز التنسيق الغليظ.";
 
   var result = null;
 
-  /* ١. Puter.js */
   try {
     if (typeof puter !== "undefined" && puter.ai) {
       var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
@@ -1962,135 +1990,88 @@ async function _scanAnalyzeAI(ingredients) {
     }
   } catch(e) {}
 
-  /* ٢. Mistral */
   if (!result && window.__MISTRAL_KEY) {
     try {
       var r = await fetch("https://api.mistral.ai/v1/chat/completions", {
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":"Bearer "+window.__MISTRAL_KEY},
-        body:JSON.stringify({model:"mistral-small-latest",messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
+        body:JSON.stringify({model:MISTRAL_MODEL,messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
       });
       if (r.ok) { var d=await r.json(); var t2=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:null; if(t2) result={text:t2,source:"Mistral"}; }
     } catch(e) {}
   }
 
-  /* ٣. Z.ai */
   if (!result && window.__GEMINI_KEY) {
     try {
       var r2 = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":"Bearer "+window.__GEMINI_KEY},
-        body:JSON.stringify({model:"glm-4-flash",messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
+        body:JSON.stringify({model:ZAI_MODEL,messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
       });
       if (r2.ok) { var d2=await r2.json(); var t3=d2&&d2.choices&&d2.choices[0]&&d2.choices[0].message?d2.choices[0].message.content:null; if(t3) result={text:t3,source:"Z.ai"}; }
     } catch(e) {}
   }
 
-  /* ٤. OpenRouter fallback */
-  if (!result && window.ORKEYFB) {
-    try {
-      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext(), prompt);
-      if (oRes) result = {text:oRes.text, source:"OpenRouter"};
-    } catch(e) {}
-  }
-
   if (!result) result = {
-    text: "تعذر التحليل الان.\n\nتذكر:\nممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات.\nمسموح: لحم خروف، سمك، ارز، بطاطس، عسل، تمر.",
-    source: "محلي"
+    text: "تعذر الاتصال بالخوادم الذكية الآن. تنبيه محلي: ممنوع الدجاج والبيض والدقيق الأبيض والألبان والبقوليات، ومسموح اللحوم الحمراء والأسماك والأرز والبطاطس وزيت الزيتون.",
+    source: "نظام محلي"
   };
 
   _renderScanResult(result.text, result.source);
 }
 
-/* scan mode: 'product' or 'food' */
-var _scanMode = 'product';
-function setScanMode(mode) {
-  _scanMode = mode;
-  var btnP = document.getElementById('scan-tab-product');
-  var btnF = document.getElementById('scan-tab-food');
-  if (!btnP || !btnF) return;
-  if (mode === 'product') {
-    btnP.style.borderColor = 'rgba(46,201,81,.5)';
-    btnP.style.background = 'linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1))';
-    btnP.style.color = '#2ec951';
-    btnF.style.borderColor = 'rgba(200,150,12,.3)';
-    btnF.style.background = 'rgba(200,150,12,.06)';
-    btnF.style.color = 'var(--txt2)';
-    document.querySelector('#premium-scanner-page label').textContent = 'المكونات المكتوبة على العلبة';
-    document.getElementById('pa-manual-ingredients').placeholder = 'مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة';
-  } else {
-    btnF.style.borderColor = 'rgba(200,150,12,.6)';
-    btnF.style.background = 'linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.08))';
-    btnF.style.color = 'var(--gold2)';
-    btnP.style.borderColor = 'rgba(46,201,81,.2)';
-    btnP.style.background = 'rgba(46,201,81,.04)';
-    btnP.style.color = 'var(--txt2)';
-    document.querySelector('#premium-scanner-page label').textContent = 'اسم الطعام أو المنتج (بدون مكونات)';
-    document.getElementById('pa-manual-ingredients').placeholder = 'مثال: تفاحة، خبز بلدي، برتقالة، بيتزا...';
-  }
-}
-
-function _playForbiddenAlert() {
-  try {
-    var ctx = audioCtx || (audioCtx = new (window.AudioContext||window.webkitAudioContext)());
-    [440,330,220].forEach(function(freq, i) {
-      var o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freq; o.type = 'square';
-      g.gain.setValueAtTime(0.25, ctx.currentTime + i*0.18);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.18 + 0.25);
-      o.start(ctx.currentTime + i*0.18);
-      o.stop(ctx.currentTime + i*0.18 + 0.26);
-    });
-  } catch(e) {}
-}
-
 function _renderScanResult(text, source) {
   var resBox = document.getElementById("pa-scan-result");
   if (!resBox) return;
+  
+  // Clean all visual double asterisks from text parameter
+  var cleanText = text.replace(/\*\*/g, "");
+  
+  var isForbidden = cleanText.includes("ممنوع في الطيبات") || cleanText.includes("ممنوع") || cleanText.includes("غير مناسب");
+  var isUnderStudy = cleanText.includes("تحت الدراسة") || cleanText.includes("يحتاج دراسة");
+  var isAllowed = !isForbidden && !isUnderStudy;
 
-  /* Strip ** markdown bold from text for clean display */
-  var cleanText = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  var cls = "scan-result-allowed";
+  var icon = "fa-check-circle";
+  var color = "#2ec951";
+  var verdict = "مسموح في الطيبات";
 
-  var isForbidden = text.includes("ممنوع") || text.includes("غير مناسب") || text.includes("لا يجوز") || text.includes("محظور");
-  var isAllowed   = (text.includes("مسموح") || text.includes("مناسب") || text.includes("جائز") || text.includes("مباح") || text.includes("يناسب")) && !isForbidden;
-  var isStudy     = (!isForbidden && !isAllowed) || text.includes("دراسة") || text.includes("مراجعة") || text.includes("يحتاج") || text.includes("تحت الدراسة");
-
-  var cls, icon, color, verdict, bgColor, borderColor;
   if (isForbidden) {
     cls = "scan-result-forbidden";
     icon = "fa-times-circle";
     color = "#ef5350";
     verdict = "ممنوع في الطيبات";
-    bgColor = "rgba(229,57,53,.13)";
-    borderColor = "rgba(229,57,53,.55)";
-    _playForbiddenAlert();
-  } else if (isAllowed) {
-    cls = "scan-result-allowed";
-    icon = "fa-check-circle";
-    color = "#2ec951";
-    verdict = "مسموح في الطيبات";
-    bgColor = "rgba(46,201,81,.12)";
-    borderColor = "rgba(46,201,81,.5)";
-    if (typeof playSoundsuccess === "function") playSoundsuccess();
-  } else {
+    // Play sound notification for forbidden items
+    if (soundEnabled) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(220, audioCtx.currentTime);
+        o.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+        g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        o.start(); o.stop(audioCtx.currentTime + 0.4);
+      } catch(x){}
+    }
+  } else if (isUnderStudy) {
     cls = "scan-result-unknown";
-    icon = "fa-exclamation-triangle";
-    color = "#ffa726";
+    icon = "fa-exclamation-circle";
+    color = "#ff9800";
     verdict = "تحت الدراسة";
-    bgColor = "rgba(255,160,0,.1)";
-    borderColor = "rgba(255,160,0,.5)";
   }
 
   resBox.innerHTML =
-    '<div style="background:' + bgColor + ';border:2px solid ' + borderColor + ';border-radius:18px;padding:16px;margin-top:12px;animation:pageIn .4s ease">'
-    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid ' + borderColor + '">'
-    + '<i class="fas ' + icon + '" style="color:' + color + ';font-size:2rem;flex-shrink:0"></i>'
-    + '<div style="flex:1"><strong style="color:' + color + ';font-size:1.05rem;display:block">' + verdict + '</strong>'
-    + '<span style="font-size:.68rem;color:var(--txt3)">تم التحليل بواسطة: ' + (source||"AI") + '</span></div>'
+    '<div class="' + cls + '">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+    + '<i class="fas ' + icon + '" style="color:' + color + ';font-size:1.4rem"></i>'
+    + '<strong style="color:' + color + ';font-size:.95rem">' + verdict + '</strong>'
+    + '<span class="scan-ai-badge" style="margin-right:auto">' + (source||"AI") + '</span>'
     + '</div>'
-    + '<div style="font-size:.83rem;line-height:1.9;color:var(--txt)">' + cleanText.replace(/\n/g,"<br>") + '</div>'
+    + '<div style="font-size:.82rem;line-height:1.8;color:var(--txt)">' + cleanText.replace(/\n/g,"<br>") + '</div>'
     + '</div>';
+  if (isAllowed && typeof playSound === "function") playSound('success');
 }
 
 /* ══════════ Tracker Dashboard Logic ══════════ */
@@ -2119,7 +2100,7 @@ function loadAndRenderPremiumTrackerMetrics() {
   var data = localData ? JSON.parse(localData) : { energy: 7, bloat: 3, sleep: 6, sugar: 125 };
   
   var target = document.getElementById('premium-charts-render-area');
-  
+  if (!target) return;
   target.innerHTML = `
     <div class="metric-progress-container">
       <div class="metric-progress-header"><span>💪 مؤشر طاقة وحيوية الخلايا الداخلية</span><strong>${data.energy * 10}%</strong></div>
@@ -2143,6 +2124,7 @@ function loadAndRenderPremiumTrackerMetrics() {
 /* ══════════ Protocols, Recipes & Challenges Renders ══════════ */
 function renderPremiumProtocolsData() {
   var target = document.getElementById('premium-protocols-list-target');
+  if (!target) return;
   target.innerHTML = PREMIUM_PROTOCOLS.map(function(p) {
     return `<div class="protocol-card-premium">
       <div style="font-size:1rem; font-weight:800; color:var(--gold2); margin-bottom:6px;"><i class="fas fa-shield-virus"></i> ${p.title}</div>
@@ -2155,8 +2137,10 @@ function renderPremiumProtocolsData() {
 }
 
 function renderPremiumRecipesData() {
-  var query = (document.getElementById('recipe-search-input').value || '').trim().toLowerCase();
+  var searchInput = document.getElementById('recipe-search-input');
+  var query = searchInput ? (searchInput.value || '').trim().toLowerCase() : '';
   var target = document.getElementById('premium-recipes-grid-target');
+  if (!target) return;
   
   var filtered = PREMIUM_RECIPES.filter(function(r) {
     return r.title.toLowerCase().includes(query) || r.desc.toLowerCase().includes(query);
@@ -2182,13 +2166,16 @@ function renderPremiumRecipesData() {
 
 function renderPremiumChallengesData() {
   var badgeTarget = document.getElementById('premium-badges-container');
-  badgeTarget.innerHTML = `
-    <div class="badge-gold-earned" title="وسام الأسبوع الأول">🌱</div>
-    <div class="badge-gold-earned" title="قاهر السكر والخبائث" style="border-color:#2ec951;">⚔️</div>
-    <div class="badge-gold-earned" title="صائم محترف" style="border-color:var(--blue2);">🌙</div>
-  `;
+  if (badgeTarget) {
+    badgeTarget.innerHTML = `
+      <div class="badge-gold-earned" title="وسام الأسبوع الأول">🌱</div>
+      <div class="badge-gold-earned" title="قاهر السكر والخبائث" style="border-color:#2ec951;">⚔️</div>
+      <div class="badge-gold-earned" title="صائم محترف" style="border-color:var(--blue2);">🌙</div>
+    `;
+  }
   
   var listTarget = document.getElementById('premium-challenges-list-target');
+  if (!listTarget) return;
   listTarget.innerHTML = PREMIUM_CHALLENGES.map(function(c) {
     return `<div class="prof-card" style="margin-bottom:10px; border-left:3px solid var(--gold2);">
       <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.88rem; color:#fff;">
@@ -2215,18 +2202,16 @@ function triggerSmartPeriodicReminders() {
   ];
   var randomTip = tipsArr[Math.floor(Math.random() * tipsArr.length)];
   showToast(randomTip, 4000);
-  
-  if (Notification && Notification.permission === "default") {
-    Notification.requestPermission();
-  }
 }
 setInterval(triggerSmartPeriodicReminders, 90000);
 
 /* ══════════ Toast ══════════ */
 function showToast(m, d) {
   d = d || 2500; var t = document.getElementById('toast');
-  t.textContent = m; t.classList.add('show');
-  clearTimeout(tTimer); tTimer = setTimeout(function() { t.classList.remove('show'); }, d);
+  if (t) {
+    t.textContent = m; t.classList.add('show');
+    clearTimeout(tTimer); tTimer = setTimeout(function() { t.classList.remove('show'); }, d);
+  }
 }
 
 /* ══════════ Sound ══════════ */
@@ -2387,7 +2372,8 @@ function filterCat(c) {
 function filterFood() { renderFood(); }
 
 function renderFood() {
-  var q = (document.getElementById('food-search').value || '').trim().toLowerCase();
+  var searchInput = document.getElementById('food-search');
+  var q = searchInput ? (searchInput.value || '').trim().toLowerCase() : '';
   var g = document.getElementById('food-grid'); if (!g) return;
   var data = FOOD_DATA.slice();
   if (curCat === 'مسموح') data = data.filter(function(f) { return f.status === 'allowed'; });
@@ -2632,1087 +2618,4 @@ function buildUserContext() {
   var u = currentUser || {}, d = u.diseases || [];
   var m = { sugar:'السكري', pressure:'ارتفاع الضغط', allergy:'الحساسية', chemo:'علاج كيماوي', heart:'أمراض القلب', kidney:'أمراض الكلى' };
   var bi = getBMIInfo(u.bmi);
-  return 'أنت مساعد صحي متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله. تتحدث بالعربية. المستخدم: ' + (u.name||'مستخدم') + '، BMI: ' + (u.bmi||'-') + ' (' + bi.label + ')، الأمراض: ' + (d.length ? d.map(function(x){return m[x];}).join(' و ') : 'لا يوجد') + '. المسموح: لحوم حمراء، سمك، أرز، بطاطس، زيت زيتون، خضار مطبوخة، فواكه باعتدال، جبن معتق. الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.';
-}
-
-async function tryPollinations(modelId, sysPrompt, userMsg) {
-  var controller = new AbortController(), tid = setTimeout(function() { controller.abort(); }, 5000);
-  try {
-    var res = await fetch(window.__aiEndpoint || __POLLINATIONS_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model:modelId, messages:[{role:'system',content:sysPrompt},{role:'user',content:userMsg}], temperature:0.7 }), signal:controller.signal });
-    clearTimeout(tid);
-    if (!res.ok) return null;
-    var data = await res.json();
-    if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content)
-      return { text: data.choices[0].message.content, source: 'pollinations' };
-    return null;
-  } catch(e) { clearTimeout(tid); return null; }
-}
-
-async function tryOpenRouter(modelId, sysPrompt, userMsg) {
-  var key = window.__OR_KEY_FB; if (!key) return null;
-  var controller = new AbortController(), tid = setTimeout(function() { controller.abort(); }, 20000);
-  try {
-    var res = await fetch(__OR_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':window.location.href,'X-Title':'طيبات'}, body:JSON.stringify({ model:modelId, messages:[{role:'system',content:sysPrompt},{role:'user',content:userMsg}], temperature:0.7, max_tokens:1000 }), signal:controller.signal });
-    clearTimeout(tid);
-    if (!res.ok) return null;
-    var data = await res.json();
-    if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content)
-      return { text: data.choices[0].message.content, source: 'openrouter' };
-    return null;
-  } catch(e) { clearTimeout(tid); return null; }
-}
-
-async function sendAiMessage() {
-  var inp = document.getElementById('ai-msg-input'), txt = (inp.value || '').trim(); if (!txt) return;
-  var chatWrap = document.getElementById('ai-chat-wrap');
-  addAiMsg('user', txt); inp.value = ''; document.getElementById('btn-ai-send').disabled = true; addThink();
-  var sysPrompt = buildUserContext(), reply = null, usedModel = null, usedSource = null;
-  var orKey = window.__OR_KEY_FB;
-  if (orKey) {
-    updateThinkText('🌐 OpenRouter — جاري البحث...');
-    for (var j = 0; j < OR_MODELS.length; j++) {
-      var oidx = (currentORIdx + j) % OR_MODELS.length, om = OR_MODELS[oidx];
-      try { var oRes = await tryOpenRouter(om.id, sysPrompt, txt); if (oRes) { reply = oRes.text; usedModel = om; usedSource = 'openrouter'; currentORIdx = (oidx + 1) % OR_MODELS.length; break; } } catch(e) { continue; }
-    }
-  }
-  if (!reply) {
-    updateThinkText('🌸 Pollinations — جاري التجربة...');
-    var polModels = (window.__aiModels && window.__aiModels.length) ? window.__aiModels : AI_MODELS;
-    for (var i = 0; i < polModels.length; i++) {
-      var pidx = (currentModelIdx + i) % polModels.length, pm = polModels[pidx];
-      try { var pRes = await tryPollinations(pm.id, sysPrompt, txt); if (pRes) { reply = pRes.text; usedModel = pm; usedSource = 'pollinations'; currentModelIdx = (pidx + 1) % polModels.length; break; } } catch(e) { continue; }
-    }
-  }
-  removeThink();
-  if (reply) {
-    var srcBadge = usedSource === 'openrouter'
-      ? '<span class="ai-model-badge or-badge">🌐 ' + usedModel.icon + ' ' + usedModel.name + ' · OR</span>'
-      : '<span class="ai-model-badge">' + usedModel.icon + ' ' + usedModel.name + '</span>';
-    addAiMsg('assistant', reply + '\n\n' + srcBadge);
-  } else { addAiMsg('assistant', generateLocalResponse(txt) + '\n\n<span class="ai-model-badge">📱 رد محلي</span>'); }
-  document.getElementById('btn-ai-send').disabled = false;
-  chatWrap.scrollTop = 99999;
-}
-
-function generateLocalResponse(q) {
-  var ql = q.toLowerCase();
-  if (ql.includes('دجاج') || ql.includes('فراخ')) return '🚫 الدجاج ممنوع تماماً في نظام الطيبات!\n✅ البدائل: لحم خروف، سمك بحري، حمام، أرنب، سمان.';
-  if (ql.includes('صيام') || ql.includes('صوم')) return '⏱️ الصيام المتقطع مفيد جداً!\nأنصح بالبدء ببروتوكول 16/8.';
-  if (ql.includes('حليب') || ql.includes('لبن')) return '🚫 الألبان السائلة ممنوعة.\n✅ مسموح: الجبن المعتق والقشطة الطبيعية.';
-  if (ql.includes('خبز') || ql.includes('عيش')) return '🚫 الخبز الأبيض ممنوع تماماً.\n✅ البديل: أرز أو بطاطس.';
-  if (ql.includes('بيض')) return '🚫 البيض ممنوع في نظام الطيبات.\n✅ البروتين من اللحوم والأسماك.';
-  return '🌿 نظام الطيبات للدكتور ضياء العوضي:\n\n✅ يومياً: أرز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n✅ أسبوعياً: لحوم حمراء، سمك، حمام، مكسرات، فواكه مسموحة.\n🚫 ممنوع: دجاج، بيض، دقيق، ألبان سائلة، بقوليات، خضار نيئة، غازيات.\n\nاسألني عن أي طعام محدد!';
-}
-
-function addAiMsg(role, text) {
-  var w = document.getElementById('ai-chat-wrap'), d = document.createElement('div');
-  d.className = 'ai-msg ' + role;
-  d.innerHTML = '<div class="ai-msg-label">' + (role === 'user' ? '<i class="fas fa-user"></i> أنت' : '<i class="fas fa-robot"></i> طبيبك الذكي') + '</div><div>' + text + '</div>';
-  w.appendChild(d); w.scrollTop = w.scrollHeight;
-}
-function addThink() {
-  var w = document.getElementById('ai-chat-wrap'), d = document.createElement('div');
-  d.id = 'ai-thinking'; d.className = 'ai-msg assistant';
-  d.innerHTML = '<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> <span id="ai-think-txt">جاري البحث...</span></div>';
-  w.appendChild(d); w.scrollTop = w.scrollHeight;
-}
-function updateThinkText(msg) { var el = document.getElementById('ai-think-txt'); if (el) el.textContent = msg; }
-function removeThink() { var el = document.getElementById('ai-thinking'); if (el) el.remove(); }
-function clearAiChat() { document.getElementById('ai-chat-wrap').innerHTML = ''; addAiMsg('assistant', '🌿 تم مسح المحادثة. اسألني سؤالك الجديد!'); showToast('🗑️ تم مسح المحادثة'); }
-
-var QP = ['ما أفضل أطعمة لحالتي؟','هل أستطيع الصيام مع مرضي؟','بديل صحي للدجاج؟','خطة غذاء يوم كامل','هل الموز مسموح؟'];
-
-function buildAiPage() {
-  if (typeof initGeminiPage === 'function') initGeminiPage();
-}
-
-/* ══════════ Experiences ══════════ */
-var SAMPLE_EXP = [
-  { id:'s1', username:'أم علي', disease:'السكري', details:'بدأت نظام الطيبات من شهرين وحمد لله انخفض سكري من 180 إلى 120.', date: Date.now() - 86400000*5 },
-  { id:'s2', username:'محمد حسن', disease:'إنقاص الوزن', details:'فقدت 15 كيلو في 4 أشهر بفضل نظام الطيبات والصيام المتقطع.', date: Date.now() - 86400000*3 },
-  { id:'s3', username:'فاطمة خالد', disease:'ارتفاع الضغط', details:'بعد الالتزام بنظام الطيبات 6 أسابيع انخفض ضغطي بشكل ملحوظ.', date: Date.now() - 86400000 }
-];
-
-function checkUserExperience() {
-  if (!currentUser) return;
-  var hasExp = allExperiences.some(function(e) { return e.userId === currentUser.username; });
-  var btn = document.getElementById('btn-share-exp');
-  if (btn) {
-    btn.innerHTML = hasExp ? '<i class="fas fa-edit"></i> تعديل تجربتك' : '<i class="fas fa-plus"></i> شارك تجربتك';
-  }
-}
-
-async function loadExperiences() {
-  var list = document.getElementById('experiences-list'); if (!list) return;
-  list.innerHTML = '<div style="text-align:center;color:var(--txt2);padding:30px"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--gold2);display:block;margin-bottom:10px"></i>جاري التحميل...</div>';
-  var data = await dbLoadExperiences();
-  allExperiences = data && data.length ? data : SAMPLE_EXP.map(function(e) { return Object.assign({}, e, { date: new Date(e.date) }); });
-  var chip = document.getElementById('exp-count-chip'); if (chip) chip.textContent = allExperiences.length;
-  checkUserExperience();
-  renderExperiences();
-}
-
-function renderExperiences() {
-  var list = document.getElementById('experiences-list'); if (!list) return;
-  if (!allExperiences.length) { list.innerHTML = '<div style="text-align:center;color:var(--txt2);padding:40px">لا توجد تجارب حتى الآن. كن الأول!</div>'; return; }
-  var colors = ['#d4af37','#42a5f5','#ef5350','#66bb6a','#ab47bc'];
-  list.innerHTML = allExperiences.map(function(exp, i) {
-    var daysAgo = Math.floor((Date.now() - (exp.date instanceof Date ? exp.date.getTime() : exp.date)) / 86400000);
-    var dateLabel = daysAgo === 0 ? 'اليوم' : daysAgo === 1 ? 'أمس' : daysAgo + ' أيام';
-    var initials = exp.username.split(' ').map(function(n) { return n.charAt(0); }).join('').slice(0,2);
-    var color = colors[i % colors.length];
-    var isOwn = currentUser && exp.userId === currentUser.username;
-    return '<div class="experience-card" onclick="showExpDetail(' + i + ')">' +
-      '<div class="exp-card-header"><div class="exp-avatar" style="background:linear-gradient(135deg,' + color + ',rgba(212,175,55,.6))">' + initials + '</div>' +
-      '<div><div class="exp-username">' + exp.username + (isOwn ? ' <span style="font-size:.65rem;color:var(--gold2);background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);border-radius:10px;padding:2px 6px">تجربتي</span>' : '') + '</div>' +
-      '<div class="exp-disease">' + exp.disease + '</div><div class="exp-date">منذ ' + dateLabel + '</div></div></div>' +
-      '<div class="exp-details-text">' + exp.details + '</div>' +
-      '<div style="text-align:center"><span class="exp-badge">👆 اضغط للتفاصيل</span></div></div>';
-  }).join('');
-}
-
-function showExpDetail(i) {
-  var exp = allExperiences[i]; if (!exp) return;
-  var daysAgo = Math.floor((Date.now() - (exp.date instanceof Date ? exp.date.getTime() : exp.date)) / 86400000);
-  var dateLabel = daysAgo === 0 ? 'اليوم' : daysAgo === 1 ? 'أمس' : daysAgo + ' أيام';
-  var initials = exp.username.split(' ').map(function(n) { return n.charAt(0); }).join('').slice(0,2);
-  var colors = ['#d4af37','#42a5f5','#ef5350','#66bb6a','#ab47bc'];
-  var color = colors[i % colors.length];
-  document.getElementById('exp-detail-body').innerHTML =
-    '<div style="text-align:center;margin-bottom:20px"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,' + color + ',rgba(212,175,55,.6));display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#050e1f;margin:0 auto 10px">' + initials + '</div>' +
-    '<div style="font-size:1.1rem;font-weight:800;color:var(--txt)">' + exp.username + '</div>' +
-    '<div style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:700;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);margin:6px 0">' + exp.disease + '</div>' +
-    '<div style="font-size:.75rem;color:var(--txt3)">منذ ' + dateLabel + '</div></div>' +
-    '<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:.88rem;color:var(--txt2);line-height:1.8;margin-bottom:16px">' + exp.details + '</div>' +
-    '<button onclick="closeExpDetail()" style="width:100%;background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:12px;font-family:\'Tajawal\',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer">إغلاق</button>';
-  var modal = document.getElementById('exp-detail-modal'); modal.style.display = 'flex';
-}
-function closeExpDetail() { document.getElementById('exp-detail-modal').style.display = 'none'; }
-
-function openShareExperienceModal() {
-  if (!currentUser) { showToast('🔐 سجل الدخول أولاً'); return; }
-  var existing = allExperiences.find(function(e) { return e.userId === currentUser.username; });
-  var titleEl = document.getElementById('share-exp-modal-title');
-  var submitBtn = document.getElementById('btn-submit-exp');
-  if (existing) {
-    if (titleEl) titleEl.textContent = 'تعديل تجربتك';
-    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ التعديل';
-    document.getElementById('exp-disease').value = existing.disease || '';
-    document.getElementById('exp-details').value = existing.details || '';
-  } else {
-    if (titleEl) titleEl.textContent = 'شارك تجربتك';
-    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> نشر التجربة';
-    document.getElementById('exp-disease').value = '';
-    document.getElementById('exp-details').value = '';
-  }
-  var u = document.getElementById('exp-uname'); if (u) u.value = currentUser.name || currentUser.username;
-  document.getElementById('share-exp-modal').style.display = 'flex';
-}
-
-function closeShareExpModal() {
-  document.getElementById('share-exp-modal').style.display = 'none';
-  var d = document.getElementById('exp-details'), dis = document.getElementById('exp-disease');
-  if (d) d.value = ''; if (dis) dis.value = '';
-  var cnt = document.getElementById('exp-char-count'); if (cnt) cnt.textContent = '0 / 500';
-}
-
-async function submitExperience() {
-  if (!currentUser) return;
-  var disease = document.getElementById('exp-disease').value;
-  var details = document.getElementById('exp-details').value.trim();
-  if (!disease) { showToast('⚠️ اختر المرض / الحالة'); return; }
-  if (!details || details.length < 20) { showToast('⚠️ اكتب تفاصيل كافية (20 حرف على الأقل)'); return; }
-
-  var existing = allExperiences.find(function(e) { return e.userId === currentUser.username; });
-  if (existing && window.__firebaseReady) {
-    try { await window.__firebaseRemove(window.__firebaseRef(window.__firebaseDB, 'experiences/' + existing.id)); } catch(e) {}
-    allExperiences = allExperiences.filter(function(e) { return e.userId !== currentUser.username; });
-  }
-
-  var expId = Date.now().toString();
-  var newExp = { id: expId, username: currentUser.name || currentUser.username, disease: disease, details: details, date: Date.now(), userId: currentUser.username, isPro: isProActive(currentUser) };
-  await dbSaveExperience(expId, newExp);
-  allExperiences.unshift(Object.assign({}, newExp, { date: new Date(newExp.date) }));
-  var chip = document.getElementById('exp-count-chip'); if (chip) chip.textContent = allExperiences.length;
-  renderExperiences(); checkUserExperience(); closeShareExpModal();
-  showToast(existing ? '✅ تم تعديل تجربتك!' : '✅ تم نشر تجربتك بنجاح!');
-  playSound('success');
-}
-
-/* ══════════ Universe Canvas ══════════ */
-(function() {
-  var c = document.getElementById('universe-canvas'), x = c.getContext('2d'), W, H, s = [];
-  function r() { W = c.width = innerWidth; H = c.height = innerHeight; }
-  r(); addEventListener('resize', r);
-  for (var i = 0; i < 200; i++) s.push({ x: Math.random()*2-1, y: Math.random()*2-1, z: Math.random(), sz: Math.random()*2+.5, sp: Math.random()*.0003+.0001, cl: Math.random()<.3 ? 'rgba(200,150,12,' : 'rgba(180,210,255,' });
-  function d() {
-    if (!W) { requestAnimationFrame(d); return; }
-    x.clearRect(0,0,W,H);
-    s.forEach(function(p) {
-      p.z -= p.sp; if (p.z <= 0) p.z = 1;
-      var px=(p.x/p.z+1)*W/2, py=(p.y/p.z+1)*H/2, r2=p.sz*(1-p.z), a=1-p.z;
-      x.beginPath(); x.arc(px, py, Math.max(r2,.2), 0, Math.PI*2);
-      x.fillStyle = p.cl + a.toFixed(2) + ')'; x.fill();
-    });
-    requestAnimationFrame(d);
-  } d();
-})();
-
-/* ══════════ DNA Canvas ══════════ */
-(function() {
-  var s = document.getElementById('dna-stage'); if (!s) return;
-  var c = document.createElement('canvas'); c.width = 420; c.height = 200;
-  c.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
-  s.appendChild(c); var x = c.getContext('2d'); var t = 0;
-  function d() {
-    x.clearRect(0,0,c.width,c.height);
-    var cx=c.width/2, cy=c.height/2, a=40, l=c.width*.8, n=12; t+=.02;
-    for (var i=0; i<=n; i++) {
-      var x1=cx-l/2+(l/n)*i, y1=cy+Math.sin(i*(Math.PI*2/n)+t)*a, y2=cy+Math.sin(i*(Math.PI*2/n)+t+Math.PI)*a, z1=Math.cos(i*(Math.PI*2/n)+t), z2=Math.cos(i*(Math.PI*2/n)+t+Math.PI);
-      x.beginPath(); x.arc(x1,y1,Math.max(5+z1*3,1),0,Math.PI*2); x.fillStyle='rgba(200,150,12,'+(0.4+z1*0.4)+')'; x.fill();
-      x.beginPath(); x.arc(x1,y2,Math.max(5+z2*3,1),0,Math.PI*2); x.fillStyle='rgba(33,150,243,'+(0.4+z2*0.4)+')'; x.fill();
-      if (i>0) {
-        var px=cx-l/2+(l/n)*(i-1), py1=cy+Math.sin((i-1)*(Math.PI*2/n)+t)*a, py2=cy+Math.sin((i-1)*(Math.PI*2/n)+t+Math.PI)*a;
-        x.beginPath(); x.moveTo(px,py1); x.lineTo(x1,y1); x.strokeStyle='rgba(200,150,12,.25)'; x.lineWidth=1.5; x.stroke();
-        x.beginPath(); x.moveTo(px,py2); x.lineTo(x1,y2); x.strokeStyle='rgba(33,150,243,.2)'; x.stroke();
-      }
-    }
-    requestAnimationFrame(d);
-  } d();
-})();
-
-/* ══════════ Welcome Videos ══════════ */
-var wvmVideos = [
-  { title: 'من أنقذ لسان شيماء ؟', src: '1.mp4' },
-  { title: 'شهادة حق من مريضة شُفيت من نظام الطيبات', src: '2.mp4' },
-  { title: 'مريض سكر بعد جلطات بالقلب وبتر جرب', src: '3.mp4' },
-  { title: 'مهندس مريض سكر وضغط وسمنة مفرطة', src: '4.mp4' },
-  { title: 'مريض قلب مفتوح يحكي تجربة نظام الطيبات', src: '5.mp4' },
-  { title: 'مريضة ضغط والعصب السابع من مجربات نظام الطيبات', src: '6.mp4' }
-];
-var wvmCurrent = 0;
-
-function wvmTodayKey() {
-  var today = new Date(), d = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
-  var u = (currentUser && currentUser.username) ? currentUser.username : 'guest';
-  return 'wvm_shown_' + u + '_' + d;
-}
-
-function showWelcomeModal() {
-  try { if (localStorage.getItem(wvmTodayKey())) return; localStorage.setItem(wvmTodayKey(), '1'); } catch(e) {}
-  wvmCurrent = 0; buildWvmDots(); wvmRender();
-  document.getElementById('welcome-videos-modal').classList.add('show');
-}
-
-function closeWelcomeModal() {
-  var vid = document.getElementById('wvm-video');
-  vid.pause(); vid.removeEventListener('ended', wvmAutoNext); vid.src = '';
-  document.getElementById('welcome-videos-modal').classList.remove('show');
-}
-
-function wvmAutoNext() { if (wvmCurrent < wvmVideos.length - 1) { wvmCurrent++; wvmRender(); } }
-
-function wvmRender() {
-  var v = wvmVideos[wvmCurrent], vid = document.getElementById('wvm-video'), loading = document.getElementById('wvm-loading');
-  vid.pause(); vid.removeEventListener('ended', wvmAutoNext); loading.classList.add('show');
-  vid.src = v.src; vid.load();
-  vid.oncanplay = function() { loading.classList.remove('show'); vid.play().catch(function(){}); };
-  vid.onerror = function() { loading.textContent = '⚠️ تعذّر تحميل الفيديو'; };
-  vid.addEventListener('ended', wvmAutoNext);
-  document.getElementById('wvm-title').textContent = v.title;
-  document.getElementById('wvm-counter').textContent = 'فيديو ' + (wvmCurrent + 1) + ' من ' + wvmVideos.length;
-  document.getElementById('wvm-prev').disabled = wvmCurrent === 0;
-  var nextBtn = document.getElementById('wvm-next');
-  if (wvmCurrent === wvmVideos.length - 1) { nextBtn.innerHTML = '✅ إنهاء'; nextBtn.onclick = function() { closeWelcomeModal(); }; }
-  else { nextBtn.innerHTML = 'التالي <i class="fas fa-chevron-left"></i>'; nextBtn.onclick = function() { wvmGo(1); }; }
-  document.querySelectorAll('.wvm-dot').forEach(function(d, i) { d.classList.toggle('active', i === wvmCurrent); });
-}
-
-function buildWvmDots() {
-  var c = document.getElementById('wvm-dots'); c.innerHTML = '';
-  wvmVideos.forEach(function(_, i) {
-    var d = document.createElement('div'); d.className = 'wvm-dot' + (i === 0 ? ' active' : '');
-    d.onclick = function() { wvmCurrent = i; wvmRender(); }; c.appendChild(d);
-  });
-}
-function wvmGo(dir) { var next = wvmCurrent + dir; if (next < 0 || next >= wvmVideos.length) return; wvmCurrent = next; wvmRender(); }
-
-/* ══════════ Modals ══════════ */
-document.querySelectorAll('.modal-overlay').forEach(function(o) { o.addEventListener('click', function(e) { if (e.target === o) o.classList.remove('show'); }); });
-document.getElementById('share-exp-modal').addEventListener('click', function(e) { if (e.target === this) closeShareExpModal(); });
-document.getElementById('exp-detail-modal').addEventListener('click', function(e) { if (e.target === this) closeExpDetail(); });
-document.getElementById('pro-modal').addEventListener('click', function(e) { if (e.target === this) closeProModal(); });
-
-var expDetailsInput = document.getElementById('exp-details');
-if (expDetailsInput) { expDetailsInput.addEventListener('input', function() { var cnt = document.getElementById('exp-char-count'); if (cnt) cnt.textContent = this.value.length + ' / 500'; }); }
-
-/* ══════════ Quotes ══════════ */
-var currentQuoteIdx = 0, quoteInterval = null;
-var allQuotes = document.querySelectorAll('.quote-slide');
-
-function startQuotesAnimation() {
-  if (quoteInterval) clearInterval(quoteInterval);
-  currentQuoteIdx = 0; showNextQuote();
-  quoteInterval = setInterval(showNextQuote, 5000);
-}
-
-function showNextQuote() {
-  allQuotes.forEach(function(q) { q.classList.remove('active'); });
-  if (allQuotes[currentQuoteIdx]) allQuotes[currentQuoteIdx].classList.add('active');
-  var progress = ((currentQuoteIdx + 1) / allQuotes.length) * 100;
-  var pb = document.getElementById('quote-progress');
-  if (pb) pb.style.width = progress + '%';
-  currentQuoteIdx = (currentQuoteIdx + 1) % allQuotes.length;
-}
-
-/* ══════════ PWA ENGINE ══════════ */
-var deferredPrompt = null;
-var DISMISS_KEY = 'pwa_banner_dismissed_at';
-var INSTALL_KEY = 'pwa_installed_status';
-
-function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
-function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone; }
-
-function canShowBanner() {
-  if (isStandalone()) return false;
-  if (localStorage.getItem(INSTALL_KEY)) return false;
-  var dismissedAt = localStorage.getItem(DISMISS_KEY);
-  if (dismissedAt) {
-    var diff = Date.now() - parseInt(dismissedAt, 10);
-    if (diff < 86400000 * 3) return false; // إخفاء لمدة 3 أيام عند الإغلاق
-  }
-  return true;
-}
-
-function adaptBannerForPlatform() {
-  if (isIOS()) {
-    var btn = document.getElementById('pwa-install-btn');
-    if (btn) btn.textContent = 'شرح التثبيت';
-  }
-}
-
-function showIOSInstructions() {
-  var html = '<div class="pro-modal-overlay show" id="ios-pwa-modal" style="z-index:99999;"><div class="pro-modal-box" style="text-align:center; padding:24px;">' +
-    '<div style="font-size:3rem; margin-bottom:12px;">🍏</div>' +
-    '<div class="pro-modal-title" style="font-size:1.2rem;">تثبيت التطبيق على هواتف iPhone</div>' +
-    '<p style="font-size:0.85rem; color:var(--txt2); margin:12px 0; line-height:1.7;">' +
-    '1. اضغط على زر <strong>مشاركة (Share)</strong> في أسفل متصفح Safari.<br/>' +
-    '2. مرر القائمة للأسفل واختر <strong>إضافة إلى الشاشة الرئيسية (Add to Home Screen)</strong>.<br/>' +
-    '3. اضغط على <strong>إضافة (Add)</strong> في أعلى اليمين.' +
-    '</p>' +
-    '<button class="btn btn-gold" onclick="this.closest(\'.pro-modal-overlay\').remove();" style="font-size:1rem; font-weight:800; cursor:pointer">فهمت</button></div></div>';
-  var div = document.createElement('div'); div.innerHTML = html; document.body.appendChild(div.firstElementChild);
-}
-
-window.pwaTriggerInstall = function() {
-  if (isIOS()) { showIOSInstructions(); return; }
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function(r) {
-      if (r.outcome === 'accepted') { localStorage.setItem(INSTALL_KEY, '1'); pwaDismiss(); showToast('🎉 تم التثبيت!'); }
-      deferredPrompt = null;
-    });
-  }
-};
-
-window.pwaDismiss = function() { localStorage.setItem(DISMISS_KEY, Date.now().toString()); document.getElementById('pwa-banner').classList.remove('show'); };
-
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault(); deferredPrompt = e;
-  if (canShowBanner()) setTimeout(function() { document.getElementById('pwa-banner').classList.add('show'); }, 3000);
-});
-
-window.addEventListener('appinstalled', function() {
-  localStorage.setItem(INSTALL_KEY, '1'); document.getElementById('pwa-banner').classList.remove('show'); showToast('🎉 تم تثبيت طيبات!');
-});
-
-/* ══════════ Init ══════════ */
-window.addEventListener('DOMContentLoaded', function() {
-  adaptBannerForPlatform();
-  startQuotesAnimation();
-  var safetyTimeout = setTimeout(function() { hideLoader(); }, 8000);
-  autoLogin().then(function() { clearTimeout(safetyTimeout); });
-});
-</script>
-  <script src="https://js.puter.com/v2/"></script>
-<script>
-(function () {
-  "use strict";
-
-  var ZAI_ENDPOINT     = "https://api.z.ai/api/paas/v4/chat/completions";
-  var ZAI_MODEL        = "glm-4-flash";
-  var MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
-  var MISTRAL_MODEL    = "mistral-small-latest";
-  var PUTER_MODELS     = ["gpt-5.4-nano","gpt-5.4","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1"];
-  var _history = [];
-
-  function _zaiKey()     { return window.__GEMINI_KEY  || null; }
-  function _mistralKey() { return window.__MISTRAL_KEY || null; }
-
-  function _buildPrompt() {
-    var u = window.currentUser || {};
-    var dm = {sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
-    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
-    var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "غير محدد";
-    var gender = u.gender==="male" ? "ذكر" : "انثى";
-    return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n"
-      + "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n"
-      + "بيانات المستخدم:\n"
-      + "- الاسم: "+(u.name||"مستخدم")+"\n"
-      + "- العمر: "+age+" سنة | الجنس: "+gender+"\n"
-      + "- BMI: "+(u.bmi||"؟")+" | الوزن: "+(u.weight||"؟")+"كجم | الطول: "+(u.height||"؟")+"سم\n"
-      + "- الحالات الصحية: "+diseases+"\n\n"
-      + "نظام الطيبات:\n"
-      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.\n"
-      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.\n\n"
-      + "القواعد: راع الحالة الصحية دائما، ذكر باستشارة الطبيب، لا تتجاوز 400 كلمة الا اذا طلب.";
-  }
-
-  function _buildMessages(msg) {
-    var msgs = [{role:"system", content:_buildPrompt()}];
-    _history.forEach(function(m) { msgs.push({role:m.role==="assistant"?"assistant":"user", content:m.text}); });
-    msgs.push({role:"user", content:msg});
-    return msgs;
-  }
-
-  async function _tryPuter(msg, idx) {
-    idx = idx || 0;
-    if (idx >= PUTER_MODELS.length) throw new Error("ALL_PUTER_FAILED");
-    try {
-      var res = await puter.ai.chat(_buildMessages(msg), {model:PUTER_MODELS[idx], temperature:0.7});
-      var text = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (!text) throw new Error("EMPTY");
-      return {text:text, source:"Puter / "+PUTER_MODELS[idx]};
-    } catch(e) { return await _tryPuter(msg, idx+1); }
-  }
-
-  async function _tryMistral(msg) {
-    var key = _mistralKey(); if (!key) throw new Error("NO_KEY");
-    var res = await fetch(MISTRAL_ENDPOINT, {method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:MISTRAL_MODEL,messages:_buildMessages(msg),temperature:0.7,max_tokens:1024})});
-    if (!res.ok) throw new Error("HTTP_"+res.status);
-    var data = await res.json();
-    var text = data&&data.choices&&data.choices[0]&&data.choices[0].message ? data.choices[0].message.content : null;
-    if (!text) throw new Error("EMPTY");
-    return {text:text, source:"Mistral / "+MISTRAL_MODEL};
-  }
-
-  async function _tryZai(msg) {
-    var key = _zaiKey(); if (!key) throw new Error("NO_KEY");
-    var res = await fetch(ZAI_ENDPOINT, {method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:ZAI_MODEL,messages:_buildMessages(msg),temperature:0.7,max_tokens:1024})});
-    if (!res.ok) throw new Error("HTTP_"+res.status);
-    var data = await res.json();
-    var text = data&&data.choices&&data.choices[0]&&data.choices[0].message ? data.choices[0].message.content : null;
-    if (!text) throw new Error("EMPTY");
-    return {text:text, source:"Z.ai / GLM-4-Flash"};
-  }
-
-  function _localFallback() {
-    var name = (window.currentUser&&window.currentUser.name)||"صديقي";
-    var tips = [
-      "انا هنا معك "+name+"! الاتصال غير متاح الان.\n\nالمسموح: لحم الخروف، السمك، الارز، البطاطس، العسل، التمر.\nالممنوع: الدجاج، البيض، الدقيق الابيض، الالبان.\n\nاعد المحاولة بعد لحظات.",
-      "مرحبا "+name+"! الخادم مشغول.\n\nنصيحة: اشرب 8 اكواب ماء يوميا وامش 30 دقيقة.\n\nاضغط ارسال مرة اخرى.",
-      "اعتذر "+name+"، الشبكة غير مستقرة.\n\nوجبة مثالية: ارز + سمك مشوي + زيت زيتون + تمر.\n\nحاول مجددا."
-    ];
-    return {text:tips[Math.floor(Math.random()*tips.length)], source:"محلي"};
-  }
-
-  async function _smartSend(msg) {
-    try { return await _tryPuter(msg, 0); } catch(e) {}
-    try { return await _tryMistral(msg); } catch(e) {}
-    try { return await _tryZai(msg);     } catch(e) {}
-    await new Promise(function(r){ setTimeout(r, 1500); });
-    try { return await _tryPuter(msg, 0); } catch(e) {}
-    return _localFallback();
-  }
-
-  function _updateCtx() {
-    var u = window.currentUser || {};
-    var dm = {sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
-    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
-    var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "؟";
-    var el = document.getElementById("gemini-ctx-body");
-    if (el) el.innerHTML = "👤 "+(u.name||"مستخدم")+" | "+age+" سنة | BMI: "+(u.bmi||"؟")+" | "+diseases;
-  }
-
-  function _setStatus(ready, source) {
-    var dot = document.getElementById("gemini-dot");
-    var txt = document.getElementById("gemini-status-txt");
-    if (!dot||!txt) return;
-    dot.className = "gemini-status-dot "+(ready?"ready":"off");
-    txt.textContent = ready ? "AI جاهز / "+(source||"Puter") : "AI جاري التحميل...";
-  }
-
-  function _appendMsg(role, text, source) {
-    var wrap = document.getElementById("gemini-chat-wrap");
-    if (!wrap) return;
-    var d = document.createElement("div");
-    d.className = "ai-msg "+(role==="user"?"user":"assistant");
-    var label = role==="user"
-      ? '<i class="fas fa-user"></i> انت'
-      : '<i class="fas fa-robot"></i> طيبات AI <span class="ai-model-badge">'+(source||"Puter")+'</span>';
-    d.innerHTML = '<div class="ai-msg-label">'+label+'</div><div>'+text.replace(/\n/g,"<br>")+'</div>';
-    wrap.appendChild(d); wrap.scrollTop = wrap.scrollHeight;
-  }
-
-  function _showTyping() {
-    var wrap = document.getElementById("gemini-chat-wrap"); if (!wrap) return;
-    var d = document.createElement("div"); d.id="gemini-typing"; d.className="ai-msg assistant";
-    d.innerHTML = '<div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI</div>'
-      +'<div class="ai-thinking-wrap"><div class="ai-dots"><span></span><span></span><span></span></div> <span id="ai-think-status">جاري التفكير...</span></div>';
-    wrap.appendChild(d); wrap.scrollTop = wrap.scrollHeight;
-  }
-  function _removeTyping() { var e=document.getElementById("gemini-typing"); if(e) e.remove(); }
-  function _updThink(t)    { var e=document.getElementById("ai-think-status"); if(e) e.textContent=t; }
-
-  async function geminiSend() {
-    var input=document.getElementById("gemini-input"), sendBtn=document.getElementById("gemini-send-btn");
-    if (!input||!sendBtn) return;
-    var msg=input.value.trim(); if (!msg) return;
-    input.value=""; sendBtn.disabled=true; sendBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
-    _appendMsg("user", msg); _showTyping();
-    var t1=setTimeout(function(){_updThink("جاري البحث عن افضل استجابة...");},3000);
-    var t2=setTimeout(function(){_updThink("لحظة من فضلك...");},7000);
-    try {
-      var result=await _smartSend(msg);
-      clearTimeout(t1); clearTimeout(t2); _removeTyping();
-      _appendMsg("assistant", result.text, result.source);
-      _history.push({role:"user",text:msg}); _history.push({role:"assistant",text:result.text});
-      if (_history.length>20) _history=_history.slice(-20);
-      if (typeof playSoundsuccess==="function") playSoundsuccess();
-      _setStatus(true, result.source);
-    } catch(e) {
-      clearTimeout(t1); clearTimeout(t2); _removeTyping();
-      _appendMsg("assistant","حدث خطا. حاول مرة اخرى.");
-    }
-    sendBtn.disabled=false; sendBtn.innerHTML='<i class="fas fa-paper-plane"></i> ارسال';
-  }
-
-  function geminiClear() {
-    _history=[];
-    var wrap=document.getElementById("gemini-chat-wrap"), welcome=document.getElementById("gemini-welcome-msg");
-    if (!wrap) return; wrap.innerHTML=""; if(welcome) wrap.appendChild(welcome);
-    if (typeof showToast==="function") showToast("تم مسح المحادثة");
-  }
-
-  function geminiQuick(t) { var i=document.getElementById("gemini-input"); if(i){i.value=t;i.focus();} }
-
-  function initGeminiPage() { _updateCtx(); _setStatus(true,"Puter / Mistral / Z.ai"); }
-
-  window.geminiSend=geminiSend; window.geminiClear=geminiClear;
-  window.geminiQuick=geminiQuick; window.initGeminiPage=initGeminiPage;
-
-  var _orig=null;
-  function _patch() { if(typeof window.goPage==="function"&&window.goPage!==_patched){_orig=window.goPage;window.goPage=_patched;} }
-  function _patched(n) { if(_orig) _orig(n); if(n==="ai") initGeminiPage(); }
-  if (document.readyState==="loading") { document.addEventListener("DOMContentLoaded",_patch); } else { setTimeout(_patch,500); }
-})();
-</script>
-<!-- ═══════════════ DAILY REWARD SYSTEM ═══════════════ -->
-<style>
-/* Daily Reward Floating Button */
-#daily-reward-fab {
-  position: fixed;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1500;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f5c842, #c8960c);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  box-shadow: 0 4px 20px rgba(200,150,12,.5), 0 0 0 0 rgba(200,150,12,.4);
-  animation: fabPulse 2s ease-in-out infinite;
-  transition: transform .3s;
-}
-#daily-reward-fab:hover { transform: translateY(-50%) scale(1.1); }
-@keyframes fabPulse {
-  0%,100% { box-shadow: 0 4px 20px rgba(200,150,12,.5), 0 0 0 0 rgba(200,150,12,.4); }
-  50%      { box-shadow: 0 4px 28px rgba(200,150,12,.7), 0 0 0 10px rgba(200,150,12,0); }
-}
-#daily-reward-fab .fab-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ef5350;
-  border: 2px solid var(--bg);
-  font-size: .6rem;
-  color: #fff;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Daily Reward Panel */
-#daily-reward-panel {
-  position: fixed;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%) translateX(-120%);
-  z-index: 1600;
-  width: 300px;
-  max-height: 85vh;
-  overflow-y: auto;
-  background: linear-gradient(145deg, #0d1e38, #112244);
-  border: 1px solid rgba(200,150,12,.4);
-  border-radius: 20px;
-  padding: 20px 16px 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 0 40px rgba(200,150,12,.15);
-  transition: transform .4s cubic-bezier(.22,1,.36,1);
-  direction: rtl;
-}
-#daily-reward-panel.open {
-  transform: translateY(-50%) translateX(0);
-}
-.drp-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(200,150,12,.25);
-}
-.drp-title {
-  font-family: 'Amiri', serif;
-  font-size: 1.05rem;
-  background: linear-gradient(135deg, var(--gold2), var(--gold3));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-.drp-close {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  color: var(--txt2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .8rem;
-  transition: all .2s;
-}
-.drp-close:hover { background: rgba(229,57,53,.2); color: #ef5350; }
-.drp-streak {
-  text-align: center;
-  margin-bottom: 14px;
-  padding: 10px;
-  background: rgba(200,150,12,.08);
-  border-radius: 12px;
-  border: 1px solid rgba(200,150,12,.2);
-}
-.drp-streak-num {
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--gold2);
-  line-height: 1;
-}
-.drp-streak-lbl { font-size: .7rem; color: var(--txt3); margin-top: 2px; }
-.drp-day {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  margin-bottom: 8px;
-  border: 1.5px solid rgba(255,255,255,.06);
-  background: rgba(255,255,255,.03);
-  transition: all .3s;
-}
-.drp-day.active-day {
-  border-color: rgba(200,150,12,.5);
-  background: linear-gradient(135deg, rgba(200,150,12,.12), rgba(200,150,12,.04));
-  box-shadow: 0 4px 16px rgba(200,150,12,.15);
-}
-.drp-day.claimed-day {
-  border-color: rgba(46,201,81,.3);
-  background: rgba(46,201,81,.06);
-  opacity: .75;
-}
-.drp-day.expired-day {
-  border-color: rgba(229,57,53,.2);
-  background: rgba(229,57,53,.04);
-  opacity: .5;
-}
-.drp-day.locked-day { opacity: .4; }
-.drp-day-num {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: .85rem;
-  flex-shrink: 0;
-  background: rgba(255,255,255,.06);
-  color: var(--txt2);
-}
-.drp-day.active-day .drp-day-num { background: var(--gold); color: #050e1f; }
-.drp-day.claimed-day .drp-day-num { background: #2ec951; color: #050e1f; }
-.drp-day.expired-day .drp-day-num { background: rgba(229,57,53,.3); color: #ef5350; }
-.drp-day-info { flex: 1; min-width: 0; }
-.drp-day-prize { font-size: .8rem; font-weight: 800; color: var(--txt); }
-.drp-day-status { font-size: .65rem; color: var(--txt3); margin-top: 1px; }
-.drp-claim-btn {
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: #050e1f;
-  border: none;
-  border-radius: 10px;
-  padding: 7px 12px;
-  font-family: 'Tajawal', sans-serif;
-  font-size: .72rem;
-  font-weight: 900;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .2s;
-  flex-shrink: 0;
-}
-.drp-claim-btn:hover { transform: scale(1.05); }
-.drp-day-7 {
-  border-color: rgba(124,58,237,.5) !important;
-  background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(168,85,247,.06)) !important;
-}
-.drp-day-7.active-day .drp-day-num { background: linear-gradient(135deg, #7c3aed, #a855f7) !important; color: #fff !important; }
-.drp-syncing { font-size: .68rem; color: var(--txt3); text-align: center; margin-top: 8px; }
-
-/* Footer */
-#tayyibat-footer {
-  background: linear-gradient(135deg, rgba(10,22,40,.98), rgba(5,14,31,.98));
-  border-top: 1px solid rgba(200,150,12,.25);
-  padding: 18px 16px;
-  text-align: center;
-  margin-bottom: var(--nav);
-  position: relative;
-  overflow: hidden;
-}
-#tayyibat-footer::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(200,150,12,.5), transparent);
-}
-.footer-text {
-  font-family: 'Tajawal', sans-serif;
-  font-size: .82rem;
-  color: var(--txt2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.footer-heart {
-  display: inline-block;
-  color: #ef5350;
-  animation: heartBeat 1.2s ease-in-out infinite;
-  font-size: 1rem;
-}
-@keyframes heartBeat {
-  0%,100% { transform: scale(1); }
-  15%      { transform: scale(1.25); }
-  30%      { transform: scale(1); }
-  45%      { transform: scale(1.15); }
-  60%      { transform: scale(1); }
-}
-.footer-name {
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--gold2), var(--gold3));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.footer-fb {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(24,119,242,.15);
-  border: 1px solid rgba(24,119,242,.3);
-  border-radius: 20px;
-  padding: 4px 12px;
-  color: #4080ff;
-  text-decoration: none;
-  font-size: .75rem;
-  font-weight: 700;
-  transition: all .3s;
-  margin-top: 6px;
-}
-.footer-fb:hover { background: rgba(24,119,242,.25); transform: scale(1.04); }
-</style>
-
-<!-- Daily Reward FAB (hidden until login) -->
-<button id="daily-reward-fab" onclick="toggleDailyRewardPanel()" title="هديتك اليومية" style="display:none">
-  🎁
-  <span class="fab-badge" id="fab-reward-badge" style="display:none">!</span>
-</button>
-
-<!-- Daily Reward Panel -->
-<div id="daily-reward-panel">
-  <div class="drp-header">
-    <div class="drp-title">🎁 هدايا الحضور اليومي</div>
-    <button class="drp-close" onclick="closeDailyRewardPanel()"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="drp-streak">
-    <div class="drp-streak-num" id="drp-streak-count">0</div>
-    <div class="drp-streak-lbl">يوم متتالي</div>
-  </div>
-  <div id="drp-days-list"></div>
-  <div class="drp-syncing" id="drp-sync-status">⏱ يتم مزامنة الوقت مع الإنترنت...</div>
-</div>
-
-<!-- Footer -->
-<div id="tayyibat-footer">
-  <div class="footer-text">
-    <span>برمجة وتطوير بكل</span>
-    <span class="footer-heart">❤️</span>
-    <span class="footer-name">المهندس محمد حماد</span>
-  </div>
-  <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="footer-fb">
-    <i class="fab fa-facebook-f"></i> تواصل معنا
-  </a>
-</div>
-
-<script>
-/* ══════════════════════════════════════════════
-   DAILY REWARD SYSTEM — مستقل تماماً عن باقي الدوال
-   ══════════════════════════════════════════════ */
-(function() {
-  'use strict';
-
-  var PRIZES = [
-    { day: 1, label: '1 ساعة برو مجانية', icon: '⭐' },
-    { day: 2, label: '2 ساعة برو مجانية', icon: '⭐⭐' },
-    { day: 3, label: '3 ساعات برو مجانية', icon: '🌟' },
-    { day: 4, label: '4 ساعات برو مجانية', icon: '💫' },
-    { day: 5, label: '5 ساعات برو مجانية', icon: '🔥' },
-    { day: 6, label: '6 ساعات برو مجانية', icon: '🏅' },
-    { day: 7, label: '7 أيام برو كاملة!', icon: '👑', mega: true }
-  ];
-
-  /* Get internet time via worldtimeapi */
-  var _netDate = null;
-  var _netDateFetched = false;
-
-  function _fetchNetDate(cb) {
-    if (_netDateFetched && _netDate) { cb(_netDate); return; }
-    fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo')
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        _netDate = new Date(d.utc_datetime);
-        _netDateFetched = true;
-        var el = document.getElementById('drp-sync-status');
-        if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
-        cb(_netDate);
-      })
-      .catch(function(){
-        /* Fallback: try another time API */
-        fetch('https://timeapi.io/api/Time/current/zone?timeZone=Africa%2FCairo')
-          .then(function(r){ return r.json(); })
-          .then(function(d){
-            _netDate = new Date(d.dateTime);
-            _netDateFetched = true;
-            var el = document.getElementById('drp-sync-status');
-            if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
-            cb(_netDate);
-          })
-          .catch(function(){
-            _netDate = new Date(); /* last resort: device time */
-            _netDateFetched = true;
-            var el = document.getElementById('drp-sync-status');
-            if (el) el.textContent = '⚠️ تعذر المزامنة - يستخدم وقت الجهاز';
-            cb(_netDate);
-          });
-      });
-  }
-
-  function _todayStr(date) {
-    return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-  }
-
-  function _getState() {
-    try {
-      var raw = localStorage.getItem('tayyibat_daily_reward_v2');
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch(e) { return null; }
-  }
-
-  function _saveState(state) {
-    try { localStorage.setItem('tayyibat_daily_reward_v2', JSON.stringify(state)); } catch(e) {}
-  }
-
-  /* Compute current streak & day index based on net date */
-  function _computeRewardState(nowDate) {
-    var state = _getState();
-    var today = _todayStr(nowDate);
-
-    if (!state) {
-      /* First time ever */
-      return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today };
-    }
-
-    var lastDay = state.lastDay || null;
-    var streak = state.streak || 0;
-    var claimedToday = (lastDay === today);
-
-    if (claimedToday) {
-      return { streak: streak, lastDay: lastDay, claimedToday: true, dayIndex: (streak - 1) % 7, todayStr: today };
-    }
-
-    /* Check if yesterday was the last claimed day */
-    if (lastDay) {
-      var last = new Date(lastDay);
-      var diff = Math.round((nowDate - last) / 86400000);
-      if (diff === 1) {
-        /* Consecutive - next day unlocked */
-        var nextStreak = (streak % 7 === 0 && streak > 0) ? 1 : streak; /* after full 7 reset streak count but keep going */
-        return { streak: streak, lastDay: lastDay, claimedToday: false, dayIndex: streak % 7, todayStr: today, canClaim: true };
-      } else if (diff > 1) {
-        /* Missed a day - reset */
-        return { streak: 0, lastDay: lastDay, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true, wasReset: true };
-      }
-    }
-    /* Never claimed or same day edge */
-    return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true };
-  }
-
-  function _renderPanel(nowDate) {
-    var rs = _computeRewardState(nowDate);
-    var list = document.getElementById('drp-days-list');
-    var streakEl = document.getElementById('drp-streak-count');
-    var badge = document.getElementById('fab-reward-badge');
-
-    if (!list) return;
-    if (streakEl) streakEl.textContent = rs.streak;
-
-    /* Badge: show if can claim */
-    if (badge) badge.style.display = (!rs.claimedToday) ? 'flex' : 'none';
-
-    var html = '';
-    for (var i = 0; i < 7; i++) {
-      var p = PRIZES[i];
-      var isPast = i < rs.dayIndex;
-      var isCurrent = i === rs.dayIndex;
-      var isFuture = i > rs.dayIndex;
-      var cls = 'drp-day';
-      var status = '';
-      var btnHtml = '';
-
-      if (rs.wasReset && !rs.claimedToday && isCurrent) {
-        cls += ' active-day';
-        status = '⚠️ انتهى التسلسل - ابدأ من جديد';
-      } else if (isPast && rs.streak >= (i+1)) {
-        cls += ' claimed-day';
-        status = '✅ تم الاستلام';
-      } else if (isPast && rs.streak < (i+1)) {
-        cls += ' expired-day';
-        status = '❌ منتهي (يوم مفقود)';
-      } else if (isCurrent && rs.claimedToday) {
-        cls += ' claimed-day';
-        status = '✅ استلمت هديتك اليوم!';
-      } else if (isCurrent && !rs.claimedToday) {
-        cls += ' active-day';
-        status = '🎁 اليوم الحالي - اضغط للاستلام';
-        btnHtml = '<button class="drp-claim-btn" onclick="window._claimDailyReward()">استلم</button>';
-      } else {
-        cls += ' locked-day';
-        status = '🔒 قادم';
-      }
-
-      if (i === 6) cls += ' drp-day-7';
-
-      html += '<div class="' + cls + '">'
-        + '<div class="drp-day-num">' + (i+1) + '</div>'
-        + '<div class="drp-day-info">'
-        + '<div class="drp-day-prize">' + p.icon + ' ' + p.label + '</div>'
-        + '<div class="drp-day-status">' + status + '</div>'
-        + '</div>'
-        + btnHtml
-        + '</div>';
-    }
-    list.innerHTML = html;
-  }
-
-  window._claimDailyReward = function() {
-    _fetchNetDate(function(nowDate) {
-      var rs = _computeRewardState(nowDate);
-      if (rs.claimedToday) {
-        if (typeof showToast === 'function') showToast('✅ استلمت هديتك اليوم بالفعل!');
-        return;
-      }
-      var newStreak = rs.streak + 1;
-      var dayIdx = rs.dayIndex;
-      var prize = PRIZES[dayIdx];
-      _saveState({ streak: newStreak, lastDay: rs.todayStr });
-      _renderPanel(nowDate);
-      /* Apply prize - add pro time */
-      if (typeof showToast === 'function') {
-        showToast('🎉 مبروك! حصلت على: ' + prize.label);
-      }
-      /* Grant pro time */
-      var proHours = dayIdx < 6 ? (dayIdx + 1) : 0;
-      var proDays  = dayIdx === 6 ? 7 : 0;
-      var now = Date.now();
-      var proExpiry = proDays > 0
-        ? now + proDays * 86400000
-        : now + proHours * 3600000;
-      try { localStorage.setItem('tayyibat_pro_expiry_bonus', proExpiry.toString()); } catch(e) {}
-      /* Activate pro temporarily */
-      if (typeof window.isProUser !== 'undefined') { window.isProUser = true; }
-      /* Play success sound */
-      try {
-        var ctx2 = audioCtx || (audioCtx = new (window.AudioContext||window.webkitAudioContext)());
-        [523, 659, 784, 1047].forEach(function(freq, i) {
-          var o = ctx2.createOscillator(), g = ctx2.createGain();
-          o.connect(g); g.connect(ctx2.destination);
-          o.frequency.value = freq; o.type = 'sine';
-          g.gain.setValueAtTime(0.3, ctx2.currentTime + i*0.12);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + i*0.12 + 0.3);
-          o.start(ctx2.currentTime + i*0.12);
-          o.stop(ctx2.currentTime + i*0.12 + 0.35);
-        });
-      } catch(e) {}
-    });
-  };
-
-  window.toggleDailyRewardPanel = function() {
-    var panel = document.getElementById('daily-reward-panel');
-    if (!panel) return;
-    if (panel.classList.contains('open')) {
-      panel.classList.remove('open');
-    } else {
-      panel.classList.add('open');
-      var el = document.getElementById('drp-sync-status');
-      if (el) el.textContent = '⏱ يتم مزامنة الوقت مع الإنترنت...';
-      _fetchNetDate(function(nowDate) { _renderPanel(nowDate); });
-    }
-  };
-
-  window.closeDailyRewardPanel = function() {
-    var panel = document.getElementById('daily-reward-panel');
-    if (panel) panel.classList.remove('open');
-  };
-
-  /* Init badge after login - called from bootApp via showDailyRewardFab() */
-  window._initDailyRewardBadge = function() {
-    _fetchNetDate(function(nowDate) {
-      var rs = _computeRewardState(nowDate);
-      var badge = document.getElementById('fab-reward-badge');
-      if (badge && !rs.claimedToday) badge.style.display = 'flex';
-    });
-  };
-
-})();
-</script>
-</body>
-</html>
+  return 'أنت مساعد صحي متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله. تتحدث بالعربية. المستخدم: ' + (u.name||'مستخدم') + '، BMI:
