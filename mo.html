@@ -888,53 +888,84 @@
     document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
     document.querySelectorAll('.user-card').forEach(c => { if(c.querySelector('.user-name') && c.querySelector('.user-name').textContent === (u.name||'بدون اسم')) c.classList.add('selected'); });
 
-    // load fresh extras from Firebase
+    // load fresh extras from Firebase — نقرأ من كل المسارات الممكنة
     let freshExperiences = {}, freshQuestions = {}, freshActivities = [];
     try {
-      const [expSnap, qSnap, actSnap, logSnap] = await Promise.all([
+      const safeUsername = u.username || id;
+      const [expSnap, qGlobalSnap, actSnap, logSnap, actUserSnap, qUserSnap, chatSnap] = await Promise.all([
         get(child(ref(db), 'experiences')),
         get(child(ref(db), 'questions')),
         get(child(ref(db), 'activityLog/' + id)),
-        get(child(ref(db), 'adminLogs/' + id))
+        get(child(ref(db), 'adminLogs/' + id)),
+        get(child(ref(db), 'users/' + id + '/activityLog')),
+        get(child(ref(db), 'users/' + id + '/questions')),
+        get(child(ref(db), 'users/' + id + '/chatHistory'))
       ]);
+
+      // ─ التجارب ─
       if (expSnap.exists()) {
-        const all = expSnap.val();
-        Object.keys(all).forEach(k => {
-          const e = all[k];
-          if (e.userId === u.username || e.userId === u._id) freshExperiences[k] = e;
+        Object.entries(expSnap.val()).forEach(([k,e]) => {
+          if (e.userId === safeUsername || e.userId === u._id) freshExperiences[k] = e;
         });
       }
-      if (qSnap.exists()) {
-        const all = qSnap.val();
-        Object.keys(all).forEach(k => {
-          const q = all[k];
-          if (q.userId === u.username || q.userId === u._id || q.userId === id) freshQuestions[k] = q;
+
+      // ─ الأسئلة من المسار العام ─
+      if (qGlobalSnap.exists()) {
+        Object.entries(qGlobalSnap.val()).forEach(([k,q]) => {
+          if (q.userId === safeUsername || q.userId === u._id || q.userId === id) freshQuestions[k] = q;
         });
       }
-      if (actSnap.exists()) {
-        const raw = actSnap.val();
-        const base = Array.isArray(raw) ? raw : Object.values(raw);
-        freshActivities = [...freshActivities, ...base];
+      // ─ الأسئلة من مسار المستخدم نفسه ─
+      if (qUserSnap.exists()) {
+        const raw = qUserSnap.val();
+        const arr = Array.isArray(raw) ? raw : Object.values(raw);
+        arr.forEach((q,i) => {
+          const key = 'uq_' + (q.ts||q.timestamp||i);
+          if (!freshQuestions[key]) freshQuestions[key] = q;
+        });
       }
-      if (logSnap.exists()) {
-        const raw = logSnap.val();
-        const logs = Array.isArray(raw) ? raw : Object.values(raw);
-        freshActivities = [...freshActivities, ...logs];
+
+      // ─ النشاط من activityLog/{id} ─
+      const _addActs = raw => {
+        if (!raw) return;
+        const arr = Array.isArray(raw) ? raw : Object.values(raw);
+        freshActivities = [...freshActivities, ...arr.filter(a => a && (a.ts||a.timestamp||a.text||a.action))];
+      };
+      if (actSnap.exists()) _addActs(actSnap.val());
+      if (logSnap.exists()) _addActs(logSnap.val());
+      if (actUserSnap.exists()) _addActs(actUserSnap.val());
+
+      // ─ النشاط من chatHistory (كل رسالة = نشاط سؤال) ─
+      if (chatSnap.exists()) {
+        const chatRaw = chatSnap.val();
+        const chatArr = Array.isArray(chatRaw) ? chatRaw : Object.values(chatRaw);
+        chatArr.filter(c => c && c.role === 'user').forEach(c => {
+          freshActivities.push({
+            type: 'question',
+            ts: c.ts || c.timestamp || 0,
+            text: 'سؤال للذكاء الاصطناعي: ' + (c.content||c.text||'').substring(0,80),
+            detail: (c.content||c.text||'').substring(0,200)
+          });
+          // أضفه للأسئلة أيضاً إن لم يكن موجوداً
+          const qk = 'chat_' + (c.ts||c.timestamp||Math.random());
+          if (!freshQuestions[qk]) freshQuestions[qk] = { question: c.content||c.text||'', ts: c.ts||c.timestamp||0, type: 'ai' };
+        });
       }
-      // also pull from user node itself if has logs array
-      if (u.logs) {
-        const ul = Array.isArray(u.logs) ? u.logs : Object.values(u.logs);
-        freshActivities = [...freshActivities, ...ul];
-      }
-      // deduplicate by ts
+
+      // ─ النشاط من حقول متفرقة داخل نود المستخدم ─
+      if (u.logs) _addActs(u.logs);
+      if (u.activity) _addActs(u.activity);
+
+      // ─ إزالة التكرار والترتيب ─
       const seen = new Set();
       freshActivities = freshActivities.filter(a => {
-        const key = (a.ts||a.timestamp||0) + (a.text||a.action||'');
+        const key = String(a.ts||a.timestamp||0) + String(a.text||a.action||'').substring(0,30);
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
       }).sort((a,b) => (b.ts||b.timestamp||0) - (a.ts||a.timestamp||0));
-    } catch(e) {}
+
+    } catch(e) { console.warn('Firebase fetch error:', e); }
     u._globalExperiences = freshExperiences;
 
     document.getElementById('profileEmpty').style.display = 'none';
@@ -1047,24 +1078,6 @@
     }
     document.getElementById('streakCalendar').innerHTML = streakHTML;
 
-    // Activity log
-    let actHTML = '';
-    const allActs = [
-      ...(loginHistory.slice(-10).reverse().map(ts => ({ type:'login', ts, text:'سجّل دخولاً للتطبيق' }))),
-      ...freshActivities.slice(-10)
-    ].sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,15);
-
-    if (!allActs.length && !loginHistory.length) {
-      actHTML = '<div class="no-data-msg">لا يوجد سجل نشاط لهذا المستخدم</div>';
-    } else {
-      (loginHistory.length ? loginHistory.slice(-10).reverse() : []).forEach(ts => {
-        actHTML += `<div class="act-item"><div class="act-dot" style="background:var(--green)"></div><div class="act-text">سجّل دخولاً للتطبيق</div><div class="act-time">${formatDateTime(ts)}</div></div>`;
-      });
-      freshActivities.slice(-8).reverse().forEach(a => {
-        actHTML += `<div class="act-item"><div class="act-dot" style="background:var(--blue)"></div><div class="act-text">${a.text||a.action||'نشاط'}</div><div class="act-time">${formatDateTime(a.ts||a.timestamp)}</div></div>`;
-      });
-    }
-    document.getElementById('activityLog').innerHTML = actHTML || '<div class="no-data-msg">لا توجد سجلات</div>';
 
     // Questions tab
     const qKeys = Object.keys(freshQuestions);
