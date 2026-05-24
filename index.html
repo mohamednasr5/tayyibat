@@ -3356,10 +3356,29 @@ async function saveEditProfile() {
 
 function setupShareButtons() {
   var msg = 'مرحبا! لقد طبقت نظام الطيبات للدكتور ضياء العوضي وأحببت أن أشاركك هذا البرنامج ' + APP_URL;
-  var wa = document.getElementById('btn-share-whatsapp'); if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  var wa = document.getElementById('btn-share-whatsapp');
+  if (wa) {
+    wa.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+    wa.addEventListener('click', function() {
+      logActivity('share', 'شارك البرنامج عبر واتساب', 'platform:whatsapp');
+      if (window.__firebaseReady && currentUser) {
+        try {
+          var shareRef = window.__firebaseRef(window.__firebaseDB, 'shares/' + currentUser.username + '/' + Date.now());
+          window.__firebaseSet(shareRef, { platform: 'whatsapp', ts: Date.now(), userId: currentUser.username, userName: currentUser.name || currentUser.username }).catch(function(){});
+        } catch(e) {}
+      }
+    });
+  }
 }
 
 function copyAppLink() {
+  logActivity('share', 'شارك البرنامج بنسخ الرابط', 'platform:copy');
+  if (window.__firebaseReady && currentUser) {
+    try {
+      var shareRef = window.__firebaseRef(window.__firebaseDB, 'shares/' + currentUser.username + '/' + Date.now());
+      window.__firebaseSet(shareRef, { platform: 'copy', ts: Date.now(), userId: currentUser.username, userName: currentUser.name || currentUser.username }).catch(function(){});
+    } catch(e) {}
+  }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(APP_URL).then(function() { showToast('✅ تم نسخ الرابط!'); playSound('success'); }).catch(fallbackCopy);
   } else { fallbackCopy(); }
@@ -3411,9 +3430,10 @@ async function sendAiMessage() {
   var chatWrap = document.getElementById('ai-chat-wrap');
   addAiMsg('user', txt); inp.value = ''; document.getElementById('btn-ai-send').disabled = true; addThink();
   logActivity('question', 'سؤال للذكاء الاصطناعي', txt.substring(0, 200));
-  // حفظ السؤال في مسار questions أيضاً
+  // حفظ السؤال بمفتاح ثابت لنُحدِّثه لاحقاً بالجواب
+  var qKey = Date.now().toString();
   if (window.__firebaseReady && currentUser) {
-    try { window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'questions/' + Date.now()), { userId: currentUser.username, question: txt, ts: Date.now(), type: 'ai' }).catch(function(){}); } catch(e) {}
+    try { window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'questions/' + qKey), { userId: currentUser.username, question: txt, ts: parseInt(qKey), type: 'ai', answer: '' }).catch(function(){}); } catch(e) {}
   }
   var sysPrompt = buildUserContext(), reply = null, usedModel = null, usedSource = null;
   var orKey = window.__OR_KEY_FB;
@@ -3433,6 +3453,12 @@ async function sendAiMessage() {
     }
   }
   removeThink();
+  var finalReply = reply || generateLocalResponse(txt);
+  var replySource = reply ? (usedSource === 'openrouter' ? usedModel.name + ' · OR' : usedModel.name) : 'رد محلي';
+  // تحديث السجل في Firebase بإضافة الجواب
+  if (window.__firebaseReady && currentUser) {
+    try { window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'questions/' + qKey), { userId: currentUser.username, question: txt, ts: parseInt(qKey), type: 'ai', answer: finalReply.replace(/<[^>]*>/g, '').substring(0, 500), model: replySource }).catch(function(){}); } catch(e) {}
+  }
   if (reply) {
     var srcBadge = usedSource === 'openrouter'
       ? '<span class="ai-model-badge or-badge">🌐 ' + usedModel.icon + ' ' + usedModel.name + ' · OR</span>'
