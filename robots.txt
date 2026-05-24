@@ -1,0 +1,94 @@
+# ==============================================================
+# robots.txt - نظام طيبات الصحي
+# https://tayyibat.online/
+# الدكتور ضياء العوضي
+# ==============================================================
+
+# --- Allow all major search engine crawlers ---
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Googlebot-Image
+Allow: /icons/
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 3
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 5
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 5
+
+# --- AI Search Engines & Crawlers ---
+# Google AI / Gemini
+User-agent: Google-Extended
+Allow: /
+
+# OpenAI / ChatGPT Search
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Anthropic Claude
+User-agent: ClaudeBot
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+
+# Microsoft Copilot / Bing AI
+User-agent: bingbot
+Allow: /
+
+# Common AI Indexers
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# --- Allow all by default ---
+User-agent: *
+Allow: /
+
+# --- Block private / system paths ---
+Disallow: /admin/
+Disallow: /firebase/
+Disallow: /config/
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /backup/
+Disallow: /private/
+Disallow: /tmp/
+
+# --- Allow important assets ---
+Allow: /icons/
+Allow: /icons/og-image.png
+Allow: /icons/apple-touch-icon.png
+Allow: /icons/favicon-32.png
+Allow: /manifest.json
+
+# --- Sitemap Location ---
+Sitemap: https://tayyibat.online/sitemap.xml
+
+# --- Host declaration ---
+Host: tayyibat.online
