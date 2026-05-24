@@ -3853,14 +3853,20 @@ window.addEventListener('DOMContentLoaded', function() {
   /* Get internet time via worldtimeapi */
   var _netDate = null;
   var _netDateFetched = false;
+  var _netDateFetchedDay = null; /* اليوم الذي تم فيه جلب الوقت */
 
   function _fetchNetDate(cb) {
-    if (_netDateFetched && _netDate) { cb(_netDate); return; }
+    /* نعيد الجلب إذا: لم يُجلب بعد، أو تغيّر اليوم منذ آخر جلب */
+    var todayLocal = new Date();
+    var todayKey = todayLocal.getFullYear() + '-' + (todayLocal.getMonth()+1) + '-' + todayLocal.getDate();
+    if (_netDateFetched && _netDate && _netDateFetchedDay === todayKey) { cb(_netDate); return; }
+
     fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo')
       .then(function(r){ return r.json(); })
       .then(function(d){
         _netDate = new Date(d.utc_datetime);
         _netDateFetched = true;
+        _netDateFetchedDay = todayKey;
         var el = document.getElementById('drp-sync-status');
         if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
         cb(_netDate);
@@ -3872,6 +3878,7 @@ window.addEventListener('DOMContentLoaded', function() {
           .then(function(d){
             _netDate = new Date(d.dateTime);
             _netDateFetched = true;
+            _netDateFetchedDay = todayKey;
             var el = document.getElementById('drp-sync-status');
             if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
             cb(_netDate);
@@ -3879,6 +3886,7 @@ window.addEventListener('DOMContentLoaded', function() {
           .catch(function(){
             _netDate = new Date(); /* last resort: device time */
             _netDateFetched = true;
+            _netDateFetchedDay = todayKey;
             var el = document.getElementById('drp-sync-status');
             if (el) el.textContent = '⚠️ تعذر المزامنة - يستخدم وقت الجهاز';
             cb(_netDate);
@@ -3886,8 +3894,12 @@ window.addEventListener('DOMContentLoaded', function() {
       });
   }
 
+  /* نستخدم UTC دائماً للتوافق مع API القاهرة (UTC+2) */
   function _todayStr(date) {
-    return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+    /* نحوّل إلى توقيت القاهرة UTC+2 */
+    var cairoOffset = 2 * 60 * 60 * 1000;
+    var cairoDate = new Date(date.getTime() + cairoOffset);
+    return cairoDate.getUTCFullYear() + '-' + (cairoDate.getUTCMonth()+1) + '-' + cairoDate.getUTCDate();
   }
 
   /* ─── مفتاح التخزين مرتبط بالمستخدم الحالي ─── */
@@ -3913,39 +3925,37 @@ window.addEventListener('DOMContentLoaded', function() {
     var state = _getState();
     var today = _todayStr(nowDate);
 
-    if (!state) {
-      /* أول مرة */
-      return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today };
+    if (!state || !state.lastDay) {
+      /* أول مرة أو لا يوجد سجل سابق */
+      return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true };
     }
 
-    var lastDay = state.lastDay || null;
-    var streak  = state.streak  || 0;
+    var lastDay = state.lastDay;
+    var streak  = state.streak || 0;
 
     /* ─ نفس اليوم: تم الاستلام مسبقاً ─ */
     if (lastDay === today) {
-      return { streak: streak, lastDay: lastDay, claimedToday: true, dayIndex: (streak - 1) % 7, todayStr: today };
+      return { streak: streak, lastDay: lastDay, claimedToday: true, dayIndex: (streak - 1) % 7, todayStr: today, canClaim: false };
     }
 
-    /* ─ حساب الفارق بالأيام ─ */
-    if (lastDay) {
-      var last = new Date(lastDay);
-      /* نحسب بداية اليوم فقط (بدون وقت) لتجنب مشاكل التوقيت */
-      var lastMid = Date.UTC(last.getUTCFullYear(), last.getUTCMonth(), last.getUTCDate());
-      var nowMid  = Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), nowDate.getUTCDate());
-      var diff = Math.round((nowMid - lastMid) / 86400000);
+    /* ─ حساب الفارق بالأيام باستخدام نفس دالة _todayStr لضمان الاتساق ─ */
+    var lastParts = lastDay.split('-');
+    var lastMid = Date.UTC(parseInt(lastParts[0]), parseInt(lastParts[1]) - 1, parseInt(lastParts[2]));
+    var todayParts = today.split('-');
+    var nowMid  = Date.UTC(parseInt(todayParts[0]), parseInt(todayParts[1]) - 1, parseInt(todayParts[2]));
+    var diff = Math.round((nowMid - lastMid) / 86400000);
 
-      if (diff === 1) {
-        /* يوم متتالي ✅ - اليوم التالي جاهز */
-        var nextIdx = streak % 7; /* 0-6 */
-        return { streak: streak, lastDay: lastDay, claimedToday: false, dayIndex: nextIdx, todayStr: today, canClaim: true };
-      } else if (diff > 1) {
-        /* فات يوم أو أكثر ❌ - إعادة البداية */
-        return { streak: 0, lastDay: lastDay, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true, wasReset: true };
-      }
+    if (diff === 1) {
+      /* يوم متتالي ✅ - اليوم التالي جاهز */
+      var nextIdx = streak % 7; /* 0-6 */
+      return { streak: streak, lastDay: lastDay, claimedToday: false, dayIndex: nextIdx, todayStr: today, canClaim: true };
+    } else if (diff > 1) {
+      /* فات يوم أو أكثر ❌ - إعادة البداية من اليوم 1 */
+      return { streak: 0, lastDay: lastDay, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true, wasReset: true };
     }
 
-    /* لم يسبق الاستلام قط */
-    return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true };
+    /* diff <= 0: حالة غير طبيعية (ربما تلاعب بالتاريخ) */
+    return { streak: streak, lastDay: lastDay, claimedToday: true, dayIndex: (streak - 1) % 7, todayStr: today, canClaim: false };
   }
 
   /* ─── رسم لوحة الهدايا ─── */
@@ -4029,7 +4039,7 @@ window.addEventListener('DOMContentLoaded', function() {
       var dayIdx    = rs.dayIndex; /* 0-6 */
       var prize     = PRIZES[dayIdx];
 
-      /* حفظ الحالة الجديدة */
+      /* حفظ الحالة الجديدة - نستخدم today من rs لضمان الاتساق مع توقيت القاهرة */
       _saveState({ streak: newStreak, lastDay: rs.todayStr });
 
       /* ─── إضافة وقت الـ PRO فوق الرصيد الحالي (لا استبدال) ─── */
