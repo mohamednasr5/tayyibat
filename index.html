@@ -983,10 +983,21 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
   <div style="padding:12px 16px 0;text-align:center">
     <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(46,201,81,.15),rgba(0,201,167,.1));border-color:rgba(46,201,81,.4)">
-      <i class="fas fa-brain"></i> Puter Vision + Mistral + Z.ai
+      <i class="fas fa-brain"></i> AI Vision - يتعرف على أي طعام أمامه
     </div>
-    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 4px;line-height:1.6">صور علبة المنتج او ادخل المكونات - والذكاء الاصطناعي يحلل فورا</p>
+    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 4px;line-height:1.6">صور أي طعام أو علبة منتج - الذكاء الاصطناعي يتعرف ويحلل فورًا</p>
   </div>
+
+  <!-- Camera Mode Tabs -->
+  <div style="padding:8px 16px 0;display:flex;gap:8px">
+    <button id="scan-tab-product" onclick="setScanMode('product')" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1));color:#2ec951;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+      <i class="fas fa-barcode"></i> مكونات العلبة
+    </button>
+    <button id="scan-tab-food" onclick="setScanMode('food')" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(200,150,12,.3);background:rgba(200,150,12,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+      <i class="fas fa-utensils"></i> التعرف على الطعام
+    </button>
+  </div>
+
   <div style="padding:12px 16px">
     <div class="camera-view-wrap" id="pa-camera-viewport">
       <div class="scanner-laser-line" id="pa-laser" style="display:none"></div>
@@ -1010,9 +1021,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
     <div class="field">
-      <label>المكونات المكتوبة على العلبة</label>
+      <label>المكونات أو اسم الطعام</label>
       <input type="text" id="pa-manual-ingredients"
-        placeholder="مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة"
+        placeholder="مثال: دقيق قمح، سكر... أو: تفاحة، خبز، دجاج..."
         onkeydown="if(event.key==='Enter') analyzeIngredientsTextDirect()">
     </div>
     <div style="display:flex;justify-content:center;margin-bottom:4px">
@@ -1622,6 +1633,10 @@ async function doRegister() {
 function doLogout() {
   clearSession(); currentUser = null; window.isProUser = false;
   document.getElementById('bottom-nav').classList.remove('show');
+  var fab = document.getElementById('daily-reward-fab');
+  if (fab) fab.style.display = 'none';
+  var panel = document.getElementById('daily-reward-panel');
+  if (panel) panel.classList.remove('open');
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.getElementById('auth-page').classList.add('active');
   showToast('👋 تم تسجيل الخروج');
@@ -1643,6 +1658,9 @@ function bootApp() {
   startGreetingSync(); buildAiPage(); setupShareButtons(); checkAdminStatus();
   syncPremiumUIStates();
   document.getElementById('bottom-nav').classList.add('show');
+  var fab = document.getElementById('daily-reward-fab');
+  if (fab) fab.style.display = 'flex';
+  if (typeof window._initDailyRewardBadge === 'function') window._initDailyRewardBadge();
   goPage('home'); hideLoader();
   setTimeout(showWelcomeModal, 600);
   startNotificationsListener();
@@ -1840,10 +1858,12 @@ async function captureAndScanProductBlob() {
   canvas.width  = video.videoWidth  || 640;
   canvas.height = video.videoHeight || 480;
   canvas.getContext("2d").drawImage(video, 0, 0);
-  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري قراءة المنتج...</span></div>';
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري تحليل الصورة بالذكاء الاصطناعي...</span></div>';
 
-  /* BarcodeDetector */
-  if ("BarcodeDetector" in window) {
+  var isFoodMode = (_scanMode === 'food');
+
+  /* BarcodeDetector - only for product mode */
+  if (!isFoodMode && "BarcodeDetector" in window) {
     try {
       var det = new BarcodeDetector({formats:["qr_code","ean_13","ean_8","code_128","code_39","upc_a","upc_e"]});
       var barcodes = await det.detect(canvas);
@@ -1856,17 +1876,29 @@ async function captureAndScanProductBlob() {
     } catch(e) {}
   }
 
-  /* Puter Vision */
+  /* Puter Vision - AI food/product recognition */
   try {
     if (typeof puter !== "undefined" && puter.ai) {
       var imgData = canvas.toDataURL("image/jpeg", 0.85);
-      var vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
-        + "انظر الى الصورة وافعل:\n"
-        + "1. اقرا قائمة المكونات المكتوبة على علبة المنتج.\n"
-        + "2. احكم: مسموح ام ممنوع في الطيبات؟\n"
-        + "3. اذكر المكونات الممنوعة (دجاج/بيض/دقيق ابيض/البان/بقوليات/سكر مكرر/زيوت مهدرجة).\n"
-        + "4. اقترح بديلا ان وجد.\n"
-        + "اذا لم تتضح الصورة اطلب ادخال المكونات يدويا. الرد مختصر لا يتجاوز 120 كلمة.";
+      var vPrompt;
+      if (isFoodMode) {
+        vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
+          + "انظر للصورة وتعرف على الطعام او الشيء الذي امامك (فاكهة، خبز، وجبة، مشروب، اي طعام).\n"
+          + "لا يلزم ان تكون هناك علبة او مكونات مكتوبة - فقط تعرف على ما تراه.\n"
+          + "ثم احكم: هل هو مسموح او ممنوع في نظام الطيبات؟\n"
+          + "نظام الطيبات:\n"
+          + "مسموح: لحم خروف، سمك، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
+          + "ممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات، سكر مكرر، زيوت مهدرجة، خضار نيئة بعض انواعها.\n"
+          + "الرد مختصر 100 كلمة: اذكر ما تراه، ثم الحكم والسبب. بدون **";
+      } else {
+        vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
+          + "انظر الى الصورة وافعل:\n"
+          + "1. اقرا قائمة المكونات المكتوبة على علبة المنتج.\n"
+          + "2. احكم: مسموح ام ممنوع في الطيبات؟\n"
+          + "3. اذكر المكونات الممنوعة (دجاج/بيض/دقيق ابيض/البان/بقوليات/سكر مكرر/زيوت مهدرجة).\n"
+          + "4. اقترح بديلا ان وجد.\n"
+          + "اذا لم تتضح الصورة اطلب ادخال المكونات يدويا. الرد مختصر 120 كلمة بدون **";
+      }
       var res = await puter.ai.chat([
         {role:"user", content:[
           {type:"text", text: vPrompt},
@@ -1880,14 +1912,14 @@ async function captureAndScanProductBlob() {
     }
   } catch(e) {}
 
-  resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">تعذر قراءة الصورة تلقائيا.<br>الرجاء ادخال المكونات في الحقل ادناه.</p>';
+  resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">تعذر قراءة الصورة تلقائيا.<br>الرجاء ادخال اسم الطعام او المكونات في الحقل ادناه.</p>';
 }
 
 async function analyzeIngredientsTextDirect() {
   var input = document.getElementById("pa-manual-ingredients");
   if (!input) return;
   var text = input.value.trim();
-  if (!text) { if (typeof showToast==="function") showToast("ادخل المكونات اولا"); return; }
+  if (!text) { if (typeof showToast==="function") showToast("ادخل المكونات او اسم الطعام اولا"); return; }
   await _scanAnalyzeAI(text);
 }
 
@@ -1896,14 +1928,28 @@ async function _scanAnalyzeAI(ingredients) {
   if (!resBox) return;
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>جاري تحليل المنتج بالذكاء الاصطناعي...</span></div>';
 
-  var prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
-    + "حلل هذه المكونات:\n" + ingredients + "\n\n"
-    + "نظام الطيبات:\n"
-    + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n"
-    + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
-    + "اعطني:\n1. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
-    + "2. المكونات الممنوعة ان وجدت\n3. البديل الصحي ان وجد\n"
-    + "الرد مختصر لا يتجاوز 150 كلمة.";
+  var isFoodMode = (_scanMode === 'food');
+  var prompt;
+
+  if (isFoodMode) {
+    prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
+      + "تعرف على هذا الطعام او المنتج: " + ingredients + "\n\n"
+      + "نظام الطيبات:\n"
+      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
+      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة بعض انواعها، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
+      + "اعطني:\n1. التعريف بهذا الطعام ومكوناته الاساسية\n2. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
+      + "3. السبب\n4. البديل الصحي ان كان ممنوعا\n"
+      + "الرد مختصر لا يتجاوز 150 كلمة. لا تستخدم ** في ردك.";
+  } else {
+    prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
+      + "حلل هذه المكونات:\n" + ingredients + "\n\n"
+      + "نظام الطيبات:\n"
+      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n"
+      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
+      + "اعطني:\n1. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
+      + "2. المكونات الممنوعة ان وجدت\n3. البديل الصحي ان وجد\n"
+      + "الرد مختصر لا يتجاوز 150 كلمة. لا تستخدم ** في ردك.";
+  }
 
   var result = null;
 
@@ -1956,25 +2002,95 @@ async function _scanAnalyzeAI(ingredients) {
   _renderScanResult(result.text, result.source);
 }
 
+/* scan mode: 'product' or 'food' */
+var _scanMode = 'product';
+function setScanMode(mode) {
+  _scanMode = mode;
+  var btnP = document.getElementById('scan-tab-product');
+  var btnF = document.getElementById('scan-tab-food');
+  if (!btnP || !btnF) return;
+  if (mode === 'product') {
+    btnP.style.borderColor = 'rgba(46,201,81,.5)';
+    btnP.style.background = 'linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1))';
+    btnP.style.color = '#2ec951';
+    btnF.style.borderColor = 'rgba(200,150,12,.3)';
+    btnF.style.background = 'rgba(200,150,12,.06)';
+    btnF.style.color = 'var(--txt2)';
+    document.querySelector('#premium-scanner-page label').textContent = 'المكونات المكتوبة على العلبة';
+    document.getElementById('pa-manual-ingredients').placeholder = 'مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة';
+  } else {
+    btnF.style.borderColor = 'rgba(200,150,12,.6)';
+    btnF.style.background = 'linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.08))';
+    btnF.style.color = 'var(--gold2)';
+    btnP.style.borderColor = 'rgba(46,201,81,.2)';
+    btnP.style.background = 'rgba(46,201,81,.04)';
+    btnP.style.color = 'var(--txt2)';
+    document.querySelector('#premium-scanner-page label').textContent = 'اسم الطعام أو المنتج (بدون مكونات)';
+    document.getElementById('pa-manual-ingredients').placeholder = 'مثال: تفاحة، خبز بلدي، برتقالة، بيتزا...';
+  }
+}
+
+function _playForbiddenAlert() {
+  try {
+    var ctx = audioCtx || (audioCtx = new (window.AudioContext||window.webkitAudioContext)());
+    [440,330,220].forEach(function(freq, i) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = 'square';
+      g.gain.setValueAtTime(0.25, ctx.currentTime + i*0.18);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.18 + 0.25);
+      o.start(ctx.currentTime + i*0.18);
+      o.stop(ctx.currentTime + i*0.18 + 0.26);
+    });
+  } catch(e) {}
+}
+
 function _renderScanResult(text, source) {
   var resBox = document.getElementById("pa-scan-result");
   if (!resBox) return;
-  var isForbidden = text.includes("ممنوع") || text.includes("غير مناسب") || text.includes("لا يجوز");
-  var isAllowed   = (text.includes("مسموح") || text.includes("مناسب") || text.includes("جائز")) && !isForbidden;
-  var cls   = isForbidden ? "scan-result-forbidden" : isAllowed ? "scan-result-allowed" : "scan-result-unknown";
-  var icon  = isForbidden ? "fa-times-circle" : isAllowed ? "fa-check-circle" : "fa-exclamation-circle";
-  var color = isForbidden ? "#ef5350" : isAllowed ? "#2ec951" : "#ff9800";
-  var verdict = isForbidden ? "ممنوع في الطيبات" : isAllowed ? "مسموح في الطيبات" : "يحتاج مراجعة";
+
+  /* Strip ** markdown bold from text for clean display */
+  var cleanText = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  var isForbidden = text.includes("ممنوع") || text.includes("غير مناسب") || text.includes("لا يجوز") || text.includes("محظور");
+  var isAllowed   = (text.includes("مسموح") || text.includes("مناسب") || text.includes("جائز") || text.includes("مباح") || text.includes("يناسب")) && !isForbidden;
+  var isStudy     = (!isForbidden && !isAllowed) || text.includes("دراسة") || text.includes("مراجعة") || text.includes("يحتاج") || text.includes("تحت الدراسة");
+
+  var cls, icon, color, verdict, bgColor, borderColor;
+  if (isForbidden) {
+    cls = "scan-result-forbidden";
+    icon = "fa-times-circle";
+    color = "#ef5350";
+    verdict = "ممنوع في الطيبات";
+    bgColor = "rgba(229,57,53,.13)";
+    borderColor = "rgba(229,57,53,.55)";
+    _playForbiddenAlert();
+  } else if (isAllowed) {
+    cls = "scan-result-allowed";
+    icon = "fa-check-circle";
+    color = "#2ec951";
+    verdict = "مسموح في الطيبات";
+    bgColor = "rgba(46,201,81,.12)";
+    borderColor = "rgba(46,201,81,.5)";
+    if (typeof playSoundsuccess === "function") playSoundsuccess();
+  } else {
+    cls = "scan-result-unknown";
+    icon = "fa-exclamation-triangle";
+    color = "#ffa726";
+    verdict = "تحت الدراسة";
+    bgColor = "rgba(255,160,0,.1)";
+    borderColor = "rgba(255,160,0,.5)";
+  }
+
   resBox.innerHTML =
-    '<div class="' + cls + '">'
-    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
-    + '<i class="fas ' + icon + '" style="color:' + color + ';font-size:1.4rem"></i>'
-    + '<strong style="color:' + color + ';font-size:.95rem">' + verdict + '</strong>'
-    + '<span class="scan-ai-badge" style="margin-right:auto">' + (source||"AI") + '</span>'
+    '<div style="background:' + bgColor + ';border:2px solid ' + borderColor + ';border-radius:18px;padding:16px;margin-top:12px;animation:pageIn .4s ease">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid ' + borderColor + '">'
+    + '<i class="fas ' + icon + '" style="color:' + color + ';font-size:2rem;flex-shrink:0"></i>'
+    + '<div style="flex:1"><strong style="color:' + color + ';font-size:1.05rem;display:block">' + verdict + '</strong>'
+    + '<span style="font-size:.68rem;color:var(--txt3)">تم التحليل بواسطة: ' + (source||"AI") + '</span></div>'
     + '</div>'
-    + '<div style="font-size:.82rem;line-height:1.8;color:var(--txt)">' + text.replace(/\n/g,"<br>") + '</div>'
+    + '<div style="font-size:.83rem;line-height:1.9;color:var(--txt)">' + cleanText.replace(/\n/g,"<br>") + '</div>'
     + '</div>';
-  if (typeof playSoundsuccess === "function") playSoundsuccess();
 }
 
 /* ══════════ Tracker Dashboard Logic ══════════ */
@@ -3089,6 +3205,513 @@ window.addEventListener('DOMContentLoaded', function() {
   function _patch() { if(typeof window.goPage==="function"&&window.goPage!==_patched){_orig=window.goPage;window.goPage=_patched;} }
   function _patched(n) { if(_orig) _orig(n); if(n==="ai") initGeminiPage(); }
   if (document.readyState==="loading") { document.addEventListener("DOMContentLoaded",_patch); } else { setTimeout(_patch,500); }
+})();
+</script>
+<!-- ═══════════════ DAILY REWARD SYSTEM ═══════════════ -->
+<style>
+/* Daily Reward Floating Button */
+#daily-reward-fab {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1500;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5c842, #c8960c);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 20px rgba(200,150,12,.5), 0 0 0 0 rgba(200,150,12,.4);
+  animation: fabPulse 2s ease-in-out infinite;
+  transition: transform .3s;
+}
+#daily-reward-fab:hover { transform: translateY(-50%) scale(1.1); }
+@keyframes fabPulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(200,150,12,.5), 0 0 0 0 rgba(200,150,12,.4); }
+  50%      { box-shadow: 0 4px 28px rgba(200,150,12,.7), 0 0 0 10px rgba(200,150,12,0); }
+}
+#daily-reward-fab .fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ef5350;
+  border: 2px solid var(--bg);
+  font-size: .6rem;
+  color: #fff;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Daily Reward Panel */
+#daily-reward-panel {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-120%);
+  z-index: 1600;
+  width: 300px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: linear-gradient(145deg, #0d1e38, #112244);
+  border: 1px solid rgba(200,150,12,.4);
+  border-radius: 20px;
+  padding: 20px 16px 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 0 40px rgba(200,150,12,.15);
+  transition: transform .4s cubic-bezier(.22,1,.36,1);
+  direction: rtl;
+}
+#daily-reward-panel.open {
+  transform: translateY(-50%) translateX(0);
+}
+.drp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(200,150,12,.25);
+}
+.drp-title {
+  font-family: 'Amiri', serif;
+  font-size: 1.05rem;
+  background: linear-gradient(135deg, var(--gold2), var(--gold3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+.drp-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--txt2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  transition: all .2s;
+}
+.drp-close:hover { background: rgba(229,57,53,.2); color: #ef5350; }
+.drp-streak {
+  text-align: center;
+  margin-bottom: 14px;
+  padding: 10px;
+  background: rgba(200,150,12,.08);
+  border-radius: 12px;
+  border: 1px solid rgba(200,150,12,.2);
+}
+.drp-streak-num {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--gold2);
+  line-height: 1;
+}
+.drp-streak-lbl { font-size: .7rem; color: var(--txt3); margin-top: 2px; }
+.drp-day {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  border: 1.5px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.03);
+  transition: all .3s;
+}
+.drp-day.active-day {
+  border-color: rgba(200,150,12,.5);
+  background: linear-gradient(135deg, rgba(200,150,12,.12), rgba(200,150,12,.04));
+  box-shadow: 0 4px 16px rgba(200,150,12,.15);
+}
+.drp-day.claimed-day {
+  border-color: rgba(46,201,81,.3);
+  background: rgba(46,201,81,.06);
+  opacity: .75;
+}
+.drp-day.expired-day {
+  border-color: rgba(229,57,53,.2);
+  background: rgba(229,57,53,.04);
+  opacity: .5;
+}
+.drp-day.locked-day { opacity: .4; }
+.drp-day-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: .85rem;
+  flex-shrink: 0;
+  background: rgba(255,255,255,.06);
+  color: var(--txt2);
+}
+.drp-day.active-day .drp-day-num { background: var(--gold); color: #050e1f; }
+.drp-day.claimed-day .drp-day-num { background: #2ec951; color: #050e1f; }
+.drp-day.expired-day .drp-day-num { background: rgba(229,57,53,.3); color: #ef5350; }
+.drp-day-info { flex: 1; min-width: 0; }
+.drp-day-prize { font-size: .8rem; font-weight: 800; color: var(--txt); }
+.drp-day-status { font-size: .65rem; color: var(--txt3); margin-top: 1px; }
+.drp-claim-btn {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #050e1f;
+  border: none;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: .72rem;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.drp-claim-btn:hover { transform: scale(1.05); }
+.drp-day-7 {
+  border-color: rgba(124,58,237,.5) !important;
+  background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(168,85,247,.06)) !important;
+}
+.drp-day-7.active-day .drp-day-num { background: linear-gradient(135deg, #7c3aed, #a855f7) !important; color: #fff !important; }
+.drp-syncing { font-size: .68rem; color: var(--txt3); text-align: center; margin-top: 8px; }
+
+/* Footer */
+#tayyibat-footer {
+  background: linear-gradient(135deg, rgba(10,22,40,.98), rgba(5,14,31,.98));
+  border-top: 1px solid rgba(200,150,12,.25);
+  padding: 18px 16px;
+  text-align: center;
+  margin-bottom: var(--nav);
+  position: relative;
+  overflow: hidden;
+}
+#tayyibat-footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,150,12,.5), transparent);
+}
+.footer-text {
+  font-family: 'Tajawal', sans-serif;
+  font-size: .82rem;
+  color: var(--txt2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.footer-heart {
+  display: inline-block;
+  color: #ef5350;
+  animation: heartBeat 1.2s ease-in-out infinite;
+  font-size: 1rem;
+}
+@keyframes heartBeat {
+  0%,100% { transform: scale(1); }
+  15%      { transform: scale(1.25); }
+  30%      { transform: scale(1); }
+  45%      { transform: scale(1.15); }
+  60%      { transform: scale(1); }
+}
+.footer-name {
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--gold2), var(--gold3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.footer-fb {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(24,119,242,.15);
+  border: 1px solid rgba(24,119,242,.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  color: #4080ff;
+  text-decoration: none;
+  font-size: .75rem;
+  font-weight: 700;
+  transition: all .3s;
+  margin-top: 6px;
+}
+.footer-fb:hover { background: rgba(24,119,242,.25); transform: scale(1.04); }
+</style>
+
+<!-- Daily Reward FAB (hidden until login) -->
+<button id="daily-reward-fab" onclick="toggleDailyRewardPanel()" title="هديتك اليومية" style="display:none">
+  🎁
+  <span class="fab-badge" id="fab-reward-badge" style="display:none">!</span>
+</button>
+
+<!-- Daily Reward Panel -->
+<div id="daily-reward-panel">
+  <div class="drp-header">
+    <div class="drp-title">🎁 هدايا الحضور اليومي</div>
+    <button class="drp-close" onclick="closeDailyRewardPanel()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="drp-streak">
+    <div class="drp-streak-num" id="drp-streak-count">0</div>
+    <div class="drp-streak-lbl">يوم متتالي</div>
+  </div>
+  <div id="drp-days-list"></div>
+  <div class="drp-syncing" id="drp-sync-status">⏱ يتم مزامنة الوقت مع الإنترنت...</div>
+</div>
+
+<!-- Footer -->
+<div id="tayyibat-footer">
+  <div class="footer-text">
+    <span>برمجة وتطوير بكل</span>
+    <span class="footer-heart">❤️</span>
+    <span class="footer-name">المهندس محمد حماد</span>
+  </div>
+  <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="footer-fb">
+    <i class="fab fa-facebook-f"></i> تواصل معنا
+  </a>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   DAILY REWARD SYSTEM — مستقل تماماً عن باقي الدوال
+   ══════════════════════════════════════════════ */
+(function() {
+  'use strict';
+
+  var PRIZES = [
+    { day: 1, label: '1 ساعة برو مجانية', icon: '⭐' },
+    { day: 2, label: '2 ساعة برو مجانية', icon: '⭐⭐' },
+    { day: 3, label: '3 ساعات برو مجانية', icon: '🌟' },
+    { day: 4, label: '4 ساعات برو مجانية', icon: '💫' },
+    { day: 5, label: '5 ساعات برو مجانية', icon: '🔥' },
+    { day: 6, label: '6 ساعات برو مجانية', icon: '🏅' },
+    { day: 7, label: '7 أيام برو كاملة!', icon: '👑', mega: true }
+  ];
+
+  /* Get internet time via worldtimeapi */
+  var _netDate = null;
+  var _netDateFetched = false;
+
+  function _fetchNetDate(cb) {
+    if (_netDateFetched && _netDate) { cb(_netDate); return; }
+    fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        _netDate = new Date(d.utc_datetime);
+        _netDateFetched = true;
+        var el = document.getElementById('drp-sync-status');
+        if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
+        cb(_netDate);
+      })
+      .catch(function(){
+        /* Fallback: try another time API */
+        fetch('https://timeapi.io/api/Time/current/zone?timeZone=Africa%2FCairo')
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            _netDate = new Date(d.dateTime);
+            _netDateFetched = true;
+            var el = document.getElementById('drp-sync-status');
+            if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
+            cb(_netDate);
+          })
+          .catch(function(){
+            _netDate = new Date(); /* last resort: device time */
+            _netDateFetched = true;
+            var el = document.getElementById('drp-sync-status');
+            if (el) el.textContent = '⚠️ تعذر المزامنة - يستخدم وقت الجهاز';
+            cb(_netDate);
+          });
+      });
+  }
+
+  function _todayStr(date) {
+    return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+  }
+
+  function _getState() {
+    try {
+      var raw = localStorage.getItem('tayyibat_daily_reward_v2');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch(e) { return null; }
+  }
+
+  function _saveState(state) {
+    try { localStorage.setItem('tayyibat_daily_reward_v2', JSON.stringify(state)); } catch(e) {}
+  }
+
+  /* Compute current streak & day index based on net date */
+  function _computeRewardState(nowDate) {
+    var state = _getState();
+    var today = _todayStr(nowDate);
+
+    if (!state) {
+      /* First time ever */
+      return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today };
+    }
+
+    var lastDay = state.lastDay || null;
+    var streak = state.streak || 0;
+    var claimedToday = (lastDay === today);
+
+    if (claimedToday) {
+      return { streak: streak, lastDay: lastDay, claimedToday: true, dayIndex: (streak - 1) % 7, todayStr: today };
+    }
+
+    /* Check if yesterday was the last claimed day */
+    if (lastDay) {
+      var last = new Date(lastDay);
+      var diff = Math.round((nowDate - last) / 86400000);
+      if (diff === 1) {
+        /* Consecutive - next day unlocked */
+        var nextStreak = (streak % 7 === 0 && streak > 0) ? 1 : streak; /* after full 7 reset streak count but keep going */
+        return { streak: streak, lastDay: lastDay, claimedToday: false, dayIndex: streak % 7, todayStr: today, canClaim: true };
+      } else if (diff > 1) {
+        /* Missed a day - reset */
+        return { streak: 0, lastDay: lastDay, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true, wasReset: true };
+      }
+    }
+    /* Never claimed or same day edge */
+    return { streak: 0, lastDay: null, claimedToday: false, dayIndex: 0, todayStr: today, canClaim: true };
+  }
+
+  function _renderPanel(nowDate) {
+    var rs = _computeRewardState(nowDate);
+    var list = document.getElementById('drp-days-list');
+    var streakEl = document.getElementById('drp-streak-count');
+    var badge = document.getElementById('fab-reward-badge');
+
+    if (!list) return;
+    if (streakEl) streakEl.textContent = rs.streak;
+
+    /* Badge: show if can claim */
+    if (badge) badge.style.display = (!rs.claimedToday) ? 'flex' : 'none';
+
+    var html = '';
+    for (var i = 0; i < 7; i++) {
+      var p = PRIZES[i];
+      var isPast = i < rs.dayIndex;
+      var isCurrent = i === rs.dayIndex;
+      var isFuture = i > rs.dayIndex;
+      var cls = 'drp-day';
+      var status = '';
+      var btnHtml = '';
+
+      if (rs.wasReset && !rs.claimedToday && isCurrent) {
+        cls += ' active-day';
+        status = '⚠️ انتهى التسلسل - ابدأ من جديد';
+      } else if (isPast && rs.streak >= (i+1)) {
+        cls += ' claimed-day';
+        status = '✅ تم الاستلام';
+      } else if (isPast && rs.streak < (i+1)) {
+        cls += ' expired-day';
+        status = '❌ منتهي (يوم مفقود)';
+      } else if (isCurrent && rs.claimedToday) {
+        cls += ' claimed-day';
+        status = '✅ استلمت هديتك اليوم!';
+      } else if (isCurrent && !rs.claimedToday) {
+        cls += ' active-day';
+        status = '🎁 اليوم الحالي - اضغط للاستلام';
+        btnHtml = '<button class="drp-claim-btn" onclick="window._claimDailyReward()">استلم</button>';
+      } else {
+        cls += ' locked-day';
+        status = '🔒 قادم';
+      }
+
+      if (i === 6) cls += ' drp-day-7';
+
+      html += '<div class="' + cls + '">'
+        + '<div class="drp-day-num">' + (i+1) + '</div>'
+        + '<div class="drp-day-info">'
+        + '<div class="drp-day-prize">' + p.icon + ' ' + p.label + '</div>'
+        + '<div class="drp-day-status">' + status + '</div>'
+        + '</div>'
+        + btnHtml
+        + '</div>';
+    }
+    list.innerHTML = html;
+  }
+
+  window._claimDailyReward = function() {
+    _fetchNetDate(function(nowDate) {
+      var rs = _computeRewardState(nowDate);
+      if (rs.claimedToday) {
+        if (typeof showToast === 'function') showToast('✅ استلمت هديتك اليوم بالفعل!');
+        return;
+      }
+      var newStreak = rs.streak + 1;
+      var dayIdx = rs.dayIndex;
+      var prize = PRIZES[dayIdx];
+      _saveState({ streak: newStreak, lastDay: rs.todayStr });
+      _renderPanel(nowDate);
+      /* Apply prize - add pro time */
+      if (typeof showToast === 'function') {
+        showToast('🎉 مبروك! حصلت على: ' + prize.label);
+      }
+      /* Grant pro time */
+      var proHours = dayIdx < 6 ? (dayIdx + 1) : 0;
+      var proDays  = dayIdx === 6 ? 7 : 0;
+      var now = Date.now();
+      var proExpiry = proDays > 0
+        ? now + proDays * 86400000
+        : now + proHours * 3600000;
+      try { localStorage.setItem('tayyibat_pro_expiry_bonus', proExpiry.toString()); } catch(e) {}
+      /* Activate pro temporarily */
+      if (typeof window.isProUser !== 'undefined') { window.isProUser = true; }
+      /* Play success sound */
+      try {
+        var ctx2 = audioCtx || (audioCtx = new (window.AudioContext||window.webkitAudioContext)());
+        [523, 659, 784, 1047].forEach(function(freq, i) {
+          var o = ctx2.createOscillator(), g = ctx2.createGain();
+          o.connect(g); g.connect(ctx2.destination);
+          o.frequency.value = freq; o.type = 'sine';
+          g.gain.setValueAtTime(0.3, ctx2.currentTime + i*0.12);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + i*0.12 + 0.3);
+          o.start(ctx2.currentTime + i*0.12);
+          o.stop(ctx2.currentTime + i*0.12 + 0.35);
+        });
+      } catch(e) {}
+    });
+  };
+
+  window.toggleDailyRewardPanel = function() {
+    var panel = document.getElementById('daily-reward-panel');
+    if (!panel) return;
+    if (panel.classList.contains('open')) {
+      panel.classList.remove('open');
+    } else {
+      panel.classList.add('open');
+      var el = document.getElementById('drp-sync-status');
+      if (el) el.textContent = '⏱ يتم مزامنة الوقت مع الإنترنت...';
+      _fetchNetDate(function(nowDate) { _renderPanel(nowDate); });
+    }
+  };
+
+  window.closeDailyRewardPanel = function() {
+    var panel = document.getElementById('daily-reward-panel');
+    if (panel) panel.classList.remove('open');
+  };
+
+  /* Init badge after login - called from bootApp via showDailyRewardFab() */
+  window._initDailyRewardBadge = function() {
+    _fetchNetDate(function(nowDate) {
+      var rs = _computeRewardState(nowDate);
+      var badge = document.getElementById('fab-reward-badge');
+      if (badge && !rs.claimedToday) badge.style.display = 'flex';
+    });
+  };
+
 })();
 </script>
 </body>
