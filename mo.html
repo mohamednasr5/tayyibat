@@ -3,33 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم الإدارية الفاخرة | نظام طيبات الذكي</title>
+  <title>لوحة التحكم الإدارية | نظام طيبات الذكي v2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
-      --gold: #c8960c;
-      --gold2: #f5c842;
-      --bg: #050e1f;
-      --bg2: #0a1628;
-      --bg3: #0f1f3a;
-      --card: #0d1e38;
-      --card2: #112244;
+      --gold: #c8960c; --gold2: #f5c842;
+      --bg: #050e1f; --bg2: #0a1628; --bg3: #0f1f3a;
+      --card: #0d1e38; --card2: #112244;
       --border: #1e3560;
-      --txt: #e8f0fc;
-      --txt2: #8aa4c8;
-      --txt3: #4a6285;
-      --green: #2ec951;
-      --red: #ef5350;
+      --txt: #e8f0fc; --txt2: #8aa4c8; --txt3: #4a6285;
+      --green: #2ec951; --red: #ef5350; --blue: #42a5f5; --purple: #ab47bc;
     }
-    
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: var(--bg); color: var(--txt); font-family: 'Tajawal', sans-serif; min-height: 100vh; overflow-x: hidden; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 25px; }
+    .container { max-width: 1600px; margin: 0 auto; padding: 25px; }
 
-    /* الشاشة الافتتاحية لتسجيل الدخول */
+    /* ═══════ LOGIN ═══════ */
     .login-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, var(--bg2) 0%, var(--bg) 100%); }
     .login-box { width: 100%; max-width: 450px; background: linear-gradient(145deg, var(--card), var(--card2)); border: 2px solid rgba(200,150,12,0.35); border-radius: 24px; padding: 45px 35px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .logo-icon { font-size: 4.5rem; display: block; margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(200,150,12,0.6)); }
@@ -44,352 +36,572 @@
     .btn-login { width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold2)); color: var(--bg); border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.3s; }
     .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(200,150,12,0.4); }
 
-    /* لوحة التحكم الرئيسية */
+    /* ═══════ DASHBOARD ═══════ */
     .dashboard-section { display: none; animation: fadeIn 0.5s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    
+
     .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--border); flex-wrap: wrap; gap: 15px; }
-    .dash-title { font-family: 'Amiri', serif; font-size: 2.2rem; color: var(--gold2); display: flex; align-items: center; gap: 12px; }
-    .header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-    
-    .btn-action { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; border: none; }
+    .dash-title { font-family: 'Amiri', serif; font-size: 2rem; color: var(--gold2); display: flex; align-items: center; gap: 12px; }
+    .header-clock { font-size: 0.9rem; color: var(--txt2); text-align: center; background: var(--card); border: 1px solid var(--border); padding: 10px 18px; border-radius: 12px; min-width: 220px; }
+    .header-clock .clock-time { font-size: 1.6rem; font-weight: 900; color: var(--gold2); font-family: monospace; }
+    .header-clock .clock-date { font-size: 0.78rem; color: var(--txt2); margin-top: 2px; }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-action { padding: 11px 18px; border-radius: 12px; font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; border: none; font-size: 0.88rem; }
     .btn-bcast { background: rgba(33,150,243,0.15); border: 1.5px solid rgba(33,150,243,0.4); color: #64b5f6; }
     .btn-bcast:hover { background: rgba(33,150,243,0.25); }
     .btn-ex { background: rgba(46,201,81,0.15); border: 1.5px solid rgba(46,201,81,0.4); color: var(--green); }
     .btn-ex:hover { background: rgba(46,201,81,0.25); }
     .btn-out { background: rgba(229,57,53,0.15); border: 1.5px solid rgba(229,57,53,0.4); color: var(--red); }
     .btn-out:hover { background: rgba(229,57,53,0.25); }
+    .btn-refresh { background: rgba(200,150,12,0.15); border: 1.5px solid rgba(200,150,12,0.4); color: var(--gold2); }
+    .btn-refresh:hover { background: rgba(200,150,12,0.25); }
 
-    /* كروت الإحصائيات */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 35px; }
-    .stat-card { background: linear-gradient(145deg, var(--card), var(--card2)); border: 1.5px solid var(--border); border-radius: 20px; padding: 25px; text-align: center; position: relative; overflow: hidden; }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--border); }
+    /* ═══════ STATS GRID ═══════ */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: linear-gradient(145deg, var(--card), var(--card2)); border: 1.5px solid var(--border); border-radius: 18px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
     .stat-card.blue::before { background: #2196f3; }
     .stat-card.green::before { background: var(--green); }
     .stat-card.gold::before { background: var(--gold2); }
-    .stat-value { font-size: 2.8rem; font-weight: 900; color: var(--txt); margin: 10px 0 5px; font-family: 'Amiri', serif; }
-    .stat-label { font-size: 0.9rem; color: var(--txt2); font-weight: 700; letter-spacing: 0.5px; }
+    .stat-card.red::before { background: var(--red); }
+    .stat-card.purple::before { background: var(--purple); }
+    .stat-card.cyan::before { background: #26c6da; }
+    .stat-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .stat-value { font-size: 2.4rem; font-weight: 900; color: var(--txt); margin: 4px 0; font-family: 'Amiri', serif; }
+    .stat-label { font-size: 0.78rem; color: var(--txt2); font-weight: 700; }
 
-    /* الفلترة والبحث */
-    .search-filter-row { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-box { flex: 1; min-width: 280px; position: relative; }
-    .search-box input { width: 100%; background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 45px 14px 15px; color: var(--txt); font-family: 'Tajawal', sans-serif; font-size: 0.95rem; outline: none; }
-    .search-box i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--txt3); font-size: 1.1rem; }
-    .filter-dropdown { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 0 15px; color: var(--txt); font-family: 'Tajawal', sans-serif; outline: none; font-size: 0.9rem; min-width: 180px; cursor: pointer; }
+    /* ═══════ LAYOUT ═══════ */
+    .main-layout { display: grid; grid-template-columns: 1fr 420px; gap: 22px; }
+    @media(max-width: 1100px) { .main-layout { grid-template-columns: 1fr; } }
 
-    /* جدول قائمة المستخدمين */
-    .users-section { background: linear-gradient(145deg, var(--card), var(--card2)); border: 1.5px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .section-title { font-size: 1.3rem; font-weight: 800; color: var(--gold2); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    .users-list { display: flex; flex-direction: column; gap: 12px; max-height: 700px; overflow-y: auto; padding-left: 5px; }
-    
-    .user-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; transition: all 0.3s ease; }
-    .user-card:hover { border-color: var(--gold); transform: translateX(-4px); background: rgba(255,255,255,0.04); }
+    /* ═══════ USERS LIST ═══════ */
+    .panel { background: linear-gradient(145deg, var(--card), var(--card2)); border: 1.5px solid var(--border); border-radius: 20px; padding: 22px; }
+    .panel-title { font-size: 1.1rem; font-weight: 800; color: var(--gold2); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+    .panel-title-text { display: flex; align-items: center; gap: 8px; }
+
+    .search-filter-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .search-box { flex: 1; min-width: 220px; position: relative; }
+    .search-box input { width: 100%; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 42px 12px 12px; color: var(--txt); font-family: 'Tajawal', sans-serif; font-size: 0.9rem; outline: none; }
+    .search-box i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--txt3); }
+    .filter-dropdown { background: var(--bg3); border: 1.5px solid var(--border); border-radius: 12px; padding: 0 14px; color: var(--txt); font-family: 'Tajawal', sans-serif; outline: none; font-size: 0.85rem; min-width: 160px; cursor: pointer; height: 46px; }
+
+    .users-list { display: flex; flex-direction: column; gap: 10px; max-height: 680px; overflow-y: auto; padding-left: 4px; }
+    .user-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 15px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: all 0.3s; cursor: pointer; }
+    .user-card:hover { border-color: var(--gold); transform: translateX(-3px); background: rgba(255,255,255,0.04); }
     .user-card.pro-active { border-color: rgba(245,200,66,0.4); background: linear-gradient(135deg, rgba(245,200,66,0.04), rgba(255,255,255,0.01)); }
-    
+    .user-card.selected { border-color: var(--gold2); background: rgba(245,200,66,0.08); box-shadow: 0 0 0 2px rgba(245,200,66,0.2); }
     .user-main { flex: 1; text-align: right; }
-    .user-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
-    .user-name { font-size: 1.05rem; font-weight: 800; color: var(--txt); }
-    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 800; }
+    .user-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+    .user-name { font-size: 1rem; font-weight: 800; color: var(--txt); }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; }
     .badge-pro { background: rgba(245,200,66,0.15); color: var(--gold2); border: 1px solid rgba(245,200,66,0.4); }
     .badge-active { background: rgba(46,201,81,0.15); color: var(--green); }
     .badge-inactive { background: rgba(255,255,255,0.05); color: var(--txt3); border: 1px solid var(--border); }
-    
-    .user-meta { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.78rem; color: var(--txt2); }
-    .user-meta span { display: flex; align-items: center; gap: 5px; }
-    .user-actions { display: flex; gap: 10px; flex-shrink: 0; }
-    
-    .btn-circle { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; transition: all 0.25s; font-size: 0.95rem; }
+    .badge-streak { background: rgba(255,152,0,0.15); color: #ffa726; border: 1px solid rgba(255,152,0,0.35); }
+    .user-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.74rem; color: var(--txt2); }
+    .user-meta span { display: flex; align-items: center; gap: 4px; }
+    .user-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-circle { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; transition: all 0.25s; font-size: 0.9rem; }
     .btn-msg { background: rgba(33,150,243,0.12); color: #64b5f6; border: 1px solid rgba(33,150,243,0.3); }
     .btn-msg:hover { background: rgba(33,150,243,0.25); }
     .btn-open { background: rgba(200,150,12,0.12); color: var(--gold2); border: 1px solid rgba(200,150,12,0.3); }
     .btn-open:hover { background: rgba(200,150,12,0.25); }
+    .btn-del-user { background: rgba(239,83,80,0.1); color: var(--red); border: 1px solid rgba(239,83,80,0.3); }
+    .btn-del-user:hover { background: rgba(239,83,80,0.2); }
 
-    /* النوافذ المنبثقة Modals */
+    /* ═══════ RIGHT PANEL - USER PROFILE ═══════ */
+    .profile-panel { display: flex; flex-direction: column; gap: 16px; }
+    .profile-empty { text-align: center; color: var(--txt3); padding: 40px 20px; font-size: 0.9rem; }
+    .profile-empty i { font-size: 3rem; margin-bottom: 15px; display: block; }
+
+    .profile-header { background: linear-gradient(145deg, var(--card), var(--card2)); border: 1.5px solid var(--border); border-radius: 20px; padding: 22px; text-align: center; position: relative; }
+    .profile-avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold2)); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 12px; box-shadow: 0 0 0 4px rgba(200,150,12,0.25); }
+    .profile-name { font-size: 1.25rem; font-weight: 900; color: var(--txt); }
+    .profile-username { font-size: 0.8rem; color: var(--txt2); margin-bottom: 10px; }
+    .profile-badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .profile-quick-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .pqs-item { background: var(--bg3); border-radius: 10px; padding: 10px 6px; text-align: center; }
+    .pqs-val { font-size: 1.15rem; font-weight: 900; color: var(--gold2); }
+    .pqs-lbl { font-size: 0.65rem; color: var(--txt3); margin-top: 2px; }
+
+    /* countdown timer */
+    .countdown-box { background: linear-gradient(145deg, var(--card), var(--card2)); border: 2px solid rgba(245,200,66,0.3); border-radius: 16px; padding: 18px; text-align: center; }
+    .cd-title { font-size: 0.8rem; font-weight: 800; color: var(--gold2); margin-bottom: 12px; }
+    .cd-expired { color: var(--red); font-weight: 800; font-size: 0.95rem; }
+    .cd-free { color: var(--txt3); font-weight: 700; font-size: 0.9rem; }
+    .cd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .cd-unit { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 4px; text-align: center; }
+    .cd-num { font-size: 1.5rem; font-weight: 900; color: var(--gold2); font-family: monospace; }
+    .cd-lbl { font-size: 0.6rem; color: var(--txt3); margin-top: 2px; }
+    .cd-bar-wrap { margin-top: 12px; background: var(--bg3); border-radius: 8px; height: 8px; overflow: hidden; }
+    .cd-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold2)); border-radius: 8px; transition: width 1s; }
+
+    /* tabs inside profile */
+    .profile-tabs { display: flex; gap: 6px; background: var(--bg3); border-radius: 12px; padding: 5px; margin-bottom: 4px; }
+    .ptab { flex: 1; padding: 9px 4px; border: none; background: transparent; color: var(--txt3); font-family: 'Tajawal', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.25s; text-align: center; }
+    .ptab.active { background: var(--card2); color: var(--gold2); }
+    .ptab-content { display: none; }
+    .ptab-content.active { display: block; }
+
+    /* info rows */
+    .info-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+    .info-row-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+    .info-row-lbl { font-size: 0.7rem; color: var(--txt3); }
+    .info-row-val { font-size: 0.88rem; font-weight: 700; color: var(--txt); }
+
+    /* activity log */
+    .activity-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+    .act-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); }
+    .act-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .act-text { font-size: 0.8rem; color: var(--txt2); flex: 1; line-height: 1.4; }
+    .act-time { font-size: 0.7rem; color: var(--txt3); flex-shrink: 0; }
+
+    /* streak */
+    .streak-row { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .streak-day { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; border: 1px solid var(--border); }
+    .streak-day.done { background: rgba(46,201,81,0.2); border-color: rgba(46,201,81,0.4); color: var(--green); }
+    .streak-day.today { background: rgba(245,200,66,0.2); border-color: var(--gold2); color: var(--gold2); box-shadow: 0 0 8px rgba(245,200,66,0.3); }
+    .streak-day.miss { background: rgba(239,83,80,0.1); border-color: rgba(239,83,80,0.25); color: var(--txt3); }
+
+    /* gifts */
+    .gifts-list { display: flex; flex-direction: column; gap: 8px; }
+    .gift-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(171,71,188,0.25); }
+    .gift-icon { font-size: 1.6rem; }
+    .gift-name { font-size: 0.85rem; font-weight: 800; color: var(--txt); }
+    .gift-date { font-size: 0.72rem; color: var(--txt3); }
+    .no-gifts { text-align: center; color: var(--txt3); font-size: 0.85rem; padding: 20px; }
+
+    /* questions log */
+    .q-item { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+    .q-text { font-size: 0.82rem; color: var(--txt2); line-height: 1.5; margin-bottom: 5px; }
+    .q-meta { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--txt3); }
+    .q-type-badge { padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; }
+
+    /* analysis section */
+    .analysis-block { background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); padding: 14px; margin-bottom: 10px; }
+    .analysis-title { font-size: 0.8rem; font-weight: 800; color: var(--blue); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .analysis-val { font-size: 0.85rem; color: var(--txt2); line-height: 1.6; }
+    .bmi-ring { position: relative; width: 90px; height: 90px; margin: 0 auto 10px; }
+    .bmi-ring svg { transform: rotate(-90deg); }
+    .bmi-ring-val { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; color: var(--txt); }
+    .bmi-ring-lbl { font-size: 0.55rem; color: var(--txt3); }
+
+    /* ═══════ MODALS ═══════ */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
     .modal-overlay.show { display: flex; }
-    .modal-content { background: linear-gradient(145deg, var(--card), var(--card2)); border: 2px solid var(--border); border-radius: 24px; padding: 30px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
-    .modal-close { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.05); border: none; color: var(--gold2); font-size: 1.2rem; cursor: pointer; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .modal-content { background: linear-gradient(145deg, var(--card), var(--card2)); border: 2px solid var(--border); border-radius: 24px; padding: 30px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
+    .modal-close { position: absolute; top: 18px; left: 18px; background: rgba(255,255,255,0.05); border: none; color: var(--gold2); font-size: 1.1rem; cursor: pointer; width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
     .modal-close:hover { background: rgba(255,255,255,0.1); }
-    .modal-title { font-family: 'Amiri', serif; font-size: 1.6rem; color: var(--gold2); margin-bottom: 25px; text-align: center; font-weight: 700; padding-left: 40px; }
+    .modal-title { font-family: 'Amiri', serif; font-size: 1.5rem; color: var(--gold2); margin-bottom: 22px; text-align: center; font-weight: 700; padding-left: 40px; }
 
-    /* تفاصيل المستخدم وتعديل البيانات */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .detail-box { margin-bottom: 15px; }
-    .detail-lbl { font-size: 0.78rem; color: var(--gold2); font-weight: 700; margin-bottom: 5px; display: block; }
-    .detail-val { font-size: 0.92rem; color: var(--txt); background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px; word-break: break-all; min-height: 45px; display: flex; align-items: center; }
-    
-    .form-group { margin-bottom: 16px; text-align: right; }
-    .form-group label { display: block; font-size: 0.78rem; color: var(--gold2); font-weight: 700; margin-bottom: 6px; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; color: var(--txt); font-family: 'Tajawal', sans-serif; font-size: 0.92rem; outline: none; transition: border-color 0.2s; }
+    /* form elements */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .detail-box { margin-bottom: 14px; }
+    .detail-lbl { font-size: 0.75rem; color: var(--gold2); font-weight: 700; margin-bottom: 5px; display: block; }
+    .detail-val { font-size: 0.9rem; color: var(--txt); background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 11px; word-break: break-all; min-height: 42px; display: flex; align-items: center; }
+    .form-group { margin-bottom: 14px; text-align: right; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--gold2); font-weight: 700; margin-bottom: 5px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px; color: var(--txt); font-family: 'Tajawal', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold2); }
-    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-group textarea { min-height: 90px; resize: vertical; }
 
-    /* معالجة كلمات السر */
-    .pwd-wrapper { background: rgba(200,150,12,0.06); border: 1px dashed rgba(200,150,12,0.3); border-radius: 14px; padding: 16px; margin: 15px 0 22px; }
+    .pwd-wrapper { background: rgba(200,150,12,0.06); border: 1px dashed rgba(200,150,12,0.3); border-radius: 14px; padding: 14px; margin: 12px 0 18px; }
     .pwd-row { display: flex; gap: 10px; align-items: center; }
-    .pwd-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--gold2); font-family: monospace; font-size: 1.05rem; outline: none; text-align: center; letter-spacing: 1px; }
-    .btn-copy { background: var(--gold); color: var(--bg); border: none; border-radius: 8px; padding: 11px 18px; cursor: pointer; font-weight: 700; font-family: 'Tajawal', sans-serif; transition: background 0.2s; }
+    .pwd-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--gold2); font-family: monospace; font-size: 1rem; outline: none; text-align: center; letter-spacing: 1px; }
+    .btn-copy { background: var(--gold); color: var(--bg); border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 700; font-family: 'Tajawal', sans-serif; transition: background 0.2s; white-space: nowrap; }
     .btn-copy:hover { background: var(--gold2); }
 
-    /* لوحة تفعيل الـ PRO */
-    .pro-control-card { background: linear-gradient(145deg, rgba(255,193,7,0.06), rgba(255,140,0,0.03)); border: 2px solid rgba(255,193,7,0.3); border-radius: 16px; padding: 20px; margin-bottom: 22px; }
-    .pro-ctrl-title { font-size: 1rem; font-weight: 800; color: #ffc107; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .pro-status-banner { padding: 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; margin-bottom: 15px; text-align: center; border: 1px solid transparent; }
+    .pro-control-card { background: linear-gradient(145deg, rgba(255,193,7,0.06), rgba(255,140,0,0.03)); border: 2px solid rgba(255,193,7,0.3); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+    .pro-ctrl-title { font-size: 0.95rem; font-weight: 800; color: #ffc107; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .pro-status-banner { padding: 11px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; margin-bottom: 12px; text-align: center; border: 1px solid transparent; }
     .pro-status-banner.none { background: rgba(255,255,255,0.03); color: var(--txt2); border-color: var(--border); }
     .pro-status-banner.active { background: rgba(46,201,81,0.12); color: var(--green); border-color: rgba(46,201,81,0.3); }
     .pro-status-banner.expired { background: rgba(229,57,53,0.12); color: var(--red); border-color: rgba(229,57,53,0.3); }
-    .pro-days-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 15px; margin-bottom: 15px; }
-    .pro-days-row label { font-size: 0.82rem; color: var(--gold2); font-weight: 700; white-space: nowrap; }
-    .pro-days-row input { flex: 1; background: transparent; border: none; color: #ffc107; font-size: 1.15rem; font-weight: 800; text-align: center; outline: none; }
+    .pro-days-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; }
+    .pro-days-row label { font-size: 0.8rem; color: var(--gold2); font-weight: 700; white-space: nowrap; }
+    .pro-days-row input { flex: 1; background: transparent; border: none; color: #ffc107; font-size: 1.1rem; font-weight: 800; text-align: center; outline: none; }
     .btn-pro-action { width: 100%; border: none; border-radius: 10px; padding: 12px; font-weight: 800; font-family: 'Tajawal', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.25s; }
     .btn-pro-on { background: linear-gradient(135deg, #ffc107, #ff8c00); color: var(--bg); }
     .btn-pro-on:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,193,7,0.35); }
-    .btn-pro-off { background: rgba(229,57,53,0.12); border: 1px solid rgba(229,57,53,0.35); color: var(--red); margin-top: 10px; }
+    .btn-pro-off { background: rgba(229,57,53,0.12); border: 1px solid rgba(229,57,53,0.35); color: var(--red); margin-top: 8px; }
     .btn-pro-off:hover { background: rgba(229,57,53,0.2); }
 
-    /* الحالات والأمراض */
-    .disease-selector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-    .disease-checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 8px; background: var(--card); border: 1px solid transparent; user-select: none; transition: all 0.2s; }
+    .disease-selector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+    .disease-checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 7px; border-radius: 7px; background: var(--card); border: 1px solid transparent; user-select: none; transition: all 0.2s; }
     .disease-checkbox-label:hover { background: var(--bg3); }
-    .disease-checkbox-label input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--gold2); }
-    .disease-checkbox-label span { font-size: 0.82rem; font-weight: 600; color: var(--txt); }
+    .disease-checkbox-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--gold2); }
+    .disease-checkbox-label span { font-size: 0.78rem; font-weight: 600; color: var(--txt); }
 
-    /* نافذة الحالات والشهادات المرضية */
-    .experiences-wrapper { background: rgba(46,201,81,0.03); border: 1.5px solid rgba(46,201,81,0.25); border-radius: 16px; padding: 20px; margin-bottom: 22px; }
-    .exp-section-header { font-size: 1rem; font-weight: 800; color: var(--green); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    .exp-scroll-area { display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; margin-bottom: 15px; }
-    .exp-item-node { background: var(--bg3); border: 1px solid rgba(46,201,81,0.2); border-radius: 12px; padding: 14px; text-align: right; }
-    .exp-node-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.72rem; }
+    .experiences-wrapper { background: rgba(46,201,81,0.03); border: 1.5px solid rgba(46,201,81,0.25); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+    .exp-section-header { font-size: 0.95rem; font-weight: 800; color: var(--green); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .exp-scroll-area { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; margin-bottom: 12px; }
+    .exp-item-node { background: var(--bg3); border: 1px solid rgba(46,201,81,0.2); border-radius: 10px; padding: 12px; text-align: right; }
+    .exp-node-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.7rem; }
     .exp-node-disease { color: var(--green); font-weight: 800; background: rgba(46,201,81,0.1); padding: 2px 8px; border-radius: 6px; }
     .exp-node-date { color: var(--txt3); }
-    .exp-node-content { font-size: 0.85rem; color: var(--txt2); line-height: 1.6; white-space: pre-wrap; }
-    .exp-node-controls { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-start; }
-    .btn-node-sub { padding: 4px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: none; font-family: 'Tajawal', sans-serif; }
+    .exp-node-content { font-size: 0.82rem; color: var(--txt2); line-height: 1.5; white-space: pre-wrap; }
+    .exp-node-controls { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-start; }
+    .btn-node-sub { padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; border: none; font-family: 'Tajawal', sans-serif; }
     .btn-node-edit { background: rgba(200,150,12,0.15); color: var(--gold2); }
     .btn-node-del { background: rgba(229,57,53,0.15); color: var(--red); }
-    .exp-panel-form { background: rgba(200,150,12,0.04); border: 1px solid rgba(200,150,12,0.15); border-radius: 12px; padding: 14px; margin-bottom: 15px; display: none; }
+    .exp-panel-form { background: rgba(200,150,12,0.04); border: 1px solid rgba(200,150,12,0.15); border-radius: 10px; padding: 12px; margin-bottom: 12px; display: none; }
     .exp-panel-form.show { display: block; }
 
-    /* التنبيهات والتوست */
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(5,14,31,0.98); border: 1px solid var(--gold); color: var(--txt); padding: 12px 28px; border-radius: 50px; z-index: 9999; backdrop-filter: blur(15px); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; font-size: 0.9rem; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .edit-section { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .edit-title { font-size: 0.95rem; font-weight: 800; color: var(--txt2); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .save-btn { width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold2)); color: var(--bg); border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
+    .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(200,150,12,0.35); }
+
+    .msg-modal-content { max-width: 500px; }
+
+    /* ═══════ TOAST ═══════ */
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(5,14,31,0.98); border: 1px solid var(--gold); color: var(--txt); padding: 12px 28px; border-radius: 50px; z-index: 9999; backdrop-filter: blur(15px); opacity: 0; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); pointer-events: none; font-size: 0.88rem; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+    .add-gift-row { display: flex; gap: 8px; }
+    .add-gift-row input { flex: 1; }
+    .add-gift-row button { background: var(--green); color: #000; border: none; border-radius: 8px; padding: 0 14px; font-weight: 800; cursor: pointer; font-family: 'Tajawal', sans-serif; }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .no-data-msg { text-align: center; color: var(--txt3); padding: 20px; font-size: 0.85rem; }
+    .act-filter-btn { padding: 5px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--txt3); font-family: 'Tajawal', sans-serif; transition: all 0.2s; }
+    .act-filter-btn.active, .act-filter-btn:hover { background: rgba(200,150,12,0.15); border-color: rgba(200,150,12,0.4); color: var(--gold2); }
+    .act-type-login { border-color: rgba(46,201,81,0.3) !important; }
+    .act-type-question { border-color: rgba(66,165,245,0.3) !important; }
+    .act-type-input { border-color: rgba(255,167,38,0.3) !important; }
+    .act-type-analysis { border-color: rgba(171,71,188,0.3) !important; }
+    .act-type-navigation { border-color: rgba(38,198,218,0.3) !important; }
+    .act-detail { font-size: 0.75rem; color: var(--txt3); margin-top: 3px; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 4px 8px; word-break: break-all; }
   </style>
 </head>
 <body>
-
 <div class="container">
 
+  <!-- ═══════════════ LOGIN ═══════════════ -->
   <div class="login-section" id="loginSection">
     <div class="login-box">
       <span class="logo-icon">🌿</span>
       <div class="logo-title">طيبات</div>
-      <div class="logo-subtitle">منظومة الإدارة الذكية والتحكم الفاخر</div>
+      <div class="logo-subtitle">مركز القيادة والرقابة الذكية</div>
       <div class="error-msg" id="loginError"></div>
       <div class="input-group">
         <label>مفتاح التشفير الإداري</label>
         <input type="password" id="passInput" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')loginAdmin()">
       </div>
+      <div class="input-group">
+        <label id="sqLabel" style="color:var(--txt2);font-size:0.78rem;">🔐 رمز التحقق الثانوي</label>
+        <input type="password" id="sqInput" placeholder="••••" maxlength="4" onkeydown="if(event.key==='Enter')loginAdmin()" autocomplete="off" style="letter-spacing:6px;text-align:center;font-size:1.2rem;">
+      </div>
       <button class="btn-login" onclick="loginAdmin()"><i class="fas fa-unlock-alt"></i> فتح لوحة التحكم</button>
     </div>
   </div>
 
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
   <div class="dashboard-section" id="dashboardSection">
     <div class="dash-header">
-      <div class="dash-title"><i class="fas fa-chart-pie"></i> غطاء التحكم السحابي الرئيسي</div>
+      <div class="dash-title"><i class="fas fa-chart-network"></i> مركز القيادة والرقابة — طيبات</div>
+      <div class="header-clock">
+        <div class="clock-time" id="liveClock">--:--:--</div>
+        <div class="clock-date" id="liveDate">--</div>
+      </div>
       <div class="header-actions">
-        <button class="btn-action btn-ex" onclick="exportUsersExcel()"><i class="fas fa-file-excel"></i> تصدير البيانات الشاملة (Excel)</button>
-        <button class="btn-action btn-bcast" onclick="openBroadcastModal()"><i class="fas fa-broadcast-tower"></i> بث إشعار عام للجميع</button>
-        <button class="btn-action btn-out" onclick="logoutAdmin()"><i class="fas fa-power-off"></i> خروج آمن</button>
+        <button class="btn-action btn-refresh" onclick="loadAndFixAllUsers()"><i class="fas fa-sync-alt"></i> تحديث</button>
+        <button class="btn-action btn-ex" onclick="exportUsersExcel()"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+        <button class="btn-action btn-bcast" onclick="openBroadcastModal()"><i class="fas fa-broadcast-tower"></i> بث عام</button>
+        <button class="btn-action btn-out" onclick="logoutAdmin()"><i class="fas fa-power-off"></i> خروج</button>
       </div>
     </div>
 
+    <!-- STATS -->
     <div class="stats-grid">
-      <div class="stat-card blue"><div class="stat-label">المستندات الغذائية الكلية</div><div class="stat-value" id="totalCount">0</div></div>
-      <div class="stat-card green"><div class="stat-label">المتصلون بالمنظومة (خلال 24 س)</div><div class="stat-value" id="activeCount">0</div></div>
-      <div class="stat-card gold"><div class="stat-label">الحسابات المطورة النشطة Pro</div><div class="stat-value" id="proCount">0</div></div>
+      <div class="stat-card blue"><div class="stat-icon">👥</div><div class="stat-value" id="totalCount">0</div><div class="stat-label">إجمالي المستخدمين</div></div>
+      <div class="stat-card green"><div class="stat-icon">🟢</div><div class="stat-value" id="activeCount">0</div><div class="stat-label">نشطون خلال 24 ساعة</div></div>
+      <div class="stat-card gold"><div class="stat-icon">👑</div><div class="stat-value" id="proCount">0</div><div class="stat-label">مشتركو Pro النشطين</div></div>
+      <div class="stat-card red"><div class="stat-icon">⌛</div><div class="stat-value" id="expiredCount">0</div><div class="stat-label">منتهو الاشتراك</div></div>
+      <div class="stat-card purple"><div class="stat-icon">🎁</div><div class="stat-value" id="giftsCount">0</div><div class="stat-label">إجمالي الهدايا الممنوحة</div></div>
+      <div class="stat-card cyan"><div class="stat-icon">🔥</div><div class="stat-value" id="streakCount">0</div><div class="stat-label">أعلى سلسلة حضور (أيام)</div></div>
     </div>
 
-    <div class="users-section">
-      <div class="section-title"><i class="fas fa-database"></i> تصفية وتفتيش جزيئات المستخدمين</div>
-      <div class="search-filter-row">
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" id="userSearchInput" placeholder="ابحث باسم الحساب، الاسم الكامل، أو رقم الجوال المعرف..." oninput="handleFilterAndSearch()">
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+
+      <!-- LEFT: Users List -->
+      <div class="panel">
+        <div class="panel-title">
+          <div class="panel-title-text"><i class="fas fa-database"></i> سجل المستخدمين</div>
+          <span id="filteredCount" style="font-size:0.8rem; color:var(--txt3); font-weight:600;"></span>
         </div>
-        <select class="filter-dropdown" id="statusFilter" onchange="handleFilterAndSearch()">
-          <option value="all">كل الحالات والحسابات</option>
-          <option value="active">الأعضاء النشطون حالياً</option>
-          <option value="pro">باقة الأعضاء المطورين Pro</option>
-          <option value="sugar">تشخيص: مرض السكري</option>
-          <option value="pressure">تشخيص: ضغط الدم المرتفع</option>
-          <option value="allergy">تشخيص: الحساسية والمناعة</option>
-        </select>
+        <div class="search-filter-row">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="userSearchInput" placeholder="ابحث بالاسم، الكود، الجوال..." oninput="handleFilterAndSearch()">
+          </div>
+          <select class="filter-dropdown" id="statusFilter" onchange="handleFilterAndSearch()">
+            <option value="all">كل الحسابات</option>
+            <option value="active">نشطون الآن</option>
+            <option value="pro">مشتركو Pro</option>
+            <option value="expired">منتهي الاشتراك</option>
+            <option value="streak">لديهم سلسلة حضور</option>
+            <option value="gifts">لديهم هدايا</option>
+            <option value="sugar">مرض السكري</option>
+            <option value="pressure">ارتفاع الضغط</option>
+            <option value="allergy">الحساسية</option>
+          </select>
+        </div>
+        <div class="users-list" id="usersList"></div>
       </div>
-      <div class="users-list" id="usersList"></div>
-    </div>
-  </div>
-</div>
 
+      <!-- RIGHT: Profile Panel -->
+      <div class="profile-panel" id="profilePanel">
+        <div class="panel" style="flex:1">
+          <div id="profileEmpty" class="profile-empty">
+            <i class="fas fa-user-circle"></i>
+            اختر مستخدماً من القائمة لعرض ملفه الكامل
+          </div>
+          <div id="profileContent" style="display:none">
+
+            <!-- Header -->
+            <div class="profile-header" style="margin-bottom:16px; padding:18px;">
+              <div class="profile-avatar" id="pAvatar">👤</div>
+              <div class="profile-name" id="pName">-</div>
+              <div class="profile-username" id="pUsername">-</div>
+              <div class="profile-badges" id="pBadges"></div>
+              <div class="profile-quick-stats">
+                <div class="pqs-item"><div class="pqs-val" id="pqsStreak">0</div><div class="pqs-lbl">🔥 يوم متتالي</div></div>
+                <div class="pqs-item"><div class="pqs-val" id="pqsQuestions">0</div><div class="pqs-lbl">❓ سؤال مُرسَل</div></div>
+                <div class="pqs-item"><div class="pqs-val" id="pqsAnalyses">0</div><div class="pqs-lbl">🔬 تحليل طلبه</div></div>
+              </div>
+            </div>
+
+            <!-- Countdown -->
+            <div class="countdown-box" id="countdownBox" style="margin-bottom:16px;">
+              <div class="cd-title">⏳ العداد التنازلي لانتهاء الاشتراك</div>
+              <div id="cdContent"></div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="profile-tabs">
+              <button class="ptab active" onclick="switchTab('info',this)">📋 بيانات</button>
+              <button class="ptab" onclick="switchTab('activity',this)">📅 نشاط</button>
+              <button class="ptab" onclick="switchTab('questions',this)">❓ أسئلة</button>
+              <button class="ptab" onclick="switchTab('gifts',this)">🎁 هدايا</button>
+              <button class="ptab" onclick="switchTab('analysis',this)">🔬 تحليل</button>
+            </div>
+
+            <!-- Tab: Info -->
+            <div class="ptab-content active" id="tab-info">
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(200,150,12,0.15);color:var(--gold2)"><i class="fas fa-phone"></i></div><div><div class="info-row-lbl">رقم الهاتف</div><div class="info-row-val" id="iPhone">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(33,150,243,0.15);color:var(--blue)"><i class="fas fa-birthday-cake"></i></div><div><div class="info-row-lbl">تاريخ الميلاد / العمر</div><div class="info-row-val" id="iDOB">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(46,201,81,0.15);color:var(--green)"><i class="fas fa-weight"></i></div><div><div class="info-row-lbl">الوزن / الطول / BMI</div><div class="info-row-val" id="iWHB">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(171,71,188,0.15);color:var(--purple)"><i class="fas fa-calendar-plus"></i></div><div><div class="info-row-lbl">تاريخ التسجيل</div><div class="info-row-val" id="iCreated">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(239,83,80,0.15);color:var(--red)"><i class="fas fa-clock"></i></div><div><div class="info-row-lbl">آخر دخول (التاريخ والوقت)</div><div class="info-row-val" id="iLastLogin">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(200,150,12,0.15);color:var(--gold2)"><i class="fas fa-smoking"></i></div><div><div class="info-row-lbl">التدخين</div><div class="info-row-val" id="iSmoking">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(239,83,80,0.15);color:var(--red)"><i class="fas fa-heartbeat"></i></div><div><div class="info-row-lbl">الأمراض المسجلة</div><div class="info-row-val" id="iDiseases">-</div></div></div>
+              <div class="info-row"><div class="info-row-icon" style="background:rgba(33,150,243,0.15);color:var(--blue)"><i class="fas fa-key"></i></div><div><div class="info-row-lbl">كلمة المرور المفككة</div><div class="info-row-val" id="iPassword" style="font-family:monospace;color:var(--gold2)">-</div></div></div>
+              <button style="width:100%;margin-top:12px;background:rgba(200,150,12,0.12);border:1.5px solid rgba(200,150,12,0.35);color:var(--gold2);border-radius:10px;padding:10px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;" onclick="openUserModal(selectedUserId)"><i class="fas fa-edit"></i> تعديل البيانات الكاملة</button>
+              <button style="width:100%;margin-top:8px;background:rgba(33,150,243,0.12);border:1.5px solid rgba(33,150,243,0.35);color:var(--blue);border-radius:10px;padding:10px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;" onclick="openMsgModal(selectedUserId, selectedUserName)"><i class="fas fa-paper-plane"></i> إرسال رسالة خاصة</button>
+            </div>
+
+            <!-- Tab: Activity -->
+            <div class="ptab-content" id="tab-activity">
+              <div style="margin-bottom:14px;">
+                <div style="font-size:0.8rem;font-weight:800;color:var(--txt2);margin-bottom:8px;">🔥 سلسلة الحضور اليومي (آخر 14 يوم)</div>
+                <div class="streak-row" id="streakCalendar"></div>
+              </div>
+              <hr class="section-divider">
+              <!-- sub-filter -->
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+                <button class="act-filter-btn active" onclick="filterActivityLog('all',this)">🗂️ الكل</button>
+                <button class="act-filter-btn" onclick="filterActivityLog('login',this)">🔑 دخول</button>
+                <button class="act-filter-btn" onclick="filterActivityLog('question',this)">❓ أسئلة</button>
+                <button class="act-filter-btn" onclick="filterActivityLog('input',this)">✏️ إدخالات</button>
+                <button class="act-filter-btn" onclick="filterActivityLog('analysis',this)">🔬 تحليلات</button>
+                <button class="act-filter-btn" onclick="filterActivityLog('navigation',this)">📱 تنقل</button>
+              </div>
+              <div class="activity-list" id="activityLog"></div>
+            </div>
+
+            <!-- Tab: Questions -->
+            <div class="ptab-content" id="tab-questions">
+              <div style="font-size:0.8rem;font-weight:800;color:var(--txt2);margin-bottom:10px;">❓ الأسئلة والاستشارات التي أرسلها للبرنامج</div>
+              <div id="questionsList"><div class="no-data-msg">لا توجد أسئلة مسجلة لهذا المستخدم</div></div>
+            </div>
+
+            <!-- Tab: Gifts -->
+            <div class="ptab-content" id="tab-gifts">
+              <div style="font-size:0.8rem;font-weight:800;color:var(--purple);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><i class="fas fa-gift"></i> الهدايا الممنوحة للمستخدم</div>
+              <div class="gifts-list" id="giftsList"></div>
+              <hr class="section-divider">
+              <div style="font-size:0.78rem;font-weight:800;color:var(--txt2);margin-bottom:8px;">➕ منح هدية جديدة</div>
+              <div class="form-group">
+                <label>نوع الهدية</label>
+                <select id="giftType">
+                  <option value="🎁 هدية ترحيب">🎁 هدية ترحيب</option>
+                  <option value="👑 اشتراك Pro مجاني">👑 اشتراك Pro مجاني</option>
+                  <option value="🌟 نجمة إنجاز">🌟 نجمة إنجاز</option>
+                  <option value="🏆 جائزة الحضور المتواصل">🏆 جائزة الحضور المتواصل</option>
+                  <option value="💎 عضوية VIP">💎 عضوية VIP</option>
+                  <option value="🎉 هدية عيد ميلاد">🎉 هدية عيد ميلاد</option>
+                  <option value="custom">🖊️ مخصص...</option>
+                </select>
+              </div>
+              <div class="form-group" id="customGiftWrap" style="display:none;"><label>اسم الهدية المخصصة</label><input type="text" id="customGiftName" placeholder="اكتب اسم الهدية..."></div>
+              <button class="btn-pro-action" style="background:linear-gradient(135deg,#6a1b9a,var(--purple));color:#fff;" onclick="grantGift()"><i class="fas fa-gift"></i> منح الهدية الآن</button>
+            </div>
+
+            <!-- Tab: Analysis -->
+            <div class="ptab-content" id="tab-analysis">
+              <div class="analysis-block">
+                <div class="analysis-title"><i class="fas fa-weight"></i> تحليل مؤشر كتلة الجسم (BMI)</div>
+                <div class="bmi-ring" id="bmiRing">
+                  <svg width="90" height="90" viewBox="0 0 90 90">
+                    <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+                    <circle id="bmiArc" cx="45" cy="45" r="38" fill="none" stroke="#ffc107" stroke-width="10" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239"/>
+                  </svg>
+                  <div class="bmi-ring-val"><span id="bmiVal">--</span><span class="bmi-ring-lbl" id="bmiLbl">BMI</span></div>
+                </div>
+                <div class="analysis-val" id="bmiAnalysis" style="text-align:center;"></div>
+              </div>
+              <div class="analysis-block">
+                <div class="analysis-title"><i class="fas fa-chart-bar"></i> إحصائيات الاستخدام</div>
+                <div class="analysis-val" id="usageStats"></div>
+              </div>
+              <div class="analysis-block">
+                <div class="analysis-title"><i class="fas fa-notes-medical"></i> ملخص الحالة الصحية</div>
+                <div class="analysis-val" id="healthSummary"></div>
+              </div>
+            </div>
+
+          </div><!-- /profileContent -->
+        </div>
+      </div>
+
+    </div><!-- /main-layout -->
+  </div><!-- /dashboardSection -->
+</div><!-- /container -->
+
+<!-- ═══════ MODAL: User Edit ═══════ -->
 <div class="modal-overlay" id="userModal">
   <div class="modal-content">
     <button class="modal-close" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button>
     <div class="modal-title" id="modalTitle">تحليل ملف الحساب</div>
-
-    <div class="grid-2">
-      <div class="detail-box"><span class="detail-lbl">الاسم المعتمد بالهوية</span><div class="detail-val" id="dName">-</div></div>
-      <div class="detail-box"><span class="detail-lbl">اسم المستخدم الفريد (Username)</span><div class="detail-val" id="dUsername">-</div></div>
-    </div>
-    <div class="grid-2">
-      <div class="detail-box"><span class="detail-lbl">الوزن / الطول الحالي</span><div class="detail-val" id="dWH">-</div></div>
-      <div class="detail-box"><span class="detail-lbl">مؤشر كتلة الجسم / تاريخ التسجيل الرسمي</span><div class="detail-val" id="dBmiCreated">-</div></div>
-    </div>
-
     <div class="pwd-wrapper">
-      <span class="detail-lbl" style="margin-bottom:8px; text-align:right;"><i class="fas fa-key"></i> استخراج فك التشفير لكلمة المرور</span>
+      <span class="detail-lbl" style="margin-bottom:8px;text-align:right;"><i class="fas fa-key"></i> كلمة المرور المفككة</span>
       <div class="pwd-row">
         <input type="text" class="pwd-input" id="passDisplay" readonly>
-        <button class="btn-copy" onclick="copyPass()"><i class="fas fa-copy"></i> نسخ كود السر</button>
+        <button class="btn-copy" onclick="copyPass()"><i class="fas fa-copy"></i> نسخ</button>
       </div>
     </div>
-
     <div class="pro-control-card">
-      <div class="pro-ctrl-title"><i class="fas fa-gem"></i> رتبة الحساب وفترة الاشتراك المطور</div>
+      <div class="pro-ctrl-title"><i class="fas fa-gem"></i> إدارة اشتراك Pro</div>
       <div class="pro-status-banner none" id="proStatusBox">-</div>
       <div class="pro-days-row">
-        <label><i class="fas fa-hourglass-half"></i> تمديد الصلاحية بفترة أيام محددة:</label>
+        <label><i class="fas fa-hourglass-half"></i> عدد الأيام:</label>
         <input type="number" id="proDaysInput" value="30" min="1" max="3650">
       </div>
-      <button class="btn-pro-action btn-pro-on" onclick="activatePro()"><i class="fas fa-check-circle"></i> منح وتفعيل ترقية الـ PRO الفورية</button>
-      <button class="btn-pro-action btn-pro-off" id="btnDeactivate" onclick="deactivatePro()"><i class="fas fa-minus-circle"></i> إسقاط الاشتراك الفاخر وإعادته للمجاني</button>
+      <button class="btn-pro-action btn-pro-on" onclick="activatePro()"><i class="fas fa-check-circle"></i> منح وتفعيل Pro</button>
+      <button class="btn-pro-action btn-pro-off" id="btnDeactivate" onclick="deactivatePro()"><i class="fas fa-minus-circle"></i> إلغاء الاشتراك</button>
     </div>
-
     <div class="experiences-wrapper">
-      <div class="exp-section-header"><i class="fas fa-notes-medical"></i> الحالات الطبية وشهادات المريض المنشورة</div>
+      <div class="exp-section-header"><i class="fas fa-notes-medical"></i> شهادات وتجارب المريض</div>
       <div class="exp-scroll-area" id="expList"></div>
-
       <div class="exp-panel-form" id="expEditForm">
-        <div class="form-group">
-          <label>تصنيف الحالة المرضية المشفية</label>
+        <div class="form-group"><label>تصنيف الحالة</label>
           <select id="editExpDisease">
-            <option value="السكري">🧠 مرض السكري وضبط الجلوكوز</option>
-            <option value="ارتفاع الضغط">💉 ارتفاع الضغط المتوازن</option>
-            <option value="الحساسية">🌸 ترميم الحساسية والجهاز الهضمي</option>
-            <option value="علاج كيماوي">⚕️ مرافقة بروتوكولات الكيماوي</option>
-            <option value="أمراض القلب">❤️ صمامات وشرايين القلب</option>
-            <option value="أمراض الكلى">🫁 كفاءة الفلترة الكلوية</option>
-            <option value="إنقاص الوزن">⚖️ الإنزلاق السريع للوزن المثالي</option>
-            <option value="أخرى">📝 متلازمات وأعراض مخصصة أخرى</option>
+            <option value="السكري">🧠 السكري</option><option value="ارتفاع الضغط">💉 الضغط</option>
+            <option value="الحساسية">🌸 الحساسية</option><option value="علاج كيماوي">⚕️ كيماوي</option>
+            <option value="أمراض القلب">❤️ القلب</option><option value="أمراض الكلى">🫁 الكلى</option>
+            <option value="إنقاص الوزن">⚖️ الوزن</option><option value="أخرى">📝 أخرى</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>النص العلاجي التفصيلي للتجربة</label>
-          <textarea id="editExpDetails"></textarea>
-        </div>
-        <div style="display:flex; gap:10px">
-          <button style="flex:1; background:var(--gold); color:var(--bg); border:none; border-radius:10px; padding:12px; font-weight:800; cursor:pointer;" onclick="saveExpEdit()"><i class="fas fa-save"></i> حفظ التعديل للمجتمع</button>
-          <button style="flex:1; background:rgba(255,255,255,0.06); color:var(--txt2); border:1px solid var(--border); border-radius:10px; padding:12px; font-weight:700; cursor:pointer;" onclick="cancelExpEdit()">تراجع</button>
+        <div class="form-group"><label>النص التفصيلي</label><textarea id="editExpDetails"></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button style="flex:1;background:var(--gold);color:var(--bg);border:none;border-radius:10px;padding:11px;font-weight:800;cursor:pointer;" onclick="saveExpEdit()"><i class="fas fa-save"></i> حفظ</button>
+          <button style="flex:1;background:rgba(255,255,255,0.06);color:var(--txt2);border:1px solid var(--border);border-radius:10px;padding:11px;font-weight:700;cursor:pointer;" onclick="cancelExpEdit()">تراجع</button>
         </div>
       </div>
-
-      <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:5px;">
-        <div style="font-size:0.85rem; font-weight:700; color:var(--green); margin-bottom:10px;"><i class="fas fa-plus"></i> حقن وتدوين تجربة استشفاء معتمدة للمريض</div>
-        <div class="form-group">
-          <label>المرض الأساسي المستهدف</label>
+      <div style="border-top:1px solid var(--border);padding-top:13px;margin-top:5px;">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--green);margin-bottom:8px;"><i class="fas fa-plus"></i> إضافة تجربة جديدة</div>
+        <div class="form-group"><label>المرض</label>
           <select id="addExpDisease">
-            <option value="">-- اختر الحالة --</option>
-            <option value="السكري">🧠 مرض السكري</option>
-            <option value="ارتفاع الضغط">💉 ارتفاع الضغط</option>
-            <option value="الحساسية">🌸 الحساسية</option>
-            <option value="علاج كيماوي">⚕️ علاج كيماوي</option>
-            <option value="أمراض القلب">❤️ أمراض القلب</option>
-            <option value="أمراض الكلى">🫁 أمراض الكلى</option>
-            <option value="إنقاص الوزن">⚖️ إنقاص الوزن</option>
-            <option value="أخرى">📝 أخرى</option>
+            <option value="">-- اختر --</option>
+            <option value="السكري">🧠 السكري</option><option value="ارتفاع الضغط">💉 الضغط</option>
+            <option value="الحساسية">🌸 الحساسية</option><option value="علاج كيماوي">⚕️ كيماوي</option>
+            <option value="أمراض القلب">❤️ القلب</option><option value="أمراض الكلى">🫁 الكلى</option>
+            <option value="إنقاص الوزن">⚖️ الوزن</option><option value="أخرى">📝 أخرى</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>نص التقرير والاستفادة الفعلي</label>
-          <textarea id="addExpDetails" placeholder="اكتب القصة العلاجية والتفاصيل هنا..."></textarea>
-        </div>
-        <button class="btn-pro-action" style="background: linear-gradient(135deg, #1a7a2e, var(--green)); color:#fff;" onclick="adminAddExperience()"><i class="fas fa-check"></i> اعتماد ونشر التجربة الطبية سحابياً</button>
+        <div class="form-group"><label>التفاصيل</label><textarea id="addExpDetails" placeholder="اكتب التجربة هنا..."></textarea></div>
+        <button class="btn-pro-action" style="background:linear-gradient(135deg,#1a7a2e,var(--green));color:#fff;" onclick="adminAddExperience()"><i class="fas fa-check"></i> نشر التجربة</button>
       </div>
     </div>
-
     <div class="edit-section">
-      <div class="edit-title"><i class="fas fa-sliders-h"></i> التجاوز والتعديل الجذري لبيانات البنية الحيوية</div>
+      <div class="edit-title"><i class="fas fa-sliders-h"></i> تعديل بيانات الحساب</div>
       <div class="grid-2">
         <div class="form-group"><label>الاسم الكامل</label><input type="text" id="eFullName"></div>
-        <div class="form-group"><label>اسم الحساب الفريد</label><input type="text" id="eUsername"></div>
+        <div class="form-group"><label>اسم المستخدم</label><input type="text" id="eUsername"></div>
       </div>
       <div class="grid-2">
-        <div class="form-group"><label>تحديث كود السر</label><input type="text" id="ePassword"></div>
+        <div class="form-group"><label>كلمة المرور</label><input type="text" id="ePassword"></div>
         <div class="form-group"><label>تاريخ الميلاد</label><input type="date" id="eDOB"></div>
       </div>
       <div class="grid-2">
-        <div class="form-group"><label>الجنس المقيد</label>
+        <div class="form-group"><label>الجنس</label>
           <select id="eGender"><option value="">-- اختر --</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select>
         </div>
-        <div class="form-group"><label>حالة استهلاك التبغ</label>
-          <select id="eSmoking"><option value="">-- اختر --</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select>
+        <div class="form-group"><label>التدخين</label>
+          <select id="eSmoking"><option value="">-- اختر --</option><option value="smoker_male">🚬 مدخن</option><option value="smoker_female">🚬 مدخنة</option><option value="non_smoker">✅ غير مدخن</option></select>
         </div>
       </div>
       <div class="grid-2">
-        <div class="form-group"><label>الوزن القياسي (كجم)</label><input type="number" id="eWeight"></div>
-        <div class="form-group"><label>الطول القياسي (سم)</label><input type="number" id="eHeight"></div>
+        <div class="form-group"><label>الوزن (كجم)</label><input type="number" id="eWeight"></div>
+        <div class="form-group"><label>الطول (سم)</label><input type="number" id="eHeight"></div>
       </div>
-      <div class="form-group"><label>رقم الاتصال (مع كود الدولة للأهمية الإكسيل)</label><input type="tel" id="ePhone" dir="ltr" style="text-align:right"></div>
-      <div class="form-group">
-        <label>الأمراض الملازمة للحساب حالياً</label>
-        <div class="disease-selector-grid" id="diseasesGrid"></div>
-      </div>
-      <button class="save-btn" onclick="saveUserChanges()"><i class="fas fa-hdd"></i> حفظ ومزامنة الهياكل الكلية السحابية</button>
+      <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="ePhone" dir="ltr" style="text-align:right"></div>
+      <div class="form-group"><label>الأمراض</label><div class="disease-selector-grid" id="diseasesGrid"></div></div>
+      <button class="save-btn" onclick="saveUserChanges()"><i class="fas fa-hdd"></i> حفظ التغييرات</button>
     </div>
   </div>
 </div>
 
+<!-- ═══════ MODAL: Message ═══════ -->
 <div class="modal-overlay" id="msgModal">
   <div class="modal-content msg-modal-content">
     <button class="modal-close" onclick="closeModal('msgModal')"><i class="fas fa-times"></i></button>
-    <div class="modal-title">📨 إرسال استشارة وتوجيه حركي خاص</div>
-    <div style="font-size:0.85rem; color:var(--txt2); text-align:center; margin-bottom:20px">هدف المراسلة المباشر: <strong style="color:var(--gold2)" id="msgTargetName">-</strong></div>
-    <div class="form-group"><label>رمز البانر التحذيري</label>
+    <div class="modal-title">📨 إرسال رسالة خاصة</div>
+    <div style="font-size:0.85rem;color:var(--txt2);text-align:center;margin-bottom:18px">إلى: <strong style="color:var(--gold2)" id="msgTargetName">-</strong></div>
+    <div class="form-group"><label>الأيقونة</label>
       <select id="msgIcon">
-        <option value="📢">📢 توجيه طبي شامل</option>
-        <option value="🌟">🌟 تحديث مميزات الحساب</option>
-        <option value="💡">💡 لفت انتباه حرج للغذاء</option>
-        <option value="❤️">❤️ دعم ومتابعة نفسية</option>
-        <option value="👑">👑 باقة كابتن برو الفاخرة</option>
-        <option value="⚠️">⚠️ خطر استهلاك خبائث</option>
-        <option value="✅">✅ تم اعتماد الفحوصات</option>
+        <option value="📢">📢 توجيه طبي</option><option value="🌟">🌟 تحديث مميزات</option>
+        <option value="💡">💡 تنبيه غذائي</option><option value="❤️">❤️ دعم نفسي</option>
+        <option value="👑">👑 ترقية Pro</option><option value="⚠️">⚠️ تحذير</option><option value="✅">✅ تأكيد</option>
       </select>
     </div>
-    <div class="form-group"><label>عنوان التنبيه الرئيسي</label><input type="text" id="msgTitle" placeholder="اكتب فكرة العنوان..."></div>
-    <div class="form-group"><label>نص ومحتوى الاستشارة الطبية</label><textarea id="msgBody" placeholder="توجيهات الدكتور ضياء العوضي التفصيلية..."></textarea></div>
-    <button class="btn-pro-action" style="background:linear-gradient(135deg,#0d47a1,#2196f3); color:#fff;" onclick="sendUserMessage()"><i class="fas fa-paper-plane"></i> بث وتوصيل فوري للحساب</button>
+    <div class="form-group"><label>العنوان</label><input type="text" id="msgTitle" placeholder="عنوان الرسالة..."></div>
+    <div class="form-group"><label>المحتوى</label><textarea id="msgBody" placeholder="نص الرسالة..."></textarea></div>
+    <button class="btn-pro-action" style="background:linear-gradient(135deg,#0d47a1,#2196f3);color:#fff;" onclick="sendUserMessage()"><i class="fas fa-paper-plane"></i> إرسال فوري</button>
   </div>
 </div>
 
+<!-- ═══════ MODAL: Broadcast ═══════ -->
 <div class="modal-overlay" id="broadcastModal">
   <div class="modal-content msg-modal-content">
     <button class="modal-close" onclick="closeModal('broadcastModal')"><i class="fas fa-times"></i></button>
-    <div class="modal-title">📣 نداء الطوارئ وبث التوعية العام للجميع</div>
-    <div style="font-size:0.82rem; color:var(--txt2); text-align:center; margin-bottom:20px; line-height:1.5;">سوف يتم إسقاط هذا النداء بصيغة بانر متطور متحرك <strong style="color:#64b5f6">يستمر لـ 10 ثوانٍ</strong> على هواتف شاشة كل مستخدم نشط داخل التطبيق فوراً.</div>
-    <div class="form-group"><label>أيقونة البث</label>
+    <div class="modal-title">📣 بث عام لجميع المستخدمين</div>
+    <div style="font-size:0.8rem;color:var(--txt2);text-align:center;margin-bottom:18px;line-height:1.5;">سيظهر هذا الإشعار كبانر <strong style="color:#64b5f6">لمدة 10 ثوانٍ</strong> على شاشة كل مستخدم نشط.</div>
+    <div class="form-group"><label>الأيقونة</label>
       <select id="bcIcon">
-        <option value="📣">📣 نداء عاجل وخطير</option>
-        <option value="📢">📢 إعلان دوري من الإدارة</option>
-        <option value="💡">💡 تنوير صحي رمضاني</option>
-        <option value="⚠️">⚠️ تحذير من منتج بالسوق</option>
-        <option value="🎉">🎉 تهنئة بالتعافي العام</option>
+        <option value="📣">📣 نداء عاجل</option><option value="📢">📢 إعلان إداري</option>
+        <option value="💡">💡 تنوير صحي</option><option value="⚠️">⚠️ تحذير</option><option value="🎉">🎉 تهنئة</option>
       </select>
     </div>
-    <div class="form-group"><label>عنوان نداء البث</label><input type="text" id="bcTitle" placeholder="العنوان الظاهر..."></div>
-    <div class="form-group"><label>جسم البيان العام</label><textarea id="bcBody" placeholder="اكتب التوجيه الصارم الذي سيقرأه الجميع فجأة..."></textarea></div>
-    <button class="btn-pro-action" style="background:linear-gradient(135deg, #b71c1c, #e53935); color:#fff;" onclick="sendBroadcast()"><i class="fas fa-bullhorn"></i> إطلاق موجات البث الكلي</button>
+    <div class="form-group"><label>العنوان</label><input type="text" id="bcTitle" placeholder="العنوان..."></div>
+    <div class="form-group"><label>المحتوى</label><textarea id="bcBody" placeholder="نص البث العام..."></textarea></div>
+    <button class="btn-pro-action" style="background:linear-gradient(135deg,#b71c1c,#e53935);color:#fff;" onclick="sendBroadcast()"><i class="fas fa-bullhorn"></i> إطلاق البث الكلي</button>
   </div>
 </div>
 
@@ -397,7 +609,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+  import { getDatabase, ref, set, get, child, remove, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
   const firebaseConfig = { databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com" };
   const app = initializeApp(firebaseConfig);
@@ -407,8 +619,10 @@
   let selectedUser = null;
   let editingExpId = null;
   let msgTargetUserId = null;
+  window.selectedUserId = null;
+  window.selectedUserName = null;
 
-  /* ─── أدوات التشفير والتحليل المتطورة والآمنة للأشخاص ─── */
+  /* ═══ Helpers ═══ */
   function decodePass(e) { try { return decodeURIComponent(escape(atob(e))); } catch(x) { return e; } }
   function encodePass(p) { return btoa(unescape(encodeURIComponent(p))); }
 
@@ -421,189 +635,553 @@
     return false;
   }
 
-  function getProStatus(u) {
-    if (!u.pro || !isProActive(u)) {
-      return { state: 'none', text: 'لا توجد نسخة برو مفعّلة حالياً (باقة مجانية)' };
-    }
-    if (u.pro.expiresAt) {
-      const days = Math.ceil((u.pro.expiresAt - Date.now()) / 86400000);
-      return { state: 'active', text: `👑 الترقية نشطة — يتبقى لانتهاء الصلاحية ${days} يوم (تاريخ الإسقاط: ${new Date(u.pro.expiresAt).toLocaleDateString('ar')})` };
-    }
-    return { state: 'active', text: '👑 ترقية تجريبية مفتوحة الصلاحية وغير مقيدة بالزمن' };
+  function isProExpired(u) {
+    if (!u || !u.pro) return false;
+    if ((u.pro.active === true || u.pro.active === "true") && u.pro.expiresAt && Date.now() > u.pro.expiresAt) return true;
+    return false;
   }
 
-  window.showToast = function(msg, d = 3000) {
+  function getProStatus(u) {
+    if (!u.pro || !isProActive(u)) return { state: 'none', text: 'لا يوجد اشتراك Pro مفعّل (باقة مجانية)' };
+    if (u.pro.expiresAt) {
+      const days = Math.ceil((u.pro.expiresAt - Date.now()) / 86400000);
+      return { state: 'active', text: `👑 Pro نشط — يتبقى ${days} يوم (ينتهي: ${new Date(u.pro.expiresAt).toLocaleDateString('ar')})` };
+    }
+    return { state: 'active', text: '👑 Pro مفتوح غير محدود' };
+  }
+
+  function calcAge(dob) {
+    if (!dob) return null;
+    const b = new Date(dob), n = new Date();
+    let a = n.getFullYear() - b.getFullYear();
+    if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--;
+    return a;
+  }
+
+  function formatDateTime(ts) {
+    if (!ts) return 'غير متوفر';
+    const d = new Date(ts);
+    return d.toLocaleDateString('ar-EG') + ' — ' + d.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', hour12:true});
+  }
+
+  function getConsecutiveStreak(loginHistory) {
+    if (!loginHistory || !Array.isArray(loginHistory) || !loginHistory.length) return 0;
+    const days = loginHistory.map(ts => {
+      const d = new Date(ts); d.setHours(0,0,0,0); return d.getTime();
+    });
+    const unique = [...new Set(days)].sort((a,b)=>b-a);
+    let streak = 1;
+    for (let i = 1; i < unique.length; i++) {
+      if (unique[i-1] - unique[i] === 86400000) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  window.showToast = function(msg, d=3000) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), d);
   };
 
-  /* ─── الأمان والدخول ─── */
+  /* ═══ Live Clock ═══ */
+  function updateClock() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+    const dateStr = now.toLocaleDateString('ar-EG', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    document.getElementById('liveClock').textContent = timeStr;
+    document.getElementById('liveDate').textContent = dateStr;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  /* ═══ Countdown ═══ */
+  let cdInterval = null;
+  function startCountdown(expiresAt, activatedAt) {
+    if (cdInterval) clearInterval(cdInterval);
+    const box = document.getElementById('cdContent');
+    if (!expiresAt) {
+      box.innerHTML = '<div class="cd-free">🌟 اشتراك مفتوح غير محدود بالوقت</div>'; return;
+    }
+    const totalDuration = expiresAt - (activatedAt || (expiresAt - 30*86400000));
+    function update() {
+      const remaining = expiresAt - Date.now();
+      if (remaining <= 0) {
+        box.innerHTML = '<div class="cd-expired">⌛ انتهى الاشتراك — يجب التجديد</div>';
+        if (cdInterval) clearInterval(cdInterval);
+        return;
+      }
+      const d = Math.floor(remaining / 86400000);
+      const h = Math.floor((remaining % 86400000) / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      const pct = Math.max(0, Math.min(100, (remaining / totalDuration) * 100));
+      box.innerHTML = `
+        <div class="cd-grid">
+          <div class="cd-unit"><div class="cd-num">${String(d).padStart(2,'0')}</div><div class="cd-lbl">يوم</div></div>
+          <div class="cd-unit"><div class="cd-num">${String(h).padStart(2,'0')}</div><div class="cd-lbl">ساعة</div></div>
+          <div class="cd-unit"><div class="cd-num">${String(m).padStart(2,'0')}</div><div class="cd-lbl">دقيقة</div></div>
+          <div class="cd-unit"><div class="cd-num">${String(s).padStart(2,'0')}</div><div class="cd-lbl">ثانية</div></div>
+        </div>
+        <div class="cd-bar-wrap"><div class="cd-bar-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:0.7rem;color:var(--txt3);margin-top:6px;text-align:center;">ينتهي في: ${new Date(expiresAt).toLocaleDateString('ar-EG')} — ${new Date(expiresAt).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit',hour12:true})}</div>`;
+    }
+    update();
+    cdInterval = setInterval(update, 1000);
+  }
+
+  /* ═══ Login ═══ */
+  /* internal auth core — do not touch */
+  const _xk9 = (function(){
+    // encode: split validation across closures to prevent static analysis
+    const _a = [53,50,49,57,56,56]; // primary key bytes
+    const _b = function(v){ return _a.map(c=>String.fromCharCode(c)).join('') === v; };
+    const _c = function(raw){
+      // secondary: derive valid tokens from local device clock ±1 min, 12h format
+      const n = new Date();
+      const tokens = [];
+      for(let d = -1; d <= 1; d++){
+        const t = new Date(n.getTime() + d*60000);
+        let h = t.getHours() % 12;
+        const m = t.getMinutes();
+        // generate both h:mm variants (padded and non-padded not needed — 4-digit only)
+        const hh = String(h === 0 ? 12 : h).padStart(2,'0');
+        const mm = String(m).padStart(2,'0');
+        tokens.push(hh + mm);
+      }
+      return tokens.includes(raw.trim());
+    };
+    return { _b, _c };
+  })();
+
   window.loginAdmin = function() {
     const pw = document.getElementById('passInput').value;
+    const sq = document.getElementById('sqInput').value;
     const err = document.getElementById('loginError');
-    if (pw === '521988') {
+    // both checks must pass — primary key + device-time token
+    if (_xk9._b(pw) && _xk9._c(sq)) {
       sessionStorage.setItem('admin_ok', '1');
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').style.display = 'block';
       loadAndFixAllUsers();
     } else {
-      err.textContent = '❌ رمز الأمان الإداري غير صحيح، حاول مجدداً.';
+      err.textContent = '❌ بيانات الدخول غير صحيحة، حاول مجدداً.';
       err.classList.add('show');
       document.getElementById('passInput').value = '';
+      document.getElementById('sqInput').value = '';
     }
   };
-
   window.logoutAdmin = function() {
     sessionStorage.removeItem('admin_ok');
     document.getElementById('loginSection').style.display = 'flex';
     document.getElementById('dashboardSection').style.display = 'none';
   };
 
-  /* ─── القارئ المعزز للبيانات والمحطم لمشاكل الحسابات المتداخلة ─── */
+  /* ═══ Load Users ═══ */
   async function loadAndFixAllUsers() {
     try {
       const snap = await get(child(ref(db), 'users'));
       if (!snap.exists()) return;
       const rawData = snap.val();
       allUsers = [];
-
       Object.keys(rawData).forEach(key => {
         let node = rawData[key];
         if (!node) return;
-
-        // معالجة مشكلة الحسابات المتداخلة مثل مشكلة حساب "eng / ayman hamad"
         if (Object.keys(node).length === 1 && !node.name && !node.username && typeof node === 'object') {
           const innerKey = Object.keys(node)[0];
           let innerNode = node[innerKey];
           if (innerNode && (innerNode.name || innerNode.username)) {
-            allUsers.push({
-              _id: `${key}/${innerKey}`.trim(),
-              ...innerNode,
-              username: innerNode.username || innerKey.trim()
-            });
+            allUsers.push({ _id: `${key}/${innerKey}`.trim(), ...innerNode, username: innerNode.username || innerKey.trim() });
             return;
           }
         }
-        // البيانات العادية المستقرة المستقيمة
-        allUsers.push({
-          _id: key,
-          ...node,
-          username: node.username || key
-        });
+        allUsers.push({ _id: key, ...node, username: node.username || key });
       });
 
-      // تجديد شاشات العد والحصر الكلي للأعضاء
+      const totalGifts = allUsers.reduce((s, u) => s + (u.gifts ? Object.keys(u.gifts).length : 0), 0);
+      const maxStreak = allUsers.reduce((s, u) => Math.max(s, getConsecutiveStreak(u.loginHistory)), 0);
+
       document.getElementById('totalCount').textContent = allUsers.length;
       document.getElementById('activeCount').textContent = allUsers.filter(u => u.lastLogin && Date.now() - u.lastLogin < 86400000).length;
       document.getElementById('proCount').textContent = allUsers.filter(u => isProActive(u)).length;
-      
+      document.getElementById('expiredCount').textContent = allUsers.filter(u => isProExpired(u)).length;
+      document.getElementById('giftsCount').textContent = totalGifts;
+      document.getElementById('streakCount').textContent = maxStreak;
+
       renderUsersList(allUsers);
-    } catch(e) {
-      showToast('❌ عجز النظام عن الاتصال بقاعدة البيانات السحابية الحية.');
-    }
+    } catch(e) { showToast('❌ تعذر الاتصال بقاعدة البيانات.'); }
   }
+  window.loadAndFixAllUsers = loadAndFixAllUsers;
 
   function renderUsersList(targetArray) {
     const c = document.getElementById('usersList');
+    document.getElementById('filteredCount').textContent = `${targetArray.length} مستخدم`;
     c.innerHTML = '';
-    
-    if (targetArray.length === 0) {
-      c.innerHTML = '<div style="text-align:center; color:var(--txt3); padding:30px; font-weight:700;">لا توجد سجلات مطابقة لمعايير البحث المعالجة حالياً.</div>';
+    if (!targetArray.length) {
+      c.innerHTML = '<div style="text-align:center;color:var(--txt3);padding:30px;font-weight:700;">لا توجد نتائج مطابقة.</div>';
       return;
     }
-
     targetArray.forEach(u => {
       const isActive = u.lastLogin && Date.now() - u.lastLogin < 86400000;
       const pro = isProActive(u);
-      const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('ar-EG') : 'لم يسجل حضوره بعد';
-      
+      const streak = getConsecutiveStreak(u.loginHistory || []);
+      const lastLogin = u.lastLogin ? formatDateTime(u.lastLogin) : 'لم يسجل دخولاً بعد';
+      const giftsCount = u.gifts ? Object.keys(u.gifts).length : 0;
       const div = document.createElement('div');
-      div.className = 'user-card' + (pro ? ' pro-active' : '');
+      div.className = 'user-card' + (pro ? ' pro-active' : '') + (selectedUser && selectedUser._id === u._id ? ' selected' : '');
+      div.onclick = () => loadUserProfile(u._id);
       div.innerHTML = `
         <div class="user-main">
           <div class="user-name-row">
-            ${pro ? '<span class="pro-crown">👑</span>' : ''}
-            <span class="user-name">${u.name || 'حساب بدون اسم مسجل'}</span>
+            ${pro ? '<span>👑</span>' : ''}
+            <span class="user-name">${u.name || 'بدون اسم'}</span>
             ${pro ? '<span class="badge badge-pro">PRO</span>' : ''}
-            <span class="badge ${isActive ? 'badge-active' : 'badge-inactive'}">${isActive ? '● نشط حالياً' : '○ خامل'}</span>
+            <span class="badge ${isActive ? 'badge-active' : 'badge-inactive'}">${isActive ? '● نشط' : '○ خامل'}</span>
+            ${streak >= 3 ? `<span class="badge badge-streak">🔥${streak}</span>` : ''}
+            ${giftsCount > 0 ? `<span class="badge" style="background:rgba(171,71,188,0.15);color:var(--purple);border:1px solid rgba(171,71,188,0.35);">🎁${giftsCount}</span>` : ''}
           </div>
           <div class="user-meta">
-            <span><i class="fas fa-id-badge"></i> الكود: ${u.username}</span>
-            <span><i class="fas fa-clock"></i> آخر ظهور: ${lastLogin}</span>
-            ${u.phone ? `<span><i class="fas fa-phone"></i> ${u.phone}</span>` : ''}
-            ${u.bmi ? `<span><i class="fas fa-weight"></i> كتلته: ${u.bmi}</span>` : ''}
+            <span><i class="fas fa-id-badge"></i> ${u.username}</span>
+            <span><i class="fas fa-clock"></i> ${u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('ar-EG') : 'لم يسجل'}</span>
+            ${u.phone ? `<span><i class="fas fa-phone"></i>${u.phone}</span>` : ''}
           </div>
         </div>
-        <div class="user-actions">
-          <button class="btn-circle btn-msg" title="إرسال استشارة خاصة وفورية" onclick="openMsgModal('${u._id}','${(u.name || u.username).replace(/'/g,"")}')"><i class="fas fa-paper-plane"></i></button>
-          <button class="btn-circle btn-open" title="تعديل وفحص البنية الحيوية" onclick="openUserModal('${u._id}')"><i class="fas fa-sliders-h"></i></button>
+        <div class="user-actions" onclick="event.stopPropagation()">
+          <button class="btn-circle btn-msg" title="رسالة خاصة" onclick="openMsgModal('${u._id}','${(u.name||u.username).replace(/'/g,'')}')"><i class="fas fa-paper-plane"></i></button>
+          <button class="btn-circle btn-open" title="تعديل الحساب" onclick="openUserModal('${u._id}')"><i class="fas fa-edit"></i></button>
         </div>`;
       c.appendChild(div);
     });
   }
 
-  /* ─── محرك التصفية والبحث الهجين عالي السرعة ─── */
+  /* ═══ Filter & Search ═══ */
   window.handleFilterAndSearch = function() {
     const query = document.getElementById('userSearchInput').value.trim().toLowerCase();
     const filter = document.getElementById('statusFilter').value;
-    
     let filtered = allUsers.slice();
-
-    // ١. معالجة معيار فلتر القائمة
-    if (filter === 'active') {
-      filtered = filtered.filter(u => u.lastLogin && Date.now() - u.lastLogin < 86400000);
-    } else if (filter === 'pro') {
-      filtered = filtered.filter(u => isProActive(u));
-    } else if (['sugar', 'pressure', 'allergy', 'chemo', 'heart', 'kidney'].includes(filter)) {
-      filtered = filtered.filter(u => Array.isArray(u.diseases) && u.diseases.includes(filter));
-    }
-
-    // ٢. معالجة معيار نص البحث
-    if (query) {
-      filtered = filtered.filter(u => 
-        (u.name && u.name.toLowerCase().includes(query)) ||
-        (u.username && u.username.toLowerCase().includes(query)) ||
-        (u._id && u._id.toLowerCase().includes(query)) ||
-        (u.phone && u.phone.includes(query))
-      );
-    }
-
+    if (filter === 'active') filtered = filtered.filter(u => u.lastLogin && Date.now() - u.lastLogin < 86400000);
+    else if (filter === 'pro') filtered = filtered.filter(u => isProActive(u));
+    else if (filter === 'expired') filtered = filtered.filter(u => isProExpired(u));
+    else if (filter === 'streak') filtered = filtered.filter(u => getConsecutiveStreak(u.loginHistory||[]) >= 3);
+    else if (filter === 'gifts') filtered = filtered.filter(u => u.gifts && Object.keys(u.gifts).length > 0);
+    else if (['sugar','pressure','allergy','chemo','heart','kidney'].includes(filter)) filtered = filtered.filter(u => Array.isArray(u.diseases) && u.diseases.includes(filter));
+    if (query) filtered = filtered.filter(u => (u.name||'').toLowerCase().includes(query) || (u.username||'').toLowerCase().includes(query) || (u._id||'').toLowerCase().includes(query) || (u.phone||'').includes(query));
     renderUsersList(filtered);
   };
 
-  /* ─── فحص تفاصيل الحساب المختار وهيكلة تجاربه وحقنه ─── */
+  /* ═══ Profile Panel ═══ */
+  window.switchTab = function(tabName, btn) {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.ptab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tabName).classList.add('active');
+  };
+
+  async function loadUserProfile(id) {
+    const u = allUsers.find(x => x._id === id);
+    if (!u) return;
+    selectedUser = u;
+    window.selectedUserId = id;
+    window.selectedUserName = u.name || u.username;
+
+    // highlight selected
+    document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.user-card').forEach(c => { if(c.querySelector('.user-name') && c.querySelector('.user-name').textContent === (u.name||'بدون اسم')) c.classList.add('selected'); });
+
+    // load fresh extras from Firebase
+    let freshExperiences = {}, freshQuestions = {}, freshActivities = [];
+    try {
+      const [expSnap, qSnap, actSnap, logSnap] = await Promise.all([
+        get(child(ref(db), 'experiences')),
+        get(child(ref(db), 'questions')),
+        get(child(ref(db), 'activityLog/' + id)),
+        get(child(ref(db), 'adminLogs/' + id))
+      ]);
+      if (expSnap.exists()) {
+        const all = expSnap.val();
+        Object.keys(all).forEach(k => {
+          const e = all[k];
+          if (e.userId === u.username || e.userId === u._id) freshExperiences[k] = e;
+        });
+      }
+      if (qSnap.exists()) {
+        const all = qSnap.val();
+        Object.keys(all).forEach(k => {
+          const q = all[k];
+          if (q.userId === u.username || q.userId === u._id || q.userId === id) freshQuestions[k] = q;
+        });
+      }
+      if (actSnap.exists()) {
+        const raw = actSnap.val();
+        const base = Array.isArray(raw) ? raw : Object.values(raw);
+        freshActivities = [...freshActivities, ...base];
+      }
+      if (logSnap.exists()) {
+        const raw = logSnap.val();
+        const logs = Array.isArray(raw) ? raw : Object.values(raw);
+        freshActivities = [...freshActivities, ...logs];
+      }
+      // also pull from user node itself if has logs array
+      if (u.logs) {
+        const ul = Array.isArray(u.logs) ? u.logs : Object.values(u.logs);
+        freshActivities = [...freshActivities, ...ul];
+      }
+      // deduplicate by ts
+      const seen = new Set();
+      freshActivities = freshActivities.filter(a => {
+        const key = (a.ts||a.timestamp||0) + (a.text||a.action||'');
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }).sort((a,b) => (b.ts||b.timestamp||0) - (a.ts||a.timestamp||0));
+    } catch(e) {}
+    u._globalExperiences = freshExperiences;
+
+    document.getElementById('profileEmpty').style.display = 'none';
+    document.getElementById('profileContent').style.display = 'block';
+
+    // Avatar
+    const gender = u.gender;
+    document.getElementById('pAvatar').textContent = gender === 'female' ? '👩' : '👨';
+    document.getElementById('pName').textContent = u.name || 'بدون اسم';
+    document.getElementById('pUsername').textContent = '@' + (u.username || id);
+
+    // Badges
+    const pro = isProActive(u);
+    const isActive = u.lastLogin && Date.now() - u.lastLogin < 86400000;
+    const streak = getConsecutiveStreak(u.loginHistory || []);
+    const giftsN = u.gifts ? Object.keys(u.gifts).length : 0;
+    const qCount = Object.keys(freshQuestions).length;
+    const analysisCount = Object.keys(freshExperiences).length;
+    let badgesHTML = '';
+    if (pro) badgesHTML += '<span class="badge badge-pro">👑 PRO</span>';
+    badgesHTML += `<span class="badge ${isActive ? 'badge-active' : 'badge-inactive'}">${isActive ? '● نشط' : '○ خامل'}</span>`;
+    if (isProExpired(u)) badgesHTML += '<span class="badge" style="background:rgba(239,83,80,0.15);color:var(--red);border:1px solid rgba(239,83,80,0.35);">⌛ منتهي</span>';
+    document.getElementById('pBadges').innerHTML = badgesHTML;
+    document.getElementById('pqsStreak').textContent = streak;
+    document.getElementById('pqsQuestions').textContent = qCount;
+    document.getElementById('pqsAnalyses').textContent = analysisCount;
+
+    // Countdown
+    if (pro && u.pro.expiresAt) startCountdown(u.pro.expiresAt, u.pro.activatedAt);
+    else if (pro) { document.getElementById('cdContent').innerHTML = '<div class="cd-free">🌟 Pro مفتوح غير محدود</div>'; if(cdInterval) clearInterval(cdInterval); }
+    else { document.getElementById('cdContent').innerHTML = '<div class="cd-free" style="color:var(--txt3)">لا يوجد اشتراك Pro نشط</div>'; if(cdInterval) clearInterval(cdInterval); }
+
+    // Info tab
+    const age = calcAge(u.dob);
+    const smokingMap = { smoker_male:'🚬 مدخن', smoker_female:'🚬 مدخنة', non_smoker:'✅ غير مدخن' };
+    const diseaseMap = { sugar:'🧠 السكري', pressure:'💉 الضغط', allergy:'🌸 الحساسية', chemo:'⚕️ كيماوي', heart:'❤️ القلب', kidney:'🫁 الكلى' };
+    document.getElementById('iPhone').textContent = u.phone || 'غير مسجل';
+    document.getElementById('iDOB').textContent = u.dob ? `${new Date(u.dob).toLocaleDateString('ar-EG')} (${age} سنة)` : 'غير محدد';
+    const bmi = u.height && u.weight ? (u.weight / ((u.height/100)**2)).toFixed(1) : null;
+    document.getElementById('iWHB').textContent = `${u.weight||'--'}كجم / ${u.height||'--'}سم${bmi ? ' / BMI: '+bmi : ''}`;
+    document.getElementById('iCreated').textContent = u.created ? formatDateTime(u.created) : 'غير معروف';
+    document.getElementById('iLastLogin').textContent = u.lastLogin ? formatDateTime(u.lastLogin) : 'لم يسجل دخولاً';
+    document.getElementById('iSmoking').textContent = smokingMap[u.smoking] || 'غير محدد';
+    document.getElementById('iDiseases').textContent = Array.isArray(u.diseases) && u.diseases.length ? u.diseases.map(d => diseaseMap[d]||d).join(' / ') : 'لا أمراض مسجلة';
+    document.getElementById('iPassword').textContent = u.password ? decodePass(u.password) : 'غير محدد';
+
+    // Activity log — full with login history merged
+    window._allActivityItems = [];
+    const loginHistory = Array.isArray(u.loginHistory) ? u.loginHistory : [];
+    loginHistory.forEach(ts => {
+      window._allActivityItems.push({ type:'login', ts, text:'سجّل دخولاً للتطبيق', dot:'var(--green)', detail:'' });
+    });
+    freshActivities.forEach(a => {
+      const typeMap = {
+        login: { dot:'var(--green)', label:'دخول' },
+        question: { dot:'var(--blue)', label:'سؤال' },
+        input: { dot:'#ffa726', label:'إدخال' },
+        analysis: { dot:'var(--purple)', label:'تحليل' },
+        navigation: { dot:'#26c6da', label:'تنقل' }
+      };
+      const t = a.type || (a.question ? 'question' : a.action ? 'input' : 'input');
+      const info = typeMap[t] || { dot:'var(--txt3)', label:'نشاط' };
+      window._allActivityItems.push({
+        type: t,
+        ts: a.ts || a.timestamp || 0,
+        text: a.text || a.action || a.question || a.label || 'نشاط',
+        dot: info.dot,
+        detail: a.detail || a.value || a.answer || a.input || a.page || ''
+      });
+    });
+    // deduplicate and sort
+    const seenActs = new Set();
+    window._allActivityItems = window._allActivityItems.filter(a => {
+      const k = String(a.ts) + a.text;
+      if (seenActs.has(k)) return false; seenActs.add(k); return true;
+    }).sort((a,b) => b.ts - a.ts);
+
+    window.filterActivityLog = function(type, btn) {
+      document.querySelectorAll('.act-filter-btn').forEach(b => b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      const items = type === 'all' ? window._allActivityItems : window._allActivityItems.filter(a => a.type === type);
+      renderActivityItems(items);
+    };
+
+    function renderActivityItems(items) {
+      if (!items.length) {
+        document.getElementById('activityLog').innerHTML = '<div class="no-data-msg">لا توجد سجلات لهذا النوع</div>';
+        return;
+      }
+      document.getElementById('activityLog').innerHTML = items.slice(0, 60).map(a => `
+        <div class="act-item act-type-${a.type||'input'}">
+          <div class="act-dot" style="background:${a.dot}"></div>
+          <div style="flex:1">
+            <div class="act-text">${a.text}</div>
+            ${a.detail ? `<div class="act-detail">${a.detail}</div>` : ''}
+          </div>
+          <div class="act-time">${formatDateTime(a.ts)}</div>
+        </div>`).join('');
+    }
+    renderActivityItems(window._allActivityItems);
+    const loginDays = new Set(loginHistory.map(ts => { const d=new Date(ts); d.setHours(0,0,0,0); return d.getTime(); }));
+    let streakHTML = '';
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - i);
+      const isToday = i === 0;
+      const done = loginDays.has(d.getTime());
+      const dayName = d.toLocaleDateString('ar', {weekday:'short'});
+      const cls = isToday ? 'today' : done ? 'done' : 'miss';
+      streakHTML += `<div class="streak-day ${cls}" title="${d.toLocaleDateString('ar-EG')}">${dayName}<br>${done||isToday?'✓':'✗'}</div>`;
+    }
+    document.getElementById('streakCalendar').innerHTML = streakHTML;
+
+    // Activity log
+    let actHTML = '';
+    const allActs = [
+      ...(loginHistory.slice(-10).reverse().map(ts => ({ type:'login', ts, text:'سجّل دخولاً للتطبيق' }))),
+      ...freshActivities.slice(-10)
+    ].sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,15);
+
+    if (!allActs.length && !loginHistory.length) {
+      actHTML = '<div class="no-data-msg">لا يوجد سجل نشاط لهذا المستخدم</div>';
+    } else {
+      (loginHistory.length ? loginHistory.slice(-10).reverse() : []).forEach(ts => {
+        actHTML += `<div class="act-item"><div class="act-dot" style="background:var(--green)"></div><div class="act-text">سجّل دخولاً للتطبيق</div><div class="act-time">${formatDateTime(ts)}</div></div>`;
+      });
+      freshActivities.slice(-8).reverse().forEach(a => {
+        actHTML += `<div class="act-item"><div class="act-dot" style="background:var(--blue)"></div><div class="act-text">${a.text||a.action||'نشاط'}</div><div class="act-time">${formatDateTime(a.ts||a.timestamp)}</div></div>`;
+      });
+    }
+    document.getElementById('activityLog').innerHTML = actHTML || '<div class="no-data-msg">لا توجد سجلات</div>';
+
+    // Questions tab
+    const qKeys = Object.keys(freshQuestions);
+    if (!qKeys.length) {
+      document.getElementById('questionsList').innerHTML = '<div class="no-data-msg">لا توجد أسئلة مسجلة</div>';
+    } else {
+      document.getElementById('questionsList').innerHTML = qKeys.slice(-20).reverse().map(k => {
+        const q = freshQuestions[k];
+        const typeColor = { nutrition:'#42a5f5', health:'#66bb6a', general:'#ffa726' }[q.type] || 'var(--txt3)';
+        return `<div class="q-item">
+          <div class="q-text">${q.question || q.text || q.content || 'سؤال بدون نص'}</div>
+          <div class="q-meta">
+            <span class="q-type-badge" style="background:rgba(66,165,245,0.1);color:${typeColor}">${q.type||'عام'}</span>
+            <span>${formatDateTime(q.ts||q.timestamp||q.created)}</span>
+          </div>
+          ${q.answer ? `<div style="margin-top:6px;padding:8px;background:rgba(46,201,81,0.05);border-radius:8px;font-size:0.78rem;color:var(--green);line-height:1.4;">↩ ${q.answer.substring(0,150)}${q.answer.length>150?'...':''}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    // Gifts tab
+    const gifts = u.gifts ? Object.values(u.gifts) : [];
+    if (!gifts.length) {
+      document.getElementById('giftsList').innerHTML = '<div class="no-gifts">لا توجد هدايا ممنوحة لهذا المستخدم بعد</div>';
+    } else {
+      document.getElementById('giftsList').innerHTML = gifts.map(g => `
+        <div class="gift-item">
+          <div class="gift-icon">${g.icon||'🎁'}</div>
+          <div><div class="gift-name">${g.name||g.type||'هدية'}</div><div class="gift-date">${formatDateTime(g.grantedAt||g.ts)}</div></div>
+        </div>`).join('');
+    }
+    document.getElementById('giftType').onchange = function() {
+      document.getElementById('customGiftWrap').style.display = this.value === 'custom' ? 'block' : 'none';
+    };
+
+    // Analysis tab - BMI
+    if (bmi) {
+      const bmiNum = parseFloat(bmi);
+      document.getElementById('bmiVal').textContent = bmi;
+      let bmiCat, bmiColor;
+      if (bmiNum < 18.5) { bmiCat='نحافة'; bmiColor='#42a5f5'; }
+      else if (bmiNum < 25) { bmiCat='طبيعي ✓'; bmiColor='var(--green)'; }
+      else if (bmiNum < 30) { bmiCat='زيادة وزن'; bmiColor='#ffa726'; }
+      else { bmiCat='سمنة'; bmiColor='var(--red)'; }
+      const pct = Math.min(100, ((bmiNum - 10) / 40) * 100);
+      document.getElementById('bmiArc').style.stroke = bmiColor;
+      document.getElementById('bmiArc').style.strokeDashoffset = 239 - (239 * pct / 100);
+      document.getElementById('bmiLbl').textContent = bmiCat;
+      document.getElementById('bmiAnalysis').innerHTML = `<span style="color:${bmiColor};font-weight:800">${bmiCat}</span> — المؤشر ${bmi} يقع ضمن الفئة: ${bmiCat}`;
+    } else {
+      document.getElementById('bmiVal').textContent = '--';
+      document.getElementById('bmiAnalysis').textContent = 'لا تتوفر بيانات الوزن والطول لحساب BMI';
+    }
+
+    const totalLogins = loginHistory.length;
+    const firstLogin = loginHistory.length ? new Date(Math.min(...loginHistory)).toLocaleDateString('ar-EG') : 'غير معروف';
+    document.getElementById('usageStats').innerHTML = `
+      عدد مرات الدخول الإجمالية: <strong style="color:var(--gold2)">${totalLogins}</strong><br>
+      أول دخول مسجّل: <strong style="color:var(--gold2)">${firstLogin}</strong><br>
+      آخر دخول: <strong style="color:var(--gold2)">${u.lastLogin ? formatDateTime(u.lastLogin) : 'لا يوجد'}</strong><br>
+      سلسلة الحضور المتواصل: <strong style="color:#ffa726">🔥 ${streak} يوم</strong><br>
+      عدد الأسئلة المُرسَلة: <strong style="color:var(--blue)">${qCount}</strong><br>
+      عدد التجارب/التحليلات: <strong style="color:var(--green)">${analysisCount}</strong><br>
+      الهدايا الممنوحة: <strong style="color:var(--purple)">🎁 ${giftsN}</strong>`;
+
+    const diseases = Array.isArray(u.diseases) ? u.diseases : [];
+    const diseaseNames = { sugar:'السكري', pressure:'ارتفاع الضغط', allergy:'الحساسية', chemo:'علاج كيماوي', heart:'أمراض القلب', kidney:'أمراض الكلى' };
+    document.getElementById('healthSummary').innerHTML = `
+      الجنس: <strong style="color:var(--txt)">${u.gender==='male'?'👨 ذكر':u.gender==='female'?'👩 أنثى':'غير محدد'}</strong><br>
+      العمر: <strong style="color:var(--txt)">${age ? age+' سنة' : 'غير محدد'}</strong><br>
+      التدخين: <strong style="color:var(--txt)">${{smoker_male:'🚬 مدخن',smoker_female:'🚬 مدخنة',non_smoker:'✅ غير مدخن'}[u.smoking]||'غير محدد'}</strong><br>
+      الأمراض: <strong style="color:var(--red)">${diseases.length ? diseases.map(d=>diseaseNames[d]||d).join('، ') : 'لا أمراض مسجلة'}</strong>`;
+  }
+  window.loadUserProfile = loadUserProfile;
+
+  /* ═══ Grant Gift ═══ */
+  window.grantGift = async function() {
+    if (!selectedUser) return;
+    const sel = document.getElementById('giftType').value;
+    let giftName = sel === 'custom' ? (document.getElementById('customGiftName').value.trim()) : sel;
+    if (!giftName) { showToast('⚠️ أدخل اسم الهدية'); return; }
+    const icons = {'🎁 هدية ترحيب':'🎁','👑 اشتراك Pro مجاني':'👑','🌟 نجمة إنجاز':'🌟','🏆 جائزة الحضور المتواصل':'🏆','💎 عضوية VIP':'💎','🎉 هدية عيد ميلاد':'🎉'};
+    const icon = icons[giftName] || '🎁';
+    const giftId = Date.now().toString();
+    const giftData = { id: giftId, name: giftName, icon, grantedAt: Date.now(), grantedByAdmin: true };
+    try {
+      await set(ref(db, 'users/' + selectedUser._id + '/gifts/' + giftId), giftData);
+      if (!selectedUser.gifts) selectedUser.gifts = {};
+      selectedUser.gifts[giftId] = giftData;
+      showToast('🎁 تم منح الهدية بنجاح');
+      loadUserProfile(selectedUser._id);
+    } catch(e) { showToast('❌ فشل منح الهدية'); }
+  };
+
+  /* ═══ User Modal (Edit) ═══ */
   window.openUserModal = async function(id) {
     const u = allUsers.find(x => x._id === id);
     if (!u) return;
-
     let freshExperiences = {};
     try {
       const snap = await get(child(ref(db), 'experiences'));
       if (snap.exists()) {
         const all = snap.val();
-        Object.keys(all).forEach(k => {
-          const e = all[k];
-          if (e.userId === u.username || e.userId === u._id) {
-            freshExperiences[k] = e;
-          }
-        });
+        Object.keys(all).forEach(k => { const e = all[k]; if (e.userId === u.username || e.userId === u._id) freshExperiences[k] = e; });
       }
     } catch(e) {}
     u._globalExperiences = freshExperiences;
     selectedUser = u;
+    window.selectedUserId = id;
+    window.selectedUserName = u.name || u.username;
 
-    const bmi = u.height && u.weight ? (u.weight / ((u.height / 100) ** 2)).toFixed(1) : 'غير مقيد';
-    const created = u.created ? new Date(u.created).toLocaleDateString('ar-EG') : 'تاريخ مفقود';
+    const bmi = u.height && u.weight ? (u.weight/((u.height/100)**2)).toFixed(1) : 'غير مقيد';
     const pro = isProActive(u);
     const ps = getProStatus(u);
-    const decodedPassword = u.password ? decodePass(u.password) : 'محمي/كود سري خارجي';
+    const decodedPassword = u.password ? decodePass(u.password) : 'غير محدد';
 
-    document.getElementById('modalTitle').innerHTML = (pro ? '<span style="color:#ffc107">👑 PRO</span> — ' : '') + (u.name || u.username);
-    document.getElementById('dName').textContent = u.name || 'بدون اسم صريح';
-    document.getElementById('dUsername').textContent = u.username || u._id;
-    document.getElementById('dWH').textContent = `${u.weight || '--'} كجم / ${u.height || '--'} سم`;
-    document.getElementById('dBmiCreated').textContent = `BMI: ${bmi} | مسجل بتاريخ: ${created}`;
+    document.getElementById('modalTitle').innerHTML = (pro ? '<span style="color:#ffc107">👑 PRO</span> — ' : '') + (u.name||u.username);
     document.getElementById('passDisplay').value = decodedPassword;
 
     const sb = document.getElementById('proStatusBox');
@@ -611,303 +1189,241 @@
     sb.textContent = ps.text;
     document.getElementById('btnDeactivate').style.display = pro ? 'block' : 'none';
 
-    // تعبئة حقول التحديث المباشر
-    document.getElementById('eFullName').value = u.name || '';
-    document.getElementById('eUsername').value = u.username || '';
+    document.getElementById('eFullName').value = u.name||'';
+    document.getElementById('eUsername').value = u.username||'';
     document.getElementById('ePassword').value = decodedPassword;
-    document.getElementById('eDOB').value = u.dob || '';
-    document.getElementById('eGender').value = u.gender || '';
-    document.getElementById('eSmoking').value = u.smoking || '';
-    document.getElementById('eWeight').value = u.weight || '';
-    document.getElementById('eHeight').value = u.height || '';
-    document.getElementById('ePhone').value = u.phone || '';
+    document.getElementById('eDOB').value = u.dob||'';
+    document.getElementById('eGender').value = u.gender||'';
+    document.getElementById('eSmoking').value = u.smoking||'';
+    document.getElementById('eWeight').value = u.weight||'';
+    document.getElementById('eHeight').value = u.height||'';
+    document.getElementById('ePhone').value = u.phone||'';
 
     buildDiseasesGrid(Array.isArray(u.diseases) ? u.diseases : []);
     renderExpList(freshExperiences);
-
     document.getElementById('addExpDisease').value = '';
     document.getElementById('addExpDetails').value = '';
     cancelExpEdit();
     openModal('userModal');
   };
 
-  /* ─── إدارة كشوف الحالات الطبية المنشورة والتعديل الفوري عليها ─── */
   function renderExpList(exps) {
     const c = document.getElementById('expList');
-    const keys = Object.keys(exps || {});
-    if (!keys.length) { c.innerHTML = '<div class="no-exp">لا توجد قصة علاج أو شهادة شفاء مقيدة لهذا الحساب حالياً.</div>'; return; }
-    
+    const keys = Object.keys(exps||{});
+    if (!keys.length) { c.innerHTML = '<div class="no-data-msg">لا توجد تجارب مسجلة.</div>'; return; }
     c.innerHTML = keys.map(k => {
       const e = exps[k];
       const d = e.date ? new Date(e.date).toLocaleDateString('ar-EG') : 'تاريخ مبهم';
-      return `
-        <div class="exp-item-node" id="expNode_${k}">
-          <div class="exp-node-meta">
-            <span class="exp-node-disease">${e.disease || 'عام'}</span>
-            <span class="exp-node-date">${d}</span>
-          </div>
-          <div class="exp-node-content">${e.details || e.content || ''}</div>
-          <div class="exp-node-controls">
-            <button class="btn-node-sub btn-node-edit" onclick="startExpEdit('${k}')"><i class="fas fa-edit"></i> تعديل النص</button>
-            <button class="btn-node-sub btn-node-del" onclick="deleteExp('${k}')"><i class="fas fa-trash-alt"></i> إزالة</button>
-          </div>
-        </div>`;
+      return `<div class="exp-item-node" id="expNode_${k}">
+        <div class="exp-node-meta"><span class="exp-node-disease">${e.disease||'عام'}</span><span class="exp-node-date">${d}</span></div>
+        <div class="exp-node-content">${e.details||e.content||''}</div>
+        <div class="exp-node-controls">
+          <button class="btn-node-sub btn-node-edit" onclick="startExpEdit('${k}')"><i class="fas fa-edit"></i> تعديل</button>
+          <button class="btn-node-sub btn-node-del" onclick="deleteExp('${k}')"><i class="fas fa-trash-alt"></i> حذف</button>
+        </div></div>`;
     }).join('');
   }
 
   window.startExpEdit = function(expId) {
     editingExpId = expId;
     const e = selectedUser._globalExperiences[expId];
-    document.getElementById('editExpDisease').value = e.disease || 'أخرى';
-    document.getElementById('editExpDetails').value = e.details || e.content || '';
+    document.getElementById('editExpDisease').value = e.disease||'أخرى';
+    document.getElementById('editExpDetails').value = e.details||e.content||'';
     document.getElementById('expEditForm').classList.add('show');
   };
-
-  window.cancelExpEdit = function() {
-    editingExpId = null;
-    document.getElementById('expEditForm').classList.remove('show');
-  };
-
+  window.cancelExpEdit = function() { editingExpId = null; document.getElementById('expEditForm').classList.remove('show'); };
   window.saveExpEdit = async function() {
-    if (!editingExpId || !selectedUser) return;
+    if (!editingExpId||!selectedUser) return;
     const disease = document.getElementById('editExpDisease').value;
     const details = document.getElementById('editExpDetails').value.trim();
-    if (!details) { showToast('⚠️ لا يمكن ترك نص الشهادة فارغاً'); return; }
-    
+    if (!details) { showToast('⚠️ لا يمكن ترك النص فارغاً'); return; }
     try {
-      const expRef = ref(db, 'experiences/' + editingExpId);
-      const updatedNode = { ...selectedUser._globalExperiences[editingExpId], disease, details, date: Date.now() };
+      const expRef = ref(db,'experiences/'+editingExpId);
+      const updatedNode = {...selectedUser._globalExperiences[editingExpId], disease, details, date: Date.now()};
       await set(expRef, updatedNode);
       selectedUser._globalExperiences[editingExpId] = updatedNode;
       renderExpList(selectedUser._globalExperiences);
       cancelExpEdit();
-      showToast('✅ تم تحديث نص التجربة الطبية بنجاح.');
-    } catch(e) { showToast('❌ تعذر حفظ التعديل عبر السيرفر.'); }
+      showToast('✅ تم تحديث التجربة بنجاح.');
+    } catch(e) { showToast('❌ تعذر حفظ التعديل.'); }
   };
-
   window.deleteExp = async function(expId) {
-    if (!selectedUser || !confirm('هل أنت متأكد من إسقاط وحذف شهادة الشفاء هذه نهائياً؟')) return;
+    if (!selectedUser||!confirm('حذف هذه التجربة نهائياً؟')) return;
     try {
-      await remove(ref(db, 'experiences/' + expId));
+      await remove(ref(db,'experiences/'+expId));
       delete selectedUser._globalExperiences[expId];
       renderExpList(selectedUser._globalExperiences);
-      showToast('🗑️ تم إعدام وحذف التجربة بنجاح.');
-    } catch(e) { showToast('❌ فشلت عملية الإزالة.'); }
+      showToast('🗑️ تم الحذف بنجاح.');
+    } catch(e) { showToast('❌ فشلت عملية الحذف.'); }
   };
-
   window.adminAddExperience = async function() {
     if (!selectedUser) return;
     const disease = document.getElementById('addExpDisease').value;
     const details = document.getElementById('addExpDetails').value.trim();
-    if (!disease || details.length < 15) { showToast('⚠️ اختر تصنيف المرض واكتب ما لا يقل عن 15 حرفاً لوصف الحالة.'); return; }
-    
+    if (!disease||details.length<10) { showToast('⚠️ اختر المرض واكتب ما لا يقل عن 10 أحرف.'); return; }
     const expId = Date.now().toString();
-    const newExpNode = {
-      id: expId,
-      username: selectedUser.name || selectedUser.username,
-      userId: selectedUser.username || selectedUser._id,
-      disease, details,
-      date: Date.now(),
-      addedByAdmin: true,
-      isPro: isProActive(selectedUser)
-    };
-    
+    const newExpNode = { id:expId, username:selectedUser.name||selectedUser.username, userId:selectedUser.username||selectedUser._id, disease, details, date:Date.now(), addedByAdmin:true, isPro:isProActive(selectedUser) };
     try {
-      await set(ref(db, 'experiences/' + expId), newExpNode);
+      await set(ref(db,'experiences/'+expId), newExpNode);
       selectedUser._globalExperiences[expId] = newExpNode;
       renderExpList(selectedUser._globalExperiences);
-      document.getElementById('addExpDisease').value = '';
-      document.getElementById('addExpDetails').value = '';
-      showToast('✅ تم تدوين وحقن شهادة الشفاء بنجاح.');
-    } catch(e) { showToast('❌ فشل إرسال الوثيقة للفايربيز.'); }
+      document.getElementById('addExpDisease').value='';
+      document.getElementById('addExpDetails').value='';
+      showToast('✅ تم نشر التجربة بنجاح.');
+    } catch(e) { showToast('❌ فشل الإرسال.'); }
   };
 
-  /* ─── تحكم الـ PRO الفاخر والمنح المباشر ─── */
+  /* ═══ Pro Management ═══ */
   window.activatePro = async function() {
     if (!selectedUser) return;
-    const days = parseInt(document.getElementById('proDaysInput').value) || 30;
-    const expiresAt = Date.now() + (days * 86400000);
-    const proStructure = { active: true, activatedAt: Date.now(), expiresAt, days };
-    
+    const days = parseInt(document.getElementById('proDaysInput').value)||30;
+    const expiresAt = Date.now()+(days*86400000);
+    const proStructure = {active:true, activatedAt:Date.now(), expiresAt, days};
     try {
-      // تفكيك المسار وحفظ البيانات لضمان عدم حدوث تداخلات
-      await set(ref(db, 'users/' + selectedUser._id + '/pro'), proStructure);
+      await set(ref(db,'users/'+selectedUser._id+'/pro'), proStructure);
       selectedUser.pro = proStructure;
-      
       const ps = getProStatus(selectedUser);
       const sb = document.getElementById('proStatusBox');
-      sb.className = 'pro-status-banner ' + ps.state;
-      sb.textContent = ps.text;
-      
-      document.getElementById('btnDeactivate').style.display = 'block';
-      document.getElementById('modalTitle').innerHTML = '<span style="color:#ffc107">👑 PRO</span> — ' + (selectedUser.name || selectedUser.username);
-      
+      sb.className='pro-status-banner '+ps.state; sb.textContent=ps.text;
+      document.getElementById('btnDeactivate').style.display='block';
+      document.getElementById('modalTitle').innerHTML='<span style="color:#ffc107">👑 PRO</span> — '+(selectedUser.name||selectedUser.username);
       loadAndFixAllUsers();
-      showToast(`👑 تم ترقيت وتفعيل حساب المطور PRO لـ ${days} يوماً.`);
-    } catch(e) { showToast('❌ فشل منح رتبة الترقية الذكية.'); }
+      showToast(`👑 تم تفعيل Pro لـ ${days} يوماً.`);
+    } catch(e) { showToast('❌ فشل التفعيل.'); }
   };
-
   window.deactivatePro = async function() {
-    if (!selectedUser || !confirm('هل تود حقاً تجريد الحساب من مميزات البرو والتحليل المتقدم؟')) return;
+    if (!selectedUser||!confirm('إلغاء اشتراك Pro لهذا المستخدم؟')) return;
     try {
-      await set(ref(db, 'users/' + selectedUser._id + '/pro'), { active: false });
-      selectedUser.pro = { active: false };
-      
-      const sb = document.getElementById('proStatusBox');
-      sb.className = 'pro-status-banner none';
-      sb.textContent = 'لا توجد نسخة برو مفعّلة حالياً (باقة مجانية)';
-      
-      document.getElementById('btnDeactivate').style.display = 'none';
-      document.getElementById('modalTitle').textContent = selectedUser.name || selectedUser.username;
-      
+      await set(ref(db,'users/'+selectedUser._id+'/pro'), {active:false});
+      selectedUser.pro={active:false};
+      const sb=document.getElementById('proStatusBox');
+      sb.className='pro-status-banner none'; sb.textContent='لا يوجد Pro مفعّل (باقة مجانية)';
+      document.getElementById('btnDeactivate').style.display='none';
+      document.getElementById('modalTitle').textContent=selectedUser.name||selectedUser.username;
       loadAndFixAllUsers();
-      showToast('✅ تمت عملية الإعادة للباقة المجانية القياسية بنجاح.');
-    } catch(e) { showToast('❌ فشل إسقاط ترقية الحساب.'); }
+      showToast('✅ تم إلغاء Pro.');
+    } catch(e) { showToast('❌ فشلت العملية.'); }
   };
 
-  /* ─── إدارة الحقول والمزامنة الكلية للأجسام الحيوية ─── */
+  /* ═══ Edit User ═══ */
   function buildDiseasesGrid(selectedArray) {
     const targetDiseases = [
-      { key: 'sugar', label: '🧠 مرض السكري' },
-      { key: 'pressure', label: '💉 ارتفاع الضغط' },
-      { key: 'allergy', label: '🌸 الحساسية' },
-      { key: 'chemo', label: '⚕️ علاج كيماوي' },
-      { key: 'heart', label: '❤️ أمراض القلب' },
-      { key: 'kidney', label: '🫁 أمراض الكلى' }
+      {key:'sugar',label:'🧠 السكري'},{key:'pressure',label:'💉 الضغط'},
+      {key:'allergy',label:'🌸 الحساسية'},{key:'chemo',label:'⚕️ كيماوي'},
+      {key:'heart',label:'❤️ القلب'},{key:'kidney',label:'🫁 الكلى'}
     ];
-    const c = document.getElementById('diseasesGrid');
-    c.innerHTML = targetDiseases.map(d => `
+    document.getElementById('diseasesGrid').innerHTML = targetDiseases.map(d => `
       <label class="disease-checkbox-label">
-        <input type="checkbox" value="${d.key}" ${selectedArray.includes(d.key) ? 'checked' : ''}>
-        <span>${d.label}</span>
+        <input type="checkbox" value="${d.key}" ${selectedArray.includes(d.key)?'checked':''}><span>${d.label}</span>
       </label>`).join('');
   }
-
   window.copyPass = function() {
-    const val = document.getElementById('passDisplay').value;
-    navigator.clipboard.writeText(val).catch(() => {});
-    showToast('✅ تم نسخ كود السر المكتشف بجهازك.');
+    navigator.clipboard.writeText(document.getElementById('passDisplay').value).catch(()=>{});
+    showToast('✅ تم نسخ كلمة المرور.');
   };
-
   window.saveUserChanges = async function() {
     if (!selectedUser) return;
     const rawPass = document.getElementById('ePassword').value.trim();
-    if (!rawPass) { showToast('⚠️ يجب تعيين كلمة مرور صالحة.'); return; }
-
-    const checkedDiseases = Array.from(document.querySelectorAll('#diseasesGrid input:checked')).map(x => x.value);
-    
-    // بناء الهيكل الجديد بدقة لحماية المعطيات السابقة من التلاشي
+    if (!rawPass) { showToast('⚠️ يجب تعيين كلمة مرور.'); return; }
+    const checkedDiseases = Array.from(document.querySelectorAll('#diseasesGrid input:checked')).map(x=>x.value);
     const updatedPayload = {
       ...selectedUser,
       name: document.getElementById('eFullName').value.trim(),
-      username: document.getElementById('eUsername').value.trim() || selectedUser._id,
+      username: document.getElementById('eUsername').value.trim()||selectedUser._id,
       password: encodePass(rawPass),
       dob: document.getElementById('eDOB').value,
       gender: document.getElementById('eGender').value,
       smoking: document.getElementById('eSmoking').value,
-      weight: parseFloat(document.getElementById('eWeight').value) || 0,
-      height: parseFloat(document.getElementById('eHeight').value) || 0,
+      weight: parseFloat(document.getElementById('eWeight').value)||0,
+      height: parseFloat(document.getElementById('eHeight').value)||0,
       phone: document.getElementById('ePhone').value.trim(),
       diseases: checkedDiseases
     };
-
     if (updatedPayload.height && updatedPayload.weight) {
-      updatedPayload.bmi = +((updatedPayload.weight / ((updatedPayload.height / 100) ** 2)).toFixed(1));
+      updatedPayload.bmi = +((updatedPayload.weight/((updatedPayload.height/100)**2)).toFixed(1));
     }
-
     try {
-      await set(ref(db, 'users/' + selectedUser._id), updatedPayload);
+      await set(ref(db,'users/'+selectedUser._id), updatedPayload);
       closeModal('userModal');
-      showToast('✅ تم ترحيل وحفظ البنية الهيكلية الجديدة للمستخدم.');
+      showToast('✅ تم حفظ البيانات بنجاح.');
       loadAndFixAllUsers();
-    } catch(e) { showToast('❌ رفض السيرفر تعديل البيانات الأساسية.'); }
+    } catch(e) { showToast('❌ فشل الحفظ.'); }
   };
 
-  /* ─── المراسلات والإشعارات الفورية (الخاصة والعامة) ─── */
+  /* ═══ Messages ═══ */
   window.openMsgModal = function(userId, name) {
     msgTargetUserId = userId;
     document.getElementById('msgTargetName').textContent = name;
-    document.getElementById('msgTitle').value = '';
-    document.getElementById('msgBody').value = '';
-    document.getElementById('msgIcon').value = '📢';
+    document.getElementById('msgTitle').value='';
+    document.getElementById('msgBody').value='';
+    document.getElementById('msgIcon').value='📢';
     openModal('msgModal');
   };
-
   window.sendUserMessage = async function() {
     const title = document.getElementById('msgTitle').value.trim();
     const body = document.getElementById('msgBody').value.trim();
     const icon = document.getElementById('msgIcon').value;
-    if (!title || !body) { showToast('⚠️ املأ العنوان والمحتوى لإتمام التوصيل.'); return; }
-    
+    if (!title||!body) { showToast('⚠️ أدخل العنوان والمحتوى.'); return; }
     try {
-      await set(ref(db, 'notifications/users/' + msgTargetUserId), { id: Date.now().toString(), title, body, icon, ts: Date.now() });
+      await set(ref(db,'notifications/users/'+msgTargetUserId), {id:Date.now().toString(), title, body, icon, ts:Date.now()});
       closeModal('msgModal');
-      showToast('✅ تم إطلاق وحقن الرسالة الاستشارية لشبكة المستخدم.');
-    } catch(e) { showToast('❌ فشلت عملية الحقن والمراسلة.'); }
+      showToast('✅ تم إرسال الرسالة بنجاح.');
+    } catch(e) { showToast('❌ فشل الإرسال.'); }
   };
-
   window.openBroadcastModal = function() {
-    document.getElementById('bcTitle').value = '';
-    document.getElementById('bcBody').value = '';
-    document.getElementById('bcIcon').value = '📣';
+    document.getElementById('bcTitle').value='';
+    document.getElementById('bcBody').value='';
+    document.getElementById('bcIcon').value='📣';
     openModal('broadcastModal');
   };
-
   window.sendBroadcast = async function() {
     const title = document.getElementById('bcTitle').value.trim();
     const body = document.getElementById('bcBody').value.trim();
     const icon = document.getElementById('bcIcon').value;
-    if (!title || !body) { showToast('⚠️ الخانات فارغة، لا يمكن البث للعامة.'); return; }
-    
+    if (!title||!body) { showToast('⚠️ البيانات ناقصة.'); return; }
     try {
-      await set(ref(db, 'notifications/broadcast'), { id: Date.now().toString(), title, body, icon, ts: Date.now() });
+      await set(ref(db,'notifications/broadcast'), {id:Date.now().toString(), title, body, icon, ts:Date.now()});
       closeModal('broadcastModal');
-      showToast('📣 تم نشر موجة البيان العام لجميع الهواتف النشطة بنجاح.');
-    } catch(e) { showToast('❌ عطل فني منع بث البيان العام.'); }
+      showToast('📣 تم إطلاق البث العام بنجاح.');
+    } catch(e) { showToast('❌ فشل البث.'); }
   };
 
-  /* ─── معالج التصدير المتقدم لملفات الإكسيل المنسقة عالي الكفاءة ─── */
+  /* ═══ Excel Export ═══ */
   window.exportUsersExcel = function() {
     const targets = allUsers.filter(u => u.phone && u.phone.trim());
-    if (!targets.length) { showToast('❌ قاعدة البيانات لا تحتوي على حسابات بهواتف صالحة للتصدير حالياً.'); return; }
-
+    if (!targets.length) { showToast('❌ لا توجد حسابات بأرقام هواتف للتصدير.'); return; }
     const book = XLSX.utils.book_new();
-    const headers = ['الاسم الكامل المسجل', 'العمر الافتراضي', 'النوع المعرف', 'رقم الهاتف والتواصل', 'مؤشر السمنة BMI', 'قائمة الأمراض المزمنة المقيدة', 'حالة تفعيل اشتراك طيبات'];
-    const sheetRows = [headers];
-
+    const headers = ['الاسم','العمر','الجنس','الهاتف','BMI','الأمراض','Pro','تاريخ الانتهاء','آخر دخول','سلسلة الحضور','الهدايا'];
+    const rows = [headers];
     targets.forEach(u => {
-      const g = u.gender === 'male' ? 'ذكر' : u.gender === 'female' ? 'أنثى' : 'غير محدد';
+      const g = u.gender==='male'?'ذكر':u.gender==='female'?'أنثى':'غير محدد';
       const age = u.dob ? calcAge(u.dob) : 'غير معروف';
-      const mappedDiseases = Array.isArray(u.diseases)
-        ? u.diseases.map(d => ({ sugar: 'السكري', pressure: 'الضغط', allergy: 'الحساسية', chemo: 'كيماوي', heart: 'القلب', kidney: 'الكلى' }[d] || d)).join(' / ')
-        : 'سليم / بدون أمراض';
-      const proState = isProActive(u) ? 'حساب PRO مطور' : 'باقة مجانية';
-      sheetRows.push([u.name || 'بدون اسم صريح', age, g, u.phone || '-', u.bmi || '-', mappedDiseases, proState]);
+      const diseases = Array.isArray(u.diseases) ? u.diseases.map(d=>({sugar:'السكري',pressure:'الضغط',allergy:'الحساسية',chemo:'كيماوي',heart:'القلب',kidney:'الكلى'}[d]||d)).join('/') : 'لا أمراض';
+      const proState = isProActive(u)?'Pro نشط':isProExpired(u)?'منتهي':'مجاني';
+      const expiry = u.pro&&u.pro.expiresAt ? new Date(u.pro.expiresAt).toLocaleDateString('ar-EG') : '-';
+      const last = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('ar-EG') : '-';
+      const streak = getConsecutiveStreak(u.loginHistory||[]);
+      const gifts = u.gifts ? Object.keys(u.gifts).length : 0;
+      rows.push([u.name||'بدون اسم', age, g, u.phone||'-', u.bmi||'-', diseases, proState, expiry, last, streak, gifts]);
     });
-
-    const worksheet = XLSX.utils.aoa_to_sheet(sheetRows);
-    
-    // ضبط أحجام وتنسيقات الأعمدة الافتراضية لحماية الأرقام
-    worksheet['!cols'] = [ {wch:26}, {wch:12}, {wch:10}, {wch:22}, {wch:12}, {wch:35}, {wch:18} ];
-
-    XLSX.utils.book_append_sheet(book, worksheet, 'بيانات منظومة طيبات');
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:22},{wch:8},{wch:8},{wch:18},{wch:8},{wch:30},{wch:12},{wch:16},{wch:16},{wch:14},{wch:10}];
+    XLSX.utils.book_append_sheet(book, ws, 'تقرير المستخدمين');
     const d = new Date();
-    XLSX.writeFile(book, `tayyibat_users_report_${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}.xlsx`);
-    showToast(`📊 تم بناء ملف التصدير لـ ${targets.length} عضواً بنجاح.`);
+    XLSX.writeFile(book, `tayyibat_report_${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}.xlsx`);
+    showToast(`📊 تم تصدير ${targets.length} مستخدم.`);
   };
 
-  /* ─── النوافذ والأحداث العامة ─── */
-  window.openModal = function(id) { document.getElementById(id).classList.add('show'); };
-  window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
-
+  /* ═══ Modals ═══ */
+  window.openModal = id => document.getElementById(id).classList.add('show');
+  window.closeModal = id => document.getElementById(id).classList.remove('show');
   document.querySelectorAll('.modal-overlay').forEach(o => {
-    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); });
+    o.addEventListener('click', e => { if (e.target===o) o.classList.remove('show'); });
   });
 
-  // التحقق التلقائي من حالة الجلسة الإدارية
-  if (sessionStorage.getItem('admin_ok') === '1') {
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('dashboardSection').style.display = 'block';
+  if (sessionStorage.getItem('admin_ok')==='1') {
+    document.getElementById('loginSection').style.display='none';
+    document.getElementById('dashboardSection').style.display='block';
     loadAndFixAllUsers();
   }
 </script>
