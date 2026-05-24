@@ -225,6 +225,12 @@
 </script>
 
 <!-- ═══════════════════════════════════════════════════
+     Google AdSense
+════════════════════════════════════════════════════ -->
+<meta name="google-adsense-account" content="ca-pub-1767845591267587">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1767845591267587" crossorigin="anonymous"></script>
+
+<!-- ═══════════════════════════════════════════════════
      Preconnect & Performance
 ════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://www.gstatic.com">
@@ -272,6 +278,13 @@ html{scroll-behavior:smooth}
 body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 .hidden{display:none!important}
+/* ══ Google AdSense Containers ══ */
+.ads-container{width:100%;overflow:hidden;text-align:center;margin:10px 0;padding:0 16px}
+.ads-container ins.adsbygoogle{display:block;border-radius:12px;overflow:hidden}
+.ads-banner{padding:0 16px;margin:12px 0}
+.ads-banner ins.adsbygoogle{display:block;border-radius:12px;overflow:hidden}
+/* الإعلانات مخفية افتراضياً حتى تُفعَّل بواسطة JS للمستخدمين العاديين */
+.ads-free-only{display:none}
 #universe-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85}
 #loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
 .loader-3d{position:relative;width:80px;height:80px}
@@ -961,6 +974,17 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="home-ai-btn-txt"><div class="home-ai-btn-title">طبيبك الذكي — مخصص لحالتك</div><div class="home-ai-btn-sub">اسألني عن طعامك ووضعك الصحي الآن</div></div>
     <i class="fas fa-chevron-left" style="color:var(--ai-purple2);opacity:.7"></i>
   </div>
+
+  <!-- إعلان جوجل - يظهر فقط للمستخدمين العاديين -->
+  <div class="ads-container ads-free-only" id="home-ad-1">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1767845591267587"
+         data-ad-slot="auto"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+
   <div class="section" id="quotes-section">
     <div class="quotes-container">
       <div class="quotes-header"><i class="fas fa-quote-left"></i><span>كلمات الدكتور ضياء العوضي</span></div>
@@ -990,6 +1014,17 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
   <div class="tip-header"><div class="tip-sec-title"><i class="fas fa-lightbulb"></i> نصيحة صحية</div><button class="tip-next-btn" onclick="nextTip()">التالية ›</button></div>
   <div class="tip-carousel" id="tip-carousel"></div>
+
+  <!-- إعلان جوجل - يظهر فقط للمستخدمين العاديين -->
+  <div class="ads-container ads-free-only" id="home-ad-2">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1767845591267587"
+         data-ad-slot="auto"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+
   <div class="footer-sig">
     <div class="heart-wrap">♥</div>
     <div class="sig-text">نظام الطيبات الغذائي<br><span class="sig-name">للدكتور ضياء العوضي رحمه الله</span></div>
@@ -1005,6 +1040,15 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 
 <div class="page" id="food-page">
   <div class="app-header"><div class="header-row"><div class="header-title">🥗 الأطعمة</div></div></div>
+  <!-- إعلان جوجل - يظهر فقط للمستخدمين العاديين -->
+  <div class="ads-container ads-free-only" id="food-ad-1">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1767845591267587"
+         data-ad-slot="auto"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
   <div class="search-wrap"><div class="search-wrap-inner"><i class="fas fa-search"></i><input class="search-input" type="search" id="food-search" placeholder="ابحث عن طعام..." oninput="filterFood()"></div></div>
   <div class="food-tabs-wrap" id="food-tabs"></div>
   <div class="food-grid" id="food-grid"></div>
@@ -1152,6 +1196,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         </thead>
         <tbody>
           <tr><td>الذكاء الاصطناعي الأساسي</td><td>✓ متاح</td><td>✓ غير محدود فائض السرعة</td></tr>
+          <tr><td>إعلانات جوجل</td><td>📢 تظهر الإعلانات</td><td>✓ بدون إعلانات نهائياً</td></tr>
           <tr><td>AI Health Analyzer (تحليل شامل)</td><td>✖ غير متاح</td><td>✓ تحليلات تفصيلية معمقة للدم والأعراض</td></tr>
           <tr><td>ماسح المنتجات المتقدم ذكياً للكاميرا</td><td>✖ غير متاح</td><td>✓ مسح ومطابقة ذكية للمكونات محلياً</td></tr>
           <tr><td>المدرب الصحي المباشر (AI Coach)</td><td>✖ غير متاح</td><td>✓ دردشة مستمرة وحفظ تفاعلي كامل للمحادثات</td></tr>
@@ -2032,6 +2077,8 @@ function syncPremiumUIStates() {
     document.getElementById('pro-upgrade-banner').style.display = 'none';
     document.getElementById('pro-user-status-bar').style.display = 'block';
     document.getElementById('pro-whatsapp-contact').style.display = 'block';
+    /* إخفاء جميع الإعلانات للمستخدمين البرو */
+    document.querySelectorAll('.ads-free-only').forEach(function(ad) { ad.style.display = 'none'; });
     /* شغّل العداد التنازلي من أبعد تاريخ */
     if (bestExp > now && typeof _startProCountdown === 'function') {
       _startProCountdown(bestExp);
@@ -2044,6 +2091,15 @@ function syncPremiumUIStates() {
     document.getElementById('pro-upgrade-banner').style.display = 'block';
     document.getElementById('pro-user-status-bar').style.display = 'none';
     document.getElementById('pro-whatsapp-contact').style.display = 'none';
+    /* إظهار الإعلانات للمستخدمين العاديين وتهيئتها */
+    document.querySelectorAll('.ads-free-only').forEach(function(ad) {
+      ad.style.display = 'block';
+      /* تهيئة AdSense إذا لم تُهيَّأ بعد */
+      var ins = ad.querySelector('ins.adsbygoogle');
+      if (ins && !ins.getAttribute('data-ad-status')) {
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+      }
+    });
   }
   checkAdminStatus();
 }
