@@ -2133,6 +2133,9 @@ function goPage(n) {
     document.getElementById('hero-bmi-status').innerHTML = '<span class="bmi-status-badge ' + bi.cls + '">' + bi.label + '</span>';
   }
   if (n === 'experiences') { loadExperiences(); checkUserExperience(); }
+  if (n === 'profile' && currentUser && currentUser.bmi) {
+    logActivity('analysis', 'اطّلع على تحليل حسابه الصحي (BMI)', 'bmi:' + currentUser.bmi + ' weight:' + (currentUser.weight||'-') + ' height:' + (currentUser.height||'-'));
+  }
 }
 
 /* ══════════ دمج الميزات والصفحات الفرعية للـ PRO ══════════ */
@@ -3203,6 +3206,7 @@ function startFast() {
   document.getElementById('btn-start').disabled = true; document.getElementById('btn-stop').disabled = false;
   document.getElementById('timer-phase').textContent = '🔥 صائم...';
   fTimer = setInterval(updateTimer, 1000); updateTimer();
+  logActivity('input', 'بدأ جلسة صيام — ' + (selFast ? selFast.name || selFast.id : ''), 'fast:' + (selFast ? selFast.id : ''));
   playSound('success'); showToast('🌿 بدأ الصيام!');
 }
 
@@ -3211,7 +3215,9 @@ function stopFast() {
   var elapsed = Date.now() - fStart; fRun = false; clearInterval(fTimer);
   document.getElementById('btn-start').disabled = false; document.getElementById('btn-stop').disabled = true;
   document.getElementById('timer-phase').textContent = '✅ انتهى';
-  recordFast(elapsed); localStorage.removeItem('fast_start'); localStorage.removeItem('fast_type');
+  recordFast(elapsed);
+  logActivity('analysis', 'أتمّ جلسة صيام — ' + (elapsed / 3600000).toFixed(1) + ' ساعة', 'fast:' + (fType ? fType.id : '') + ' duration:' + Math.round(elapsed/60000) + 'min');
+  localStorage.removeItem('fast_start'); localStorage.removeItem('fast_type');
   playSound('success'); showToast('✅ انتهى — ' + (elapsed / 3600000).toFixed(1) + ' ساعة');
   document.getElementById('ring-prog').style.strokeDashoffset = 565.5;
 }
@@ -3343,6 +3349,7 @@ async function saveEditProfile() {
   currentUser.diseases = editDiseases.slice();
   if (eSmoke) currentUser.smoking = eSmoke.value;
   await dbSaveUser(currentUser.username, currentUser);
+  logActivity('input', 'حدّث بياناته الشخصية (وزن/طول/أمراض)', 'weight:' + currentUser.weight + ' height:' + currentUser.height + ' bmi:' + currentUser.bmi);
   buildProfile(); buildHomeDisTags(); buildMedicalAlerts(); buildAiPage();
   closeModal('edit-profile-modal'); showToast('✅ تم تحديث البيانات'); playSound('success');
 }
@@ -3574,6 +3581,7 @@ async function submitExperience() {
   var expId = Date.now().toString();
   var newExp = { id: expId, username: currentUser.name || currentUser.username, disease: disease, details: details, date: Date.now(), userId: currentUser.username, isPro: isProActive(currentUser) };
   await dbSaveExperience(expId, newExp);
+  logActivity('input', 'أضاف/عدّل تجربته الصحية — ' + disease, details.substring(0, 100));
   allExperiences.unshift(Object.assign({}, newExp, { date: new Date(newExp.date) }));
   var chip = document.getElementById('exp-count-chip'); if (chip) chip.textContent = allExperiences.length;
   renderExperiences(); checkUserExperience(); closeShareExpModal();
