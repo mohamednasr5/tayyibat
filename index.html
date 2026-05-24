@@ -1625,6 +1625,32 @@ async function dbSaveUser(u, d) {
   local[u] = d; localStorage.setItem('tayyibat_users', JSON.stringify(local));
 }
 
+/* ══════════ تسجيل نشاط المستخدم في Firebase ══════════ */
+function logActivity(type, text, detail) {
+  if (!window.__firebaseReady || !currentUser) return;
+  var uid = currentUser.username;
+  var entry = { type: type, text: text, detail: detail || '', ts: Date.now() };
+  try {
+    var newRef = window.__firebaseRef(window.__firebaseDB, 'activityLog/' + uid + '/' + Date.now());
+    window.__firebaseSet(newRef, entry).catch(function(){});
+    // أيضاً احفظ سجل الدخول داخل نود المستخدم
+    if (type === 'login') {
+      var loginHistory = Array.isArray(currentUser.loginHistory) ? currentUser.loginHistory : [];
+      var today = new Date(); today.setHours(0,0,0,0);
+      var alreadyToday = loginHistory.some(function(ts) {
+        var d = new Date(ts); d.setHours(0,0,0,0); return d.getTime() === today.getTime();
+      });
+      if (!alreadyToday) {
+        loginHistory.push(Date.now());
+        currentUser.loginHistory = loginHistory;
+        window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/loginHistory'), loginHistory).catch(function(){});
+      }
+      // تحديث lastLogin دائماً
+      window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/lastLogin'), Date.now()).catch(function(){});
+    }
+  } catch(e) {}
+}
+
 async function dbSaveExperience(id, data) {
   if (window.__firebaseReady) {
     try { await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'experiences/' + id), data); } catch(e) {}
@@ -1840,6 +1866,7 @@ async function doLogin() {
     }
     
     try { await dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
+    logActivity('login', 'سجّل دخولاً للتطبيق', 'من صفحة تسجيل الدخول');
     playSound('success'); showToast('✅ أهلاً ' + user.name); bootApp(); setTimeout(refreshGiftFab, 700);
   } catch(e) { showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً'); }
   finally { b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'; }
@@ -1932,6 +1959,10 @@ function goPage(n) {
   document.querySelectorAll('.nav-item').forEach(function(v) { v.classList.remove('act'); });
   var nv = document.getElementById('nav-' + n); if (nv) nv.classList.add('act');
   if (n !== 'auth') playSound('nav');
+  if (n !== 'auth' && currentUser) {
+    var pageNames = { home:'الصفحة الرئيسية', food:'قائمة الأطعمة', experiences:'التجارب', ai:'AI الذكي', fast:'الصيام', profile:'حسابي' };
+    logActivity('navigation', 'انتقل إلى ' + (pageNames[n] || n), 'page:' + n);
+  }
   if (n === 'home' && currentUser) {
     if (currentUser.bmi) { document.getElementById('bmi-hero-wrap').style.display = 'inline-flex'; document.getElementById('bmi-hero-val').textContent = 'BMI: ' + currentUser.bmi; }
     syncPremiumUIStates();
@@ -3198,6 +3229,11 @@ async function sendAiMessage() {
   var inp = document.getElementById('ai-msg-input'), txt = (inp.value || '').trim(); if (!txt) return;
   var chatWrap = document.getElementById('ai-chat-wrap');
   addAiMsg('user', txt); inp.value = ''; document.getElementById('btn-ai-send').disabled = true; addThink();
+  logActivity('question', 'سؤال للذكاء الاصطناعي', txt.substring(0, 200));
+  // حفظ السؤال في مسار questions أيضاً
+  if (window.__firebaseReady && currentUser) {
+    try { window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'questions/' + Date.now()), { userId: currentUser.username, question: txt, ts: Date.now(), type: 'ai' }).catch(function(){}); } catch(e) {}
+  }
   var sysPrompt = buildUserContext(), reply = null, usedModel = null, usedSource = null;
   var orKey = window.__OR_KEY_FB;
   if (orKey) {
