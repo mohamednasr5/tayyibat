@@ -347,10 +347,12 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 @keyframes cdTick{0%{transform:scale(1.25);color:#fff}100%{transform:scale(1);color:#ffc107}}
 .pro-cd-label{font-size:.58rem;color:rgba(232,213,163,.75);font-weight:600;white-space:nowrap}
 .pro-cd-expired{color:#ef5350!important}
-.gift-medal-fab{position:fixed;left:14px;bottom:calc(var(--nav)+18px);width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 30%,#ffe27a 0%,#d4af37 45%,#8c6a08 100%);border:3px solid rgba(255,215,120,.85);box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 22px rgba(212,175,55,.45),inset 0 2px 10px rgba(255,255,255,.18);z-index:1600;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
-.gift-medal-fab:hover,.gift-medal-fab:active{transform:scale(1.06);box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 26px rgba(212,175,55,.6)}
-.gift-medal-fab .medal-emoji{font-size:1.75rem;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
-.gift-medal-fab .gift-badge-dot{position:absolute;top:4px;right:6px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#ef5350;color:#fff;font-size:.62rem;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+/* gift-medal-fab styles moved to #daily-reward-fab */
+.gift-medal-fab .gf-inner{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ffe87a 0%,#d4a017 55%,#8c5e00 100%);border:3px solid #f5d060;box-shadow:0 0 16px rgba(212,175,55,.5),inset 0 2px 8px rgba(255,255,255,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;gap:1px}
+.gift-medal-fab .gf-ribbon{font-size:.65rem;font-weight:900;color:#7a3a00;letter-spacing:.5px;text-transform:uppercase;line-height:1}
+.gift-medal-fab .gf-icon{font-size:1.55rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+.gift-medal-fab .gf-label{font-size:.48rem;font-weight:900;color:#5a2800;line-height:1;letter-spacing:.3px}
+.gift-medal-fab .gift-badge-dot{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;border:2.5px solid #0d1b3e;box-shadow:0 2px 10px rgba(255,68,68,.6);z-index:2}
 .share-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .share-btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;padding:14px 12px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer;transition:all .3s;text-decoration:none}
 .share-btn-whatsapp{background:linear-gradient(135deg,#128C7E,var(--whatsapp));color:#fff;box-shadow:0 4px 15px rgba(37,211,102,.3)}
@@ -627,6 +629,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .scan-result-allowed{background:rgba(46,201,81,.13);border:2.5px solid #2ec951;border-radius:18px;padding:16px;margin-top:12px;box-shadow:0 0 18px rgba(46,201,81,.25),0 4px 20px rgba(0,0,0,.3)}
 .scan-result-forbidden{background:rgba(229,57,53,.13);border:2.5px solid #ef5350;border-radius:18px;padding:16px;margin-top:12px;box-shadow:0 0 18px rgba(229,57,53,.35),0 4px 20px rgba(0,0,0,.3)}
 .scan-result-unknown{background:rgba(255,160,0,.1);border:2.5px solid #ffa726;border-radius:18px;padding:16px;margin-top:12px;box-shadow:0 0 18px rgba(255,160,0,.2),0 4px 20px rgba(0,0,0,.3)}
+.scan-result-carcinogen{background:rgba(10,30,100,.92);border:2.5px solid #2979ff;border-radius:18px;padding:16px;margin-top:10px;box-shadow:0 0 24px rgba(41,121,255,.35),0 4px 20px rgba(0,0,0,.4)}
+.carcinogen-hazard-block{padding:8px 12px;background:rgba(21,101,192,.2);border:1.5px solid #2979ff;border-radius:10px;font-size:.78rem;color:#90caf9;margin-top:8px}
+.carcinogen-hazard-block .ch-title{font-size:.75rem;font-weight:800;color:#64b5f6;display:block;margin-bottom:3px}
+.reason-block{background:rgba(255,255,255,.05);padding:7px 10px;border-radius:8px;margin-bottom:7px;font-size:.8rem;color:var(--txt)}
+.reason-title{font-size:.7rem;font-weight:800;display:block;margin-bottom:2px}
 /* floating toast enhanced */
 .scan-toast-floating{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);z-index:9000;min-width:260px;max-width:min(92vw,420px);border-radius:24px;padding:16px 22px;font-size:.92rem;font-weight:800;text-align:center;opacity:0;transition:all .4s cubic-bezier(.22,1,.36,1);pointer-events:none;backdrop-filter:blur(14px);display:flex;align-items:center;gap:10px;justify-content:center;box-shadow:0 18px 55px rgba(0,0,0,.55)}
 .scan-toast-floating.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -2030,35 +2037,50 @@ async function _scanAnalyzeAI(ingredients) {
   var prompt;
 
   if (isFoodMode) {
-    prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
-      + "تعرف على هذا الطعام او المنتج: " + ingredients + "\n\n"
+    prompt = "انت خبير تغذية وسلامة غذائية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
+      + "تعرف على هذا الطعام أو المنتج: " + ingredients + "\n\n"
       + "نظام الطيبات:\n"
       + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
       + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة بعض انواعها، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
-      + "أعطني:\n1. تعريف هذا الطعام أو المنتج ومكوناته الأساسية بشكل واضح (بدون أي نجوم أو ** في الإجابة)\n"
-      + "2. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
-      + "3. السبب التفصيلي\n4. البديل الصحي في الطيبات إن كان ممنوعًا\n"
-      + "مهم: إذا كان الإدخال يحتوي أكثر من مكون أو طعام، قدم كل مكون بشكل منفصل بالتنسيق التالي:\n"
-      + "1. اسم المكون\n   الحكم: مسموح/ممنوع/يحتاج دراسة\n   الوصف: ...\n"
-      + "2. اسم المكون\n   الحكم: مسموح/ممنوع/يحتاج دراسة\n   الوصف: ...\n"
-      + "وهكذا لكل مكون. لا تجمع كل شيء في فقرة واحدة.\n"
-      + "لا تستخدم ** أو *** إطلاقاً.\n"
-      + "الرد مختصر لكل مكون (جملتان أو ثلاث) لا أكثر.";
+      + "المواد المسرطنة والخطرة المعروفة: E171 (ثاني أكسيد التيتانيوم), E951 (أسبارتام), E250 (نيتريت الصوديوم), E251 (نترات الصوديوم), E252 (نترات البوتاسيوم), E320 (BHA), E321 (BHT), E102 (تارترازين), E110 (أصفر غروب الشمس), E122 (كارموزين), E124 (بونسو 4R), E129 (ألورا ريد), E131 (بلو باتنت), E132 (إنديجوتين), E142 (أخضر S)، نيتروزامين، أكريلاميد، أفلاتوكسين، بنزو(أ)بيرين.\n"
+      + "إذا كان الطعام يحتوي أي مادة من القائمة أعلاه أو أي مادة مصنفة مسرطنة من قِبل IARC أو WHO أو الاتحاد الأوروبي، اذكرها.\n\n"
+      + "قدم كل مكون أو طعام بشكل منفصل بالتنسيق الحرفي التالي بدون أي تعديل:\n"
+      + "1. اسم المكون\n"
+      + "   الحكم: مسموح\n"
+      + "   السبب: لماذا هو مسموح بجملة واضحة مختصرة\n"
+      + "   الوصف: وصف مختصر للمكون\n"
+      + "   البديل: لا يوجد\n"
+      + "   مسرطن: لا\n"
+      + "\n"
+      + "إذا كان ممنوعاً أو فيه مادة مسرطنة:\n"
+      + "1. اسم المكون\n"
+      + "   الحكم: ممنوع\n"
+      + "   السبب: لماذا هو ممنوع بجملة واضحة\n"
+      + "   الوصف: وصف مختصر\n"
+      + "   البديل: اذكر البديل الصحي\n"
+      + "   مسرطن: نعم\n"
+      + "   خطر: اسم المادة المسرطنة وسبب خطورتها العلمي في جملة واحدة.\n"
+      + "لا تستخدم ** أو *** أو أي تنسيق markdown إطلاقاً.";
   } else {
-    prompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
+    prompt = "انت خبير تغذية وسلامة غذائية في نظام الطيبات للدكتور ضياء العوضي.\n\n"
       + "حلل هذه المكونات:\n" + ingredients + "\n\n"
       + "نظام الطيبات:\n"
       + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n"
       + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر، زيوت مهدرجة.\n\n"
-      + "أعطني:\n1. الحكم: مسموح / ممنوع / يحتاج دراسة\n"
-      + "2. اشرح المنتج وماذا يحتوي (بدون أي نجوم أو ** في الإجابة)\n"
-      + "3. المكونات الممنوعة إن وجدت\n4. البديل الصحي إن وجد\n"
-      + "مهم: إذا كان الإدخال يحتوي أكثر من مكون، قدم كل مكون بشكل منفصل بالتنسيق التالي:\n"
-      + "1. اسم المكون\n   الحكم: مسموح/ممنوع/يحتاج دراسة\n   الوصف: ...\n"
-      + "2. اسم المكون\n   الحكم: مسموح/ممنوع/يحتاج دراسة\n   الوصف: ...\n"
-      + "وهكذا لكل مكون. لا تجمع في فقرة واحدة.\n"
-      + "لا تستخدم ** أو *** إطلاقاً.\n"
-      + "الرد مختصر (جملتان لكل مكون).";
+      + "المواد المسرطنة والخطرة: E171 (ثاني أكسيد التيتانيوم), E951 (أسبارتام), E250 (نيتريت الصوديوم), E251 (نترات الصوديوم), E252 (نترات البوتاسيوم), E320 (BHA), E321 (BHT), E102 (تارترازين), E110 (أصفر غروب الشمس), E122 (كارموزين), E124 (بونسو 4R), E129 (ألورا ريد), E131 (بلو باتنت), E132 (إنديجوتين), E142 (أخضر S)، نيتروزامين، أكريلاميد، أفلاتوكسين.\n"
+      + "إذا وجدت أي مادة من القائمة أعلاه أو أي مادة مصنفة مسرطنة من قِبل IARC أو WHO، اذكرها.\n\n"
+      + "قدم كل مكون بشكل منفصل بالتنسيق الحرفي التالي:\n"
+      + "1. اسم المكون\n"
+      + "   الحكم: مسموح/ممنوع/يحتاج دراسة\n"
+      + "   السبب: (لماذا مسموح أو لماذا ممنوع بجملة مختصرة)\n"
+      + "   الوصف: (وصف قصير)\n"
+      + "   البديل: (البديل الصحي أو لا يوجد)\n"
+      + "   مسرطن: لا\n"
+      + "\n"
+      + "إذا وجدت مادة مسرطنة في أي مكون:\n"
+      + "   مسرطن: نعم\n"
+      + "   خطر: اسم المادة وسبب خطورتها العلمي في جملة واحدة.\n"
+      + "لا تستخدم ** أو *** إطلاقاً.";
   }
 
   var result = null;
@@ -2160,6 +2182,22 @@ function _playForbiddenAlert() {
     });
   } catch(e) {}
 }
+function _playCarcinogenAlert() {
+  try {
+    var ctx = audioCtx || (audioCtx = new (window.AudioContext||window.webkitAudioContext)());
+    /* Urgent alarm: rising then descending */
+    [300,400,500,400,300,200].forEach(function(freq, i) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = 'sawtooth';
+      g.gain.setValueAtTime(0.2, ctx.currentTime + i*0.15);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.15 + 0.18);
+      o.start(ctx.currentTime + i*0.15);
+      o.stop(ctx.currentTime + i*0.15 + 0.2);
+    });
+  } catch(e) {}
+}
+
 
 function _renderScanResult(text, source) {
   var resBox = document.getElementById("pa-scan-result");
@@ -2173,14 +2211,16 @@ function _renderScanResult(text, source) {
 }
 
 function _parseScanItems(text) {
-  /* Try to split lines into numbered items */
   var lines = text.split('\n');
   var items = [];
   var cur = null;
-  var numRx = /^(\d+)[.\-)]\s*(.+)/;
-  var statusRx = /(?:الحكم|الحالة|النتيجة|الحكم\s*:)?\s*(مسموح|ممنوع|يحتاج\s*دراسة|تحت\s*الدراسة|غير\s*مناسب|محظور)/;
-  var descRx = /^(?:الوصف|السبب|التفصيل|الشرح)\s*[:：]\s*/i;
-  var altRx  = /^(?:البديل|بديل)\s*[:：]\s*/i;
+  var numRx = /^(\d+)[.\-)\s]\s*(.+)/;
+  var statusRx = /(?:الحكم\s*[:：]?\s*)(مسموح|ممنوع|يحتاج\s*دراسة|تحت\s*الدراسة|غير\s*مناسب|محظور)/;
+  var reasonRx = /^\s*السبب\s*[:：]/;
+  var descRx   = /^\s*الوصف\s*[:：]/;
+  var altRx    = /^\s*البديل\s*[:：]/;
+  var cancRx   = /^\s*مسرطن\s*[:：]/;
+  var hazRx    = /^\s*خطر\s*[:：]/;
 
   for (var i = 0; i < lines.length; i++) {
     var l = lines[i].replace(/\*\*/g,'').trim();
@@ -2188,29 +2228,57 @@ function _parseScanItems(text) {
     var nm = numRx.exec(l);
     if (nm) {
       if (cur) items.push(cur);
-      cur = { name: nm[2].replace(/\*\*/g,'').trim(), status: '', desc: '', alt: '' };
-    } else if (cur) {
-      var sm = statusRx.exec(l);
-      if (sm) { cur.status = sm[1]; continue; }
-      if (altRx.test(l)) { cur.alt += l.replace(altRx,''); continue; }
-      var dl = l.replace(descRx,'');
-      cur.desc += (cur.desc ? '\n' : '') + dl;
+      cur = { name: nm[2].trim(), status:'', reason:'', desc:'', alt:'', carcinogen: false, hazard:'' };
+      continue;
     }
+    if (!cur) { cur = { name:'', status:'', reason:'', desc:'', alt:'', carcinogen:false, hazard:'' }; }
+    var sm = statusRx.exec(l);
+    if (sm) { cur.status = sm[1]; continue; }
+    if (cancRx.test(l)) {
+      var cv = l.replace(cancRx,'').trim();
+      cur.carcinogen = (cv === 'نعم' || cv.includes('نعم'));
+      continue;
+    }
+    if (hazRx.test(l)) { cur.hazard += (cur.hazard?' ':'') + l.replace(hazRx,'').trim(); continue; }
+    if (reasonRx.test(l)) { cur.reason += l.replace(reasonRx,'').trim(); continue; }
+    if (altRx.test(l))    { cur.alt    += l.replace(altRx,'').trim();    continue; }
+    if (descRx.test(l))   { cur.desc   += l.replace(descRx,'').trim();   continue; }
+    /* fallback append to desc */
+    if (cur.name) cur.desc += (cur.desc?'\n':'') + l;
   }
-  if (cur) items.push(cur);
-  var valid = items.filter(function(it){ return it.status; });
+  if (cur && (cur.name || cur.status)) items.push(cur);
+  var valid = items.filter(function(it){ return it.status || it.name; });
   return valid.length >= 2 ? valid : null;
 }
 
+
 function _renderMultiCards(resBox, items, source) {
-  var order = { 'مسموح':0, 'مناسب':0, 'يحتاج دراسة':1, 'تحت الدراسة':1, 'ممنوع':2, 'غير مناسب':2, 'محظور':2 };
+  var order = { 'مسموح':0,'مناسب':0,'يحتاج دراسة':1,'تحت الدراسة':1,'ممنوع':2,'غير مناسب':2,'محظور':2 };
   items.sort(function(a,b){ return (order[a.status.trim()]||1)-(order[b.status.trim()]||1); });
 
-  var hasForbidden = items.some(function(it){ return it.status.includes('ممنوع') || it.status.includes('غير مناسب') || it.status.includes('محظور'); });
-  if (hasForbidden) _playForbiddenAlert();
+  var hasForbidden   = items.some(function(it){ return it.status.includes('ممنوع') || it.status.includes('غير مناسب') || it.status.includes('محظور'); });
+  var hasCarcinogen  = items.some(function(it){ return it.carcinogen; });
+  if (hasForbidden)  _playForbiddenAlert();
+  if (hasCarcinogen) { setTimeout(function(){ _playCarcinogenAlert(); }, 600); }
 
-  var h = '<div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">';
-  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 4px">تم التحليل بواسطة: '+(source||'AI')+'</div>';
+  var h = '<div style="margin-top:10px;display:flex;flex-direction:column;gap:12px">';
+  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 2px">تم التحليل بواسطة: '+(source||'AI')+'</div>';
+
+  /* Carcinogen global warning banner */
+  if (hasCarcinogen) {
+    h += '<div style="background:rgba(10,30,100,.92);border:2.5px solid #2979ff;border-radius:16px;padding:14px;animation:pageIn .3s ease;box-shadow:0 0 24px rgba(41,121,255,.35)">';
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
+    h += '<span style="font-size:1.6rem;filter:drop-shadow(0 0 8px #2979ff)">☣️</span>';
+    h += '<strong style="color:#64b5f6;font-size:.95rem;flex:1">⚠️ تحذير: تم رصد مادة مسرطنة أو خطرة!</strong>';
+    h += '</div>';
+    var hazards = items.filter(function(it){ return it.carcinogen && it.hazard; });
+    hazards.forEach(function(it){
+      h += '<div style="background:rgba(41,121,255,.1);border-right:3px solid #2979ff;padding:8px 10px;border-radius:8px;margin-bottom:6px;font-size:.8rem;color:#90caf9">';
+      h += '<strong style="color:#64b5f6">'+it.name+':</strong> '+it.hazard;
+      h += '</div>';
+    });
+    h += '</div>';
+  }
 
   items.forEach(function(it, idx) {
     var isForbidden = it.status.includes('ممنوع') || it.status.includes('غير مناسب') || it.status.includes('محظور');
@@ -2223,33 +2291,59 @@ function _renderMultiCards(resBox, items, source) {
     } else {
       bg='rgba(255,160,0,.1)';border='#ffa726';labelBg='rgba(110,70,5,.9)';icon='🔍';label='تحت الدراسة';
     }
-    var delay = (idx * 0.1).toFixed(1);
-    var descHtml = it.desc ? it.desc.replace(/\n/g,'<br>').replace(/\*\*/g,'') : '';
-    var altHtml  = it.alt  ? '<div style="margin-top:8px;padding:7px 10px;background:rgba(255,255,255,.05);border-radius:10px;font-size:.75rem;color:#a0c4ff"><i class="fas fa-leaf"></i> البديل: '+it.alt.replace(/\*\*/g,'')+'</div>' : '';
+    var delay = (idx * 0.08).toFixed(2);
+
     h += '<div style="background:'+bg+';border:2px solid '+border+';border-radius:16px;overflow:hidden;animation:pageIn .4s ease '+delay+'s both;box-shadow:0 4px 18px rgba(0,0,0,.3)">';
+    /* Label bar */
     h += '<div style="background:'+labelBg+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
     h += '<span style="font-size:1rem">'+icon+'</span>';
     h += '<strong style="color:#fff;font-size:.9rem;flex:1">'+label+'</strong>';
+    if (it.carcinogen) h += '<span style="background:#1565c0;color:#90caf9;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:20px;border:1px solid #2979ff">☣️ مسرطن</span>';
     h += '</div>';
+    /* Content */
     h += '<div style="padding:12px 14px">';
-    h += '<div style="font-size:.95rem;font-weight:800;color:'+border+';margin-bottom:6px">'+it.name.replace(/\*\*/g,'')+'</div>';
-    if (descHtml) h += '<div style="font-size:.82rem;line-height:1.85;color:var(--txt)">'+descHtml+'</div>';
-    h += altHtml;
+    h += '<div style="font-size:.95rem;font-weight:800;color:'+border+';margin-bottom:8px">'+it.name.replace(/\*\*/g,'')+'</div>';
+    /* Reason block */
+    if (it.reason) {
+      h += '<div style="background:rgba(255,255,255,.05);border-right:3px solid '+border+';padding:7px 10px;border-radius:8px;margin-bottom:7px;font-size:.8rem;color:var(--txt)">';
+      h += '<span style="font-size:.7rem;font-weight:800;color:'+border+';display:block;margin-bottom:2px">'+(isAllowed?'لماذا مسموح؟':isForbidden?'لماذا ممنوع؟':'ملاحظة:')+'</span>';
+      h += it.reason.replace(/\*\*/g,'');
+      h += '</div>';
+    }
+    /* Desc */
+    if (it.desc && it.desc !== it.reason) {
+      h += '<div style="font-size:.8rem;line-height:1.8;color:var(--txt2);margin-bottom:6px">'+it.desc.replace(/\n/g,'<br>').replace(/\*\*/g,'')+'</div>';
+    }
+    /* Alt */
+    if (it.alt && it.alt !== 'لا يوجد') {
+      h += '<div style="margin-top:6px;padding:7px 10px;background:rgba(255,255,255,.05);border-radius:10px;font-size:.75rem;color:#a0c4ff"><i class="fas fa-leaf"></i> البديل الصحي: '+it.alt.replace(/\*\*/g,'')+'</div>';
+    }
+    /* Carcinogen detail */
+    if (it.carcinogen && it.hazard) {
+      h += '<div style="margin-top:8px;padding:8px 12px;background:rgba(10,30,100,.7);border:1.5px solid #2979ff;border-radius:10px;font-size:.78rem;color:#90caf9">';
+      h += '<span style="font-size:.75rem;font-weight:800;color:#64b5f6;display:block;margin-bottom:3px">☣️ خطر مسرطن:</span>';
+      h += it.hazard.replace(/\*\*/g,'');
+      h += '</div>';
+    }
     h += '</div></div>';
   });
+
   h += '</div>';
   resBox.innerHTML = h;
 
+  /* Summary toast */
   var cntA = items.filter(function(i){ return i.status.includes('مسموح'); }).length;
   var cntF = items.filter(function(i){ return i.status.includes('ممنوع') || i.status.includes('محظور'); }).length;
   var cntS = items.length - cntA - cntF;
-  var msg = (cntA ? '✅ '+cntA+' مسموح  ' : '')+(cntF ? '🚫 '+cntF+' ممنوع  ' : '')+(cntS>0 ? '🔍 '+cntS+' تحت الدراسة' : '');
+  var cntC = items.filter(function(i){ return i.carcinogen; }).length;
+  var msg = (cntA?'✅ '+cntA+' مسموح  ':'')+(cntF?'🚫 '+cntF+' ممنوع  ':'')+(cntS>0?'🔍 '+cntS+' دراسة  ':'')+( cntC>0?'☣️ '+cntC+' مسرطن':'');
   if (typeof _showScanToast === 'function') {
-    var tc = cntF > 0 ? 'forbidden-toast' : cntS > 0 ? 'unknown-toast' : 'allowed-toast';
-    var ic = cntF > 0 ? '🚫' : cntS > 0 ? '🔍' : '✅';
+    var tc = cntC > 0 ? 'forbidden-toast' : cntF > 0 ? 'forbidden-toast' : cntS > 0 ? 'unknown-toast' : 'allowed-toast';
+    var ic = cntC > 0 ? '☣️' : cntF > 0 ? '🚫' : cntS > 0 ? '🔍' : '✅';
     _showScanToast(tc, ic, msg.trim());
   }
 }
+
 
 function _renderSingleCard(resBox, text, source) {
   var cleanText = text.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*\*/g,'');
@@ -2411,7 +2505,7 @@ setInterval(triggerSmartPeriodicReminders, 90000);
 
 function refreshGiftFab() {
   var btn = document.getElementById('gift-medal-fab');
-  var dot = document.getElementById('gift-badge-dot');
+  var dot = document.getElementById('fab-reward-badge');
   if (!btn || !dot) return;
   var hasGift = false;
   try {
@@ -3420,44 +3514,75 @@ window.addEventListener('DOMContentLoaded', function() {
 /* Daily Reward Floating Button */
 #daily-reward-fab {
   position: fixed;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1500;
-  width: 54px;
-  height: 54px;
+  left: 14px;
+  bottom: calc(var(--nav) + 18px);
+  top: auto;
+  transform: none;
+  z-index: 1600;
+  width: 66px;
+  height: 66px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f5c842, #c8960c);
+  background: rgba(10,22,40,0.85);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  box-shadow: 0 4px 20px rgba(200,150,12,.5), 0 0 0 0 rgba(200,150,12,.4);
-  animation: fabPulse 2s ease-in-out infinite;
-  transition: transform .3s;
+  padding: 0;
+  overflow: visible;
+  box-shadow: 0 8px 28px rgba(0,0,0,.55);
+  animation: fabPulse 2.5s ease-in-out infinite;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
-#daily-reward-fab:hover { transform: translateY(-50%) scale(1.1); }
+#daily-reward-fab:hover { transform: scale(1.07) translateY(-2px); box-shadow: 0 14px 35px rgba(0,0,0,.6), 0 0 22px rgba(212,175,55,.4); }
 @keyframes fabPulse {
   0%,100% { box-shadow: 0 4px 20px rgba(200,150,12,.5), 0 0 0 0 rgba(200,150,12,.4); }
   50%      { box-shadow: 0 4px 28px rgba(200,150,12,.7), 0 0 0 10px rgba(200,150,12,0); }
 }
+#daily-reward-fab .gf-inner {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #ffe87a 0%, #d4a017 55%, #8c5e00 100%);
+  border: 3px solid #f5d060;
+  box-shadow: 0 0 16px rgba(212,175,55,.5), inset 0 2px 8px rgba(255,255,255,.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 2px;
+}
+#daily-reward-fab .gf-icon {
+  font-size: 1.9rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
+}
+#daily-reward-fab .gf-label {
+  font-size: .48rem;
+  font-weight: 900;
+  color: #5a2800;
+  line-height: 1;
+  letter-spacing: .3px;
+}
 #daily-reward-fab .fab-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ef5350;
-  border: 2px solid var(--bg);
-  font-size: .6rem;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: linear-gradient(135deg,#ff4444,#cc0000);
+  border: 2.5px solid #0d1b3e;
+  font-size: .65rem;
   color: #fff;
   font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 10px rgba(255,68,68,.6);
+  z-index: 2;
 }
 
 /* Daily Reward Panel */
@@ -3660,8 +3785,11 @@ window.addEventListener('DOMContentLoaded', function() {
 
 <!-- Daily Reward FAB (hidden until login) -->
 <button id="daily-reward-fab" onclick="toggleDailyRewardPanel()" title="هديتك اليومية" style="display:none">
-  🎁
-  <span class="fab-badge" id="fab-reward-badge" style="display:none">!</span>
+  <div class="gf-inner">
+    <span class="gf-icon">🎁</span>
+    <span class="gf-label">هدية اليوم</span>
+    <span class="fab-badge gift-badge-dot" id="fab-reward-badge" style="display:none">!</span>
+  </div>
 </button>
 
 <!-- Daily Reward Panel -->
