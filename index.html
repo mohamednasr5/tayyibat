@@ -29,7 +29,7 @@
 <meta property="og:url" content="https://tayyibat.online/">
 <meta property="og:image" content="https://tayyibat.online/icons/og-image.png">
 <meta property="og:image:secure_url" content="https://tayyibat.online/icons/og-image.png">
-<meta property="og:image:type" content="image/png">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="نظام طيبات الصحي - تطبيق الدايت والتغذية بالذكاء الاصطناعي من الدكتور ضياء العوضي">
@@ -1352,12 +1352,18 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 
   <!-- Camera Mode Tabs -->
-  <div style="padding:8px 16px 0;display:flex;gap:8px">
-    <button id="scan-tab-product" onclick="setScanMode('product')" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1));color:#2ec951;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+  <div style="padding:8px 16px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <button id="scan-tab-product" onclick="setScanMode('product')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1));color:#2ec951;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
       <i class="fas fa-barcode"></i> مكونات العلبة
     </button>
-    <button id="scan-tab-food" onclick="setScanMode('food')" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(200,150,12,.3);background:rgba(200,150,12,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+    <button id="scan-tab-food" onclick="setScanMode('food')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(200,150,12,.3);background:rgba(200,150,12,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
       <i class="fas fa-utensils"></i> التعرف على الطعام
+    </button>
+    <button id="scan-tab-medicine" onclick="setScanMode('medicine')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+      <i class="fas fa-pills"></i> قراءة علبة الدواء
+    </button>
+    <button id="scan-tab-report" onclick="setScanMode('report')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(156,39,176,.3);background:rgba(156,39,176,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+      <i class="fas fa-file-medical"></i> قراءة التقارير الطبية
     </button>
   </div>
 
@@ -1374,7 +1380,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <button class="btn btn-gold" style="width:auto;padding:10px 18px;font-size:.82rem" onclick="startPremiumCameraScanner()">
         <i class="fas fa-camera"></i> فتح الكاميرا
       </button>
-      <button class="btn" style="width:auto;padding:10px 18px;font-size:.82rem;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;border:none" onclick="captureAndScanProductBlob()">
+      <button class="btn" style="width:auto;padding:10px 18px;font-size:.82rem;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;border:none" onclick="captureSmartByMode()">
         <i class="fas fa-search"></i> التقط وحلل
       </button>
     </div>
@@ -1383,14 +1389,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
       <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
-    <div class="field">
-      <label>المكونات أو اسم الطعام</label>
+    <div class="field" id="pa-manual-field">
+      <label id="pa-manual-label">المكونات أو اسم الطعام</label>
       <input type="text" id="pa-manual-ingredients"
         placeholder="مثال: دقيق قمح، سكر... أو: تفاحة، خبز، دجاج..."
         onkeydown="if(event.key==='Enter') analyzeIngredientsTextDirect()">
     </div>
     <div style="display:flex;justify-content:center;margin-bottom:4px">
-      <button class="btn" style="background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;width:auto;padding:12px 32px;border-radius:14px;display:flex;align-items:center;gap:8px;font-size:.9rem" onclick="analyzeIngredientsTextDirect()">
+      <button class="btn" style="background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;width:auto;padding:12px 32px;border-radius:14px;display:flex;align-items:center;gap:8px;font-size:.9rem" onclick="analyzeSmartByMode()">
         <i class="fas fa-robot"></i> تحليل بالذكاء الاصطناعي
       </button>
     </div>
@@ -2572,38 +2578,306 @@ async function _scanAnalyzeAI(ingredients) {
   _renderScanResult(result.text, result.source);
 }
 
-/* scan mode: 'product' or 'food' */
+/* scan mode: 'product' | 'food' | 'medicine' | 'report' */
 var _scanMode = 'product';
 function setScanMode(mode) {
   _scanMode = mode;
   var badge = document.getElementById('pa-camera-mode-badge');
+  var modeLabels = {
+    'product':  '📦 وضع قراءة المكونات',
+    'food':     '🍎 وضع التعرف على الطعام',
+    'medicine': '💊 وضع قراءة علبة الدواء',
+    'report':   '🩺 وضع قراءة التقارير الطبية'
+  };
+  var modeBorderColors = {
+    'product':  '#2ec951',
+    'food':     'var(--gold)',
+    'medicine': '#2196f3',
+    'report':   '#9c27b0'
+  };
   if (badge) {
     badge.style.display = 'block';
-    badge.textContent = mode === 'food' ? '🍎 وضع التعرف على الطعام' : '📦 وضع قراءة المكونات';
-    badge.style.borderColor = mode === 'food' ? 'var(--gold)' : '#2ec951';
+    badge.textContent = modeLabels[mode] || modeLabels['product'];
+    badge.style.borderColor = modeBorderColors[mode] || '#2ec951';
   }
-  var btnP = document.getElementById('scan-tab-product');
-  var btnF = document.getElementById('scan-tab-food');
-  if (!btnP || !btnF) return;
-  if (mode === 'product') {
-    btnP.style.borderColor = 'rgba(46,201,81,.5)';
-    btnP.style.background = 'linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1))';
-    btnP.style.color = '#2ec951';
-    btnF.style.borderColor = 'rgba(200,150,12,.3)';
-    btnF.style.background = 'rgba(200,150,12,.06)';
-    btnF.style.color = 'var(--txt2)';
-    document.querySelector('#premium-scanner-page label').textContent = 'المكونات المكتوبة على العلبة';
-    document.getElementById('pa-manual-ingredients').placeholder = 'مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة';
-  } else {
-    btnF.style.borderColor = 'rgba(200,150,12,.6)';
-    btnF.style.background = 'linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.08))';
-    btnF.style.color = 'var(--gold2)';
-    btnP.style.borderColor = 'rgba(46,201,81,.2)';
-    btnP.style.background = 'rgba(46,201,81,.04)';
-    btnP.style.color = 'var(--txt2)';
-    document.querySelector('#premium-scanner-page label').textContent = 'اسم الطعام أو المنتج (بدون مكونات)';
-    document.getElementById('pa-manual-ingredients').placeholder = 'مثال: تفاحة، خبز بلدي، برتقالة، بيتزا...';
+  /* Reset all tab buttons */
+  var tabs = {
+    product:  { el: document.getElementById('scan-tab-product'),  active: 'rgba(46,201,81,.5)',    activeBg: 'linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1))',    activeColor: '#2ec951',    inactiveBorder: 'rgba(46,201,81,.15)',    inactiveBg: 'rgba(46,201,81,.03)',    inactiveColor: 'var(--txt2)' },
+    food:     { el: document.getElementById('scan-tab-food'),     active: 'rgba(200,150,12,.6)',   activeBg: 'linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.08))', activeColor: 'var(--gold2)',inactiveBorder: 'rgba(200,150,12,.15)',   inactiveBg: 'rgba(200,150,12,.03)',   inactiveColor: 'var(--txt2)' },
+    medicine: { el: document.getElementById('scan-tab-medicine'), active: 'rgba(33,150,243,.6)',   activeBg: 'linear-gradient(135deg,rgba(33,150,243,.2),rgba(33,150,243,.08))', activeColor: '#2196f3',    inactiveBorder: 'rgba(33,150,243,.15)',   inactiveBg: 'rgba(33,150,243,.03)',   inactiveColor: 'var(--txt2)' },
+    report:   { el: document.getElementById('scan-tab-report'),   active: 'rgba(156,39,176,.6)',   activeBg: 'linear-gradient(135deg,rgba(156,39,176,.2),rgba(156,39,176,.08))', activeColor: '#ce93d8',    inactiveBorder: 'rgba(156,39,176,.15)',   inactiveBg: 'rgba(156,39,176,.03)',   inactiveColor: 'var(--txt2)' }
+  };
+  Object.keys(tabs).forEach(function(k) {
+    var t = tabs[k];
+    if (!t.el) return;
+    if (k === mode) {
+      t.el.style.borderColor = t.active;
+      t.el.style.background  = t.activeBg;
+      t.el.style.color       = t.activeColor;
+    } else {
+      t.el.style.borderColor = t.inactiveBorder;
+      t.el.style.background  = t.inactiveBg;
+      t.el.style.color       = t.inactiveColor;
+    }
+  });
+  /* Update label + placeholder */
+  var lbl = document.getElementById('pa-manual-label');
+  var inp = document.getElementById('pa-manual-ingredients');
+  var modeConfigs = {
+    'product':  { label: 'المكونات المكتوبة على العلبة',            placeholder: 'مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة' },
+    'food':     { label: 'اسم الطعام أو المنتج (بدون مكونات)',      placeholder: 'مثال: تفاحة، خبز بلدي، برتقالة، بيتزا...' },
+    'medicine': { label: 'اسم الدواء أو المادة الفعّالة',           placeholder: 'مثال: باراسيتامول 500mg أو Amoxicillin...' },
+    'report':   { label: 'اكتب نتائج التقرير أو وجّه الكاميرا إليه', placeholder: 'مثال: HBA1C=8.2، كوليسترول=240، ضغط 140/90...' }
+  };
+  var cfg = modeConfigs[mode] || modeConfigs['product'];
+  if (lbl) lbl.textContent = cfg.label;
+  if (inp) inp.placeholder = cfg.placeholder;
+}
+
+/* ══════════════════════════════════════════════
+   MEDICINE BOX READER - قراءة علبة الدواء
+══════════════════════════════════════════════ */
+async function analyzeMedicineFromCamera() {
+  var video  = document.getElementById("pa-video-stream");
+  var resBox = document.getElementById("pa-scan-result");
+  if (!video || video.readyState < 2 || video.style.display === "none") {
+    if (resBox) resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">افتح الكاميرا أولاً ثم اضغط تحليل الدواء.</p>';
+    return;
   }
+  var canvas = document.createElement("canvas");
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>جاري قراءة علبة الدواء بالذكاء الاصطناعي...</span></div>';
+  var imgData = canvas.toDataURL("image/jpeg", 0.85);
+  await _analyzeMedicineWithAI(imgData, null);
+}
+
+async function analyzeMedicineFromText() {
+  var inp = document.getElementById("pa-manual-ingredients");
+  var text = inp ? inp.value.trim() : '';
+  if (!text) { if(typeof showToast==="function") showToast("أدخل اسم الدواء أولاً"); return; }
+  var resBox = document.getElementById("pa-scan-result");
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>جاري تحليل الدواء بالذكاء الاصطناعي...</span></div>';
+  await _analyzeMedicineWithAI(null, text);
+}
+
+async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
+  var resBox = document.getElementById("pa-scan-result");
+  var prompt = "أنت صيدلاني خبير ومتخصص في الأدوية. قم بتحليل هذا الدواء وأجب بالتنسيق التالي الحرفي فقط بدون أي تنسيق markdown أو **:\n\n" +
+    "الاستخدام:\nاذكر دواعي الاستعمال الرئيسية للدواء بشكل واضح ومفصل\n\n" +
+    "الآثار_الجانبية:\nاذكر الآثار الجانبية الشائعة والخطيرة\n\n" +
+    "الجرعة:\n" +
+    "للبالغين: اذكر الجرعة المعتادة للبالغين\n" +
+    "للأطفال (6-12 سنة): اذكر الجرعة\n" +
+    "للأطفال (2-6 سنوات): اذكر الجرعة\n" +
+    "الرضع (أقل من 2 سنة): اذكر التوجيه\n\n" +
+    "موانع_الاستخدام:\nاذكر حالات التحذير والممنوعين من هذا الدواء\n\n" +
+    "السعر:\n" +
+    "مصر: اذكر السعر التقريبي بالجنيه المصري\n" +
+    "السعودية: اذكر السعر بالريال السعودي\n" +
+    "الإمارات: اذكر السعر بالدرهم الإماراتي\n" +
+    "الكويت: اذكر السعر بالدينار الكويتي\n" +
+    "الأردن: اذكر السعر بالدينار الأردني\n\n" +
+    (textInput ? "الدواء: " + textInput : "انظر للصورة واستخرج اسم الدواء والمعلومات منه");
+
+  var result = null;
+  try {
+    if (typeof puter !== "undefined" && puter.ai) {
+      var content = imgDataUrl
+        ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
+        : prompt;
+      var res = await puter.ai.chat(
+        imgDataUrl ? [{role:"user",content:content}] : prompt,
+        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
+      );
+      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
+      if (t) result = {text:t, source:"AI Pharma"};
+    }
+  } catch(e) {}
+
+  if (!result && window.ORKEYFB) {
+    try {
+      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext ? buildUserContext() : "", prompt);
+      if (oRes) result = {text:oRes.text, source:"AI Pharma"};
+    } catch(e) {}
+  }
+  if (!result) result = {text:"تعذر تحليل الدواء. أدخل اسم الدواء يدوياً أو حاول مرة أخرى.", source:"محلي"};
+  _renderMedicineResult(result.text, result.source);
+}
+
+function _renderMedicineResult(text, source) {
+  var resBox = document.getElementById("pa-scan-result");
+  if (!resBox) return;
+
+  /* Parse sections */
+  var sections = {
+    استخدام:    { key: 'الاستخدام',         color: '#2e7d32', bg: 'rgba(46,125,50,.13)', border: '#43a047', icon: '💚', label: 'الاستخدامات' },
+    اثار:       { key: 'الآثار_الجانبية',   color: '#c62828', bg: 'rgba(198,40,40,.13)', border: '#ef5350', icon: '🔴', label: 'الآثار الجانبية وموانع الاستخدام' },
+    جرعة:       { key: 'الجرعة',            color: '#1565c0', bg: 'rgba(21,101,192,.13)', border: '#42a5f5', icon: '🔵', label: 'الجرعة' },
+    سعر:        { key: 'السعر',             color: '#00838f', bg: 'rgba(0,131,143,.13)', border: '#26c6da', icon: '🩵', label: 'الأسعار التقريبية' }
+  };
+
+  /* موانع merge into اثار */
+  var fullText = text.replace(/موانع_الاستخدام\s*:\s*/g, '\nموانع الاستخدام:\n');
+
+  function extractSection(sectionKey, nextKeys) {
+    var rx = new RegExp(sectionKey + '\\s*:\\s*([\\s\\S]*?)(?=' + nextKeys.map(function(k){return k+'\\s*:';}).join('|') + '|$)', 'i');
+    var m = rx.exec(fullText);
+    return m ? m[1].trim() : '';
+  }
+
+  var usageText   = extractSection('الاستخدام',       ['الآثار_الجانبية','الجرعة','موانع_الاستخدام','السعر']);
+  var sideText    = extractSection('الآثار_الجانبية', ['الجرعة','موانع_الاستخدام','السعر']);
+  var contrText   = extractSection('موانع_الاستخدام', ['السعر']);
+  var doseText    = extractSection('الجرعة',          ['موانع_الاستخدام','السعر']);
+  var priceText   = extractSection('السعر',           ['$$$']);
+  var combinedRed = [sideText, contrText].filter(Boolean).join('\n\n');
+
+  var boxes = [
+    { color:'#2e7d32', bg:'rgba(46,125,50,.13)', border:'#43a047', icon:'💚', label:'الاستخدامات', content: usageText },
+    { color:'#c62828', bg:'rgba(198,40,40,.13)', border:'#ef5350', icon:'🔴', label:'الآثار الجانبية وموانع الاستخدام', content: combinedRed },
+    { color:'#1565c0', bg:'rgba(21,101,192,.13)', border:'#42a5f5', icon:'🔵', label:'الجرعة للمرضى المختلفين', content: doseText },
+    { color:'#00838f', bg:'rgba(0,131,143,.13)', border:'#26c6da', icon:'🩵', label:'الأسعار التقريبية', content: priceText }
+  ];
+
+  var h = '<div style="margin-top:10px">';
+  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 8px">تحليل الدواء بواسطة: '+(source||'AI')+'</div>';
+  h += '<div style="display:flex;flex-direction:column;gap:10px">';
+
+  boxes.forEach(function(box, idx) {
+    if (!box.content) return;
+    h += '<div style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
+    h += '<span style="font-size:1rem">'+box.icon+'</span>';
+    h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
+    h += '</div>';
+    h += '<div style="padding:12px 14px;font-size:.82rem;color:var(--txt);line-height:1.7;white-space:pre-wrap">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    h += '</div>';
+  });
+
+  h += '</div></div>';
+  resBox.innerHTML = h;
+}
+
+/* ══════════════════════════════════════════════
+   MEDICAL REPORT READER - قراءة التقارير الطبية
+══════════════════════════════════════════════ */
+async function analyzeReportFromCamera() {
+  var video  = document.getElementById("pa-video-stream");
+  var resBox = document.getElementById("pa-scan-result");
+  if (!video || video.readyState < 2 || video.style.display === "none") {
+    if (resBox) resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">افتح الكاميرا أولاً ثم وجّهها للتقرير.</p>';
+    return;
+  }
+  var canvas = document.createElement("canvas");
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>جاري قراءة التقرير الطبي وتحليله...</span></div>';
+  var imgData = canvas.toDataURL("image/jpeg", 0.85);
+  await _analyzeReportWithAI(imgData, null);
+}
+
+async function analyzeReportFromText() {
+  var inp = document.getElementById("pa-manual-ingredients");
+  var text = inp ? inp.value.trim() : '';
+  if (!text) { if(typeof showToast==="function") showToast("أدخل نتائج التقرير أولاً"); return; }
+  var resBox = document.getElementById("pa-scan-result");
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>جاري تحليل التقرير الطبي...</span></div>';
+  await _analyzeReportWithAI(null, text);
+}
+
+async function _analyzeReportWithAI(imgDataUrl, textInput) {
+  var resBox = document.getElementById("pa-scan-result");
+  var prompt = "أنت طبيب معالج خبير ومتمرس. بعد قراءة هذا التقرير الطبي، قم بالرد بالتنسيق التالي الحرفي فقط بدون أي تنسيق markdown أو **:\n\n" +
+    "وصف_التقرير:\nصف نتائج التقرير بأسلوب طبيب يشرح لمريضه، اذكر القيم الطبيعية والمرتفعة والمنخفضة\n\n" +
+    "تحذيرات:\nاذكر أي قيم خطرة أو تحتاج تدخلاً عاجلاً. اكتب 'لا توجد قيم خطرة' إن لم تجد شيئاً\n\n" +
+    "توصيات_الطبيب:\nبصفتك طبيباً معالجاً، اذكر توصياتك للعلاج والمتابعة والنظام الغذائي والأدوية المقترحة\n\n" +
+    (textInput ? "نتائج التقرير:\n" + textInput : "انظر للصورة واقرأ التقرير الطبي المكتوب فيها بدقة");
+
+  var result = null;
+  try {
+    if (typeof puter !== "undefined" && puter.ai) {
+      var content = imgDataUrl
+        ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
+        : prompt;
+      var res = await puter.ai.chat(
+        imgDataUrl ? [{role:"user",content:content}] : prompt,
+        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
+      );
+      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
+      if (t) result = {text:t, source:"AI Doctor"};
+    }
+  } catch(e) {}
+
+  if (!result && window.ORKEYFB) {
+    try {
+      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext ? buildUserContext() : "", prompt);
+      if (oRes) result = {text:oRes.text, source:"AI Doctor"};
+    } catch(e) {}
+  }
+  if (!result) result = {text:"تعذر تحليل التقرير. أدخل النتائج يدوياً أو حاول مرة أخرى.", source:"محلي"};
+  _renderReportResult(result.text, result.source);
+}
+
+function _renderReportResult(text, source) {
+  var resBox = document.getElementById("pa-scan-result");
+  if (!resBox) return;
+
+  function extractSection(sectionKey, nextKeys) {
+    var rx = new RegExp(sectionKey + '\\s*:\\s*([\\s\\S]*?)(?=' + nextKeys.map(function(k){return k+'\\s*:';}).join('|') + '|$)', 'i');
+    var m = rx.exec(text);
+    return m ? m[1].trim() : '';
+  }
+
+  var descText  = extractSection('وصف_التقرير',       ['تحذيرات','توصيات_الطبيب']);
+  var warnText  = extractSection('تحذيرات',           ['توصيات_الطبيب']);
+  var recText   = extractSection('توصيات_الطبيب',     ['$$$']);
+
+  var hasWarning = warnText && !warnText.includes('لا توجد') && warnText.trim().length > 5;
+
+  var boxes = [
+    { color:'#2e7d32', bg:'rgba(46,125,50,.13)', border:'#43a047', icon:'💚', label:'وصف التقرير - تحليل الطبيب', content: descText },
+    { color:'#c62828', bg:'rgba(198,40,40,.13)', border:'#ef5350', icon:'🔴', label: hasWarning ? '⚠️ تحذير طبي - قيم تحتاج انتباهاً' : 'التقرير - لا توجد قيم خطرة', content: warnText || 'لا توجد قيم خطرة أو تحتاج تدخلاً عاجلاً.' },
+    { color:'#1565c0', bg:'rgba(21,101,192,.13)', border:'#42a5f5', icon:'🔵', label:'توصيات الطبيب المعالج', content: recText }
+  ];
+
+  var h = '<div style="margin-top:10px">';
+  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 8px;display:flex;align-items:center;gap:6px"><i class="fas fa-user-md"></i> تحليل الطبيب الذكي: '+(source||'AI')+'</div>';
+  if (hasWarning) {
+    h += '<div style="background:rgba(198,40,40,.15);border:2px solid #ef5350;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:.82rem;color:#ef9a9a;animation:pageIn .3s ease both">';
+    h += '<i class="fas fa-exclamation-triangle"></i> <strong>تنبيه:</strong> يُنصح بمراجعة الطبيب للاطمئنان على هذه النتائج.';
+    h += '</div>';
+  }
+  h += '<div style="display:flex;flex-direction:column;gap:10px">';
+
+  boxes.forEach(function(box, idx) {
+    if (!box.content) return;
+    h += '<div style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
+    h += '<span style="font-size:1rem">'+box.icon+'</span>';
+    h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
+    h += '</div>';
+    h += '<div style="padding:12px 14px;font-size:.82rem;color:var(--txt);line-height:1.7;white-space:pre-wrap">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    h += '</div>';
+  });
+
+  h += '</div></div>';
+  resBox.innerHTML = h;
+}
+
+
+
+function captureSmartByMode() {
+  if (_scanMode === 'medicine') { analyzeMedicineFromCamera(); }
+  else if (_scanMode === 'report') { analyzeReportFromCamera(); }
+  else { captureAndScanProductBlob(); }
+}
+function analyzeSmartByMode() {
+  if (_scanMode === 'medicine') { analyzeMedicineFromText(); }
+  else if (_scanMode === 'report') { analyzeReportFromText(); }
+  else { analyzeIngredientsTextDirect(); }
 }
 
 function _playForbiddenAlert() {
