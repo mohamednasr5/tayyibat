@@ -1276,6 +1276,58 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;}
 .auth-divider span{font-size:.75rem;color:var(--txt3);}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── Profile Completion Circle ── */
+.profile-complete-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 16px 8px;position:relative}
+.profile-circle-svg{width:110px;height:110px;transform:rotate(-90deg)}
+.profile-circle-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:8}
+.profile-circle-prog{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);animation:none}
+.profile-circle-prog.animate{animation:circleGrow 1.4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes circleGrow{from{stroke-dashoffset:283}to{stroke-dashoffset:var(--dash-target)}}
+.profile-circle-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.profile-circle-pct{font-size:1.5rem;font-weight:900;color:var(--gold2);font-family:'Amiri',serif;line-height:1}
+.profile-circle-lbl{font-size:.62rem;color:var(--txt3);font-weight:700;margin-top:2px}
+.profile-complete-label{font-size:.78rem;font-weight:800;margin-top:8px;text-align:center}
+.profile-complete-label.done{color:var(--green2)}
+.profile-complete-label.warn{color:var(--gold2)}
+.profile-complete-label.low{color:var(--red2)}
+
+/* ── Steps missing ── */
+.profile-steps{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 16px 12px}
+.profile-step{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;border:1.5px solid}
+.profile-step.done{background:rgba(46,201,81,.1);border-color:rgba(46,201,81,.3);color:var(--green2)}
+.profile-step.miss{background:rgba(229,57,53,.1);border-color:rgba(229,57,53,.35);color:#ef5350}
+.profile-step.miss:hover{background:rgba(229,57,53,.2);transform:translateY(-1px)}
+
+/* ── Complete Profile Modal (Google new users) ── */
+.complete-profile-overlay{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.complete-profile-overlay.show{opacity:1;pointer-events:auto}
+.complete-profile-box{width:100%;max-width:500px;background:linear-gradient(145deg,var(--card),var(--card2));border:2px solid rgba(200,150,12,.4);border-radius:28px 28px 0 0;padding:28px 20px 36px;position:relative;transform:translateY(60px);transition:transform .4s cubic-bezier(.34,1.56,.64,1);max-height:90vh;overflow-y:auto}
+.complete-profile-overlay.show .complete-profile-box{transform:translateY(0)}
+.cpb-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,150,12,.25) 0,transparent 70%);pointer-events:none}
+.cpb-icon{font-size:3rem;text-align:center;margin-bottom:8px;animation:cpbBounce 1s ease-in-out infinite alternate}
+@keyframes cpbBounce{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+.cpb-title{font-family:'Amiri',serif;font-size:1.3rem;font-weight:900;color:var(--gold2);text-align:center;margin-bottom:6px}
+.cpb-sub{font-size:.8rem;color:var(--txt2);text-align:center;margin-bottom:16px;line-height:1.7}
+.cpb-warn{background:rgba(229,57,53,.12);border:1.5px solid rgba(229,57,53,.35);border-radius:12px;padding:12px 14px;font-size:.78rem;color:#ef5350;margin-bottom:18px;display:flex;align-items:flex-start;gap:8px;line-height:1.6}
+.cpb-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.cpb-field{display:flex;flex-direction:column;gap:4px}
+.cpb-field label{font-size:.78rem;color:var(--gold2);font-weight:700}
+.cpb-field input,.cpb-field select{background:#0d1f3c;border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;min-height:44px;-webkit-appearance:none;color-scheme:dark}
+.cpb-field input:focus,.cpb-field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,150,12,.2)}
+.cpb-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cpb-dis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.cpb-dis-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;transition:all .2s;user-select:none}
+.cpb-dis-item.sel{border-color:var(--gold);box-shadow:var(--glow-gold)}
+.cpb-dis-icon{font-size:1.4rem;flex-shrink:0}
+.cpb-dis-name{font-size:.75rem;font-weight:700;color:var(--txt)}
+.cpb-bmi{padding:8px 12px;border-radius:10px;font-size:.78rem;font-weight:700;text-align:center;display:none;margin-top:4px}
+.cpb-bmi.show{display:block}
+.cpb-btn-save{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:14px;padding:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;transition:all .3s;margin-bottom:10px}
+.cpb-btn-save:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,150,12,.4)}
+.cpb-btn-skip{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
+.cpb-progress-bar-wrap{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.cpb-progress-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .8s ease;width:0%}
 </style>
 </head>
 <body>
@@ -1640,6 +1692,84 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="profile-avatar-3d">🌿</div>
     <div class="profile-name" id="p-name2">-</div>
     <div class="profile-info" id="p-info">-</div>
+  </div>
+
+  <!-- Profile Completion Circle -->
+  <div class="profile-complete-wrap" id="profile-complete-wrap">
+    <div style="position:relative;width:110px;height:110px">
+      <svg class="profile-circle-svg" viewBox="0 0 100 100">
+        <circle class="profile-circle-bg" cx="50" cy="50" r="45"/>
+        <circle class="profile-circle-prog" id="profile-circle-prog" cx="50" cy="50" r="45"/>
+      </svg>
+      <div class="profile-circle-inner">
+        <div class="profile-circle-pct" id="profile-pct-text">0%</div>
+        <div class="profile-circle-lbl">مكتمل</div>
+      </div>
+    </div>
+    <div class="profile-complete-label" id="profile-complete-label">جارٍ التحميل...</div>
+  </div>
+  <div class="profile-steps" id="profile-steps"></div>
+
+  <!-- Complete Profile Modal -->
+  <div class="complete-profile-overlay" id="complete-profile-overlay">
+    <div class="complete-profile-box">
+      <div class="cpb-glow"></div>
+      <div class="cpb-icon">👤</div>
+      <div class="cpb-title">أكمل بياناتك الصحية</div>
+      <div class="cpb-sub">مرحباً بك في طيبات! لكي يعمل التطبيق بشكل صحيح ويقدم لك توصيات دقيقة، يجب إكمال بياناتك الصحية الآن.</div>
+      <div class="cpb-warn">
+        <span style="font-size:1.1rem;flex-shrink:0">⚠️</span>
+        <span>التطبيق <strong>لا يعمل بشكل سليم</strong> بدون بياناتك — الذكاء الاصطناعي وتحليل الأطعمة وتنبيهات الأمراض كلها تعتمد على معلوماتك الصحية.</span>
+      </div>
+      <div class="cpb-progress-bar-wrap"><div class="cpb-progress-bar" id="cpb-progress-bar"></div></div>
+      <div class="cpb-fields">
+        <div class="cpb-field-row">
+          <div class="cpb-field">
+            <label>الوزن (كجم)</label>
+            <input type="number" id="cpb-weight" placeholder="70" min="30" max="250" oninput="cpbCalcBMI()">
+          </div>
+          <div class="cpb-field">
+            <label>الطول (سم)</label>
+            <input type="number" id="cpb-height" placeholder="170" min="100" max="250" oninput="cpbCalcBMI()">
+          </div>
+        </div>
+        <div class="cpb-field">
+          <label>تاريخ الميلاد</label>
+          <input type="date" id="cpb-dob">
+        </div>
+        <div class="cpb-field">
+          <label>الجنس</label>
+          <select id="cpb-gender">
+            <option value="">اختر الجنس</option>
+            <option value="male">👨 ذكر</option>
+            <option value="female">👩 أنثى</option>
+          </select>
+        </div>
+        <div class="cpb-field">
+          <label>هل أنت مدخن؟</label>
+          <select id="cpb-smoking">
+            <option value="">اختر...</option>
+            <option value="smoker_male">🚬 مدخن (ذكر)</option>
+            <option value="smoker_female">🚬 مدخنة (أنثى)</option>
+            <option value="non_smoker">✅ غير مدخن</option>
+          </select>
+        </div>
+        <div class="cpb-bmi" id="cpb-bmi-result"></div>
+        <div class="cpb-field">
+          <label>الأمراض المزمنة (اختياري)</label>
+          <div class="cpb-dis-grid" id="cpb-dis-grid">
+            <div class="cpb-dis-item" onclick="cpbToggleDis('sugar',this)"><span class="cpb-dis-icon">🧠</span><span class="cpb-dis-name">السكري</span></div>
+            <div class="cpb-dis-item" onclick="cpbToggleDis('pressure',this)"><span class="cpb-dis-icon">💉</span><span class="cpb-dis-name">الضغط</span></div>
+            <div class="cpb-dis-item" onclick="cpbToggleDis('allergy',this)"><span class="cpb-dis-icon">🌸</span><span class="cpb-dis-name">الحساسية</span></div>
+            <div class="cpb-dis-item" onclick="cpbToggleDis('chemo',this)"><span class="cpb-dis-icon">⚕️</span><span class="cpb-dis-name">كيماوي</span></div>
+            <div class="cpb-dis-item" onclick="cpbToggleDis('heart',this)"><span class="cpb-dis-icon">❤️</span><span class="cpb-dis-name">أمراض القلب</span></div>
+            <div class="cpb-dis-item" onclick="cpbToggleDis('kidney',this)"><span class="cpb-dis-icon">🫁</span><span class="cpb-dis-name">أمراض الكلى</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="cpb-btn-save" onclick="saveCompleteProfile()">💾 حفظ البيانات والمتابعة</button>
+      <button class="cpb-btn-skip" onclick="closeCompleteProfileModal()">لاحقاً (بعض الميزات لن تعمل)</button>
+    </div>
   </div>
   <div id="pro-user-status-bar" style="display:none;padding:0 16px 10px">
     <div style="background:linear-gradient(135deg,rgba(255,193,7,.15),rgba(255,140,0,.06));border:2px solid rgba(255,193,7,.5);border-radius:20px;padding:16px;text-align:center;position:relative;overflow:hidden">
@@ -4419,6 +4549,8 @@ function buildProfile() {
   if (disEl) disEl.innerHTML = u.diseases && u.diseases.length ? u.diseases.map(function(d) { return dm[d] || d; }).join('، ') : '✅ بصحة جيدة';
   var smLabels = { smoker_male:'🚬 مدخن', smoker_female:'🚬 مدخنة', non_smoker:'✅ غير مدخن', '':'— غير محدد' };
   setVal('pp-smoking', smLabels[u.smoking || ''] || '— غير محدد');
+  // Render completion circle
+  setTimeout(renderProfileCircle, 100);
 }
 
 function openProModal() { document.getElementById('pro-modal').classList.add('show'); }
@@ -5809,22 +5941,27 @@ window.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+
+
 <script>
 /* ══════════════════════════════════════════════════════
-   Google Sign-In Functions
+   Google Sign-In + Profile Completion System
 ══════════════════════════════════════════════════════ */
 
+/* ─── Google Login ─────────────────────────────────── */
 async function doGoogleLogin() {
-  var btn = document.getElementById('btn-google-login');
+  var btn  = document.getElementById('btn-google-login');
   var btn2 = document.getElementById('btn-google-register');
-  var originalHTML  = btn  ? btn.innerHTML  : '';
-  var originalHTML2 = btn2 ? btn2.innerHTML : '';
-  if (btn)  { btn.disabled  = true; btn.innerHTML  = '<span class="btn-spinner"></span> جارٍ التسجيل...'; }
-  if (btn2) { btn2.disabled = true; btn2.innerHTML = '<span class="btn-spinner"></span> جارٍ التسجيل...'; }
+  var orig1 = btn  ? btn.innerHTML  : '';
+  var orig2 = btn2 ? btn2.innerHTML : '';
+  var spinner = '<span class="btn-spinner"></span> جارٍ التسجيل...';
+  if (btn)  { btn.disabled  = true; btn.innerHTML  = spinner; }
+  if (btn2) { btn2.disabled = true; btn2.innerHTML = spinner; }
   try {
     if (!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) {
       showAuthError('login', '⚠️ انتظر ثانية ثم أعد المحاولة');
-      if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+      if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
+      if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
       return;
     }
     var result = await window.fbSignInWithPopup(window.firebaseAuth, window.googleProvider);
@@ -5836,11 +5973,12 @@ async function doGoogleLogin() {
             : e.code === 'auth/unauthorized-domain'    ? '⚠️ النطاق غير مسموح به في Firebase Console'
             : 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى';
     showAuthError('login', msg);
-    if (btn)  { btn.disabled  = false; btn.innerHTML  = originalHTML; }
-    if (btn2) { btn2.disabled = false; btn2.innerHTML = originalHTML2; }
+    if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
+    if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
   }
 }
 
+/* ─── Handle Google User Data ──────────────────────── */
 async function handleGoogleUserData(googleUser) {
   var uid = googleUser.uid;
   var snap = await window.__firebaseGet(
@@ -5856,27 +5994,20 @@ async function handleGoogleUserData(googleUser) {
   } else {
     isNewUser = true;
     userData = {
-      name:         googleUser.displayName || 'مستخدم جديد',
-      username:     uid,
-      email:        googleUser.email    || '',
-      photo:        googleUser.photoURL || '',
-      loginMethod:  'google',
-      created:      Date.now(),
-      pro:          { active: false },
-      diseases:     [],
-      bmi:          0, weight: 0, height: 0,
-      gender:       '', dob: '', smoking: 'nonsmoker', loginHistory: []
+      name: googleUser.displayName || 'مستخدم جديد',
+      username: uid, email: googleUser.email || '',
+      photo: googleUser.photoURL || '', loginMethod: 'google',
+      created: Date.now(), pro: { active: false },
+      diseases: [], bmi: 0, weight: 0, height: 0,
+      gender: '', dob: '', smoking: 'nonsmoker', loginHistory: []
     };
     await window.__firebaseSet(
-      window.__firebaseRef(window.__firebaseDB, 'users/' + uid),
-      userData
+      window.__firebaseRef(window.__firebaseDB, 'users/' + uid), userData
     );
   }
-
   try {
     await window.__firebaseSet(
-      window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/lastLogin'),
-      Date.now()
+      window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/lastLogin'), Date.now()
     );
   } catch(_) {}
 
@@ -5890,23 +6021,268 @@ async function handleGoogleUserData(googleUser) {
     } else {
       currentUser.pro.active = false; window.isProUser = false;
     }
-  } else {
-    window.isProUser = false;
-  }
+  } else { window.isProUser = false; }
 
   saveSession(uid);
   logActivity(isNewUser ? 'register' : 'login', isNewUser ? 'تسجيل بـ Google' : 'دخول بـ Google', googleUser.email);
   playSound('success');
-  showToast(isNewUser ? '🎉 أهلاً ' + currentUser.name + '! تم إنشاء حسابك' : 'مرحباً ' + currentUser.name + ' 👋');
+
+  // انتقل للتطبيق أولاً
   bootApp();
   setTimeout(refreshGiftFab, 700);
 
-  // إذا كان مستخدم جديد، اعرض له رسالة لاحقاً لإكمال بياناته
-  if (isNewUser) {
-    setTimeout(function() {
-      showToast('💡 يمكنك إضافة بياناتك الصحية من صفحة الملف الشخصي');
-    }, 3000);
+  // اعرض رسالة ترحيب
+  showToast(isNewUser ? '🎉 أهلاً ' + currentUser.name + '! تم إنشاء حسابك' : 'مرحباً ' + currentUser.name + ' 👋');
+
+  // بعد الدخول: توجّه لصفحة الحساب وأظهر نموذج استكمال البيانات
+  setTimeout(function() {
+    goPage('profile');
+    var pct = calcProfileCompletion(currentUser);
+    if (pct < 100) {
+      setTimeout(function() { openCompleteProfileModal(); }, 500);
+    }
+  }, 600);
+}
+
+/* ─── Profile Completion Calculator ───────────────── */
+function calcProfileCompletion(u) {
+  if (!u) return 0;
+  var fields = [
+    { key: 'weight',  val: u.weight  && u.weight  > 0,    label: 'الوزن',         icon: '⚖️' },
+    { key: 'height',  val: u.height  && u.height  > 0,    label: 'الطول',         icon: '📏' },
+    { key: 'dob',     val: !!u.dob,                       label: 'تاريخ الميلاد', icon: '🎂' },
+    { key: 'gender',  val: !!u.gender,                    label: 'الجنس',         icon: '👤' },
+    { key: 'smoking', val: u.smoking && u.smoking !== '', label: 'التدخين',       icon: '🚭' },
+    { key: 'diseases',val: Array.isArray(u.diseases),     label: 'الأمراض',       icon: '🏥' },
+  ];
+  var done = fields.filter(function(f) { return f.val; }).length;
+  window._profileFields = fields;
+  return Math.round((done / fields.length) * 100);
+}
+
+/* ─── Render Profile Circle ────────────────────────── */
+function renderProfileCircle() {
+  if (!currentUser) return;
+  var pct = calcProfileCompletion(currentUser);
+  var fields = window._profileFields || [];
+
+  // Circle
+  var circle = document.getElementById('profile-circle-prog');
+  var pctText = document.getElementById('profile-pct-text');
+  var label   = document.getElementById('profile-complete-label');
+  var stepsEl = document.getElementById('profile-steps');
+
+  if (!circle) return;
+
+  var radius = 45;
+  var circum = 2 * Math.PI * radius; // ≈282.7
+  var offset = circum - (pct / 100) * circum;
+
+  // Color by percentage
+  var color = pct >= 80 ? '#2ec951' : pct >= 50 ? '#f5c842' : '#ef5350';
+  circle.style.stroke = color;
+  circle.style.setProperty('--dash-target', offset + 'px');
+  circle.style.strokeDashoffset = circum; // reset
+  circle.style.strokeDasharray  = circum;
+
+  // Animate after short delay
+  setTimeout(function() {
+    circle.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)';
+    circle.style.strokeDashoffset = offset;
+  }, 200);
+
+  if (pctText) pctText.textContent = pct + '%';
+  if (pctText) pctText.style.color = color;
+
+  if (label) {
+    if (pct === 100) {
+      label.textContent = '✅ ملفك الشخصي مكتمل!';
+      label.className = 'profile-complete-label done';
+    } else if (pct >= 50) {
+      label.textContent = '⚠️ أكمل بياناتك لتجربة أفضل';
+      label.className = 'profile-complete-label warn';
+    } else {
+      label.textContent = '❌ بياناتك غير مكتملة — ميزات كثيرة معطّلة';
+      label.className = 'profile-complete-label low';
+    }
   }
+
+  // Render steps
+  if (stepsEl) {
+    stepsEl.innerHTML = fields.map(function(f) {
+      return '<div class="profile-step ' + (f.val ? 'done' : 'miss') + '" onclick="' + (f.val ? '' : 'openCompleteProfileModal()') + '">'
+        + f.icon + ' ' + f.label
+        + (f.val ? ' ✓' : ' — مفقود')
+        + '</div>';
+    }).join('');
+  }
+}
+
+/* ─── Open Complete Profile Modal ──────────────────── */
+var _cpbDiseases = [];
+function openCompleteProfileModal() {
+  _cpbDiseases = currentUser && Array.isArray(currentUser.diseases) ? currentUser.diseases.slice() : [];
+  var overlay = document.getElementById('complete-profile-overlay');
+  if (!overlay) return;
+
+  // Pre-fill existing values
+  var setVal = function(id, v) { var e = document.getElementById(id); if (e && v) e.value = v; };
+  setVal('cpb-weight',  currentUser.weight  || '');
+  setVal('cpb-height',  currentUser.height  || '');
+  setVal('cpb-dob',     currentUser.dob     || '');
+  setVal('cpb-gender',  currentUser.gender  || '');
+  setVal('cpb-smoking', currentUser.smoking || '');
+
+  // Pre-select diseases
+  document.querySelectorAll('.cpb-dis-item').forEach(function(el) {
+    var key = el.getAttribute('onclick').match(/'([^']+)'/)[1];
+    el.classList.toggle('sel', _cpbDiseases.indexOf(key) > -1);
+  });
+
+  // Update progress bar
+  cpbUpdateProgress();
+  overlay.classList.add('show');
+}
+
+function closeCompleteProfileModal() {
+  var overlay = document.getElementById('complete-profile-overlay');
+  if (overlay) overlay.classList.remove('show');
+  // Re-render circle after closing
+  setTimeout(renderProfileCircle, 300);
+}
+
+function cpbToggleDis(key, el) {
+  var idx = _cpbDiseases.indexOf(key);
+  if (idx > -1) { _cpbDiseases.splice(idx, 1); el.classList.remove('sel'); }
+  else          { _cpbDiseases.push(key);       el.classList.add('sel'); }
+  cpbUpdateProgress();
+}
+
+function cpbCalcBMI() {
+  var w = parseFloat(document.getElementById('cpb-weight').value) || 0;
+  var h = parseFloat(document.getElementById('cpb-height').value) || 0;
+  var el = document.getElementById('cpb-bmi-result');
+  if (!el) return;
+  if (w > 0 && h > 0) {
+    var bmi = (w / ((h/100) * (h/100))).toFixed(1);
+    var cls = bmi < 18.5 ? 'bmi-under' : bmi < 25 ? 'bmi-normal' : bmi < 30 ? 'bmi-over' : 'bmi-obese';
+    var lbl = bmi < 18.5 ? 'نقص في الوزن' : bmi < 25 ? 'وزن طبيعي ✅' : bmi < 30 ? 'وزن زائد' : 'سمنة';
+    el.className = 'cpb-bmi show ' + cls;
+    el.textContent = 'مؤشر كتلة الجسم: ' + bmi + ' — ' + lbl;
+  } else {
+    el.className = 'cpb-bmi'; el.textContent = '';
+  }
+  cpbUpdateProgress();
+}
+
+function cpbUpdateProgress() {
+  var fields = [
+    document.getElementById('cpb-weight')  && document.getElementById('cpb-weight').value,
+    document.getElementById('cpb-height')  && document.getElementById('cpb-height').value,
+    document.getElementById('cpb-dob')     && document.getElementById('cpb-dob').value,
+    document.getElementById('cpb-gender')  && document.getElementById('cpb-gender').value,
+    document.getElementById('cpb-smoking') && document.getElementById('cpb-smoking').value,
+  ];
+  var filled = fields.filter(Boolean).length;
+  var pct = Math.round((filled / fields.length) * 100);
+  var bar = document.getElementById('cpb-progress-bar');
+  if (bar) bar.style.width = pct + '%';
+}
+
+async function saveCompleteProfile() {
+  var w  = parseFloat(document.getElementById('cpb-weight').value)  || 0;
+  var h  = parseFloat(document.getElementById('cpb-height').value)  || 0;
+  var dob = document.getElementById('cpb-dob').value;
+  var gen = document.getElementById('cpb-gender').value;
+  var sm  = document.getElementById('cpb-smoking').value;
+
+  if (!w || !h || !dob || !gen || !sm) {
+    showToast('⚠️ يرجى ملء جميع الحقول الإلزامية');
+    return;
+  }
+
+  var bmi = (w && h) ? parseFloat((w / ((h/100)*(h/100))).toFixed(1)) : 0;
+
+  currentUser.weight   = w;
+  currentUser.height   = h;
+  currentUser.dob      = dob;
+  currentUser.gender   = gen;
+  currentUser.smoking  = sm;
+  currentUser.bmi      = bmi;
+  currentUser.diseases = _cpbDiseases;
+
+  try {
+    await window.__firebaseSet(
+      window.__firebaseRef(window.__firebaseDB, 'users/' + currentUser.username),
+      currentUser
+    );
+    showToast('✅ تم حفظ بياناتك بنجاح!');
+    playSound('success');
+    closeCompleteProfileModal();
+    buildProfile();
+    buildHomeDisTags();
+    buildMedicalAlerts();
+    setTimeout(renderProfileCircle, 400);
+  } catch(e) {
+    showToast('❌ فشل الحفظ، تحقق من الاتصال');
+  }
+}
+
+/* ─── Logout with Google Auth ──────────────────────── */
+function doLogout() {
+  clearSession(); currentUser = null; window.isProUser = false;
+  if (window.fbSignOut && window.firebaseAuth) {
+    window.fbSignOut(window.firebaseAuth).catch(function(){});
+  }
+  document.getElementById('bottom-nav').classList.remove('show');
+  var fab = document.getElementById('daily-reward-fab');
+  if (fab) fab.style.display = 'none';
+  var panel = document.getElementById('daily-reward-panel');
+  if (panel) panel.classList.remove('open');
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('auth-page').classList.add('active');
+  showToast('👋 تم تسجيل الخروج');
+}
+
+/* ─── autoLogin with Google support ───────────────── */
+async function autoLogin() {
+  var s = getSession();
+  if (!s) { hideLoader(); return; }
+  try {
+    var snap = await window.__firebaseGet(
+      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
+    );
+    if (snap.exists()) {
+      var data = snap.val();
+      if (data.loginMethod === 'google' && window.firebaseAuth) {
+        var done = await Promise.race([
+          new Promise(function(resolve) {
+            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
+              unsub();
+              if (user && user.uid === s) {
+                try { await handleGoogleUserData(user); resolve(true); }
+                catch(e) { resolve(false); }
+              } else { resolve(false); }
+            });
+          }),
+          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 4000); })
+        ]);
+        if (done) return;
+        hideLoader(); return;
+      }
+    }
+    var u = await dbGetUser(s);
+    if (u) {
+      currentUser = Object.assign({}, u, { username: s });
+      if (currentUser.pro && currentUser.pro.active === true) {
+        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) window.isProUser = true;
+        else if (!currentUser.pro.expiresAt) window.isProUser = true;
+        else { currentUser.pro.active = false; window.isProUser = false; }
+      } else { window.isProUser = false; }
+      bootApp(); setTimeout(refreshGiftFab, 700); return;
+    }
+  } catch(e) {}
+  hideLoader();
 }
 </script>
 </body>
