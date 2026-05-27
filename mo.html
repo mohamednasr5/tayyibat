@@ -277,7 +277,74 @@
     .act-type-navigation { border-color: rgba(38,198,218,0.3) !important; }
     .act-type-share { border-color: rgba(37,211,102,0.4) !important; background: rgba(37,211,102,0.03) !important; }
     .act-detail { font-size: 0.75rem; color: var(--txt3); margin-top: 3px; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 4px 8px; word-break: break-all; }
-  </style>
+  
+  /* ═══ شارة هدية نمبر 1 - لوحة الأدمن ═══ */
+  @keyframes shimmerGoldAdmin {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+  @keyframes pulseGlowAdmin {
+    0%, 100% { box-shadow: 0 0 12px rgba(255,215,0,.6), 0 0 30px rgba(255,165,0,.3); }
+    50%       { box-shadow: 0 0 25px rgba(255,215,0,.9), 0 0 55px rgba(255,165,0,.5); }
+  }
+  @keyframes floatAdmin {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%       { transform: translateY(-4px) rotate(2deg); }
+  }
+  @keyframes spinStarAdmin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .no1-gift-badge-admin {
+    position: relative;
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    cursor: default;
+    background: linear-gradient(135deg, #7a4800, #c8960c, #f5c842, #ffe066, #c8960c, #7a4800);
+    background-size: 300% 300%;
+    animation: floatAdmin 3s ease-in-out infinite, pulseGlowAdmin 2.5s ease-in-out infinite, shimmerGoldAdmin 3s linear infinite;
+    border: 3px solid transparent;
+    box-shadow: 0 0 20px rgba(255,215,0,.7), 0 0 50px rgba(255,165,0,.4);
+  }
+  .no1-gift-badge-admin::before {
+    content: '';
+    position: absolute; inset: -3px; border-radius: 50%;
+    background: conic-gradient(from 0deg, #ffd700, #ff8c00, #ffd700, #fff7aa, #ffd700);
+    z-index: -1;
+    animation: spinStarAdmin 4s linear infinite;
+  }
+  .no1-gift-badge-admin .no1-inner-a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0; z-index: 1;
+  }
+  .no1-gift-badge-admin .no1-crown-a { font-size: .9rem; line-height: 1; }
+  .no1-gift-badge-admin .no1-number-a {
+    font-size: 1.3rem; font-weight: 900; color: #050e1f; line-height: 1;
+    font-family: 'Amiri', serif;
+  }
+  .admin-challenge-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(46,201,81,.12); border: 1px solid rgba(46,201,81,.35);
+    color: #2ec951; font-size: .7rem; font-weight: 800;
+  }
+  .btn-del-gift {
+    background: rgba(239,83,80,.1);
+    color: var(--red);
+    border: 1px solid rgba(239,83,80,.3);
+    border-radius: 7px;
+    padding: 3px 10px;
+    font-size: .68rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: Tajawal, sans-serif;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .btn-del-gift:hover { background: rgba(239,83,80,.22); }
+</style>
 </head>
 <body>
 <div class="container">
@@ -443,6 +510,7 @@
               <div class="form-group">
                 <label>نوع الهدية</label>
                 <select id="giftType">
+                  <option value="🏅 هدية الأدمن الذهبية #1" style="font-weight:900;color:#b8860b;">🏅 هدية نمبر 1 الذهبية المميزة ✨</option>
                   <option value="🎁 هدية ترحيب">🎁 هدية ترحيب</option>
                   <option value="👑 اشتراك Pro مجاني">👑 اشتراك Pro مجاني</option>
                   <option value="🌟 نجمة إنجاز">🌟 نجمة إنجاز</option>
@@ -1141,11 +1209,29 @@
     if (!gifts.length) {
       document.getElementById('giftsList').innerHTML = '<div class="no-gifts">لا توجد هدايا ممنوحة لهذا المستخدم بعد</div>';
     } else {
-      document.getElementById('giftsList').innerHTML = gifts.map(g => `
-        <div class="gift-item">
-          <div class="gift-icon">${g.icon||'🎁'}</div>
-          <div><div class="gift-name">${g.name||g.type||'هدية'}</div><div class="gift-date">${formatDateTime(g.grantedAt||g.ts)}</div></div>
-        </div>`).join('');
+      document.getElementById('giftsList').innerHTML = gifts.map(g => {
+        const isNo1 = !!g.isNo1AdminGift;
+        const isChallenge = !!(g.challengeId || g.isChallenge);
+        const badgeHTML = isNo1
+          ? `<div class="no1-gift-badge-admin" title="هدية نمبر 1 الذهبية ✨">
+               <div class="no1-inner-a">
+                 <span class="no1-crown-a">👑</span>
+                 <span class="no1-number-a">#1</span>
+               </div>
+             </div>`
+          : `<div class="gift-icon">${g.icon||'🎁'}</div>`;
+        const challengeBadge = isChallenge ? `<span class="admin-challenge-badge">✅ تحدي</span>` : '';
+        return `<div class="gift-item">
+          ${badgeHTML}
+          <div style="flex:1;">
+            <div class="gift-name">${g.name||g.type||'هدية'} ${challengeBadge}</div>
+            <div class="gift-date">${formatDateTime(g.grantedAt||g.ts)}</div>
+          </div>
+          <button class="btn-del-gift" onclick="deleteGift('${g.id||''}')">
+            <i class="fas fa-trash-alt"></i> حذف
+          </button>
+        </div>`;
+      }).join('');
     }
     document.getElementById('giftType').onchange = function() {
       document.getElementById('customGiftWrap').style.display = this.value === 'custom' ? 'block' : 'none';
@@ -1199,85 +1285,34 @@
     const sel = document.getElementById('giftType').value;
     let giftName = sel === 'custom' ? (document.getElementById('customGiftName').value.trim()) : sel;
     if (!giftName) { showToast('⚠️ أدخل اسم الهدية'); return; }
-    const icons = {'🎁 هدية ترحيب':'🎁','👑 اشتراك Pro مجاني':'👑','🌟 نجمة إنجاز':'🌟','🏆 جائزة الحضور المتواصل':'🏆','💎 عضوية VIP':'💎','🎉 هدية عيد ميلاد':'🎉'};
+    const isNo1 = giftName === '🏅 هدية الأدمن الذهبية #1';
+    const icons = {
+      '🎁 هدية ترحيب':'🎁','👑 اشتراك Pro مجاني':'👑','🌟 نجمة إنجاز':'🌟',
+      '🏆 جائزة الحضور المتواصل':'🏆','💎 عضوية VIP':'💎','🎉 هدية عيد ميلاد':'🎉',
+      '🏅 هدية الأدمن الذهبية #1':'🏅'
+    };
     const icon = icons[giftName] || '🎁';
     const giftId = Date.now().toString();
-    const now = Date.now();
-
-    /* حساب مدة الهدية بالمللي ثانية */
-    const proGiftTypes = ['👑 اشتراك Pro مجاني', '💎 عضوية VIP'];
-    const isProGift = proGiftTypes.includes(giftName) || giftName.includes('Pro') || giftName.includes('برو') || giftName.includes('VIP');
-
-    /* مدة الهدية: Pro = 30 يوم, VIP = 90 يوم */
-    let giftDurationMs = 0;
-    if (giftName.includes('VIP') || giftName.includes('فيب')) giftDurationMs = 90 * 86400000;
-    else if (isProGift) giftDurationMs = 30 * 86400000;
-
-    const giftData = {
-      id: giftId,
-      name: giftName,
-      icon,
-      grantedAt: now,
-      grantedByAdmin: true,
-      isPro: isProGift,
-      durationMs: giftDurationMs
-    };
-
+    const giftData = { id: giftId, name: giftName, icon, grantedAt: Date.now(), grantedByAdmin: true,
+      ...(isNo1 ? { isNo1AdminGift: true } : {}) };
     try {
-      /* 1. حفظ الهدية في سجل هدايا المستخدم */
       await set(ref(db, 'users/' + selectedUser._id + '/gifts/' + giftId), giftData);
-
-      /* 2. إذا كانت الهدية Pro — فعّل الاشتراك فوراً في Firebase */
-      if (isProGift && giftDurationMs > 0) {
-        /* الحصول على تاريخ انتهاء الاشتراك الحالي إن وجد (نضيف فوقه) */
-        let currentExpiry = now;
-        if (selectedUser.pro && selectedUser.pro.active && selectedUser.pro.expiresAt && selectedUser.pro.expiresAt > now) {
-          currentExpiry = selectedUser.pro.expiresAt;
-        }
-        const newExpiry = currentExpiry + giftDurationMs;
-        const proData = {
-          active: true,
-          activatedAt: now,
-          expiresAt: newExpiry,
-          grantedByGift: giftId,
-          grantedByAdmin: true
-        };
-        await set(ref(db, 'users/' + selectedUser._id + '/pro'), proData);
-
-        /* تحديث الكائن المحلي */
-        selectedUser.pro = proData;
-
-        /* 3. إرسال إشعار للمستخدم في Firebase */
-        const notifData = {
-          id: giftId,
-          title: '🎁 هدية من الإدارة!',
-          body: `تم منحك ${giftName} — اشتراك Pro لمدة ${Math.round(giftDurationMs/86400000)} يوماً ينتهي في ${new Date(newExpiry).toLocaleDateString('ar-EG')}`,
-          icon: icon,
-          ts: now
-        };
-        await set(ref(db, 'notifications/users/' + (selectedUser.username || selectedUser._id)), notifData);
-
-        showToast(`👑 تم منح ${giftName} وتفعيل Pro لمدة ${Math.round(giftDurationMs/86400000)} يوماً بنجاح!`);
-      } else {
-        /* هدية عادية — فقط إشعار */
-        const notifData = {
-          id: giftId,
-          title: icon + ' هدية من الإدارة!',
-          body: `تم منحك: ${giftName}`,
-          icon: icon,
-          ts: now
-        };
-        await set(ref(db, 'notifications/users/' + (selectedUser.username || selectedUser._id)), notifData);
-        showToast('🎁 تم منح الهدية وإرسال إشعار للمستخدم!');
-      }
-
       if (!selectedUser.gifts) selectedUser.gifts = {};
       selectedUser.gifts[giftId] = giftData;
+      showToast(isNo1 ? '🏅 تم منح هدية نمبر 1 الذهبية! 🎉' : '🎁 تم منح الهدية بنجاح');
       loadUserProfile(selectedUser._id);
-    } catch(e) {
-      console.error(e);
-      showToast('❌ فشل منح الهدية: ' + e.message);
-    }
+    } catch(e) { showToast('❌ فشل منح الهدية'); }
+  };
+
+  window.deleteGift = async function(giftId) {
+    if (!selectedUser) return;
+    if (!confirm('🗑️ هل تريد حذف هذه الهدية نهائياً؟')) return;
+    try {
+      await remove(ref(db, 'users/' + selectedUser._id + '/gifts/' + giftId));
+      if (selectedUser.gifts) delete selectedUser.gifts[giftId];
+      showToast('🗑️ تم حذف الهدية بنجاح');
+      loadUserProfile(selectedUser._id);
+    } catch(e) { showToast('❌ فشل حذف الهدية'); }
   };
 
   /* ═══ User Modal (Edit) ═══ */
