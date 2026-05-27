@@ -245,7 +245,7 @@
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
   import {
     getAuth, GoogleAuthProvider,
-    signInWithPopup, signOut, onAuthStateChanged
+    signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -280,8 +280,10 @@
     window.firebaseRemove    = remove;
     window.__firebaseRemove  = remove;
     window.googleProvider    = googleProvider;
-    window.fbSignInWithPopup = signInWithPopup;
-    window.fbSignOut         = signOut;
+    window.fbSignInWithPopup    = signInWithPopup;
+    window.fbSignInWithRedirect = signInWithRedirect;
+    window.fbGetRedirectResult  = getRedirectResult;
+    window.fbSignOut            = signOut;
     window.firebaseReady     = true;
     window.__firebaseReady   = true;
 
@@ -1402,8 +1404,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     </div>
     <div id="login-form">
       <div class="auth-error" id="login-error"></div>
-      <div class="field"><label>اسم المستخدم</label><div class="input-wrap"><input type="text" id="l-user" placeholder="أدخل اسم المستخدم" autocomplete="username"></div></div>
-      <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="l-pass" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button></div></div>
+      <div class="field"><label for="l-user">اسم المستخدم</label><div class="input-wrap"><input type="text" id="l-user" placeholder="أدخل اسم المستخدم" autocomplete="username"></div></div>
+      <div class="field"><label for="l-pass">كلمة المرور</label><div class="input-wrap"><input type="password" id="l-pass" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button></div></div>
       <button class="btn btn-gold" style="margin-top:8px" id="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
       <div class="auth-divider"><span>أو</span></div>
       <button class="btn-google" id="btn-google-login" onclick="doGoogleLogin()">
@@ -1433,17 +1435,17 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     </div>
     <div id="register-form" class="hidden">
       <div class="auth-error" id="reg-error"></div>
-      <div class="field"><label>الاسم الكامل</label><input type="text" id="r-name" placeholder="محمد أحمد"></div>
-      <div class="field"><label>اسم المستخدم</label><input type="text" id="r-user" placeholder="username123"></div>
-      <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="r-pass" placeholder="6 أحرف على الأقل"><button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button></div></div>
-      <div class="field"><label>تاريخ الميلاد</label><input type="date" id="r-dob"></div>
-      <div class="field"><label>الجنس</label><select id="r-gender"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div>
-      <div class="field"><label>هل أنت مدخن؟</label><select id="r-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
+      <div class="field"><label for="r-name">الاسم الكامل</label><input type="text" id="r-name" placeholder="محمد أحمد"></div>
+      <div class="field"><label for="r-user">اسم المستخدم</label><input type="text" id="r-user" placeholder="username123"></div>
+      <div class="field"><label for="r-pass">كلمة المرور</label><div class="input-wrap"><input type="password" id="r-pass" placeholder="6 أحرف على الأقل"><button class="eye-btn" onclick="togglePass('r-pass',this)"><i class="fas fa-eye"></i></button></div></div>
+      <div class="field"><label for="r-dob">تاريخ الميلاد</label><input type="date" id="r-dob"></div>
+      <div class="field"><label for="r-gender">الجنس</label><select id="r-gender"><option value="">اختر الجنس</option><option value="male">👨 ذكر</option><option value="female">👩 أنثى</option></select></div>
+      <div class="field"><label for="r-smoking">هل أنت مدخن؟</label><select id="r-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
       <div class="field-row">
-        <div class="field"><label>الوزن (كجم)</label><input type="number" id="r-weight" placeholder="70" oninput="calcBMI('r')"></div>
-        <div class="field"><label>الطول (سم)</label><input type="number" id="r-height" placeholder="170" oninput="calcBMI('r')"></div>
+        <div class="field"><label for="r-weight">الوزن (كجم)</label><input type="number" id="r-weight" placeholder="70" oninput="calcBMI('r')"></div>
+        <div class="field"><label for="r-height">الطول (سم)</label><input type="number" id="r-height" placeholder="170" oninput="calcBMI('r')"></div>
       </div>
-      <div class="field"><label>رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label><input type="tel" id="r-phone" placeholder="966501234567" dir="ltr" style="text-align:right"></div>
+      <div class="field"><label for="r-phone">رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label><input type="tel" id="r-phone" placeholder="966501234567" dir="ltr" style="text-align:right"></div>
       <div class="bmi-result" id="bmi-result"></div>
       <div class="disease-section">
         <div style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i>الأمراض المزمنة (اختياري)</div>
@@ -1724,29 +1726,29 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="cpb-progress-bar-wrap"><div class="cpb-progress-bar" id="cpb-progress-bar"></div></div>
       <div class="cpb-fields">
         <div class="cpb-field">
-          <label>الاسم الكامل بالعربية <span style="color:var(--red2)">*</span></label>
+          <label for="cpb-name-ar">الاسم الكامل بالعربية <span style="color:var(--red2)">*</span></label>
           <input type="text" id="cpb-name-ar" placeholder="محمد أحمد العلي" dir="rtl" oninput="cpbUpdateProgress()">
         </div>
         <div class="cpb-field">
-          <label>رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label>
+          <label for="cpb-phone">رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label>
           <input type="tel" id="cpb-phone" placeholder="966501234567" dir="ltr" style="text-align:right" oninput="cpbUpdateProgress()">
         </div>
         <div class="cpb-field-row">
           <div class="cpb-field">
-            <label>الوزن (كجم)</label>
+            <label for="cpb-weight">الوزن (كجم)</label>
             <input type="number" id="cpb-weight" placeholder="70" min="30" max="250" oninput="cpbCalcBMI()">
           </div>
           <div class="cpb-field">
-            <label>الطول (سم)</label>
+            <label for="cpb-height">الطول (سم)</label>
             <input type="number" id="cpb-height" placeholder="170" min="100" max="250" oninput="cpbCalcBMI()">
           </div>
         </div>
         <div class="cpb-field">
-          <label>تاريخ الميلاد</label>
+          <label for="cpb-dob">تاريخ الميلاد</label>
           <input type="date" id="cpb-dob">
         </div>
         <div class="cpb-field">
-          <label>الجنس</label>
+          <label for="cpb-gender">الجنس</label>
           <select id="cpb-gender">
             <option value="">اختر الجنس</option>
             <option value="male">👨 ذكر</option>
@@ -1754,7 +1756,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
           </select>
         </div>
         <div class="cpb-field">
-          <label>هل أنت مدخن؟</label>
+          <label for="cpb-smoking">هل أنت مدخن؟</label>
           <select id="cpb-smoking">
             <option value="">اختر...</option>
             <option value="smoker_male">🚬 مدخن (ذكر)</option>
@@ -1852,10 +1854,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   <div class="app-header"><div class="header-row"><div class="header-title">🩺 محلل الصحة المتقدم PRO</div><button onclick="goPage('home')" style="background:none; border:none; color:var(--txt2); font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button></div></div>
   <div style="padding:16px;">
     <div class="prof-card" style="padding:16px;">
-      <div class="field"><label>الأعراض الحالية وعلامات التعب (مثال: انتفاخ، ارتجاع، خمول)</label><input type="text" id="pa-symptoms" placeholder="اكتب الأعراض بالتفصيل هنا"></div>
-      <div class="field"><label>الأدوية المتناولة حالياً أو الفيتامينات</label><input type="text" id="pa-meds" placeholder="اكتب الأدوية أو اتركها فارغة"></div>
-      <div class="field"><label>مستوى النشاط البدني والحركي</label><select id="pa-activity"><option value="منخفض">خامل أو نشاط مكتبي منخفض</option><option value="متوسط">نشاط وحركة متوسطة</option><option value="عالي">رياضي أو مجهود بدني عالي</option></select></div>
-      <div class="field"><label>جودة ونظام النوم اليومي</label><select id="pa-sleep"><option value="متقطع أو قليل">نوم متقطع أقل من 6 ساعات</option><option value="عميق وصحي">نوم عميق مستقر 7-8 ساعات</option></select></div>
+      <div class="field"><label for="pa-symptoms">الأعراض الحالية وعلامات التعب (مثال: انتفاخ، ارتجاع، خمول)</label><input type="text" id="pa-symptoms" placeholder="اكتب الأعراض بالتفصيل هنا"></div>
+      <div class="field"><label for="pa-meds">الأدوية المتناولة حالياً أو الفيتامينات</label><input type="text" id="pa-meds" placeholder="اكتب الأدوية أو اتركها فارغة"></div>
+      <div class="field"><label for="pa-activity">مستوى النشاط البدني والحركي</label><select id="pa-activity"><option value="منخفض">خامل أو نشاط مكتبي منخفض</option><option value="متوسط">نشاط وحركة متوسطة</option><option value="عالي">رياضي أو مجهود بدني عالي</option></select></div>
+      <div class="field"><label for="pa-sleep">جودة ونظام النوم اليومي</label><select id="pa-sleep"><option value="متقطع أو قليل">نوم متقطع أقل من 6 ساعات</option><option value="عميق وصحي">نوم عميق مستقر 7-8 ساعات</option></select></div>
       <button class="btn btn-gold" onclick="runPremiumHealthAnalyzer()"><i class="fas fa-stethoscope"></i> ابدأ التحليل الميكروبيولوجي الذكي</button>
     </div>
     <div id="pa-result-container" style="margin-top:14px;"></div>
@@ -1955,10 +1957,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="prof-card" style="padding:14px;">
       <div style="font-size:0.85rem; font-weight:800; color:var(--gold2); margin-bottom:10px;"><i class="fas fa-plus-circle"></i> تسجيل قياسات اليوم الحالية</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div class="field"><label>مستوى الطاقة (1-10)</label><input type="number" id="pt-energy" value="8" min="1" max="10"></div>
-        <div class="field"><label>درجة الانتفاخ (1-10)</label><input type="number" id="pt-bloat" value="2" min="1" max="10"></div>
-        <div class="field"><label>ساعات النوم الفعلي</label><input type="number" id="pt-sleep-hrs" value="7" min="1" max="24"></div>
-        <div class="field"><label>مستوى السكر (إن وجد)</label><input type="number" id="pt-sugar-lvl" placeholder="120"></div>
+        <div class="field"><label for="pt-energy">مستوى الطاقة (1-10)</label><input type="number" id="pt-energy" value="8" min="1" max="10"></div>
+        <div class="field"><label for="pt-bloat">درجة الانتفاخ (1-10)</label><input type="number" id="pt-bloat" value="2" min="1" max="10"></div>
+        <div class="field"><label for="pt-sleep-hrs">ساعات النوم الفعلي</label><input type="number" id="pt-sleep-hrs" value="7" min="1" max="24"></div>
+        <div class="field"><label for="pt-sugar-lvl">مستوى السكر (إن وجد)</label><input type="number" id="pt-sugar-lvl" placeholder="120"></div>
       </div>
       <button class="btn btn-gold" style="padding:10px; font-size:0.85rem; margin-top:6px;" onclick="savePremiumTrackerMetrics()"><i class="fas fa-save"></i> حفظ القياسات ومزامنتها سحابياً</button>
     </div>
@@ -2021,11 +2023,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 <div class="modal-overlay" id="edit-profile-modal">
   <div class="modal-box">
     <div class="modal-title">✏️ تعديل البيانات الصحية</div>
-    <div class="field"><label>الوزن (كجم)</label><input type="number" id="e-weight" min="30" max="250" oninput="calcBMI('e')"></div>
-    <div class="field"><label>الطول (سم)</label><input type="number" id="e-height" min="100" max="250" oninput="calcBMI('e')"></div>
-    <div class="field"><label>تاريخ الميلاد</label><input type="date" id="e-dob"></div>
+    <div class="field"><label for="e-weight">الوزن (كجم)</label><input type="number" id="e-weight" min="30" max="250" oninput="calcBMI('e')"></div>
+    <div class="field"><label for="e-height">الطول (سم)</label><input type="number" id="e-height" min="100" max="250" oninput="calcBMI('e')"></div>
+    <div class="field"><label for="e-dob">تاريخ الميلاد</label><input type="date" id="e-dob"></div>
     <div class="bmi-result" id="e-bmi-result"></div>
-    <div class="field"><label>حالة التدخين</label><select id="e-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
+    <div class="field"><label for="e-smoking">حالة التدخين</label><select id="e-smoking"><option value="">اختر...</option><option value="smoker_male">🚬 مدخن (ذكر)</option><option value="smoker_female">🚬 مدخنة (أنثى)</option><option value="non_smoker">✅ غير مدخن</option></select></div>
     <div style="font-size:.85rem;font-weight:700;color:var(--gold2);margin-bottom:12px"><i class="fas fa-notes-medical" style="color:var(--red2)"></i> الأمراض المزمنة</div>
     <div class="dis-grid" id="dis-grid-edit"></div>
     <button class="btn btn-gold" style="margin-top:16px" onclick="saveEditProfile()"><i class="fas fa-save"></i> حفظ التعديلات</button>
@@ -2039,7 +2041,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div style="font-size:1.1rem;font-weight:800;color:var(--txt)" id="share-exp-modal-title">شارك تجربتك</div>
       <button onclick="closeShareExpModal()" style="background:none;border:none;font-size:1.4rem;color:var(--txt2);cursor:pointer"><i class="fas fa-times"></i></button>
     </div>
-    <div class="field"><label>اسم المستخدم</label><input id="exp-uname" type="text" readonly style="color:var(--txt2)"></div>
+    <div class="field"><label for="exp-uname">اسم المستخدم</label><input id="exp-uname" type="text" readonly style="color:var(--txt2)"></div>
     <div class="field">
       <label>المرض / الحالة <span style="color:#ef5350">*</span></label>
       <select id="exp-disease" style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:1rem;outline:none;min-height:48px;-webkit-appearance:none;color-scheme:dark">
@@ -2632,6 +2634,21 @@ function hideLoader() {
 
 /* ══════════ Auto Login ══════════ */
 async function autoLogin() {
+  // تحقق من نتيجة Redirect إذا كان المستخدم قادماً من Google Redirect
+  if (window.fbGetRedirectResult && window.firebaseAuth) {
+    try {
+      var redirectResult = await window.fbGetRedirectResult(window.firebaseAuth);
+      if (redirectResult && redirectResult.user) {
+        await handleGoogleUserData(redirectResult.user);
+        return;
+      }
+    } catch(re) {
+      if (re.code !== 'auth/no-auth-event' && re.code !== 'auth/null-user') {
+        console.warn('Redirect result error:', re.code);
+      }
+    }
+  }
+
   var s = getSession();
   if (!s) { hideLoader(); return; }
   try {
@@ -6005,29 +6022,30 @@ async function doGoogleLogin() {
 
   // انتظر Firebase حتى 8 ثوانٍ
   var waited = 0;
-  while ((!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) && waited < 80) {
+  while ((!window.fbSignInWithRedirect || !window.googleProvider || !window.firebaseAuth) && waited < 80) {
     await new Promise(function(r){ setTimeout(r, 100); });
     waited++;
   }
 
+  if (!window.fbSignInWithRedirect || !window.googleProvider || !window.firebaseAuth) {
+    showAuthError('login', '⚠️ فشل تحميل Firebase، أعد تحميل الصفحة');
+    if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
+    if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
+    return;
+  }
+
   try {
-    if (!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) {
-      showAuthError('login', '⚠️ فشل تحميل Firebase، أعد تحميل الصفحة');
-      if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
-      if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
-      return;
-    }
-    var result = await window.fbSignInWithPopup(window.firebaseAuth, window.googleProvider);
-    await handleGoogleUserData(result.user);
+    // استخدم Redirect مباشرة (متوافق مع CSP ولا يحتاج نوافذ منبثقة)
+    showToast('🔄 جارٍ التحويل لتسجيل الدخول بجوجل...');
+    await window.fbSignInWithRedirect(window.firebaseAuth, window.googleProvider);
+    // الصفحة ستُعاد تحميلها تلقائياً بعد نجاح الـ redirect
   } catch(e) {
-    console.error('Google login error:', e);
-    var msg = e.code === 'auth/popup-closed-by-user'  ? 'تم إغلاق نافذة تسجيل الدخول'
-            : e.code === 'auth/popup-blocked'          ? '⚠️ المتصفح حجب النافذة — اسمح بالنوافذ المنبثقة'
-            : e.code === 'auth/unauthorized-domain'    ? '⚠️ النطاق غير مسموح به في Firebase Console'
-            : e.code === 'auth/cancelled-popup-request'? ''
-            : e.code === 'auth/network-request-failed' ? '⚠️ تحقق من الاتصال بالإنترنت'
-            : 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى';
-    if (msg) showAuthError('login', msg);
+    console.warn('Redirect failed:', e.code);
+    if (e.code === 'auth/network-request-failed') {
+      showAuthError('login', '⚠️ تحقق من الاتصال بالإنترنت');
+    } else {
+      showAuthError('login', 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى');
+    }
     if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
     if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
   }
@@ -6324,6 +6342,21 @@ function doLogout() {
 
 /* ─── autoLogin with Google support ───────────────── */
 async function autoLogin() {
+  // تحقق من نتيجة Redirect إذا كان المستخدم قادماً من Google Redirect
+  if (window.fbGetRedirectResult && window.firebaseAuth) {
+    try {
+      var redirectResult = await window.fbGetRedirectResult(window.firebaseAuth);
+      if (redirectResult && redirectResult.user) {
+        await handleGoogleUserData(redirectResult.user);
+        return;
+      }
+    } catch(re) {
+      if (re.code !== 'auth/no-auth-event' && re.code !== 'auth/null-user') {
+        console.warn('Redirect result error:', re.code);
+      }
+    }
+  }
+
   var s = getSession();
   if (!s) { hideLoader(); return; }
   try {
