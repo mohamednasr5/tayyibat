@@ -1723,6 +1723,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       </div>
       <div class="cpb-progress-bar-wrap"><div class="cpb-progress-bar" id="cpb-progress-bar"></div></div>
       <div class="cpb-fields">
+        <div class="cpb-field">
+          <label>الاسم الكامل بالعربية <span style="color:var(--red2)">*</span></label>
+          <input type="text" id="cpb-name-ar" placeholder="محمد أحمد العلي" dir="rtl" oninput="cpbUpdateProgress()">
+        </div>
+        <div class="cpb-field">
+          <label>رقم الهاتف <span style="color:var(--txt3);font-weight:400">(اختياري)</span></label>
+          <input type="tel" id="cpb-phone" placeholder="966501234567" dir="ltr" style="text-align:right" oninput="cpbUpdateProgress()">
+        </div>
         <div class="cpb-field-row">
           <div class="cpb-field">
             <label>الوزن (كجم)</label>
@@ -2913,7 +2921,7 @@ function syncPremiumUIStates() {
 
   if(window.isProUser) {
     targetGreeting.textContent = greetingTxt;
-    targetName.innerHTML = currentUser.name + ' <span class="pro-badge-animated">👑 PRO</span>';
+    targetName.innerHTML = (currentUser.nameAr||currentUser.name) + ' <span class="pro-badge-animated">👑 PRO</span>';
     document.getElementById('pro-upgrade-banner').style.display = 'none';
     document.getElementById('pro-user-status-bar').style.display = 'block';
     document.getElementById('pro-whatsapp-contact').style.display = 'block';
@@ -2927,7 +2935,7 @@ function syncPremiumUIStates() {
     }
   } else {
     targetGreeting.textContent = greetingTxt;
-    targetName.textContent = currentUser.name;
+    targetName.textContent = currentUser.nameAr || currentUser.name;
     document.getElementById('pro-upgrade-banner').style.display = 'block';
     document.getElementById('pro-user-status-bar').style.display = 'none';
     document.getElementById('pro-whatsapp-contact').style.display = 'none';
@@ -4534,8 +4542,10 @@ function buildProfile() {
       el('pro-expiry-text').textContent = 'اشتراك مفتوح غير محدود المدة';
     }
   }
-  ['p-name','p-name2'].forEach(function(id) { var e = el(id); if (e) e.textContent = u.name; });
+  var displayName = u.nameAr || u.name;
+  ['p-name','p-name2'].forEach(function(id) { var e = el(id); if (e) e.textContent = displayName; });
   var setVal = function(id, v) { var e = el(id); if (e) e.textContent = v; };
+  var hn = document.getElementById('pp-name'); if (hn) hn.textContent = displayName;
   setVal('pp-weight', u.weight ? u.weight + ' كجم' : '-');
   setVal('pp-height', u.height ? u.height + ' سم' : '-');
   setVal('pp-dob', u.dob || '-');
@@ -4593,7 +4603,7 @@ function setupShareButtons() {
       if (window.__firebaseReady && currentUser) {
         try {
           var shareRef = window.__firebaseRef(window.__firebaseDB, 'shares/' + currentUser.username + '/' + Date.now());
-          window.__firebaseSet(shareRef, { platform: 'whatsapp', ts: Date.now(), userId: currentUser.username, userName: currentUser.name || currentUser.username }).catch(function(){});
+          window.__firebaseSet(shareRef, { platform: 'whatsapp', ts: Date.now(), userId: currentUser.username, userName: currentUser.nameAr || currentUser.name || currentUser.username }).catch(function(){});
         } catch(e) {}
       }
     });
@@ -4605,7 +4615,7 @@ function copyAppLink() {
   if (window.__firebaseReady && currentUser) {
     try {
       var shareRef = window.__firebaseRef(window.__firebaseDB, 'shares/' + currentUser.username + '/' + Date.now());
-      window.__firebaseSet(shareRef, { platform: 'copy', ts: Date.now(), userId: currentUser.username, userName: currentUser.name || currentUser.username }).catch(function(){});
+      window.__firebaseSet(shareRef, { platform: 'copy', ts: Date.now(), userId: currentUser.username, userName: currentUser.nameAr || currentUser.name || currentUser.username }).catch(function(){});
     } catch(e) {}
   }
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -4624,7 +4634,7 @@ function buildUserContext() {
   var u = currentUser || {}, d = u.diseases || [];
   var m = { sugar:'السكري', pressure:'ارتفاع الضغط', allergy:'الحساسية', chemo:'علاج كيماوي', heart:'أمراض القلب', kidney:'أمراض الكلى' };
   var bi = getBMIInfo(u.bmi);
-  return 'أنت مساعد صحي متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله. تتحدث بالعربية. المستخدم: ' + (u.name||'مستخدم') + '، BMI: ' + (u.bmi||'-') + ' (' + bi.label + ')، الأمراض: ' + (d.length ? d.map(function(x){return m[x];}).join(' و ') : 'لا يوجد') + '. المسموح: لحوم حمراء، سمك، أرز، بطاطس، زيت زيتون، خضار مطبوخة، فواكه باعتدال، جبن معتق. الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.';
+  return 'أنت مساعد صحي متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله. تتحدث بالعربية. المستخدم: ' + (u.nameAr||u.name||'مستخدم') + '، BMI: ' + (u.bmi||'-') + ' (' + bi.label + ')، الأمراض: ' + (d.length ? d.map(function(x){return m[x];}).join(' و ') : 'لا يوجد') + '. المسموح: لحوم حمراء، سمك، أرز، بطاطس، زيت زيتون، خضار مطبوخة، فواكه باعتدال، جبن معتق. الممنوع: دجاج، بيض، دقيق أبيض، ألبان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.';
 }
 
 async function tryPollinations(modelId, sysPrompt, userMsg) {
@@ -4916,7 +4926,7 @@ function openShareExperienceModal() {
     document.getElementById('exp-disease').value = '';
     document.getElementById('exp-details').value = '';
   }
-  var u = document.getElementById('exp-uname'); if (u) u.value = currentUser.name || currentUser.username;
+  var u = document.getElementById('exp-uname'); if (u) u.value = currentUser.nameAr || currentUser.name || currentUser.username;
   document.getElementById('share-exp-modal').style.display = 'flex';
 }
 
@@ -5174,7 +5184,7 @@ window.addEventListener('DOMContentLoaded', function() {
     return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n"
       + "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n"
       + "بيانات المستخدم:\n"
-      + "- الاسم: "+(u.name||"مستخدم")+"\n"
+      + "- الاسم: "+(u.nameAr||u.name||"مستخدم")+"\n"
       + "- العمر: "+age+" سنة | الجنس: "+gender+"\n"
       + "- BMI: "+(u.bmi||"؟")+" | الوزن: "+(u.weight||"؟")+"كجم | الطول: "+(u.height||"؟")+"سم\n"
       + "- الحالات الصحية: "+diseases+"\n\n"
@@ -5223,7 +5233,7 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   function _localFallback() {
-    var name = (window.currentUser&&window.currentUser.name)||"صديقي";
+    var name = (window.currentUser&&(window.currentUser.nameAr||window.currentUser.name))||"صديقي";
     var tips = [
       "انا هنا معك "+name+"! الاتصال غير متاح الان.\n\nالمسموح: لحم الخروف، السمك، الارز، البطاطس، العسل، التمر.\nالممنوع: الدجاج، البيض، الدقيق الابيض، الالبان.\n\nاعد المحاولة بعد لحظات.",
       "مرحبا "+name+"! الخادم مشغول.\n\nنصيحة: اشرب 8 اكواب ماء يوميا وامش 30 دقيقة.\n\nاضغط ارسال مرة اخرى.",
@@ -5247,7 +5257,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
     var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "؟";
     var el = document.getElementById("gemini-ctx-body");
-    if (el) el.innerHTML = "👤 "+(u.name||"مستخدم")+" | "+age+" سنة | BMI: "+(u.bmi||"؟")+" | "+diseases;
+    if (el) el.innerHTML = "👤 "+(u.nameAr||u.name||"مستخدم")+" | "+age+" سنة | BMI: "+(u.bmi||"؟")+" | "+diseases;
   }
 
   function _setStatus(ready, source) {
@@ -6032,7 +6042,8 @@ async function handleGoogleUserData(googleUser) {
   setTimeout(refreshGiftFab, 700);
 
   // اعرض رسالة ترحيب
-  showToast(isNewUser ? '🎉 أهلاً ' + currentUser.name + '! تم إنشاء حسابك' : 'مرحباً ' + currentUser.name + ' 👋');
+  var displayName = currentUser.nameAr || currentUser.name;
+  showToast(isNewUser ? '🎉 أهلاً ' + displayName + '! تم إنشاء حسابك' : 'مرحباً ' + displayName + ' 👋');
 
   // بعد الدخول: توجّه لصفحة الحساب وأظهر نموذج استكمال البيانات
   setTimeout(function() {
@@ -6048,12 +6059,14 @@ async function handleGoogleUserData(googleUser) {
 function calcProfileCompletion(u) {
   if (!u) return 0;
   var fields = [
-    { key: 'weight',  val: u.weight  && u.weight  > 0,    label: 'الوزن',         icon: '⚖️' },
-    { key: 'height',  val: u.height  && u.height  > 0,    label: 'الطول',         icon: '📏' },
-    { key: 'dob',     val: !!u.dob,                       label: 'تاريخ الميلاد', icon: '🎂' },
-    { key: 'gender',  val: !!u.gender,                    label: 'الجنس',         icon: '👤' },
-    { key: 'smoking', val: u.smoking && u.smoking !== '', label: 'التدخين',       icon: '🚭' },
-    { key: 'diseases',val: Array.isArray(u.diseases),     label: 'الأمراض',       icon: '🏥' },
+    { key: 'nameAr',  val: !!(u.nameAr && u.nameAr.trim()),  label: 'الاسم بالعربية',  icon: '✍️' },
+    { key: 'weight',  val: u.weight  && u.weight  > 0,        label: 'الوزن',           icon: '⚖️' },
+    { key: 'height',  val: u.height  && u.height  > 0,        label: 'الطول',           icon: '📏' },
+    { key: 'dob',     val: !!u.dob,                           label: 'تاريخ الميلاد',   icon: '🎂' },
+    { key: 'gender',  val: !!u.gender,                        label: 'الجنس',           icon: '👤' },
+    { key: 'smoking', val: u.smoking && u.smoking !== '',     label: 'التدخين',         icon: '🚭' },
+    { key: 'diseases',val: Array.isArray(u.diseases),         label: 'الأمراض',         icon: '🏥' },
+    { key: 'phone',   val: !!(u.phone && u.phone.trim()),     label: 'رقم الهاتف',      icon: '📱' },
   ];
   var done = fields.filter(function(f) { return f.val; }).length;
   window._profileFields = fields;
@@ -6126,7 +6139,9 @@ function openCompleteProfileModal() {
   if (!overlay) return;
 
   // Pre-fill existing values
-  var setVal = function(id, v) { var e = document.getElementById(id); if (e && v) e.value = v; };
+  var setVal = function(id, v) { var e = document.getElementById(id); if (e && v !== undefined && v !== null) e.value = v; };
+  setVal('cpb-name-ar', currentUser.nameAr  || currentUser.name || '');
+  setVal('cpb-phone',   currentUser.phone   || '');
   setVal('cpb-weight',  currentUser.weight  || '');
   setVal('cpb-height',  currentUser.height  || '');
   setVal('cpb-dob',     currentUser.dob     || '');
@@ -6176,26 +6191,29 @@ function cpbCalcBMI() {
 }
 
 function cpbUpdateProgress() {
-  var fields = [
-    document.getElementById('cpb-weight')  && document.getElementById('cpb-weight').value,
-    document.getElementById('cpb-height')  && document.getElementById('cpb-height').value,
-    document.getElementById('cpb-dob')     && document.getElementById('cpb-dob').value,
-    document.getElementById('cpb-gender')  && document.getElementById('cpb-gender').value,
-    document.getElementById('cpb-smoking') && document.getElementById('cpb-smoking').value,
-  ];
-  var filled = fields.filter(Boolean).length;
-  var pct = Math.round((filled / fields.length) * 100);
+  var ids = ['cpb-name-ar','cpb-weight','cpb-height','cpb-dob','cpb-gender','cpb-smoking'];
+  var filled = ids.filter(function(id) {
+    var e = document.getElementById(id); return e && e.value && e.value.trim() !== '';
+  }).length;
+  var pct = Math.round((filled / ids.length) * 100);
   var bar = document.getElementById('cpb-progress-bar');
   if (bar) bar.style.width = pct + '%';
 }
 
 async function saveCompleteProfile() {
+  var nameAr = (document.getElementById('cpb-name-ar').value || '').trim();
+  var phone  = (document.getElementById('cpb-phone').value  || '').trim();
   var w  = parseFloat(document.getElementById('cpb-weight').value)  || 0;
   var h  = parseFloat(document.getElementById('cpb-height').value)  || 0;
   var dob = document.getElementById('cpb-dob').value;
   var gen = document.getElementById('cpb-gender').value;
   var sm  = document.getElementById('cpb-smoking').value;
 
+  if (!nameAr) {
+    showToast('⚠️ يرجى إدخال الاسم الكامل بالعربية');
+    document.getElementById('cpb-name-ar').focus();
+    return;
+  }
   if (!w || !h || !dob || !gen || !sm) {
     showToast('⚠️ يرجى ملء جميع الحقول الإلزامية');
     return;
@@ -6203,6 +6221,9 @@ async function saveCompleteProfile() {
 
   var bmi = (w && h) ? parseFloat((w / ((h/100)*(h/100))).toFixed(1)) : 0;
 
+  currentUser.name     = nameAr;   // الاسم بالعربي يصبح الاسم الرئيسي
+  currentUser.nameAr   = nameAr;
+  currentUser.phone    = phone;
   currentUser.weight   = w;
   currentUser.height   = h;
   currentUser.dob      = dob;
