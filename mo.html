@@ -1202,14 +1202,82 @@
     const icons = {'🎁 هدية ترحيب':'🎁','👑 اشتراك Pro مجاني':'👑','🌟 نجمة إنجاز':'🌟','🏆 جائزة الحضور المتواصل':'🏆','💎 عضوية VIP':'💎','🎉 هدية عيد ميلاد':'🎉'};
     const icon = icons[giftName] || '🎁';
     const giftId = Date.now().toString();
-    const giftData = { id: giftId, name: giftName, icon, grantedAt: Date.now(), grantedByAdmin: true };
+    const now = Date.now();
+
+    /* حساب مدة الهدية بالمللي ثانية */
+    const proGiftTypes = ['👑 اشتراك Pro مجاني', '💎 عضوية VIP'];
+    const isProGift = proGiftTypes.includes(giftName) || giftName.includes('Pro') || giftName.includes('برو') || giftName.includes('VIP');
+
+    /* مدة الهدية: Pro = 30 يوم, VIP = 90 يوم */
+    let giftDurationMs = 0;
+    if (giftName.includes('VIP') || giftName.includes('فيب')) giftDurationMs = 90 * 86400000;
+    else if (isProGift) giftDurationMs = 30 * 86400000;
+
+    const giftData = {
+      id: giftId,
+      name: giftName,
+      icon,
+      grantedAt: now,
+      grantedByAdmin: true,
+      isPro: isProGift,
+      durationMs: giftDurationMs
+    };
+
     try {
+      /* 1. حفظ الهدية في سجل هدايا المستخدم */
       await set(ref(db, 'users/' + selectedUser._id + '/gifts/' + giftId), giftData);
+
+      /* 2. إذا كانت الهدية Pro — فعّل الاشتراك فوراً في Firebase */
+      if (isProGift && giftDurationMs > 0) {
+        /* الحصول على تاريخ انتهاء الاشتراك الحالي إن وجد (نضيف فوقه) */
+        let currentExpiry = now;
+        if (selectedUser.pro && selectedUser.pro.active && selectedUser.pro.expiresAt && selectedUser.pro.expiresAt > now) {
+          currentExpiry = selectedUser.pro.expiresAt;
+        }
+        const newExpiry = currentExpiry + giftDurationMs;
+        const proData = {
+          active: true,
+          activatedAt: now,
+          expiresAt: newExpiry,
+          grantedByGift: giftId,
+          grantedByAdmin: true
+        };
+        await set(ref(db, 'users/' + selectedUser._id + '/pro'), proData);
+
+        /* تحديث الكائن المحلي */
+        selectedUser.pro = proData;
+
+        /* 3. إرسال إشعار للمستخدم في Firebase */
+        const notifData = {
+          id: giftId,
+          title: '🎁 هدية من الإدارة!',
+          body: `تم منحك ${giftName} — اشتراك Pro لمدة ${Math.round(giftDurationMs/86400000)} يوماً ينتهي في ${new Date(newExpiry).toLocaleDateString('ar-EG')}`,
+          icon: icon,
+          ts: now
+        };
+        await set(ref(db, 'notifications/users/' + (selectedUser.username || selectedUser._id)), notifData);
+
+        showToast(`👑 تم منح ${giftName} وتفعيل Pro لمدة ${Math.round(giftDurationMs/86400000)} يوماً بنجاح!`);
+      } else {
+        /* هدية عادية — فقط إشعار */
+        const notifData = {
+          id: giftId,
+          title: icon + ' هدية من الإدارة!',
+          body: `تم منحك: ${giftName}`,
+          icon: icon,
+          ts: now
+        };
+        await set(ref(db, 'notifications/users/' + (selectedUser.username || selectedUser._id)), notifData);
+        showToast('🎁 تم منح الهدية وإرسال إشعار للمستخدم!');
+      }
+
       if (!selectedUser.gifts) selectedUser.gifts = {};
       selectedUser.gifts[giftId] = giftData;
-      showToast('🎁 تم منح الهدية بنجاح');
       loadUserProfile(selectedUser._id);
-    } catch(e) { showToast('❌ فشل منح الهدية'); }
+    } catch(e) {
+      console.error(e);
+      showToast('❌ فشل منح الهدية: ' + e.message);
+    }
   };
 
   /* ═══ User Modal (Edit) ═══ */
