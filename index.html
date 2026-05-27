@@ -1766,6 +1766,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <div class="cpb-field">
           <label>الأمراض المزمنة (اختياري)</label>
           <div class="cpb-dis-grid" id="cpb-dis-grid">
+            <div class="cpb-dis-item" onclick="cpbToggleDis('none',this)" style="grid-column:1/-1;border-color:rgba(46,201,81,.3);background:rgba(46,201,81,.05)"><span class="cpb-dis-icon">✅</span><span class="cpb-dis-name">لا يوجد مرض</span></div>
             <div class="cpb-dis-item" onclick="cpbToggleDis('sugar',this)"><span class="cpb-dis-icon">🧠</span><span class="cpb-dis-name">السكري</span></div>
             <div class="cpb-dis-item" onclick="cpbToggleDis('pressure',this)"><span class="cpb-dis-icon">💉</span><span class="cpb-dis-name">الضغط</span></div>
             <div class="cpb-dis-item" onclick="cpbToggleDis('allergy',this)"><span class="cpb-dis-icon">🌸</span><span class="cpb-dis-name">الحساسية</span></div>
@@ -6184,9 +6185,9 @@ function openCompleteProfileModal() {
   setVal('cpb-smoking', currentUser.smoking || '');
 
   // Pre-select diseases
-  document.querySelectorAll('.cpb-dis-item').forEach(function(el) {
-    var key = el.getAttribute('onclick').match(/'([^']+)'/)[1];
-    el.classList.toggle('sel', _cpbDiseases.indexOf(key) > -1);
+  document.querySelectorAll('#cpb-dis-grid .cpb-dis-item').forEach(function(el) {
+    var m = el.getAttribute('onclick').match(/'([^']+)'/);
+    if (m) el.classList.toggle('sel', _cpbDiseases.indexOf(m[1]) > -1);
   });
 
   // Update progress bar
@@ -6203,8 +6204,28 @@ function closeCompleteProfileModal() {
 
 function cpbToggleDis(key, el) {
   var idx = _cpbDiseases.indexOf(key);
-  if (idx > -1) { _cpbDiseases.splice(idx, 1); el.classList.remove('sel'); }
-  else          { _cpbDiseases.push(key);       el.classList.add('sel'); }
+  if (idx > -1) {
+    _cpbDiseases.splice(idx, 1);
+    el.classList.remove('sel');
+  } else {
+    if (key === 'none') {
+      // إذا اختار "لا يوجد مرض" → امسح كل الأمراض الأخرى
+      _cpbDiseases.length = 0;
+      document.querySelectorAll('#cpb-dis-grid .cpb-dis-item').forEach(function(e) {
+        e.classList.remove('sel');
+      });
+    } else {
+      // إذا اختار مرضاً → أزل "لا يوجد مرض" إن كان محدداً
+      var noneIdx = _cpbDiseases.indexOf('none');
+      if (noneIdx > -1) {
+        _cpbDiseases.splice(noneIdx, 1);
+        var noneEl = document.querySelector('#cpb-dis-grid [onclick*="'none'"]');
+        if (noneEl) noneEl.classList.remove('sel');
+      }
+    }
+    _cpbDiseases.push(key);
+    el.classList.add('sel');
+  }
   cpbUpdateProgress();
 }
 
