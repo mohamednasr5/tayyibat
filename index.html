@@ -6002,9 +6002,17 @@ async function doGoogleLogin() {
   var spinner = '<span class="btn-spinner"></span> جارٍ التسجيل...';
   if (btn)  { btn.disabled  = true; btn.innerHTML  = spinner; }
   if (btn2) { btn2.disabled = true; btn2.innerHTML = spinner; }
+
+  // انتظر Firebase حتى 8 ثوانٍ
+  var waited = 0;
+  while ((!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) && waited < 80) {
+    await new Promise(function(r){ setTimeout(r, 100); });
+    waited++;
+  }
+
   try {
     if (!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) {
-      showAuthError('login', '⚠️ انتظر ثانية ثم أعد المحاولة');
+      showAuthError('login', '⚠️ فشل تحميل Firebase، أعد تحميل الصفحة');
       if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
       if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
       return;
@@ -6016,8 +6024,10 @@ async function doGoogleLogin() {
     var msg = e.code === 'auth/popup-closed-by-user'  ? 'تم إغلاق نافذة تسجيل الدخول'
             : e.code === 'auth/popup-blocked'          ? '⚠️ المتصفح حجب النافذة — اسمح بالنوافذ المنبثقة'
             : e.code === 'auth/unauthorized-domain'    ? '⚠️ النطاق غير مسموح به في Firebase Console'
+            : e.code === 'auth/cancelled-popup-request'? ''
+            : e.code === 'auth/network-request-failed' ? '⚠️ تحقق من الاتصال بالإنترنت'
             : 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى';
-    showAuthError('login', msg);
+    if (msg) showAuthError('login', msg);
     if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
     if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
   }
@@ -6072,22 +6082,13 @@ async function handleGoogleUserData(googleUser) {
   logActivity(isNewUser ? 'register' : 'login', isNewUser ? 'تسجيل بـ Google' : 'دخول بـ Google', googleUser.email);
   playSound('success');
 
-  // انتقل للتطبيق أولاً
+  // تشغيل التطبيق - bootApp يتولى التوجيه الذكي تلقائياً
   bootApp();
   setTimeout(refreshGiftFab, 700);
 
-  // اعرض رسالة ترحيب
+  // رسالة ترحيب
   var displayName = currentUser.nameAr || currentUser.name;
   showToast(isNewUser ? '🎉 أهلاً ' + displayName + '! تم إنشاء حسابك' : 'مرحباً ' + displayName + ' 👋');
-
-  // بعد الدخول: توجّه لصفحة الحساب وأظهر نموذج استكمال البيانات
-  setTimeout(function() {
-    goPage('profile');
-    var pct = calcProfileCompletion(currentUser);
-    if (pct < 100) {
-      setTimeout(function() { openCompleteProfileModal(); }, 500);
-    }
-  }, 600);
 }
 
 /* ─── Profile Completion Calculator ───────────────── */
