@@ -27,8 +27,8 @@
 <meta property="og:title" content="نظام طيبات | دايت ذكي بالـ AI | الدكتور ضياء العوضي">
 <meta property="og:description" content="أفضل تطبيق عربي للدايت والحمية الغذائية والصيام المتقطع بإشراف الدكتور ضياء العوضي. استشارات تغذية بالذكاء الاصطناعي، حساب سعرات، وخطط وجبات مخصصة. جرّب مجاناً!">
 <meta property="og:url" content="https://tayyibat.online/">
-<meta property="og:image" content="https://tayyibat.online/icons/og-image.png">
-<meta property="og:image:secure_url" content="https://tayyibat.online/icons/og-image.png">
+<meta property="og:image" content="https://tayyibat.online/icons/og-image.jpg">
+<meta property="og:image:secure_url" content="https://tayyibat.online/icons/og-image.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -2112,6 +2112,7 @@ var notifTimer = null;
 window.isProUser = false;
 
 var DISEASES_LIST = [
+  { key: 'none',     icon: '✅', name: 'لا يوجد مرض',   hint: 'أنا بصحة جيدة تماماً' },
   { key: 'sugar',    icon: '🧠', name: 'مرض السكري',    hint: 'السكر النوع 1 أو 2' },
   { key: 'pressure', icon: '💉', name: 'ارتفاع الضغط',  hint: 'ضغط الدم المرتفع' },
   { key: 'allergy',  icon: '🌸', name: 'الحساسية',      hint: 'حساسية غذاء أو بيئة' },
@@ -2297,8 +2298,11 @@ function logActivity(type, text, detail) {
   var uid = currentUser.username;
   var entry = { type: type, text: text, detail: detail || '', ts: Date.now() };
   try {
-    var newRef = window.__firebaseRef(window.__firebaseDB, 'activityLog/' + uid + '/' + Date.now());
+    var ts = Date.now();
+    var newRef = window.__firebaseRef(window.__firebaseDB, 'activityLog/' + uid + '/' + ts);
     window.__firebaseSet(newRef, entry).catch(function(){});
+    var userRef = window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/activityLog/' + ts);
+    window.__firebaseSet(userRef, entry).catch(function(){});
     // أيضاً احفظ سجل الدخول داخل نود المستخدم
     if (type === 'login') {
       var loginHistory = Array.isArray(currentUser.loginHistory) ? currentUser.loginHistory : [];
@@ -2699,10 +2703,30 @@ function buildDisGrid(cId, arr) {
 function toggleDis(k, cId) {
   var isAuth = cId === 'dis-grid-auth';
   var arr = isAuth ? selectedDiseases : editDiseases;
-  var idx = arr.indexOf(k);
+  var idx2 = arr.indexOf(k);
   var el = document.getElementById(cId + '-' + k);
-  if (idx > -1) { arr.splice(idx, 1); el.className = 'dis-item'; }
-  else { arr.push(k); el.className = 'dis-item sel sel-' + k; }
+  if (idx2 > -1) {
+    arr.splice(idx2, 1);
+    el.className = 'dis-item';
+  } else {
+    // إذا اختار "لا يوجد مرض" → امسح باقي الاختيارات
+    if (k === 'none') {
+      arr.length = 0;
+      document.querySelectorAll('#' + cId + ' .dis-item').forEach(function(e) {
+        e.className = 'dis-item';
+      });
+    } else {
+      // إذا اختار مرضاً → أزل "لا يوجد مرض" إن كان محدداً
+      var noneIdx = arr.indexOf('none');
+      if (noneIdx > -1) {
+        arr.splice(noneIdx, 1);
+        var noneEl = document.getElementById(cId + '-none');
+        if (noneEl) noneEl.className = 'dis-item';
+      }
+    }
+    arr.push(k);
+    el.className = 'dis-item sel sel-' + k;
+  }
   playSound('click');
 }
 
@@ -2826,8 +2850,18 @@ function bootApp() {
   var fab = document.getElementById('daily-reward-fab');
   if (fab) fab.style.display = 'flex';
   if (typeof window._initDailyRewardBadge === 'function') window._initDailyRewardBadge();
-  goPage('home'); hideLoader();
-  setTimeout(showWelcomeModal, 600);
+
+  // ── توجيه ذكي: بروفايل مكتمل ← الرئيسية / ناقص ← حسابي ──
+  var pct = calcProfileCompletion(currentUser);
+  if (pct >= 100) {
+    goPage('home');
+    setTimeout(showWelcomeModal, 600);
+  } else {
+    goPage('profile');
+    setTimeout(function() { openCompleteProfileModal(); }, 700);
+  }
+
+  hideLoader();
   startNotificationsListener();
   checkUserExperience();
 }
@@ -6065,7 +6099,7 @@ function calcProfileCompletion(u) {
     { key: 'dob',     val: !!u.dob,                           label: 'تاريخ الميلاد',   icon: '🎂' },
     { key: 'gender',  val: !!u.gender,                        label: 'الجنس',           icon: '👤' },
     { key: 'smoking', val: u.smoking && u.smoking !== '',     label: 'التدخين',         icon: '🚭' },
-    { key: 'diseases',val: Array.isArray(u.diseases),         label: 'الأمراض',         icon: '🏥' },
+    { key: 'diseases',val: Array.isArray(u.diseases) && u.diseases.length > 0, label: 'الأمراض', icon: '🏥' },
     { key: 'phone',   val: !!(u.phone && u.phone.trim()),     label: 'رقم الهاتف',      icon: '📱' },
   ];
   var done = fields.filter(function(f) { return f.val; }).length;
@@ -6134,6 +6168,7 @@ function renderProfileCircle() {
 /* ─── Open Complete Profile Modal ──────────────────── */
 var _cpbDiseases = [];
 function openCompleteProfileModal() {
+  if (currentUser && calcProfileCompletion(currentUser) >= 100) return;
   _cpbDiseases = currentUser && Array.isArray(currentUser.diseases) ? currentUser.diseases.slice() : [];
   var overlay = document.getElementById('complete-profile-overlay');
   if (!overlay) return;
