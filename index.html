@@ -243,32 +243,64 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-  const firebaseConfig = { databaseURL: "https://daybat-cfa12-default-rtdb.firebaseio.com" };
+  import {
+    getAuth, GoogleAuthProvider,
+    signInWithPopup, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBf7IUVNUr7bihe4CqtqUwd3UbNRacq2po",
+    authDomain:        "daybat-cfa12.firebaseapp.com",
+    databaseURL:       "https://daybat-cfa12-default-rtdb.firebaseio.com",
+    projectId:         "daybat-cfa12",
+    storageBucket:     "daybat-cfa12.appspot.com",
+    messagingSenderId: "278890052232",
+    appId:             "1:278890052232:web:06d85004268fdf9f4afd3d"
+  };
+
   try {
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getDatabase(firebaseApp);
-    window.__firebaseDB = db;
-    window.__firebaseRef = ref;
-    window.__firebaseSet = set;
-    window.__firebaseGet = get;
-    window.__firebaseChild = child;
+    const firebaseApp    = initializeApp(firebaseConfig);
+    const db             = getDatabase(firebaseApp);
+    const auth           = getAuth(firebaseApp);
+    const googleProvider = new GoogleAuthProvider();
+
+    window.firebaseDB        = db;
+    window.__firebaseDB      = db;
+    window.firebaseAuth      = auth;
+    window.firebaseRef       = ref;
+    window.__firebaseRef     = ref;
+    window.firebaseSet       = set;
+    window.__firebaseSet     = set;
+    window.firebaseGet       = get;
+    window.__firebaseGet     = get;
+    window.firebaseChild     = child;
+    window.__firebaseChild   = child;
+    window.firebaseOnValue   = onValue;
     window.__firebaseOnValue = onValue;
-    window.__firebaseRemove = remove;
-    window.__firebaseReady = true;
+    window.firebaseRemove    = remove;
+    window.__firebaseRemove  = remove;
+    window.googleProvider    = googleProvider;
+    window.fbSignInWithPopup = signInWithPopup;
+    window.fbSignOut         = signOut;
+    window.firebaseReady     = true;
+    window.__firebaseReady   = true;
+
     try {
       const cfgSnap = await get(child(ref(db), 'config/ai'));
       if (cfgSnap.exists()) {
         const cfg = cfgSnap.val();
-        if (cfg.endpoint)      window.__aiEndpoint = cfg.endpoint;
-        if (cfg.models && Array.isArray(cfg.models)) window.__aiModels = cfg.models;
-        if (cfg.apiKey)        window.__aiApiKey   = cfg.apiKey;
-        if (cfg.openrouterKey) window.__OR_KEY_FB  = cfg.openrouterKey;
-        if (cfg.geminiKey) { window.__GEMINI_KEY = cfg.geminiKey; window.__geminiReady = true;}
-        if (cfg.mistralKey) { window.__MISTRAL_KEY = cfg.mistralKey; }
+        if (cfg.endpoint)              window.__aiEndpoint  = cfg.endpoint;
+        if (Array.isArray(cfg.models)) window.__aiModels    = cfg.models;
+        if (cfg.apiKey)                window.__aiApiKey    = cfg.apiKey;
+        if (cfg.openrouterKey)         window.__OR_KEY_FB   = cfg.openrouterKey;
+        if (cfg.geminiKey)           { window.__GEMINI_KEY  = cfg.geminiKey; window.__geminiReady = true; }
+        if (cfg.mistralKey)            window.__MISTRAL_KEY = cfg.mistralKey;
       }
     } catch(_) {}
+
   } catch(e) {
     window.__firebaseReady = false;
+    window.firebaseReady   = false;
   }
 </script>
 <style>
@@ -1236,6 +1268,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .scan-toast-floating .toast-icon{font-size:1.5rem;flex-shrink:0}
 .scan-toast-floating .toast-msg{flex:1;text-align:center}
 .scan-ai-badge{font-size:.62rem;font-weight:700;background:rgba(124,58,237,.15);color:var(--ai-purple2);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:2px 8px}
+
+/* ── Google Sign-In Button ── */
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#1a1a2e,#2d2d44);border:1.5px solid rgba(255,255,255,.18);color:#fff;border-radius:14px;padding:13px 14px;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s;margin-top:10px;min-height:48px;}
+.btn-google:hover{background:linear-gradient(135deg,#252545,#3a3a5c);box-shadow:0 4px 20px rgba(66,133,244,.25);transform:translateY(-1px);}
+.btn-google:disabled{opacity:.6;cursor:not-allowed;}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.auth-divider span{font-size:.75rem;color:var(--txt3);}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 </style>
 </head>
 <body>
@@ -1313,6 +1353,16 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="field"><label>اسم المستخدم</label><div class="input-wrap"><input type="text" id="l-user" placeholder="أدخل اسم المستخدم" autocomplete="username"></div></div>
       <div class="field"><label>كلمة المرور</label><div class="input-wrap"><input type="password" id="l-pass" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye-btn" onclick="togglePass('l-pass',this)"><i class="fas fa-eye"></i></button></div></div>
       <button class="btn btn-gold" style="margin-top:8px" id="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
+      <div class="auth-divider"><span>أو</span></div>
+      <button class="btn-google" id="btn-google-login" onclick="doGoogleLogin()">
+        <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        الدخول بحساب Google
+      </button>
       <a id="btn-download-apk" href="https://tayyibat.online/tayyibat.apk" class="btn-apk-download" onclick="startApkDownloadAnim(event)">
         <span class="apk-btn-content" id="apk-btn-content">
           <span class="apk-android-icon"><i class="fab fa-android"></i></span>
@@ -1349,6 +1399,19 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       </div>
       <div class="disclaimer" style="margin-top:14px"><div class="dis-title"><i class="fas fa-exclamation-triangle"></i> تنبيه طبي</div><p>هذا التطبيق للتوعية والمعلومات فقط. استشر طبيبك دائماً.</p></div>
       <button class="btn btn-gold" id="btn-register" onclick="doRegister()"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
+      <div class="auth-divider"><span>أو سجّل مباشرةً بـ</span></div>
+      <button class="btn-google" id="btn-google-register" onclick="doGoogleLogin()">
+        <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        إنشاء حساب بـ Google
+      </button>
+      <p style="font-size:.72rem;color:var(--txt3);text-align:center;margin-top:10px;line-height:1.6;">
+        عند التسجيل بجوجل لا تحتاج اسم مستخدم أو كلمة مرور،<br>يتم إنشاء حسابك تلقائياً ببريدك الإلكتروني.
+      </p>
     </div>
   </div>
 </div>
@@ -2427,31 +2490,47 @@ function hideLoader() {
 /* ══════════ Auto Login ══════════ */
 async function autoLogin() {
   var s = getSession();
-  if (s) {
-    try {
-      var u = await dbGetUser(s);
-      if (u) { 
-        currentUser = Object.assign({}, u, { username: s }); 
-        
-        // التحقق الصارم من حالة الـ PRO القادمة من الفايربيز ومنع تلاشيها
-        if (currentUser.pro && currentUser.pro.active === true) {
-          if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-            window.isProUser = true;
-          } else if (!currentUser.pro.expiresAt) {
-            window.isProUser = true; // باقة مفتوحة أو تجريبية
-          } else {
-            currentUser.pro.active = false;
-            window.isProUser = false;
-          }
-        } else {
-          window.isProUser = false;
-        }
-        
-        bootApp(); setTimeout(refreshGiftFab, 700); 
-        return; 
+  if (!s) { hideLoader(); return; }
+  try {
+    // تحقق هل المستخدم سجّل بجوجل
+    var snap = await window.__firebaseGet(
+      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
+    );
+    if (snap.exists()) {
+      var data = snap.val();
+      if (data.loginMethod === 'google' && window.firebaseAuth) {
+        var done = await Promise.race([
+          new Promise(function(resolve) {
+            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
+              unsub();
+              if (user && user.uid === s) {
+                try { await handleGoogleUserData(user); resolve(true); }
+                catch(e) { resolve(false); }
+              } else { resolve(false); }
+            });
+          }),
+          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 4000); })
+        ]);
+        if (done) return;
+        hideLoader(); return;
       }
-    } catch(e) {}
-  }
+    }
+    // دخول عادي username/password
+    var u = await dbGetUser(s);
+    if (u) {
+      currentUser = Object.assign({}, u, { username: s });
+      if (currentUser.pro && currentUser.pro.active === true) {
+        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
+          window.isProUser = true;
+        } else if (!currentUser.pro.expiresAt) {
+          window.isProUser = true;
+        } else {
+          currentUser.pro.active = false; window.isProUser = false;
+        }
+      } else { window.isProUser = false; }
+      bootApp(); setTimeout(refreshGiftFab, 700); return;
+    }
+  } catch(e) {}
   hideLoader();
 }
 
@@ -2577,6 +2656,9 @@ async function doRegister() {
 
 function doLogout() {
   clearSession(); currentUser = null; window.isProUser = false;
+  if (window.fbSignOut && window.firebaseAuth) {
+    window.fbSignOut(window.firebaseAuth).catch(function(){});
+  }
   document.getElementById('bottom-nav').classList.remove('show');
   var fab = document.getElementById('daily-reward-fab');
   if (fab) fab.style.display = 'none';
@@ -5725,6 +5807,107 @@ window.addEventListener('DOMContentLoaded', function() {
   };
 
 })();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   Google Sign-In Functions
+══════════════════════════════════════════════════════ */
+
+async function doGoogleLogin() {
+  var btn = document.getElementById('btn-google-login');
+  var btn2 = document.getElementById('btn-google-register');
+  var originalHTML  = btn  ? btn.innerHTML  : '';
+  var originalHTML2 = btn2 ? btn2.innerHTML : '';
+  if (btn)  { btn.disabled  = true; btn.innerHTML  = '<span class="btn-spinner"></span> جارٍ التسجيل...'; }
+  if (btn2) { btn2.disabled = true; btn2.innerHTML = '<span class="btn-spinner"></span> جارٍ التسجيل...'; }
+  try {
+    if (!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) {
+      showAuthError('login', '⚠️ انتظر ثانية ثم أعد المحاولة');
+      if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+      return;
+    }
+    var result = await window.fbSignInWithPopup(window.firebaseAuth, window.googleProvider);
+    await handleGoogleUserData(result.user);
+  } catch(e) {
+    console.error('Google login error:', e);
+    var msg = e.code === 'auth/popup-closed-by-user'  ? 'تم إغلاق نافذة تسجيل الدخول'
+            : e.code === 'auth/popup-blocked'          ? '⚠️ المتصفح حجب النافذة — اسمح بالنوافذ المنبثقة'
+            : e.code === 'auth/unauthorized-domain'    ? '⚠️ النطاق غير مسموح به في Firebase Console'
+            : 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى';
+    showAuthError('login', msg);
+    if (btn)  { btn.disabled  = false; btn.innerHTML  = originalHTML; }
+    if (btn2) { btn2.disabled = false; btn2.innerHTML = originalHTML2; }
+  }
+}
+
+async function handleGoogleUserData(googleUser) {
+  var uid = googleUser.uid;
+  var snap = await window.__firebaseGet(
+    window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + uid)
+  );
+  var userData;
+  var isNewUser = false;
+
+  if (snap.exists()) {
+    userData = snap.val();
+    userData.photo = googleUser.photoURL || userData.photo || '';
+    userData.email = googleUser.email    || userData.email  || '';
+  } else {
+    isNewUser = true;
+    userData = {
+      name:         googleUser.displayName || 'مستخدم جديد',
+      username:     uid,
+      email:        googleUser.email    || '',
+      photo:        googleUser.photoURL || '',
+      loginMethod:  'google',
+      created:      Date.now(),
+      pro:          { active: false },
+      diseases:     [],
+      bmi:          0, weight: 0, height: 0,
+      gender:       '', dob: '', smoking: 'nonsmoker', loginHistory: []
+    };
+    await window.__firebaseSet(
+      window.__firebaseRef(window.__firebaseDB, 'users/' + uid),
+      userData
+    );
+  }
+
+  try {
+    await window.__firebaseSet(
+      window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/lastLogin'),
+      Date.now()
+    );
+  } catch(_) {}
+
+  currentUser = Object.assign({}, userData, { username: uid });
+
+  if (currentUser.pro && currentUser.pro.active === true) {
+    if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
+      window.isProUser = true;
+    } else if (!currentUser.pro.expiresAt) {
+      window.isProUser = true;
+    } else {
+      currentUser.pro.active = false; window.isProUser = false;
+    }
+  } else {
+    window.isProUser = false;
+  }
+
+  saveSession(uid);
+  logActivity(isNewUser ? 'register' : 'login', isNewUser ? 'تسجيل بـ Google' : 'دخول بـ Google', googleUser.email);
+  playSound('success');
+  showToast(isNewUser ? '🎉 أهلاً ' + currentUser.name + '! تم إنشاء حسابك' : 'مرحباً ' + currentUser.name + ' 👋');
+  bootApp();
+  setTimeout(refreshGiftFab, 700);
+
+  // إذا كان مستخدم جديد، اعرض له رسالة لاحقاً لإكمال بياناته
+  if (isNewUser) {
+    setTimeout(function() {
+      showToast('💡 يمكنك إضافة بياناتك الصحية من صفحة الملف الشخصي');
+    }, 3000);
+  }
+}
 </script>
 </body>
 </html>
