@@ -344,6 +344,22 @@
     flex-shrink: 0;
   }
   .btn-del-gift:hover { background: rgba(239,83,80,.22); }
+
+/* ═══ GIFT BADGES ═══ */
+.gift-badge-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;position:relative;transition:transform 0.2s;font-size:1.7rem;}
+.gift-badge-wrap:hover{transform:scale(1.18) rotate(5deg);}
+.gift-badge-wrap .gift-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) scale(0.85);background:linear-gradient(135deg,#3d2000,#6b3a00);border:1.5px solid rgba(255,215,0,.7);color:#ffe066;font-size:.68rem;font-weight:800;white-space:nowrap;padding:5px 10px;border-radius:9px;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:10;font-family:Tajawal,sans-serif;}
+.gift-badge-wrap:hover .gift-tooltip{opacity:1;transform:translateX(-50%) scale(1);}
+.gbadge-no1{background:linear-gradient(135deg,#7a4800,#c8960c,#f5c842,#ffe066,#c8960c,#7a4800);background-size:300% 300%;animation:shimmerGoldAdmin 3s linear infinite,floatAdmin 3s ease-in-out infinite,pulseGlowAdmin 2.5s ease-in-out infinite;border:3px solid transparent;box-shadow:0 0 20px rgba(255,215,0,.7);border-radius:50%;}
+.gbadge-welcome{background:linear-gradient(135deg,#0d47a1,#1565c0,#1976d2);border:2px solid #42a5f5;border-radius:14px;box-shadow:0 0 14px rgba(66,165,245,.5);animation:floatAdmin 4s ease-in-out infinite;}
+.gbadge-pro{background:linear-gradient(135deg,#4a148c,#6a1b9a,#8e24aa);border:2px solid #ce93d8;border-radius:12px;box-shadow:0 0 14px rgba(171,71,188,.5);animation:floatAdmin 3.5s ease-in-out infinite;}
+.gbadge-star{background:linear-gradient(135deg,#f57f17,#ff8f00,#ffa000);border:2px solid #ffe082;border-radius:50%;box-shadow:0 0 16px rgba(255,160,0,.6);animation:floatAdmin 2.8s ease-in-out infinite,shimmerGoldAdmin 4s linear infinite;}
+.gbadge-streak{background:linear-gradient(135deg,#b71c1c,#c62828,#e53935);border:2px solid #ef9a9a;border-radius:12px;box-shadow:0 0 14px rgba(229,57,53,.5);animation:floatAdmin 3.2s ease-in-out infinite;}
+.gbadge-vip{background:linear-gradient(135deg,#004d40,#00695c,#00796b);border:2px solid #4db6ac;border-radius:50%;box-shadow:0 0 18px rgba(0,150,136,.6);animation:floatAdmin 3.8s ease-in-out infinite,pulseGlowAdmin 3s ease-in-out infinite;}
+.gbadge-birthday{background:linear-gradient(135deg,#880e4f,#ad1457,#c2185b);border:2px solid #f48fb1;border-radius:14px;box-shadow:0 0 16px rgba(194,24,91,.5);animation:floatAdmin 2.5s ease-in-out infinite;}
+.gbadge-custom{background:linear-gradient(135deg,#1a237e,#283593,#303f9f);border:2px solid #90caf9;border-radius:12px;box-shadow:0 0 12px rgba(63,81,181,.5);animation:floatAdmin 4.2s ease-in-out infinite;}
+.gbadge-challenge{background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c);border:2px solid #a5d6a7;border-radius:14px;box-shadow:0 0 14px rgba(56,142,60,.5);animation:floatAdmin 3.1s ease-in-out infinite;}
+@keyframes giftModalPop{from{transform:scale(.6) translateY(40px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
 </style>
 </head>
 <body>
@@ -988,15 +1004,17 @@
     // load fresh extras from Firebase — نقرأ من كل المسارات الممكنة
     let freshExperiences = {}, freshQuestions = {}, freshActivities = [];
     try {
-      const safeUsername = u.username || id;
-      const [expSnap, qGlobalSnap, actSnap, logSnap, actUserSnap, qUserSnap, chatSnap, sharesUserSnap] = await Promise.all([
+      const safeUsername = (u.username || id || '').trim();
+      const safeId = safeUsername; // username = Firebase key
+      const [expSnap, qGlobalSnap, actSnap, actSnap2, logSnap, actUserSnap, qUserSnap, chatSnap, sharesUserSnap] = await Promise.all([
         get(child(ref(db), 'experiences')),
         get(child(ref(db), 'questions')),
+        get(child(ref(db), 'activityLog/' + safeId)),
         get(child(ref(db), 'activityLog/' + id)),
-        get(child(ref(db), 'adminLogs/' + id)),
-        get(child(ref(db), 'users/' + id + '/activityLog')),
-        get(child(ref(db), 'users/' + id + '/questions')),
-        get(child(ref(db), 'users/' + id + '/chatHistory')),
+        get(child(ref(db), 'adminLogs/' + safeId)),
+        get(child(ref(db), 'users/' + safeId + '/activityLog')),
+        get(child(ref(db), 'users/' + safeId + '/questions')),
+        get(child(ref(db), 'users/' + safeId + '/chatHistory')),
         get(child(ref(db), 'shares/' + safeUsername))
       ]);
 
@@ -1030,6 +1048,7 @@
         freshActivities = [...freshActivities, ...arr.filter(a => a && (a.ts||a.timestamp||a.text||a.action))];
       };
       if (actSnap.exists()) _addActs(actSnap.val());
+      if (actSnap2 && actSnap2.exists()) _addActs(actSnap2.val());
       if (logSnap.exists()) _addActs(logSnap.val());
       if (actUserSnap.exists()) _addActs(actUserSnap.val());
 
@@ -1160,7 +1179,8 @@
     window.filterActivityLog = function(type, btn) {
       document.querySelectorAll('.act-filter-btn').forEach(b => b.classList.remove('active'));
       if(btn) btn.classList.add('active');
-      const items = type === 'all' ? window._allActivityItems : window._allActivityItems.filter(a => a.type === type);
+      const _all = window._allActivityItems || [];
+      const items = type === 'all' ? _all : _all.filter(a => a.type === type);
       renderActivityItems(items);
     };
 
@@ -1194,51 +1214,66 @@
 
 
     // Questions tab
-    const qKeys = Object.keys(freshQuestions);
-    if (!qKeys.length) {
-      document.getElementById('questionsList').innerHTML = '<div class="no-data-msg">لا توجد أسئلة مسجلة</div>';
+    const qList = Object.values(freshQuestions).sort((a,b)=>(b.ts||b.timestamp||0)-(a.ts||a.timestamp||0));
+    if (!qList.length) {
+      document.getElementById('questionsList').innerHTML = '<div class="no-data-msg">💬 لا توجد أسئلة مسجلة</div>';
     } else {
-      document.getElementById('questionsList').innerHTML = qKeys.slice(-30).reverse().map(k => {
-        const q = freshQuestions[k];
-        const typeLabels = { nutrition:'🥗 تغذية', health:'💊 صحة', general:'💬 عام', ai:'🤖 ذكاء اصطناعي' };
-        const typeColors = { nutrition:'#42a5f5', health:'#66bb6a', general:'#ffa726', ai:'#ab47bc' };
+      const qTypeLabels = { nutrition:'🥗 تغذية', health:'💊 صحة', general:'💬 عام', ai:'🤖 ذكاء اصطناعي', food:'🍽️ غذاء', fasting:'🌙 صيام' };
+      const qTypeColors = { nutrition:'#42a5f5', health:'#66bb6a', general:'#ffa726', ai:'#ab47bc', food:'#ffa726', fasting:'#26c6da' };
+      document.getElementById('questionsList').innerHTML = qList.slice(0,50).map(q => {
+        const qText = q.question || q.text || q.content || q.body || 'سؤال';
         const typeKey = q.type || 'general';
-        const typeColor = typeColors[typeKey] || 'var(--txt3)';
-        const typeLabel = typeLabels[typeKey] || typeKey;
+        const typeColor = qTypeColors[typeKey] || '#8aa4c8';
+        const typeLabel = qTypeLabels[typeKey] || typeKey;
+        const qTs = q.ts || q.timestamp || q.created || 0;
         return `<div class="q-item">
-          <div class="q-text">${q.question || q.text || q.content || 'سؤال بدون نص'}</div>
+          <div class="q-text">${qText.substring(0,300)}${qText.length>300?'...':''}</div>
           <div class="q-meta">
-            <span class="q-type-badge" style="background:rgba(66,165,245,0.1);color:${typeColor}">${typeLabel}</span>
+            <span>${qTs ? formatDateTime(qTs) : '–'}</span>
+            <span class="q-type-badge" style="background:${typeColor}22;color:${typeColor};border:1px solid ${typeColor}44;">${typeLabel}</span>
             ${q.model ? `<span style="font-size:0.65rem;color:var(--txt3)">🧠 ${q.model}</span>` : ''}
-            <span>${formatDateTime(q.ts||q.timestamp||q.created)}</span>
           </div>
-          ${q.answer ? `<div style="margin-top:6px;padding:8px;background:rgba(46,201,81,0.05);border-radius:8px;font-size:0.78rem;color:var(--green);line-height:1.5;">↩ ${q.answer.substring(0,200)}${q.answer.length>200?'...':''}</div>` : ''}
+          ${q.answer ? `<div style="margin-top:6px;padding:8px 10px;background:rgba(46,201,81,0.07);border-radius:8px;font-size:0.78rem;color:var(--green);line-height:1.6;border:1px solid rgba(46,201,81,0.2);">💬 ${q.answer.substring(0,250)}${q.answer.length>250?'...':''}</div>` : ''}
         </div>`;
       }).join('');
     }
 
     // Gifts tab
-    const gifts = u.gifts ? Object.values(u.gifts) : [];
+    // ── الهدايا ──
+    const gifts = u.gifts
+      ? Object.values(u.gifts).sort((a,b)=>(b.grantedAt||b.ts||0)-(a.grantedAt||a.ts||0))
+      : [];
     if (!gifts.length) {
-      document.getElementById('giftsList').innerHTML = '<div class="no-gifts">لا توجد هدايا ممنوحة لهذا المستخدم بعد</div>';
+      document.getElementById('giftsList').innerHTML =
+        '<div class="no-gifts" style="text-align:center;padding:24px 0;color:var(--txt3);font-size:0.88rem;">🎁 لا توجد هدايا بعد</div>';
     } else {
       document.getElementById('giftsList').innerHTML = gifts.map(g => {
         const isNo1 = !!g.isNo1AdminGift;
         const isChallenge = !!(g.challengeId || g.isChallenge);
+        const bClass = g.badgeClass || (isChallenge ? 'gbadge-challenge' : isNo1 ? 'gbadge-no1' : 'gbadge-custom');
+        const gColor = g.color || '#f5c842';
+        const safeN = (g.name||'هدية').replace(/'/g,"\'").replace(/"/g,'&quot;');
+        const safeD = (g.description||'هدية خاصة من الأدمن').replace(/'/g,"\'").replace(/"/g,'&quot;');
+        const safeI = g.icon||'🎁';
         const badgeHTML = isNo1
-          ? `<div class="no1-gift-badge-admin" title="هدية نمبر 1 الذهبية ✨">
-               <div class="no1-inner-a">
-                 <span class="no1-crown-a">👑</span>
-                 <span class="no1-number-a">#1</span>
+          ? `<div class="gift-badge-wrap gbadge-no1" onclick="showGiftDetail('${safeN}','${safeD}','${safeI}','${gColor}')">
+               <div style="display:flex;flex-direction:column;align-items:center;gap:0;z-index:1;">
+                 <span style="font-size:.75rem;line-height:1;">👑</span>
+                 <span style="font-size:1.1rem;font-weight:900;color:#050e1f;line-height:1;font-family:Amiri,serif;">#1</span>
                </div>
+               <div class="gift-tooltip">هدية نمبر 1 ✨</div>
              </div>`
-          : `<div class="gift-icon">${g.icon||'🎁'}</div>`;
+          : `<div class="gift-badge-wrap ${bClass}" onclick="showGiftDetail('${safeN}','${safeD}','${safeI}','${gColor}')">
+               ${safeI}
+               <div class="gift-tooltip">${g.name||'هدية'}</div>
+             </div>`;
         const challengeBadge = isChallenge ? `<span class="admin-challenge-badge">✅ تحدي</span>` : '';
         return `<div class="gift-item">
           ${badgeHTML}
-          <div style="flex:1;">
+          <div style="flex:1;cursor:pointer;" onclick="showGiftDetail('${safeN}','${safeD}','${safeI}','${gColor}')">
             <div class="gift-name">${g.name||g.type||'هدية'} ${challengeBadge}</div>
             <div class="gift-date">${formatDateTime(g.grantedAt||g.ts)}</div>
+            ${g.description ? `<div style="font-size:0.72rem;color:var(--txt3);margin-top:4px;line-height:1.5;">${g.description.substring(0,80)}...</div>` : ''}
           </div>
           <button class="btn-del-gift" onclick="deleteGift('${g.id||''}')">
             <i class="fas fa-trash-alt"></i> حذف
@@ -1293,30 +1328,56 @@
   window.loadUserProfile = loadUserProfile;
 
   /* ═══ Grant Gift ═══ */
+  window.showGiftDetail = function(name, desc, icon, color) {
+    const existing = document.getElementById('giftDetailModal');
+    if (existing) existing.remove();
+    const c = color || '#f5c842';
+    const modal = document.createElement('div');
+    modal.id = 'giftDetailModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `<div style="background:linear-gradient(145deg,#0d1e38,#112244);border:2px solid ${c}66;border-radius:28px;padding:36px 28px 28px;text-align:center;max-width:320px;width:100%;box-shadow:0 0 60px ${c}33;animation:giftModalPop .5s cubic-bezier(.34,1.56,.64,1) both;"><div style="width:82px;height:82px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,${c}88,${c});display:flex;align-items:center;justify-content:center;font-size:2.8rem;box-shadow:0 0 0 6px ${c}22;">${icon}</div><div style="font-family:Amiri,serif;font-size:1.4rem;font-weight:900;color:${c};margin-bottom:10px;">${name}</div><div style="font-size:0.88rem;color:var(--txt2);line-height:1.8;margin-bottom:24px;">${desc}</div><button onclick="document.getElementById('giftDetailModal').remove()" style="width:100%;background:linear-gradient(135deg,${c}cc,${c});color:#050e1f;border:none;border-radius:14px;padding:13px;font-size:1rem;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">✅ رائع!</button></div>`;
+    modal.onclick = e => { if(e.target===modal) modal.remove(); };
+    document.body.appendChild(modal);
+  };
+
   window.grantGift = async function() {
     if (!selectedUser) return;
     const sel = document.getElementById('giftType').value;
     let giftName = sel === 'custom' ? (document.getElementById('customGiftName').value.trim()) : sel;
     if (!giftName) { showToast('⚠️ أدخل اسم الهدية'); return; }
-    const isNo1 = giftName === '🏅 هدية الأدمن الذهبية #1';
-    const icons = {
-      '🎁 هدية ترحيب':'🎁','👑 اشتراك Pro مجاني':'👑','🌟 نجمة إنجاز':'🌟',
-      '🏆 جائزة الحضور المتواصل':'🏆','💎 عضوية VIP':'💎','🎉 هدية عيد ميلاد':'🎉',
-      '🏅 هدية الأدمن الذهبية #1':'🏅'
+    const CATALOG = {
+      '🏅 هدية الأدمن الذهبية #1': { icon:'🏅', badgeClass:'gbadge-no1', isNo1:true, color:'#f5c842', desc:'أنت الأفضل! هذه الهدية الذهبية تُمنح لأكثر المستخدمين تميزاً.' },
+      '🎁 هدية ترحيب':             { icon:'🎁', badgeClass:'gbadge-welcome', color:'#42a5f5', desc:'أهلاً بك في مجتمع طيبات! هدية ترحيب خاصة من فريقنا.' },
+      '👑 اشتراك Pro مجاني':        { icon:'👑', badgeClass:'gbadge-pro', color:'#ce93d8', desc:'تهانينا! حصلت على اشتراك Pro مجاني بلا قيود.' },
+      '🌟 نجمة إنجاز':             { icon:'🌟', badgeClass:'gbadge-star', color:'#ffa000', desc:'أنجزت شيئاً رائعاً يستحق التقدير والاحتفاء!' },
+      '🏆 جائزة الحضور المتواصل':  { icon:'🏆', badgeClass:'gbadge-streak', color:'#ef9a9a', desc:'التزامك اليومي مثير للإعجاب! هذه الجائزة تكريماً لمثابرتك.' },
+      '💎 عضوية VIP':              { icon:'💎', badgeClass:'gbadge-vip', color:'#4db6ac', desc:'مبروك! أنت الآن عضو VIP مميز في مجتمع طيبات.' },
+      '🎉 هدية عيد ميلاد':         { icon:'🎉', badgeClass:'gbadge-birthday', color:'#f48fb1', desc:'كل عام وأنت بألف خير! هدية خاصة بمناسبة عيد ميلادك.' }
     };
-    const icon = icons[giftName] || '🎁';
+    const cat = CATALOG[giftName] || { icon:'🎖️', badgeClass:'gbadge-custom', color:'#90caf9', desc:'هدية خاصة من إدارة مجتمع طيبات.' };
     const giftId = Date.now().toString();
-    const giftData = { id: giftId, name: giftName, icon, grantedAt: Date.now(), grantedByAdmin: true,
-      ...(isNo1 ? { isNo1AdminGift: true } : {}) };
+    const userId = (selectedUser._id || selectedUser.id || '').trim();
+    const giftData = {
+      id: giftId, name: giftName, description: cat.desc,
+      icon: cat.icon, badgeClass: cat.badgeClass, color: cat.color,
+      grantedAt: Date.now(), grantedByAdmin: true,
+      ...(cat.isNo1 ? { isNo1AdminGift: true } : {})
+    };
     try {
-      await set(ref(db, 'users/' + selectedUser._id + '/gifts/' + giftId), giftData);
+      await set(ref(db, `users/${userId}/gifts/${giftId}`), giftData);
+      await set(ref(db, `notifications/users/${userId}/${giftId}`), {
+        id: giftId, title: `${cat.icon} لقد حصلت على هدية جديدة!`,
+        body: `${giftName} — ${cat.desc}`, icon: cat.icon,
+        type: 'gift', giftId, badgeClass: cat.badgeClass,
+        color: cat.color, ts: Date.now(), read: false
+      });
       if (!selectedUser.gifts) selectedUser.gifts = {};
       selectedUser.gifts[giftId] = giftData;
-      showToast(isNo1 ? '🏅 تم منح هدية نمبر 1 الذهبية! 🎉' : '🎁 تم منح الهدية بنجاح');
-      loadUserProfile(selectedUser._id);
-    } catch(e) { showToast('❌ فشل منح الهدية'); }
+      showToast(cat.isNo1 ? '🏅 تم منح هدية نمبر 1 الذهبية! 🎉' : `${cat.icon} تم منح الهدية وإرسال إشعار ✅`);
+      loadUserProfile(userId);
+      loadAndFixAllUsers();
+    } catch(e) { showToast('❌ فشل: ' + e.message); }
   };
-
   window.deleteGift = async function(giftId) {
     if (!selectedUser) return;
     if (!confirm('🗑️ هل تريد حذف هذه الهدية نهائياً؟')) return;
