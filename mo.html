@@ -1006,7 +1006,7 @@
     try {
       const safeUsername = (u.username || id || '').trim();
       const safeId = safeUsername; // username = Firebase key
-      const [expSnap, qGlobalSnap, actSnap, actSnap2, logSnap, actUserSnap, qUserSnap, chatSnap, sharesUserSnap] = await Promise.all([
+      const [expSnap, qGlobalSnap, actSnap, actSnap2, logSnap, actUserSnap, qUserSnap, chatSnap, sharesUserSnap, aiQSnap, coachSnap, trackerSnap2] = await Promise.all([
         get(child(ref(db), 'experiences')),
         get(child(ref(db), 'questions')),
         get(child(ref(db), 'activityLog/' + safeId)),
@@ -1015,20 +1015,23 @@
         get(child(ref(db), 'users/' + safeId + '/activityLog')),
         get(child(ref(db), 'users/' + safeId + '/questions')),
         get(child(ref(db), 'users/' + safeId + '/chatHistory')),
-        get(child(ref(db), 'shares/' + safeUsername))
+        get(child(ref(db), 'shares/' + safeUsername)),
+        get(child(ref(db), 'users/' + safeId + '/aiQuestions')),
+        get(child(ref(db), 'users/' + safeId + '/coachHistory')),
+        get(child(ref(db), 'users/' + safeId + '/trackerMetrics'))
       ]);
 
       // ─ التجارب ─
       if (expSnap.exists()) {
         Object.entries(expSnap.val()).forEach(([k,e]) => {
-          if (e.userId === safeUsername || e.userId === u._id) freshExperiences[k] = e;
+          if (e.userId === safeUsername || e.userId === u.id) freshExperiences[k] = e;
         });
       }
 
       // ─ الأسئلة من المسار العام ─
       if (qGlobalSnap.exists()) {
         Object.entries(qGlobalSnap.val()).forEach(([k,q]) => {
-          if (q.userId === safeUsername || q.userId === u._id || q.userId === id) freshQuestions[k] = q;
+          if (q.userId === safeUsername || q.userId === u.id || q.userId === id) freshQuestions[k] = q;
         });
       }
       // ─ الأسئلة من مسار المستخدم نفسه ─
@@ -1081,6 +1084,43 @@
             dot: '#25D366',
             detail: 'platform:' + (s.platform || '-')
           });
+        });
+      }
+
+      // ─ aiQuestions ─
+      if (aiQSnap && aiQSnap.exists()) {
+        const raw = aiQSnap.val();
+        const arr = Array.isArray(raw) ? raw : Object.values(raw);
+        arr.filter(q => q).forEach((q, i) => {
+          const key = 'aiq_' + (q.ts||q.timestamp||i);
+          if (!freshQuestions[key]) freshQuestions[key] = q;
+          freshActivities.push({ type:'question', ts: q.ts||q.timestamp||0,
+            text: 'سؤال AI: ' + (q.question||q.text||'').substring(0,80),
+            detail: (q.question||q.text||'').substring(0,200) });
+        });
+      }
+
+      // ─ coachHistory ─
+      if (coachSnap && coachSnap.exists()) {
+        const raw = coachSnap.val();
+        const arr = Array.isArray(raw) ? raw : Object.values(raw);
+        arr.filter(c => c && c.role === 'user').forEach(c => {
+          const key = 'coach_' + (c.ts||c.timestamp||Math.random());
+          if (!freshQuestions[key]) freshQuestions[key] = { question: c.content||c.text||'', ts: c.ts||c.timestamp||0, type:'coach' };
+          freshActivities.push({ type:'question', ts: c.ts||c.timestamp||0,
+            text: 'Coach: ' + (c.content||c.text||'').substring(0,80),
+            detail: (c.content||c.text||'').substring(0,200) });
+        });
+      }
+
+      // ─ trackerMetrics ─
+      if (trackerSnap2 && trackerSnap2.exists()) {
+        const raw = trackerSnap2.val();
+        const arr = Array.isArray(raw) ? raw : Object.values(raw);
+        arr.filter(t => t).forEach(t => {
+          freshActivities.push({ type:'input', ts: t.ts||t.date||0,
+            text: 'تتبع صحي — طاقة: ' + (t.energy||'-') + ' | نوم: ' + (t.sleep||t.sleepHrs||'-') + 'س | سكر: ' + (t.sugarLvl||'-'),
+            detail: JSON.stringify(t).substring(0,200) });
         });
       }
 
