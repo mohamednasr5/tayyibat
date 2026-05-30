@@ -1917,17 +1917,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <video id="pa-video-stream" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
       <div id="pa-camera-fallback-msg" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
         <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4"></i>
-        اضغط "فتح الكاميرا" للبدء
+        اختر وضعاً أعلاه لبدء الكاميرا
       </div>
     </div>
-    <div style="display:flex;gap:8px;justify-content:center;margin:10px 0">
-      <button class="btn btn-gold" style="width:auto;padding:10px 18px;font-size:.82rem" onclick="startPremiumCameraScanner()">
-        <i class="fas fa-camera"></i> فتح الكاميرا
-      </button>
-      <button class="btn" style="width:auto;padding:10px 18px;font-size:.82rem;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;border:none" onclick="captureSmartByMode()">
-        <i class="fas fa-search"></i> التقط وحلل
-      </button>
-    </div>
+    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"><i class="fas fa-hand-pointer" style="margin-left:5px"></i> اختر وضع المسح أعلاه لبدء الكاميرا تلقائياً</span></div>
     <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">
       <div style="flex:1;height:1px;background:var(--border)"></div>
       <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
@@ -1959,10 +1952,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
             style="flex:1;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;padding:0 12px;font-size:.88rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
             oninput="drugSearchDebounce(this.value)"
             onkeydown="if(event.key==='Enter') drugSearchByName(this.value)">
-          <button onclick="drugSearchByCamera()" title="مسح بالكاميرا"
-            style="width:44px;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;background:rgba(33,150,243,.12);color:#42a5f5;font-size:1rem;cursor:pointer;flex-shrink:0;transition:all .2s">
-            <i class="fas fa-camera"></i>
-          </button>
+          
         </div>
         <div id="drug-db-status" style="font-size:.72rem;color:var(--txt3);text-align:center;margin-bottom:4px;min-height:16px"></div>
         <div id="drug-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto"></div>
@@ -3153,26 +3143,33 @@ async function sendPremiumCoachMsg() {
 /* ══════════ Product Scanner & Camera Analysis ══════════ */
 var paStreamRef = null;
 
-function startPremiumCameraScanner() {
-  var video = document.getElementById('pa-video-stream');
+function startPremiumCameraScanner(onReady) {
+  var video    = document.getElementById('pa-video-stream');
   var fallback = document.getElementById('pa-camera-fallback-msg');
-  var laser = document.getElementById('pa-laser');
-  
+  var laser    = document.getElementById('pa-laser');
+  if (video && video.srcObject && video.style.display !== 'none') {
+    if (typeof onReady === 'function') onReady();
+    return;
+  }
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width:{ideal:1280}, height:{ideal:720} } })
+    .then(function(stream) {
       paStreamRef = stream;
       video.srcObject = stream;
       video.style.display = 'block';
-      fallback.style.display = 'none';
-      laser.style.display = 'block';
-      showToast('📸 تم تشغيل عدسة الكاميرا الخلفية بنجاح.');
+      if (fallback) fallback.style.display = 'none';
+      if (laser) laser.style.display = 'block';
+      video.onloadedmetadata = function(){
+        if (typeof onReady === 'function') onReady();
+      };
     }).catch(function() {
-      fallback.textContent = '❌ لم يتم منح صلاحية الوصول للكاميرا، يرجى استخدام الإدخال النصي أدناه.';
+      if (fallback) fallback.textContent = '❌ لم يتم منح صلاحية الوصول للكاميرا، يرجى السماح من إعدادات المتصفح.';
     });
   } else {
-    fallback.textContent = '❌ المتصفح الحالي لا يدعم تشغيل تدفق الكاميرا.';
+    if (fallback) fallback.textContent = '❌ المتصفح الحالي لا يدعم تشغيل تدفق الكاميرا.';
   }
 }
+
 
 async function captureAndScanProductBlob() {
   var video  = document.getElementById("pa-video-stream");
@@ -3367,6 +3364,8 @@ async function _scanAnalyzeAI(ingredients) {
 /* scan mode: 'product' | 'food' | 'medicine' | 'report' */
 var _scanMode = 'product';
 function setScanMode(mode) {
+  clearInterval(window._autoScanInterval);
+  window._autoScanLock = false;
   _scanMode = mode;
   // Show drug search section only in medicine mode
   var _dss = document.getElementById('drug-search-section');
@@ -3422,6 +3421,27 @@ function setScanMode(mode) {
   var cfg = modeConfigs[mode] || modeConfigs['product'];
   if (lbl) lbl.textContent = cfg.label;
   if (inp) inp.placeholder = cfg.placeholder;
+
+  // === تشغيل الكاميرا تلقائياً عند اختيار أي وضع ===
+  var _camStatusEl = document.getElementById('camera-status-text');
+  var _modeLabelsLocal = {
+    'product':  'مكونات العلبة',
+    'food':     'التعرف على الطعام',
+    'medicine': 'قراءة علبة الدواء',
+    'report':   'قراءة التقارير'
+  };
+  if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
+  var _vid = document.getElementById('pa-video-stream');
+  var _already = _vid && _vid.srcObject && _vid.style.display !== 'none';
+  if (!_already) {
+    startPremiumCameraScanner(function(){
+      if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
+      if (mode === 'medicine') _startMedicineAutoScan();
+    });
+  } else {
+    if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
+    if (mode === 'medicine') _startMedicineAutoScan();
+  }
 }
 
 /* ══════════════════════════════════════════════
@@ -6759,6 +6779,76 @@ async function autoLogin() {
   } catch(e) {}
   hideLoader();
 }
+</script>
+
+<script>
+/* === مسح تلقائي لوضع الدواء === */
+window._autoScanInterval = null;
+window._autoScanLock = false;
+window._autoScanDone = false;
+
+function _startMedicineAutoScan() {
+  clearInterval(window._autoScanInterval);
+  window._autoScanLock = false;
+  window._autoScanDone = false;
+  var statusEl = document.getElementById('camera-status-text');
+  if (statusEl) statusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px;animation:pulse 1s infinite"></i> الكاميرا تعمل — جاري البحث عن الدواء...';
+  window._autoScanInterval = setInterval(function() {
+    if (window._autoScanDone) { clearInterval(window._autoScanInterval); return; }
+    var video = document.getElementById('pa-video-stream');
+    if (video && video.readyState >= 2 && video.style.display !== 'none') {
+      _autoScanMedicine();
+    }
+  }, 2000);
+}
+
+async function _autoScanMedicine() {
+  if (window._autoScanLock || window._autoScanDone) return;
+  window._autoScanLock = true;
+  var video  = document.getElementById('pa-video-stream');
+  var resBox = document.getElementById('pa-scan-result');
+  var statusEl = document.getElementById('camera-status-text');
+  try {
+    var canvas = document.createElement('canvas');
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    // محاولة قراءة الباركود أولاً
+    if ('BarcodeDetector' in window) {
+      try {
+        var det = new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e','qr_code']});
+        var codes = await det.detect(canvas);
+        if (codes.length > 0) {
+          window._autoScanDone = true;
+          clearInterval(window._autoScanInterval);
+          var code = codes[0].rawValue;
+          if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;margin-left:5px"></i> تم قراءة الباركود: ' + code;
+          if (resBox) resBox.innerHTML = '<div style="padding:10px;text-align:center;font-size:.82rem;color:#26c6da"><i class="fas fa-check-circle" style="margin-left:6px"></i> باركود: '+code+'</div>';
+          var db = await _loadDrugDB();
+          if (db) {
+            var found = db.filter(function(d){ return String(d.id)===String(code); });
+            if (found.length > 0 && resBox) _showDrugPriceCard(found[0], resBox);
+          }
+          await _analyzeMedicineWithAI(null, 'باركود الدواء: ' + code);
+          window._autoScanLock = false;
+          return;
+        }
+      } catch(e) {}
+    }
+
+    // إذا لم يوجد باركود — ذكاء اصطناعي يقرأ العلبة بصرياً
+    var imgData = canvas.toDataURL('image/jpeg', 0.85);
+    if (resBox) resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.8rem"> يتعرف على الدواء...</span></div>';
+    if (statusEl) statusEl.innerHTML = '<i class="fas fa-brain" style="color:#9c27b0;margin-left:5px"></i> يحلل الذكاء الاصطناعي صورة العلبة...';
+    window._autoScanDone = true;
+    clearInterval(window._autoScanInterval);
+    await _analyzeMedicineWithAI(imgData, null);
+    if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;margin-left:5px"></i> تم تحليل الدواء بنجاح';
+  } catch(e) {}
+  window._autoScanLock = false;
+}
+/* ============================================ */
 </script>
 
 <script>
