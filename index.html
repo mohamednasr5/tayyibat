@@ -1945,6 +1945,28 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       </button>
     </div>
     <div id="pa-scan-result" style="text-align:right"></div>
+
+    <!-- Drug Search Section (medicine mode only) -->
+    <div id="drug-search-section" style="margin-top:16px;display:none">
+      <div style="background:linear-gradient(135deg,rgba(33,150,243,.12),rgba(0,188,212,.08));border:1.5px solid rgba(33,150,243,.35);border-radius:18px;padding:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <i class="fas fa-pills" style="color:#2196f3;font-size:1.1rem"></i>
+          <span style="font-size:.88rem;font-weight:800;color:#42a5f5">&#x1F50D; بحث عن الدواء بالاسم أو الكاميرا</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input type="text" id="drug-name-search-input"
+            placeholder="اكتب اسم الدواء..."
+            style="flex:1;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;padding:0 12px;font-size:.88rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
+            oninput="drugSearchDebounce(this.value)"
+            onkeydown="if(event.key==='Enter') drugSearchByName(this.value)">
+          <button onclick="drugSearchByCamera()" title="مسح بالكاميرا"
+            style="width:44px;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;background:rgba(33,150,243,.12);color:#42a5f5;font-size:1rem;cursor:pointer;flex-shrink:0;transition:all .2s">
+            <i class="fas fa-camera"></i>
+          </button>
+        </div>
+        <div id="drug-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3173,8 +3195,16 @@ async function captureAndScanProductBlob() {
       var barcodes = await det.detect(canvas);
       if (barcodes.length > 0) {
         var code = barcodes[0].rawValue;
-        resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>تم قراءة الباركود ' + code + ' - جاري التحليل...</span></div>';
-        await _scanAnalyzeAI("باركود المنتج: " + code + " - قم بتحليل هذا المنتج حسب نظام الطيبات.");
+        resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>&#x2705; تم قراءة الباركود ' + code + ' - جاري التحليل...</span></div>';
+        if (_scanMode === 'medicine') {
+          // Fetch real price from egyptdwa.com
+          _fetchDrugFromEgyptdwa(code).then(function(drugInfo) {
+            if (drugInfo) _showDrugPriceCard(drugInfo, resBox);
+          });
+          await _scanAnalyzeAI("باركود الدواء: " + code + " - قم بتحليل هذا الدواء طبياً مع ذكر الاستخدام والجرعة والآثار الجانبية والسعر التقريبي.");
+        } else {
+          await _scanAnalyzeAI("باركود المنتج: " + code + " - قم بتحليل هذا المنتج حسب نظام الطيبات.");
+        }
         return;
       }
     } catch(e) {}
@@ -3337,6 +3367,9 @@ async function _scanAnalyzeAI(ingredients) {
 var _scanMode = 'product';
 function setScanMode(mode) {
   _scanMode = mode;
+  // Show drug search section only in medicine mode
+  var _dss = document.getElementById('drug-search-section');
+  if (_dss) _dss.style.display = (mode === 'medicine') ? 'block' : 'none';
   var badge = document.getElementById('pa-camera-mode-badge');
   var modeLabels = {
     'product':  '📦 وضع قراءة المكونات',
@@ -3493,7 +3526,7 @@ function _renderMedicineResult(text, source) {
     { color:'#2e7d32', bg:'rgba(46,125,50,.13)', border:'#43a047', icon:'💚', label:'الاستخدامات', content: usageText },
     { color:'#c62828', bg:'rgba(198,40,40,.13)', border:'#ef5350', icon:'🔴', label:'الآثار الجانبية وموانع الاستخدام', content: combinedRed },
     { color:'#1565c0', bg:'rgba(21,101,192,.13)', border:'#42a5f5', icon:'🔵', label:'الجرعة للمرضى المختلفين', content: doseText },
-    { color:'#00838f', bg:'rgba(0,131,143,.13)', border:'#26c6da', icon:'🩵', label:'الأسعار التقريبية', content: priceText }
+    { color:'#00838f', bg:'rgba(0,131,143,.13)', border:'#26c6da', icon:'🩵', label:'الأسعار التقريبية', content: priceText, section:'price' }
   ];
 
   var h = '<div style="margin-top:10px">';
@@ -3502,7 +3535,7 @@ function _renderMedicineResult(text, source) {
 
   boxes.forEach(function(box, idx) {
     if (!box.content) return;
-    h += '<div style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div' + (box.section ? ' data-section="'+box.section+'"' : '') + ' style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
     h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
     h += '<span style="font-size:1rem">'+box.icon+'</span>';
     h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
@@ -3513,9 +3546,45 @@ function _renderMedicineResult(text, source) {
 
   h += '</div></div>';
   resBox.innerHTML = h;
+
+  // Auto-fetch real price from egyptdwa.com after AI analysis
+  (function() {
+    var nameForSearch = '';
+    if (text) {
+      var nm = text.match(/(?:اسم[^::\n]*|الاسم[^::\n]*)[::]\s*([^\n\r،,]{2,40})/i);
+      if (nm) nameForSearch = nm[1].trim();
+      if (!nameForSearch) {
+        var fl = text.split('\n').find(function(l){ return l.replace(/[*_#\s]/g,'').length > 2; });
+        if (fl) nameForSearch = fl.replace(/[*_#]/g,'').trim().split(/\s+/).slice(0,3).join(' ');
+      }
+    }
+    if (nameForSearch) {
+      _fetchDrugFromEgyptdwa(nameForSearch).then(function(drug) {
+        if (!drug || !drug.price) return;
+        // Update the price section if displayed
+        var priceBoxes = resBox.querySelectorAll('[data-section="price"]');
+        var badge = document.createElement('div');
+        badge.style.cssText = "margin-top:8px;padding:8px 12px;background:rgba(0,131,143,.2);border:1.5px solid rgba(0,188,212,.5);border-radius:10px;display:flex;align-items:center;gap:10px";
+        badge.innerHTML =
+          (drug.img ? '<img src="https://egyptdwa.com/dwa/'+drug.img+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0">'
+                    : '<span style="font-size:1.4rem">&#x1F48A;</span>') +
+          '<div>' +
+            '<div style="font-size:.68rem;color:#80deea;margin-bottom:2px;font-weight:700">&#x1F4CB; سعر السوق الفعلي</div>' +
+            '<div style="font-size:.88rem;font-weight:800;color:var(--txt);margin-bottom:2px">' + (drug.arabic || drug.name || '') + '</div>' +
+            '<div style="font-size:1rem;font-weight:900;color:#26c6da">&#x1F4B0; ' + drug.price + ' جنيه</div>' +
+            (drug.active ? '<div style="font-size:.68rem;color:var(--txt3);margin-top:2px">' + drug.active + '</div>' : '') +
+          '</div>';
+        if (priceBoxes.length > 0) {
+          priceBoxes[0].appendChild(badge);
+        } else {
+          _showDrugPriceCard(drug, resBox);
+        }
+      }).catch(function(){});
+    }
+  })();
 }
 
-/* ══════════════════════════════════════════════
+/* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
    MEDICAL REPORT READER - قراءة التقارير الطبية
 ══════════════════════════════════════════════ */
 async function analyzeReportFromCamera() {
@@ -3623,6 +3692,187 @@ function _renderReportResult(text, source) {
 }
 
 
+
+
+/* ============================================================
+   DRUG SEARCH — egyptdwa.com Integration
+   ============================================================ */
+
+async function _fetchDrugFromEgyptdwa(query) {
+  var form = new URLSearchParams();
+  form.append("search","1");
+  form.append("searchq", query);
+  try {
+    var res = await fetch("https://egyptdwa.com/ajax/routing.php", {
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: form
+    });
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    var data = await res.json();
+    if (Array.isArray(data) && data.length > 0) return data[0];
+    return null;
+  } catch(e) {
+    try {
+      var proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://egyptdwa.com/ajax/routing.php");
+      var res2 = await fetch(proxyUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body: new URLSearchParams({search:"1", searchq: query})
+      });
+      var data2 = await res2.json();
+      if (Array.isArray(data2) && data2.length > 0) return data2[0];
+    } catch(e2) {}
+    return null;
+  }
+}
+
+async function _fetchAllDrugsFromEgyptdwa(query) {
+  var form = new URLSearchParams();
+  form.append("search","1");
+  form.append("searchq", query);
+  try {
+    var res = await fetch("https://egyptdwa.com/ajax/routing.php", {
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: form
+    });
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    var data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch(e) {
+    try {
+      var proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://egyptdwa.com/ajax/routing.php");
+      var res2 = await fetch(proxyUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body: new URLSearchParams({search:"1", searchq: query})
+      });
+      var data2 = await res2.json();
+      return Array.isArray(data2) ? data2 : [];
+    } catch(e2) { return []; }
+  }
+}
+
+function _showDrugPriceCard(drug, container) {
+  if (!container) return;
+  var imgSrc = drug.img ? "https://egyptdwa.com/dwa/" + drug.img : "";
+  var priceHtml = drug.price
+    ? '<span style="color:#26c6da;font-weight:800;font-size:1rem">&#x1F4B0; ' + drug.price + ' جنيه</span>'
+    : '<span style="color:var(--txt3);font-size:.8rem">السعر غير متوفر</span>';
+  var card = document.createElement('div');
+  card.style.cssText = "background:linear-gradient(135deg,rgba(0,131,143,.18),rgba(33,150,243,.1));border:2px solid rgba(0,188,212,.5);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;margin-bottom:12px;box-shadow:0 0 16px rgba(0,188,212,.2)";
+  var imgHtml = imgSrc
+    ? '<img src="' + imgSrc + '" onerror="this.style.display=\'none\'" style="width:68px;height:68px;object-fit:cover;border-radius:10px;flex-shrink:0;border:1.5px solid rgba(255,255,255,.12)">'
+    : '<div style="width:68px;height:68px;border-radius:10px;background:rgba(33,150,243,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:2rem">&#x1F48A;</div>';
+  card.innerHTML = imgHtml +
+    '<div style="flex:1;min-width:0">' +
+      '<div style="font-size:.68rem;color:#80deea;margin-bottom:4px;font-weight:700">&#x1F4CB; معلومات الدواء — قاعدة بيانات مصر</div>' +
+      '<div style="font-size:.95rem;font-weight:800;color:var(--txt);margin-bottom:2px">' + (drug.arabic || '') + '</div>' +
+      (drug.arabic && drug.name ? '<div style="font-size:.75rem;color:var(--txt2);margin-bottom:3px">' + drug.name + '</div>' : '') +
+      (drug.active ? '<div style="font-size:.7rem;color:var(--txt3);margin-bottom:5px">' + drug.active + '</div>' : '') +
+      priceHtml +
+    '</div>';
+  container.insertBefore(card, container.firstChild);
+}
+
+var _drugSearchTimer = null;
+function drugSearchDebounce(val) {
+  clearTimeout(_drugSearchTimer);
+  if (!val || val.trim().length < 2) {
+    var r = document.getElementById('drug-search-results');
+    if (r) r.innerHTML = '';
+    return;
+  }
+  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 400);
+}
+
+async function drugSearchByName(query) {
+  if (!query || query.trim().length < 2) return;
+  var resultsDiv = document.getElementById('drug-search-results');
+  if (!resultsDiv) return;
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:12px;color:var(--txt3);font-size:.82rem"><i class="fas fa-spinner fa-spin" style="margin-left:6px"></i> جاري البحث في قاعدة البيانات...</div>';
+  var drugs = await _fetchAllDrugsFromEgyptdwa(query.trim());
+  resultsDiv.innerHTML = '';
+  if (!drugs.length) {
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:14px;color:var(--txt3);font-size:.82rem">&#x26A0;&#xFE0F; لم يتم العثور على نتائج لـ «' + query + '»</div>';
+    return;
+  }
+  drugs.slice(0, 8).forEach(function(drug) {
+    var imgSrc = drug.img ? "https://egyptdwa.com/dwa/" + drug.img : "";
+    var card = document.createElement('div');
+    card.style.cssText = "background:rgba(255,255,255,.04);border:1px solid rgba(33,150,243,.25);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;transition:all .2s";
+    var imgEl = imgSrc
+      ? '<img src="' + imgSrc + '" onerror="this.style.display=\'none\'" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(255,255,255,.08)">'
+      : '<div style="width:56px;height:56px;border-radius:8px;background:rgba(33,150,243,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.5rem">&#x1F48A;</div>';
+    card.innerHTML = imgEl +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:.88rem;font-weight:800;color:var(--txt);margin-bottom:2px">' + (drug.arabic || '') + '</div>' +
+        '<div style="font-size:.75rem;color:var(--txt2);margin-bottom:2px">' + (drug.name || '') + '</div>' +
+        (drug.active ? '<div style="font-size:.7rem;color:var(--txt3);margin-bottom:3px">' + drug.active + '</div>' : '') +
+        (drug.price
+          ? '<span style="color:#26c6da;font-weight:800;font-size:.92rem">&#x1F4B0; ' + drug.price + ' جنيه</span>'
+          : '<span style="color:var(--txt3);font-size:.75rem">السعر غير متوفر</span>') +
+      '</div>';
+    card.onmouseover = function(){ this.style.background='rgba(33,150,243,.1)'; this.style.borderColor='rgba(33,150,243,.5)'; };
+    card.onmouseout  = function(){ this.style.background='rgba(255,255,255,.04)'; this.style.borderColor='rgba(33,150,243,.25)'; };
+    resultsDiv.appendChild(card);
+  });
+}
+
+async function drugSearchByCamera() {
+  var video = document.getElementById('pa-video-stream');
+  var resDiv = document.getElementById('drug-search-results');
+  if (!video || video.readyState < 2 || video.style.display === 'none') {
+    if (typeof showScanToast === 'function') showScanToast('افتح الكاميرا أولاً', '📷', 'unknown');
+    else alert('افتح الكاميرا أولاً');
+    return;
+  }
+  if (resDiv) resDiv.innerHTML = '<div style="text-align:center;padding:12px;color:var(--txt3);font-size:.82rem"><i class="fas fa-spinner fa-spin" style="margin-left:6px"></i> جاري قراءة الصورة...</div>';
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  // Try BarcodeDetector first (fast)
+  if ('BarcodeDetector' in window) {
+    try {
+      var det = new BarcodeDetector({formats:["qr_code","ean_13","ean_8","code_128","code_39","upc_a","upc_e"]});
+      var barcodes = await det.detect(canvas);
+      if (barcodes.length > 0) {
+        var code = barcodes[0].rawValue;
+        var inp = document.getElementById('drug-name-search-input');
+        if (inp) inp.value = code;
+        await drugSearchByName(code);
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // AI fallback: extract drug name from image
+  try {
+    var imgData = canvas.toDataURL('image/jpeg', 0.85);
+    var aiRes = await puter.ai.chat([{
+      role: 'user',
+      content: [
+        {type:'text', text:'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.'},
+        {type:'image_url', image_url:{url: imgData}}
+      ]
+    }], {model:'gpt-4o-mini', temperature:0});
+    var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message?.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
+    if (drugName && drugName.length > 1) {
+      var inp2 = document.getElementById('drug-name-search-input');
+      if (inp2) inp2.value = drugName;
+      await drugSearchByName(drugName);
+    } else {
+      if (resDiv) resDiv.innerHTML = '<div style="text-align:center;padding:14px;color:var(--txt3);font-size:.82rem">لم أتمكن من قراءة الاسم. حاول الكتابة يدوياً.</div>';
+    }
+  } catch(err) {
+    if (resDiv) resDiv.innerHTML = '<div style="text-align:center;padding:14px;color:var(--txt3);font-size:.82rem">حدث خطأ أثناء القراءة. حاول الكتابة يدوياً.</div>';
+  }
+}
+
+/* ============================================================ */
 
 function captureSmartByMode() {
   if (_scanMode === 'medicine') { analyzeMedicineFromCamera(); }
