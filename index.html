@@ -3199,11 +3199,18 @@ async function captureAndScanProductBlob() {
         var code = barcodes[0].rawValue;
         resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>&#x2705; تم قراءة الباركود ' + code + ' - جاري التحليل...</span></div>';
         if (_scanMode === 'medicine') {
-          // Fetch real price from egyptdwa.com
-          _fetchDrugFromEgyptdwa(code).then(function(drugInfo) {
-            if (drugInfo) _showDrugPriceCard(drugInfo, resBox);
-          });
-          await _scanAnalyzeAI("باركود الدواء: " + code + " - قم بتحليل هذا الدواء طبياً مع ذكر الاستخدام والجرعة والآثار الجانبية والسعر التقريبي.");
+          // Search LOCAL DB first, fallback to API
+          var _db = await _loadDrugDB();
+          var _found = _db ? _db.filter(function(d){ return String(d.id)===String(code); }) : [];
+          if (_found.length > 0) {
+            resBox.innerHTML = '';
+            _showDrugPriceCard(_found[0], resBox);
+          } else {
+            _fetchDrugFromEgyptdwa(code).then(function(drugInfo) {
+              if (drugInfo) _showDrugPriceCard(drugInfo, resBox);
+            });
+          }
+          await _analyzeMedicineWithAI(null, 'باركود الدواء: ' + code);
         } else {
           await _scanAnalyzeAI("باركود المنتج: " + code + " - قم بتحليل هذا المنتج حسب نظام الطيبات.");
         }
@@ -3557,18 +3564,28 @@ function _renderMedicineResult(text, source) {
     { color:'#00838f', bg:'rgba(0,131,143,.13)', border:'#26c6da', icon:'🩵', label:'الأسعار التقريبية', content: priceText, section:'price' }
   ];
 
-  var h = '<div style="margin-top:10px">';
-  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 8px">تحليل الدواء بواسطة: '+(source||'AI')+'</div>';
-  h += '<div style="display:flex;flex-direction:column;gap:10px">';
+  var h = '<div style="margin-top:12px">';
+  h += '<div style="display:flex;align-items:center;gap:6px;padding:0 2px 10px">';
+  h += '<i class="fas fa-robot" style="color:#9c27b0;font-size:.85rem"></i>';
+  h += '<span style="font-size:.7rem;color:var(--txt3)">تحليل الذكاء الاصطناعي — '+(source||'AI')+'</span>';
+  h += '</div>';
+  h += '<div style="display:flex;flex-direction:column;gap:12px">';
 
   boxes.forEach(function(box, idx) {
     if (!box.content) return;
-    h += '<div' + (box.section ? ' data-section="'+box.section+'"' : '') + ' style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
-    h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
-    h += '<span style="font-size:1rem">'+box.icon+'</span>';
-    h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
+    var gradMap = {
+      '#43a047': 'linear-gradient(135deg,rgba(46,125,50,.22),rgba(56,142,60,.08))',
+      '#ef5350': 'linear-gradient(135deg,rgba(198,40,40,.22),rgba(229,57,53,.08))',
+      '#42a5f5': 'linear-gradient(135deg,rgba(21,101,192,.22),rgba(33,150,243,.08))',
+      '#26c6da': 'linear-gradient(135deg,rgba(0,131,143,.22),rgba(0,188,212,.08))'
+    };
+    var grad = gradMap[box.border] || box.bg;
+    h += '<div' + (box.section ? ' data-section="'+box.section+'"' : '') + ' style="background:'+grad+';border:2px solid '+box.border+';border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.35);animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div style="background:linear-gradient(135deg,'+box.border+','+box.border+'cc);padding:10px 14px;display:flex;align-items:center;gap:10px">';
+    h += '<span style="font-size:1.15rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.4))">'+box.icon+'</span>';
+    h += '<strong style="color:#fff;font-size:.9rem;font-family:Tajawal,sans-serif;letter-spacing:.3px">'+box.label+'</strong>';
     h += '</div>';
-    h += '<div style="padding:12px 14px;font-size:.82rem;color:var(--txt);line-height:1.7;white-space:pre-wrap">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    h += '<div style="padding:14px 16px;font-size:.83rem;color:var(--txt);line-height:1.85;white-space:pre-wrap;direction:rtl">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
     h += '</div>';
   });
 
@@ -3702,23 +3719,32 @@ function _renderReportResult(text, source) {
     { color:'#1565c0', bg:'rgba(21,101,192,.13)', border:'#42a5f5', icon:'🔵', label:'توصيات الطبيب المعالج', content: recText }
   ];
 
-  var h = '<div style="margin-top:10px">';
-  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 8px;display:flex;align-items:center;gap:6px"><i class="fas fa-user-md"></i> تحليل الطبيب الذكي: '+(source||'AI')+'</div>';
+  var h = '<div style="margin-top:12px">';
+  h += '<div style="display:flex;align-items:center;gap:6px;padding:0 2px 10px">';
+  h += '<i class="fas fa-user-md" style="color:#9c27b0;font-size:.85rem"></i>';
+  h += '<span style="font-size:.7rem;color:var(--txt3)">تحليل الطبيب الذكي — '+(source||'AI')+'</span>';
+  h += '</div>';
   if (hasWarning) {
-    h += '<div style="background:rgba(198,40,40,.15);border:2px solid #ef5350;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:.82rem;color:#ef9a9a;animation:pageIn .3s ease both">';
-    h += '<i class="fas fa-exclamation-triangle"></i> <strong>تنبيه:</strong> يُنصح بمراجعة الطبيب للاطمئنان على هذه النتائج.';
+    h += '<div style="background:linear-gradient(135deg,rgba(198,40,40,.2),rgba(229,57,53,.1));border:2px solid #ef5350;border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:.83rem;color:#ef9a9a;animation:pageIn .3s ease both;box-shadow:0 4px 16px rgba(198,40,40,.25)">';
+    h += '<i class="fas fa-exclamation-triangle" style="margin-left:6px"></i> <strong style="color:#ef5350">تنبيه:</strong> يُنصح بمراجعة الطبيب للاطمئنان على هذه النتائج.';
     h += '</div>';
   }
-  h += '<div style="display:flex;flex-direction:column;gap:10px">';
+  h += '<div style="display:flex;flex-direction:column;gap:12px">';
 
   boxes.forEach(function(box, idx) {
     if (!box.content) return;
-    h += '<div style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
-    h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
-    h += '<span style="font-size:1rem">'+box.icon+'</span>';
-    h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
+    var gradMap = {
+      '#43a047': 'linear-gradient(135deg,rgba(46,125,50,.22),rgba(56,142,60,.08))',
+      '#ef5350': 'linear-gradient(135deg,rgba(198,40,40,.22),rgba(229,57,53,.08))',
+      '#42a5f5': 'linear-gradient(135deg,rgba(21,101,192,.22),rgba(33,150,243,.08))'
+    };
+    var grad = gradMap[box.border] || box.bg;
+    h += '<div style="background:'+grad+';border:2px solid '+box.border+';border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.35);animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div style="background:linear-gradient(135deg,'+box.border+','+box.border+'cc);padding:10px 14px;display:flex;align-items:center;gap:10px">';
+    h += '<span style="font-size:1.15rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.4))">'+box.icon+'</span>';
+    h += '<strong style="color:#fff;font-size:.9rem;font-family:Tajawal,sans-serif">'+box.label+'</strong>';
     h += '</div>';
-    h += '<div style="padding:12px 14px;font-size:.82rem;color:var(--txt);line-height:1.7;white-space:pre-wrap">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    h += '<div style="padding:14px 16px;font-size:.83rem;color:var(--txt);line-height:1.85;white-space:pre-wrap;direction:rtl">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
     h += '</div>';
   });
 
@@ -6876,13 +6902,16 @@ async function _autoScanMedicine() {
     // الخطوة 2: البحث في قاعدة البيانات المحلية وعرض البطاقة الحقيقية
     if (extractedName) {
       if (statusEl) statusEl.innerHTML = '<i class="fas fa-database" style="color:#2196f3;margin-left:5px"></i> يبحث في قاعدة البيانات: ' + extractedName + '...';
+      // عرض معاينة الصورة المُلتقطة
+      if (resBox) resBox.innerHTML = '<div style="text-align:center;margin-bottom:10px"><img src="'+imgData+'" style="max-width:100%;max-height:160px;border-radius:12px;border:2px solid rgba(33,150,243,.4);object-fit:contain"></div>';
       var db = await _loadDrugDB();
       if (db) {
         var dbResults = _searchDrugLocal(extractedName, 1);
         if (dbResults && dbResults.length > 0) {
-          if (resBox) resBox.innerHTML = '';
           _showDrugPriceCard(dbResults[0], resBox);
           if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;margin-left:5px"></i> تم العثور في قاعدة البيانات: ' + (dbResults[0].arabic || dbResults[0].name);
+        } else {
+          if (statusEl) statusEl.innerHTML = '<i class="fas fa-search" style="color:#ff9800;margin-left:5px"></i> لم يُعثر في قاعدة البيانات، جاري التحليل بالذكاء الاصطناعي...';
         }
       }
       // الخطوة 3: التحليل الكامل بالذكاء الاصطناعي يظهر أسفل بطاقة قاعدة البيانات
