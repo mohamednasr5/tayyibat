@@ -324,6 +324,85 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
 .disease-check-item:hover{border-color:rgba(200,150,12,.4);background:rgba(200,150,12,.06)}
 .disease-check-item input{accent-color:var(--gold2);width:15px;height:15px;cursor:pointer}
 .disease-check-item label{font-size:.82rem;color:var(--txt);cursor:pointer;font-weight:600}
+
+/* ─── PRO MANAGEMENT SECTION ─── */
+.pro-mgmt-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid rgba(200,150,12,.3);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;transition:all .25s;cursor:pointer}
+.pro-mgmt-card:hover{border-color:rgba(200,150,12,.7);box-shadow:0 6px 20px rgba(200,150,12,.15);transform:translateY(-1px)}
+.pro-mgmt-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#050e1f;flex-shrink:0;position:relative}
+.pro-mgmt-crown{position:absolute;top:-4px;right:-4px;font-size:.75rem;background:var(--gold);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center}
+.pro-mgmt-info{flex:1;min-width:0}
+.pro-mgmt-name{font-size:.92rem;font-weight:800;color:var(--txt);margin-bottom:3px}
+.pro-mgmt-status{font-size:.7rem;font-weight:700}
+.pro-mgmt-status.active{color:var(--gold2)}
+.pro-mgmt-status.expired{color:#ef5350}
+.pro-mgmt-status.lifetime{color:var(--green2)}
+.pro-mgmt-actions{display:flex;gap:6px;flex-shrink:0}
+.pro-action-btn{border:none;border-radius:8px;padding:6px 12px;font-family:'Tajawal',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.pro-action-btn.extend{background:linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.1));color:var(--gold2);border:1px solid rgba(200,150,12,.4)}
+.pro-action-btn.extend:hover{background:rgba(200,150,12,.3)}
+.pro-action-btn.revoke{background:rgba(165,21,21,.15);color:#ef5350;border:1px solid rgba(165,21,21,.3)}
+.pro-action-btn.revoke:hover{background:rgba(165,21,21,.3)}
+.pro-action-btn.grant{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f}
+.pro-action-btn.grant:hover{opacity:.85}
+
+/* ─── USER DETAIL EXTRA ─── */
+.udetail-pro-mgmt{background:linear-gradient(135deg,rgba(200,150,12,.08),rgba(200,150,12,.03));border:1px solid rgba(200,150,12,.25);border-radius:14px;padding:14px;margin-bottom:12px}
+.udetail-pro-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.udetail-pro-label{font-size:.82rem;font-weight:800;color:var(--gold2);display:flex;align-items:center;gap:6px}
+.pro-quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pro-quick-btn{border:none;border-radius:8px;padding:7px 14px;font-family:'Tajawal',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .2s}
+.pro-quick-btn.d1{background:rgba(200,150,12,.15);color:var(--gold2);border:1px solid rgba(200,150,12,.3)}
+.pro-quick-btn.d7{background:rgba(200,150,12,.15);color:var(--gold2);border:1px solid rgba(200,150,12,.3)}
+.pro-quick-btn.d30{background:rgba(200,150,12,.2);color:var(--gold2);border:1px solid rgba(200,150,12,.4)}
+.pro-quick-btn.d365{background:linear-gradient(135deg,rgba(200,150,12,.3),rgba(245,200,66,.2));color:var(--gold2);border:1px solid rgba(200,150,12,.5)}
+.pro-quick-btn.life{background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(46,201,81,.1));color:var(--green2);border:1px solid rgba(46,201,81,.4)}
+.pro-quick-btn.off{background:rgba(165,21,21,.15);color:#ef5350;border:1px solid rgba(165,21,21,.3)}
+.pro-quick-btn:hover{transform:translateY(-1px);filter:brightness(1.15)}
+
+/* ─── GIFTS LIST IN USER DETAIL ─── */
+.gifts-list-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;margin-bottom:6px}
+.gift-item-icon{font-size:1.3rem;flex-shrink:0}
+.gift-item-info{flex:1;min-width:0}
+.gift-item-name{font-size:.82rem;font-weight:700;color:var(--txt)}
+.gift-item-date{font-size:.65rem;color:var(--txt3)}
+.gift-item-del{background:rgba(165,21,21,.12);border:1px solid rgba(165,21,21,.25);color:#ef5350;border-radius:6px;padding:3px 8px;font-size:.65rem;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s}
+.gift-item-del:hover{background:rgba(165,21,21,.3)}
+
+/* ─── DANGER ZONE ─── */
+.danger-zone{background:rgba(165,21,21,.06);border:1px solid rgba(165,21,21,.2);border-radius:14px;padding:14px;margin-bottom:12px}
+.danger-zone-title{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:#ef5350;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.danger-zone-title::after{content:'';flex:1;height:1px;background:rgba(165,21,21,.25)}
+.danger-btns{display:flex;gap:8px;flex-wrap:wrap}
+.danger-btn{flex:1;min-width:100px;border:none;border-radius:10px;padding:10px;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.danger-btn.ban{background:rgba(255,152,0,.12);color:#ffa726;border:1px solid rgba(255,152,0,.3)}
+.danger-btn.ban:hover{background:rgba(255,152,0,.25)}
+.danger-btn.delete{background:rgba(165,21,21,.15);color:#ef5350;border:1px solid rgba(165,21,21,.3)}
+.danger-btn.delete:hover{background:rgba(165,21,21,.3);transform:translateY(-1px)}
+
+/* ─── CUSTOM GIFT FORM ─── */
+.custom-gift-form{background:rgba(200,150,12,.05);border:1px solid rgba(200,150,12,.2);border-radius:12px;padding:12px;margin-bottom:12px}
+.custom-gift-title{font-size:.75rem;color:var(--gold2);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.custom-gift-row{display:flex;gap:8px;margin-bottom:8px}
+.custom-gift-icon-input{width:60px;background:#050e1f;border:1.5px solid var(--border);border-radius:8px;padding:8px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:1.2rem;text-align:center;outline:none}
+.custom-gift-name-input{flex:1;background:#050e1f;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none}
+.custom-gift-name-input:focus,.custom-gift-icon-input:focus{border-color:var(--gold)}
+.custom-gift-send-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:8px;padding:9px;font-family:'Tajawal',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s}
+.custom-gift-send-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(200,150,12,.35)}
+
+/* ─── PRO SECTION PAGE ─── */
+.pro-stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.pro-stat-mini{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.pro-stat-mini-val{font-size:1.6rem;font-weight:900;color:var(--gold2);font-family:'Amiri',serif}
+.pro-stat-mini-lbl{font-size:.65rem;color:var(--txt3);font-weight:700;margin-top:2px}
+.pro-grid{display:flex;flex-direction:column;gap:10px}
+
+/* ─── DURATION PICKER ─── */
+.dur-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.dur-btn{padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
+.dur-btn:hover,.dur-btn.sel{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border-color:transparent}
+.custom-days-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.custom-days-input{flex:1;background:#050e1f;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none}
+.custom-days-input:focus{border-color:var(--gold)}
 </style>
 </head>
 <body>
@@ -486,10 +565,58 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
       </button>
     </div>
 
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button onclick="openGiftFromDetail()" style="flex:1;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:12px;padding:10px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer"><i class="fas fa-gift"></i> منح هدية</button>
+    <!-- PRO Management -->
+    <div class="udetail-section">
+      <div class="udetail-section-title"><i class="fas fa-crown"></i> إدارة عضوية PRO</div>
+      <div class="udetail-pro-mgmt" id="udetail-pro-block">
+        <div class="udetail-pro-row">
+          <div class="udetail-pro-label" id="udetail-pro-status-label">جاري التحقق...</div>
+          <span id="udetail-pro-expiry" style="font-size:.7rem;color:var(--txt3)"></span>
+        </div>
+        <div class="pro-quick-btns" id="pro-quick-btns">
+          <button class="pro-quick-btn d1" onclick="grantProFromDetail(1)">+1 يوم</button>
+          <button class="pro-quick-btn d7" onclick="grantProFromDetail(7)">+أسبوع</button>
+          <button class="pro-quick-btn d30" onclick="grantProFromDetail(30)">+شهر</button>
+          <button class="pro-quick-btn d365" onclick="grantProFromDetail(365)">+سنة</button>
+          <button class="pro-quick-btn life" onclick="grantProFromDetail(0)">♾️ مدى الحياة</button>
+          <button class="pro-quick-btn off" onclick="revokeProFromDetail()">❌ إلغاء PRO</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gifts List -->
+    <div class="udetail-section">
+      <div class="udetail-section-title"><i class="fas fa-gift"></i> الهدايا الممنوحة</div>
+      <div id="udetail-gifts-list" style="max-height:160px;overflow-y:auto"></div>
+      <button onclick="openGiftFromDetail()" style="width:100%;margin-top:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:10px;padding:9px;font-family:'Tajawal',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"><i class="fas fa-plus"></i> منح هدية جديدة</button>
+    </div>
+
+    <div class="udetail-section">
+      <div class="udetail-section-title"><i class="fas fa-flask"></i> التجارب</div>
+      <div id="udf-exps-preview" style="margin-bottom:8px"></div>
+      <button onclick="openExpModal()" style="width:100%;background:rgba(46,201,81,.1);border:1px solid rgba(46,201,81,.3);color:var(--green2);border-radius:10px;padding:9px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s">
+        <i class="fas fa-flask"></i> عرض وإدارة التجارب
+      </button>
+    </div>
+
+    <!-- Notifications -->
+    <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:12px">
       <button onclick="openNotifyFromDetail()" style="flex:1;background:linear-gradient(135deg,#0d47a1,#2196f3);color:#fff;border:none;border-radius:12px;padding:10px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer"><i class="fas fa-bell"></i> إرسال إشعار</button>
     </div>
+
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+      <div class="danger-zone-title"><i class="fas fa-exclamation-triangle"></i> منطقة الخطر</div>
+      <div class="danger-btns">
+        <button class="danger-btn ban" id="udetail-ban-btn" onclick="toggleBanUser()">
+          <i class="fas fa-ban"></i> <span id="udetail-ban-label">حظر المستخدم</span>
+        </button>
+        <button class="danger-btn delete" onclick="deleteUserAccount()">
+          <i class="fas fa-trash-alt"></i> حذف الحساب نهائياً
+        </button>
+      </div>
+    </div>
+
     <button class="udetail-close" onclick="closeUserDetail()">إغلاق</button>
   </div>
 </div>
@@ -523,28 +650,50 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
   </div>
 </div>
 
-<!-- Gift Modal -->
+<!-- Gift Modal (Enhanced) -->
 <div class="modal-overlay" id="gift-modal">
   <div class="modal-box">
     <div class="modal-title">🎁 منح هدية للمستخدم</div>
     <div id="gift-target-info" style="text-align:center;margin-bottom:16px;font-size:.9rem;color:var(--txt2)"></div>
+
+    <!-- PRO Toggle -->
     <div class="pro-toggle" onclick="toggleProGift()" id="pro-toggle">
       <div class="toggle-switch" id="toggle-switch"></div>
       <div>
-        <div style="font-size:.85rem;font-weight:700;color:var(--gold2)">👑 تفعيل PRO</div>
+        <div style="font-size:.85rem;font-weight:700;color:var(--gold2)">👑 تفعيل PRO مع الهدية</div>
         <div style="font-size:.7rem;color:var(--txt3)">تفعيل الاشتراك المدفوع للمستخدم</div>
       </div>
     </div>
+
+    <!-- PRO Duration (hidden until toggled) -->
     <div id="pro-duration-row" style="display:none;margin-bottom:12px">
       <div style="font-size:.78rem;color:var(--txt2);margin-bottom:8px">مدة الاشتراك:</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-        <button class="filter-btn" onclick="setProDuration(1,'يوم')">1 يوم</button>
-        <button class="filter-btn" onclick="setProDuration(7,'أسبوع')">أسبوع</button>
-        <button class="filter-btn" onclick="setProDuration(30,'شهر')">شهر</button>
-        <button class="filter-btn" onclick="setProDuration(365,'سنة')">سنة</button>
+      <div class="dur-picker">
+        <button class="dur-btn" onclick="setProDuration(1,'يوم')">1 يوم</button>
+        <button class="dur-btn" onclick="setProDuration(7,'أسبوع')">أسبوع</button>
+        <button class="dur-btn sel" onclick="setProDuration(30,'شهر')">شهر</button>
+        <button class="dur-btn" onclick="setProDuration(90,'3 أشهر')">3 أشهر</button>
+        <button class="dur-btn" onclick="setProDuration(365,'سنة')">سنة</button>
       </div>
-      <div id="pro-duration-note" style="font-size:.72rem;color:var(--txt3);margin-top:6px;text-align:center"></div>
+      <div class="custom-days-row">
+        <input class="custom-days-input" type="number" id="custom-days-val" placeholder="أيام مخصصة..." min="1" max="9999" oninput="setProDuration(parseInt(this.value)||1, this.value+' يوم')">
+        <button class="dur-btn" onclick="setProDuration(0,'مدى الحياة')" style="white-space:nowrap;padding:8px 12px">♾️ مدى الحياة</button>
+      </div>
+      <div id="pro-duration-note" style="font-size:.72rem;color:var(--gold2);margin-top:4px;text-align:center;font-weight:700"></div>
     </div>
+
+    <!-- Custom Gift Form -->
+    <div class="custom-gift-form">
+      <div class="custom-gift-title"><i class="fas fa-magic"></i> هدية مخصصة</div>
+      <div class="custom-gift-row">
+        <input class="custom-gift-icon-input" id="custom-gift-icon" type="text" placeholder="🎁" maxlength="2" value="🎁">
+        <input class="custom-gift-name-input" id="custom-gift-name" type="text" placeholder="اسم الهدية المخصصة...">
+      </div>
+      <button class="custom-gift-send-btn" onclick="sendCustomGift()"><i class="fas fa-paper-plane"></i> إرسال الهدية المخصصة</button>
+    </div>
+
+    <!-- Preset Gifts -->
+    <div style="font-size:.72rem;color:var(--txt3);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">أو اختر من الهدايا الجاهزة</div>
     <div class="gift-grid">
       <button class="gift-btn" onclick="sendGift('🎁','هدية ترحيب')"><span class="gift-icon">🎁</span>هدية ترحيب</button>
       <button class="gift-btn" onclick="sendGift('🌟','نجمة إنجاز')"><span class="gift-icon">🌟</span>نجمة إنجاز</button>
@@ -552,7 +701,10 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
       <button class="gift-btn" onclick="sendGift('💎','عضوية VIP')"><span class="gift-icon">💎</span>عضوية VIP</button>
       <button class="gift-btn" onclick="sendGift('🎉','هدية عيد ميلاد')"><span class="gift-icon">🎉</span>عيد ميلاد</button>
       <button class="gift-btn" onclick="sendGift('🏅','هدية الأدمن الذهبية #1',true)"><span class="gift-icon">🏅</span>هدية ذهبية #1</button>
+      <button class="gift-btn" onclick="sendGift('🌺','هدية الالتزام')"><span class="gift-icon">🌺</span>هدية الالتزام</button>
+      <button class="gift-btn" onclick="sendGift('⚡','نشاط مميز')"><span class="gift-icon">⚡</span>نشاط مميز</button>
     </div>
+
     <div style="display:flex;gap:8px">
       <button onclick="closeGiftModal()" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--txt2);border-radius:12px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer">إلغاء</button>
     </div>
@@ -620,6 +772,9 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
     <div class="nav-section-label">الإدارة</div>
     <a class="nav-item" onclick="showSection('gifts')">
       <div class="nav-icon"><i class="fas fa-gift"></i></div> الهدايا
+    </a>
+    <a class="nav-item" onclick="showSection('pro')">
+      <div class="nav-icon"><i class="fas fa-crown"></i></div> إدارة PRO
     </a>
     <a class="nav-item" onclick="showSection('notifications')">
       <div class="nav-icon"><i class="fas fa-bell"></i></div> الإشعارات
@@ -810,6 +965,53 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
     <div class="users-grid" id="gifts-users-grid"></div>
   </div>
 
+  <!-- ══ PRO MANAGEMENT ══ -->
+  <div class="section" id="section-pro">
+    <div class="page-header">
+      <div class="page-title">👑 إدارة عضويات PRO</div>
+      <div class="header-meta">
+        <button onclick="renderProSection()" class="refresh-btn"><i class="fas fa-sync-alt"></i> تحديث</button>
+      </div>
+    </div>
+    <div class="pro-stats-bar" id="pro-stats-bar"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="chart-wrap">
+        <div class="chart-title"><i class="fas fa-crown" style="color:var(--gold2)"></i> المشتركون النشطون</div>
+        <div class="pro-grid" id="pro-active-list"></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title"><i class="fas fa-clock" style="color:#ef5350"></i> منتهية الصلاحية / بدون PRO</div>
+        <div style="overflow-y:auto;max-height:400px">
+          <div class="pro-grid" id="pro-inactive-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title"><i class="fas fa-user-plus" style="color:var(--green2)"></i> منح PRO سريع لمستخدم</div>
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <label style="font-size:.72rem;color:var(--gold2);font-weight:700;display:block;margin-bottom:5px">اختر المستخدم</label>
+          <select id="quick-pro-user" style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none"></select>
+        </div>
+        <div style="flex:1;min-width:140px">
+          <label style="font-size:.72rem;color:var(--gold2);font-weight:700;display:block;margin-bottom:5px">المدة</label>
+          <select id="quick-pro-dur" style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none">
+            <option value="1">1 يوم</option>
+            <option value="7">أسبوع</option>
+            <option value="30" selected>شهر</option>
+            <option value="90">3 أشهر</option>
+            <option value="180">6 أشهر</option>
+            <option value="365">سنة</option>
+            <option value="0">مدى الحياة ♾️</option>
+          </select>
+        </div>
+        <button onclick="quickGrantPro()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:#050e1f;border:none;border-radius:10px;padding:10px 20px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          <i class="fas fa-crown"></i> تفعيل PRO
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ NOTIFICATIONS ══ -->
   <div class="section" id="section-notifications">
     <div class="page-header">
@@ -937,7 +1139,8 @@ function refreshUserDetailUI(uid) {
   av.textContent = initials(name);
   document.getElementById('udetail-name').textContent = name;
   document.getElementById('udetail-uid').textContent = 'UID: ' + uid;
-  const isPro = u.pro?.active && (!u.pro?.expiresAt || u.pro.expiresAt > Date.now());
+  const now = Date.now();
+  const isPro = u.pro?.active && (!u.pro?.expiresAt || u.pro.expiresAt > now);
   document.getElementById('udetail-pro-badge').style.display = isPro ? 'block' : 'none';
   document.getElementById('udf-fullname').textContent = u.nameAr || u.name || '—';
   let ageStr = '—';
@@ -966,6 +1169,45 @@ function refreshUserDetailUI(uid) {
     .map(([k,v])=>`${k}: ${typeof v==='object'?JSON.stringify(v,null,1):v}`).join('\n');
   document.getElementById('udf-extra').textContent = extra || '—';
   loadExpPreview(uid);
+
+  // ─── PRO Status Block ───
+  const proLabelEl = document.getElementById('udetail-pro-status-label');
+  const proExpEl = document.getElementById('udetail-pro-expiry');
+  if (u.pro?.active) {
+    const exp = u.pro?.expiresAt;
+    if (!exp) {
+      proLabelEl.innerHTML = '<i class="fas fa-crown"></i> PRO مدى الحياة ♾️';
+      proLabelEl.style.color = 'var(--green2)';
+      proExpEl.textContent = '';
+    } else if (exp <= now) {
+      proLabelEl.innerHTML = '<i class="fas fa-clock"></i> PRO منتهي الصلاحية';
+      proLabelEl.style.color = '#ef5350';
+      proExpEl.textContent = 'انتهى: ' + new Date(exp).toLocaleDateString('ar-EG');
+    } else {
+      const days = Math.ceil((exp - now) / 86400000);
+      proLabelEl.innerHTML = '<i class="fas fa-crown"></i> PRO نشط 👑';
+      proLabelEl.style.color = 'var(--gold2)';
+      proExpEl.textContent = `يتبقى ${days} يوم — ينتهي ${new Date(exp).toLocaleDateString('ar-EG')}`;
+    }
+  } else {
+    proLabelEl.innerHTML = '<i class="fas fa-times-circle"></i> لا يوجد اشتراك PRO';
+    proLabelEl.style.color = 'var(--txt3)';
+    proExpEl.textContent = '';
+  }
+
+  // ─── Gifts List ───
+  loadUserGiftsList(uid);
+
+  // ─── Ban Status ───
+  const isBanned = u.banned === true;
+  const banBtn = document.getElementById('udetail-ban-btn');
+  const banLabel = document.getElementById('udetail-ban-label');
+  if (banBtn && banLabel) {
+    banLabel.textContent = isBanned ? 'رفع الحظر' : 'حظر المستخدم';
+    banBtn.style.background = isBanned ? 'rgba(46,201,81,.12)' : 'rgba(255,152,0,.12)';
+    banBtn.style.color = isBanned ? 'var(--green2)' : '#ffa726';
+    banBtn.style.borderColor = isBanned ? 'rgba(46,201,81,.3)' : 'rgba(255,152,0,.3)';
+  }
 }
 
 // ─── INLINE EDIT ───
@@ -1294,6 +1536,7 @@ function renderAll() {
   renderShares();
   renderGiftsUsers();
   renderNotifUsers();
+  renderProSection();
 }
 
 // ─── Helpers ───
@@ -1728,7 +1971,17 @@ window.toggleProGift = () => {
 
 window.setProDuration = (days, label) => {
   PRO_DURATION_DAYS = days;
-  document.getElementById('pro-duration-note').textContent = `✅ تم اختيار: ${label}`;
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('pro-duration-note').textContent = days === 0 ? '✅ مدى الحياة ♾️' : `✅ تم اختيار: ${label}`;
+};
+
+window.sendCustomGift = async () => {
+  if (!GIFT_TARGET_UID) return;
+  const icon = document.getElementById('custom-gift-icon').value.trim() || '🎁';
+  const name = document.getElementById('custom-gift-name').value.trim();
+  if (!name) { showToast('⚠️ أدخل اسم الهدية'); return; }
+  await sendGift(icon, name);
+  document.getElementById('custom-gift-name').value = '';
 };
 
 window.sendGift = async (icon, name, isNo1=false) => {
@@ -1746,17 +1999,258 @@ window.sendGift = async (icon, name, isNo1=false) => {
     await set(ref(db, `users/${uid}/gifts/${giftId}`), giftData);
 
     if (PRO_GIFT_ACTIVE) {
-      const expiresAt = Date.now() + PRO_DURATION_DAYS * 86400000;
-      await set(ref(db, `users/${uid}/pro`), { active: true, expiresAt, grantedByAdmin: true });
-      await set(ref(db, `users/${uid}/pro/expiresAt`), expiresAt);
+      const proData = { active: true, grantedByAdmin: true };
+      if (PRO_DURATION_DAYS === 0) {
+        proData.expiresAt = null; // lifetime
+      } else {
+        proData.expiresAt = Date.now() + PRO_DURATION_DAYS * 86400000;
+      }
+      await set(ref(db, `users/${uid}/pro`), proData);
     }
 
     closeGiftModal();
-    showToast(`✅ تم إرسال "${name}" بنجاح${PRO_GIFT_ACTIVE?' مع تفعيل PRO':''}`);
-    await loadData();
+    const durLabel = PRO_GIFT_ACTIVE ? (PRO_DURATION_DAYS === 0 ? ' + PRO مدى الحياة ♾️' : ` + PRO ${PRO_DURATION_DAYS} يوم`) : '';
+    showToast(`✅ تم إرسال "${name}" بنجاح${durLabel}`);
+    ALL_USERS[uid] = (await get(ref(db, `users/${uid}`))).val();
+    renderAll();
   } catch(e) {
     showToast('❌ فشل الإرسال: ' + e.message);
   }
+};
+
+// ─── Grant PRO from User Detail ───
+window.grantProFromDetail = async (days) => {
+  if (!CURRENT_UID) return;
+  const uid = CURRENT_UID;
+  const u = ALL_USERS[uid] || {};
+  const proData = { active: true, grantedByAdmin: true };
+
+  if (days === 0) {
+    proData.expiresAt = null; // lifetime
+  } else {
+    // If already has active PRO, extend from current expiry
+    const now = Date.now();
+    const curExp = u.pro?.active && u.pro?.expiresAt && u.pro.expiresAt > now ? u.pro.expiresAt : now;
+    proData.expiresAt = curExp + days * 86400000;
+  }
+
+  try {
+    await set(ref(db, `users/${uid}/pro`), proData);
+    ALL_USERS[uid] = { ...u, pro: proData };
+    refreshUserDetailUI(uid);
+    renderAll();
+    const msg = days === 0 ? 'تم تفعيل PRO مدى الحياة ♾️' : `تم إضافة ${days} يوم PRO ✅`;
+    showToast(msg);
+  } catch(e) {
+    showToast('❌ فشل التفعيل: ' + e.message);
+  }
+};
+
+window.revokeProFromDetail = async () => {
+  if (!CURRENT_UID) return;
+  if (!confirm('هل تريد إلغاء عضوية PRO لهذا المستخدم؟')) return;
+  const uid = CURRENT_UID;
+  try {
+    await set(ref(db, `users/${uid}/pro`), { active: false, revokedByAdmin: true, revokedAt: Date.now() });
+    ALL_USERS[uid] = { ...(ALL_USERS[uid] || {}), pro: { active: false } };
+    refreshUserDetailUI(uid);
+    renderAll();
+    showToast('✅ تم إلغاء عضوية PRO');
+  } catch(e) {
+    showToast('❌ فشل الإلغاء: ' + e.message);
+  }
+};
+
+// ─── Ban / Unban User ───
+window.toggleBanUser = async () => {
+  if (!CURRENT_UID) return;
+  const uid = CURRENT_UID;
+  const u = ALL_USERS[uid] || {};
+  const isBanned = u.banned === true;
+  const action = isBanned ? 'رفع الحظر عن' : 'حظر';
+  if (!confirm(`هل تريد ${action} هذا المستخدم؟`)) return;
+  try {
+    await set(ref(db, `users/${uid}/banned`), !isBanned);
+    ALL_USERS[uid] = { ...u, banned: !isBanned };
+    refreshUserDetailUI(uid);
+    showToast(isBanned ? '✅ تم رفع الحظر' : '⛔ تم حظر المستخدم');
+  } catch(e) {
+    showToast('❌ فشل العملية: ' + e.message);
+  }
+};
+
+// ─── Delete User Account ───
+window.deleteUserAccount = async () => {
+  if (!CURRENT_UID) return;
+  const uid = CURRENT_UID;
+  const u = ALL_USERS[uid] || {};
+  const name = u.nameAr || u.name || u.username || uid.slice(0,10);
+  if (!confirm(`⚠️ تحذير: سيتم حذف بيانات "${name}" نهائياً من Firebase.\nهذا الإجراء لا يمكن التراجع عنه!\n\nهل أنت متأكد تماماً؟`)) return;
+  if (!confirm(`تأكيد أخير: حذف "${name}" نهائياً؟`)) return;
+  try {
+    await set(ref(db, `users/${uid}`), null);
+    delete ALL_USERS[uid];
+    closeUserDetail();
+    renderAll();
+    showToast(`✅ تم حذف حساب "${name}" نهائياً`);
+  } catch(e) {
+    showToast('❌ فشل الحذف: ' + e.message);
+  }
+};
+
+// ─── Load Gifts List in User Detail ───
+function loadUserGiftsList(uid) {
+  const u = ALL_USERS[uid] || {};
+  const gifts = u.gifts ? Object.values(u.gifts) : [];
+  const el = document.getElementById('udetail-gifts-list');
+  if (!gifts.length) {
+    el.innerHTML = '<div style="font-size:.78rem;color:var(--txt3);text-align:center;padding:10px">لا توجد هدايا بعد</div>';
+    return;
+  }
+  gifts.sort((a,b) => (b.grantedAt||0) - (a.grantedAt||0));
+  el.innerHTML = gifts.map(g => `
+    <div class="gifts-list-item">
+      <span class="gift-item-icon">${g.icon||'🎁'}</span>
+      <div class="gift-item-info">
+        <div class="gift-item-name">${g.name||'هدية'}</div>
+        <div class="gift-item-date">${g.grantedAt ? fmtDate(g.grantedAt) : '—'}</div>
+      </div>
+      <button class="gift-item-del" onclick="deleteGiftFromDetail('${g.id||''}','${uid}')"><i class="fas fa-trash"></i></button>
+    </div>`).join('');
+}
+
+window.deleteGiftFromDetail = async (giftId, uid) => {
+  if (!giftId || !uid) return;
+  try {
+    await set(ref(db, `users/${uid}/gifts/${giftId}`), null);
+    if (ALL_USERS[uid]?.gifts) delete ALL_USERS[uid].gifts[giftId];
+    loadUserGiftsList(uid);
+    showToast('✅ تم حذف الهدية');
+  } catch(e) {
+    showToast('❌ فشل الحذف');
+  }
+};
+
+// ─── Quick Grant PRO from PRO Section ───
+window.quickGrantPro = async () => {
+  const uid = document.getElementById('quick-pro-user').value;
+  const days = parseInt(document.getElementById('quick-pro-dur').value);
+  if (!uid) { showToast('⚠️ اختر مستخدماً'); return; }
+  const u = ALL_USERS[uid] || {};
+  const proData = { active: true, grantedByAdmin: true };
+  if (days === 0) {
+    proData.expiresAt = null;
+  } else {
+    const now = Date.now();
+    const curExp = u.pro?.active && u.pro?.expiresAt && u.pro.expiresAt > now ? u.pro.expiresAt : now;
+    proData.expiresAt = curExp + days * 86400000;
+  }
+  try {
+    await set(ref(db, `users/${uid}/pro`), proData);
+    ALL_USERS[uid] = { ...u, pro: proData };
+    renderAll();
+    renderProSection();
+    const name = u.nameAr || u.name || u.username || uid.slice(0,10);
+    showToast(days === 0 ? `✅ تم تفعيل PRO مدى الحياة لـ ${name}` : `✅ تم تفعيل PRO لـ ${name}`);
+  } catch(e) {
+    showToast('❌ فشل التفعيل: ' + e.message);
+  }
+};
+
+// ─── Render PRO Section ───
+function renderProSection() {
+  const users = Object.entries(ALL_USERS);
+  const now = Date.now();
+
+  const active = users.filter(([,u]) => u.pro?.active && (!u.pro?.expiresAt || u.pro.expiresAt > now));
+  const inactive = users.filter(([,u]) => !u.pro?.active || (u.pro?.expiresAt && u.pro.expiresAt <= now));
+  const expired = users.filter(([,u]) => u.pro?.active && u.pro?.expiresAt && u.pro.expiresAt <= now);
+  const lifetime = users.filter(([,u]) => u.pro?.active && !u.pro?.expiresAt);
+
+  // Stats
+  document.getElementById('pro-stats-bar').innerHTML = `
+    <div class="pro-stat-mini"><div class="pro-stat-mini-val" style="color:var(--gold2)">${active.length}</div><div class="pro-stat-mini-lbl">👑 نشط الآن</div></div>
+    <div class="pro-stat-mini"><div class="pro-stat-mini-val" style="color:var(--green2)">${lifetime.length}</div><div class="pro-stat-mini-lbl">♾️ مدى الحياة</div></div>
+    <div class="pro-stat-mini"><div class="pro-stat-mini-val" style="color:#ef5350">${expired.length}</div><div class="pro-stat-mini-lbl">⏰ منتهي الصلاحية</div></div>
+    <div class="pro-stat-mini"><div class="pro-stat-mini-val" style="color:var(--txt3)">${inactive.length}</div><div class="pro-stat-mini-lbl">بدون PRO</div></div>`;
+
+  // Active list
+  document.getElementById('pro-active-list').innerHTML = active.length ? active.map(([uid, u]) => {
+    const name = u.nameAr || u.name || u.username || uid.slice(0,10);
+    const col = avatarColor(name);
+    const exp = u.pro?.expiresAt;
+    const statusLabel = !exp ? '♾️ مدى الحياة' : `ينتهي: ${new Date(exp).toLocaleDateString('ar-EG',{month:'short',day:'numeric',year:'numeric'})}`;
+    const statusClass = !exp ? 'lifetime' : (exp - now < 3*86400000 ? 'expired' : 'active');
+    return `<div class="pro-mgmt-card" onclick="openUserDetail('${uid}')">
+      <div class="pro-mgmt-avatar" style="background:linear-gradient(135deg,${col},${col}99)">
+        ${initials(name)}
+        <div class="pro-mgmt-crown">👑</div>
+      </div>
+      <div class="pro-mgmt-info">
+        <div class="pro-mgmt-name">${name}</div>
+        <div class="pro-mgmt-status ${statusClass}">${statusLabel}</div>
+      </div>
+      <div class="pro-mgmt-actions" onclick="event.stopPropagation()">
+        <button class="pro-action-btn extend" onclick="quickExtendPro('${uid}',30)">+شهر</button>
+        <button class="pro-action-btn revoke" onclick="quickRevokePro('${uid}')">إلغاء</button>
+      </div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;padding:20px;color:var(--txt3);font-size:.82rem">لا يوجد مشتركون نشطون</div>';
+
+  // Inactive list (only those with expired pro or never subscribed, limit 30)
+  const toShow = inactive.slice(0, 30);
+  document.getElementById('pro-inactive-list').innerHTML = toShow.map(([uid, u]) => {
+    const name = u.nameAr || u.name || u.username || uid.slice(0,10);
+    const col = avatarColor(name);
+    const wasExpired = u.pro?.expiresAt && u.pro.expiresAt <= now;
+    return `<div class="pro-mgmt-card" onclick="openUserDetail('${uid}')">
+      <div class="pro-mgmt-avatar" style="background:linear-gradient(135deg,${col},${col}99)">${initials(name)}</div>
+      <div class="pro-mgmt-info">
+        <div class="pro-mgmt-name">${name}</div>
+        <div class="pro-mgmt-status ${wasExpired ? 'expired' : ''}">${wasExpired ? '⏰ انتهت الصلاحية' : '— لا يوجد اشتراك'}</div>
+      </div>
+      <div class="pro-mgmt-actions" onclick="event.stopPropagation()">
+        <button class="pro-action-btn grant" onclick="quickExtendPro('${uid}',30)">تفعيل PRO</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Populate quick grant user dropdown
+  const sel = document.getElementById('quick-pro-user');
+  if (sel) {
+    sel.innerHTML = '<option value="">— اختر المستخدم —</option>' +
+      Object.entries(ALL_USERS).map(([uid, u]) => {
+        const name = u.nameAr || u.name || u.username || uid.slice(0,10);
+        return `<option value="${uid}">${name}</option>`;
+      }).join('');
+  }
+}
+
+window.quickExtendPro = async (uid, days) => {
+  const u = ALL_USERS[uid] || {};
+  const now = Date.now();
+  const curExp = u.pro?.active && u.pro?.expiresAt && u.pro.expiresAt > now ? u.pro.expiresAt : now;
+  const proData = { active: true, grantedByAdmin: true, expiresAt: curExp + days * 86400000 };
+  try {
+    await set(ref(db, `users/${uid}/pro`), proData);
+    ALL_USERS[uid] = { ...u, pro: proData };
+    renderAll();
+    renderProSection();
+    const name = u.nameAr || u.name || u.username || uid.slice(0,10);
+    showToast(`✅ تم تمديد PRO لـ ${name}`);
+  } catch(e) { showToast('❌ فشل: ' + e.message); }
+};
+
+window.quickRevokePro = async (uid) => {
+  if (!confirm('إلغاء عضوية PRO لهذا المستخدم؟')) return;
+  const u = ALL_USERS[uid] || {};
+  try {
+    await set(ref(db, `users/${uid}/pro`), { active: false, revokedByAdmin: true, revokedAt: Date.now() });
+    ALL_USERS[uid] = { ...u, pro: { active: false } };
+    renderAll();
+    renderProSection();
+    showToast('✅ تم إلغاء PRO');
+  } catch(e) { showToast('❌ فشل: ' + e.message); }
 };
 
 // ─── Notify Modal ───
