@@ -4252,18 +4252,23 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
     'خط الأطباء صعب القراءة — حاول قراءته بأفضل ما يمكن واستخدم سياق الكلمة والاسم الطبي.\n\n' +
     'المطلوب: استخرج كل الأدوية الموجودة في الروشتة وأجب بالتنسيق التالي الحرفي فقط (بدون ** أو markdown):\n\n' +
     'دواء_1:\n' +
-    'الاسم: (اسم الدواء كما هو مكتوب)\n' +
+    'الاسم: (اسم الدواء كما هو مكتوب في الروشتة)\n' +
     'النوع: (برشام / شراب / مرهم / كريم / قطرة / حقن عضل / حقن وريد / تحاميل / بخاخ / غيرها)\n' +
-    'التركيز: (مثل 500mg أو 10ml أو غير محدد)\n' +
-    'الجرعة: (كما كتبها الطبيب بالعربية، مثل: حبة كل 8 ساعات لمدة 5 أيام)\n\n' +
+    'التركيز: (مثل 500mg أو 250mg/5ml أو غير محدد)\n' +
+    'الجرعة: (اكتب الجرعة كاملة حرفياً كما كتبها الطبيب — اذكر: العدد + التكرار + التوقيت + المدة + العلاقة بالأكل إن وُجدت. مثال: حبة كل 12 ساعة لمدة 7 أيام بعد الأكل — أو: نصف حبة صباحاً ومساءً لمدة 5 أيام قبل الطعام. لا تختصر ولا تحذف أي تفصيلة.)\n\n' +
     'دواء_2:\n' +
     'الاسم: ...\n' +
     'النوع: ...\n' +
     'التركيز: ...\n' +
     'الجرعة: ...\n\n' +
     'وهكذا مع كل دواء في الروشتة.\n' +
-    'ملاحظة: اذكر فقط الأدوية الموجودة فعلاً. إذا لم تستطع قراءة كلمة اكتب (غير واضح).\n' +
-    (textInput ? 'نص الروشتة: ' + textInput : 'انظر للصورة واستخرج جميع الأدوية منها.');
+    'تعليمات مهمة:\n' +
+    '— اذكر فقط الأدوية الموجودة فعلاً في الروشتة.\n' +
+    '— في حقل الجرعة: اكتب كل ما كتبه الطبيب بشأن كيفية الأخذ، لا تحذف شيئاً.\n' +
+    '— إذا كتب الطبيب "صباحاً وظهراً ومساءً" فاكتبها كما هي بالتفصيل.\n' +
+    '— إذا كتب "بعد الفطار والغداء" فاكتبها كما هي.\n' +
+    '— إذا لم تستطع قراءة كلمة اكتب (غير واضح) ولا تتركها فارغة.\n' +
+    (textInput ? 'نص الروشتة: ' + textInput : 'انظر للصورة واستخرج جميع الأدوية منها بدقة.');
 
   var result = null;
 
@@ -4328,7 +4333,7 @@ async function _renderPrescriptionResult(text) {
     h += '<div id="rx-card-' + idx + '" style="background:linear-gradient(160deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,111,0,.35);border-radius:20px;overflow:hidden;margin-bottom:12px;animation:pageIn .4s ease ' + (idx * 0.12).toFixed(2) + 's both">';
     // Header
     h += '<div style="background:linear-gradient(135deg,rgba(255,111,0,.3),rgba(255,87,34,.2));padding:10px 14px;display:flex;align-items:center;gap:10px">';
-    h += '<span style="font-size:1.4rem">' + typeIcon + '</span>';
+    h += '<div style="flex-shrink:0;width:40px;height:40px;background:rgba(0,0,0,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,111,0,.3)">' + typeIcon + '</div>';
     h += '<div style="flex:1"><div style="font-size:1rem;font-weight:900;color:#ffe0b2">' + (drug.name || 'غير محدد') + '</div>';
     h += '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">' + (drug.type || '') + (drug.concentration ? ' — ' + drug.concentration : '') + '</div></div>';
     h += '<div style="font-size:.6rem;background:rgba(255,111,0,.25);border:1px solid rgba(255,111,0,.5);border-radius:12px;padding:3px 8px;color:#ff8a50;font-weight:700"># ' + (idx + 1) + '</div>';
@@ -4363,23 +4368,32 @@ async function _renderPrescriptionResult(text) {
 
 function _parsePrescriptionDrugs(text) {
   var drugs = [];
-  // قسّم على "دواء_N:"
-  var blocks = text.split(/دواء_?\d+\s*:/i).filter(function(b){ return b.trim().length > 3; });
+  // قسّم على "دواء_N:" أو "دواء N:"
+  var blocks = text.split(/دواء_?\s*\d+\s*:/i).filter(function(b){ return b.trim().length > 3; });
   if (blocks.length === 0) {
-    // fallback: قسّم على سطر فارغ
+    // fallback: قسّم على سطر فارغ مزدوج
     blocks = text.split(/\n{2,}/);
   }
   blocks.forEach(function(block) {
-    var nameM  = block.match(/الاسم\s*:\s*([^\n]+)/i);
-    var typeM  = block.match(/النوع\s*:\s*([^\n]+)/i);
-    var concM  = block.match(/التركيز\s*:\s*([^\n]+)/i);
-    var doseM  = block.match(/الجرعة\s*:\s*([\s\S]*?)(?=الاسم|النوع|التركيز|دواء_|$)/i);
+    var nameM = block.match(/الاسم\s*:\s*([^\n]+)/i);
+    var typeM = block.match(/النوع\s*:\s*([^\n]+)/i);
+    var concM = block.match(/التركيز\s*:\s*([^\n]+)/i);
+    // الجرعة: كل شيء بعد "الجرعة:" حتى السطر الفارغ أو نهاية البلوك
+    // تستوعب أسطراً متعددة
+    var doseM = block.match(/الجرعة\s*:\s*([\s\S]*?)(?=\n\s*\n|\n(?:الاسم|النوع|التركيز|دواء_|$)|$)/i);
     if (!nameM) return;
+    // نظّف الجرعة: اجمع الأسطر بمسافة وأزل الفراغات الزائدة
+    var rawDose = doseM ? doseM[1] : '';
+    var cleanDose = rawDose
+      .split('\n')
+      .map(function(l){ return l.trim(); })
+      .filter(function(l){ return l.length > 0 && !l.match(/^(الاسم|النوع|التركيز|دواء_)/i); })
+      .join(' — ');
     drugs.push({
       name:          (nameM[1]||'').trim().replace(/[*_#]/g,''),
-      type:          (typeM  ? typeM[1]  : '').trim(),
-      concentration: (concM  ? concM[1]  : '').trim(),
-      dose:          (doseM  ? doseM[1]  : '').trim().replace(/\n/g, ' ')
+      type:          (typeM  ? typeM[1].trim() : ''),
+      concentration: (concM  ? concM[1].trim() : ''),
+      dose:          cleanDose || 'راجع الطبيب أو الصيدلاني'
     });
   });
   return drugs;
@@ -4387,14 +4401,59 @@ function _parsePrescriptionDrugs(text) {
 
 function _rxTypeIcon(type) {
   var t = (type||'').toLowerCase();
-  if (t.includes('برشام') || t.includes('tab') || t.includes('حبة'))  return '💊';
-  if (t.includes('شراب') || t.includes('syrup'))                       return '🍶';
-  if (t.includes('مرهم') || t.includes('كريم') || t.includes('cream'))return '🧴';
-  if (t.includes('قطرة') || t.includes('drop'))                        return '💧';
-  if (t.includes('حقن') || t.includes('inject') || t.includes('ampoule')) return '💉';
-  if (t.includes('بخاخ') || t.includes('spray'))                       return '🌬️';
-  if (t.includes('تحاميل'))                                             return '🟡';
-  return '💊';
+
+  // ── برشام / حبة / tab ──────────────────────────────────────────────
+  if (t.includes('برشام') || t.includes('tab') || t.includes('حبة') || t.includes('كبسول') || t.includes('capsule')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="pill_a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff6f00"/><stop offset="100%" stop-color="#ffa726"/></linearGradient><linearGradient id="pill_b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1565c0"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs><rect x="6" y="18" width="36" height="12" rx="6" fill="url(#pill_a)"/><rect x="24" y="18" width="18" height="12" rx="0" fill="url(#pill_b)"/><rect x="30" y="18" width="12" height="12" rx="6" fill="url(#pill_b)"/><line x1="24" y1="18" x2="24" y2="30" stroke="#fff" stroke-width="1.5" stroke-opacity=".6"/><ellipse cx="15" cy="24" rx="5" ry="3" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg>';
+  }
+
+  // ── شراب / syrup ───────────────────────────────────────────────────
+  if (t.includes('شراب') || t.includes('syrup') || t.includes('محلول') || t.includes('solution')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="syrup_a" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ab47bc"/><stop offset="100%" stop-color="#6a1b9a"/></linearGradient></defs><rect x="17" y="6" width="14" height="5" rx="2" fill="#ce93d8"/><rect x="13" y="10" width="22" height="30" rx="5" fill="url(#syrup_a)"/><rect x="13" y="28" width="22" height="12" rx="5" fill="#4a148c" opacity=".5"/><ellipse cx="24" cy="28" rx="9" ry="2" fill="rgba(255,255,255,.15)"/><rect x="16" y="22" width="16" height="2" rx="1" fill="rgba(255,255,255,.3)"/><rect x="16" y="26" width="10" height="2" rx="1" fill="rgba(255,255,255,.2)"/></svg>';
+  }
+
+  // ── مرهم / كريم / cream ────────────────────────────────────────────
+  if (t.includes('مرهم') || t.includes('كريم') || t.includes('cream') || t.includes('جل') || t.includes('gel')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="cream_a" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#26a69a"/><stop offset="100%" stop-color="#00695c"/></linearGradient></defs><rect x="14" y="20" width="20" height="22" rx="3" fill="url(#cream_a)"/><rect x="17" y="14" width="14" height="8" rx="2" fill="#4db6ac"/><rect x="20" y="10" width="8" height="6" rx="2" fill="#80cbc4"/><path d="M14 28 Q24 24 34 28" stroke="rgba(255,255,255,.3)" stroke-width="1.5" fill="none"/><path d="M14 34 Q24 30 34 34" stroke="rgba(255,255,255,.2)" stroke-width="1" fill="none"/><circle cx="24" cy="37" r="2" fill="rgba(255,255,255,.25)"/></svg>';
+  }
+
+  // ── قطرة / drop ────────────────────────────────────────────────────
+  if (t.includes('قطرة') || t.includes('drop') || t.includes('قطرات')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="drop_a" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#29b6f6"/><stop offset="100%" stop-color="#0277bd"/></linearGradient></defs><path d="M24 8 C24 8 12 22 12 30 a12 12 0 0 0 24 0 C36 22 24 8 24 8z" fill="url(#drop_a)"/><ellipse cx="19" cy="27" rx="3" ry="5" fill="rgba(255,255,255,.3)" transform="rotate(-20 19 27)"/><circle cx="29" cy="32" r="2" fill="rgba(255,255,255,.2)"/><rect x="22" y="5" width="4" height="6" rx="2" fill="#4fc3f7"/></svg>';
+  }
+
+  // ── حقن عضل ────────────────────────────────────────────────────────
+  if (t.includes('حقن عضل') || t.includes('عضل') || t.includes('im ') || t.includes('intramuscular')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="im_a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ef5350"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient></defs><rect x="10" y="22" width="26" height="5" rx="2.5" fill="url(#im_a)"/><rect x="36" y="23.5" width="6" height="2" rx="1" fill="#ef9a9a"/><polygon points="10,22 6,24.5 10,27" fill="#c62828"/><rect x="14" y="20" width="3" height="9" rx="1" fill="rgba(255,255,255,.25)"/><rect x="19" y="20" width="2" height="9" rx="1" fill="rgba(255,255,255,.15)"/><rect x="23" y="20" width="2" height="9" rx="1" fill="rgba(255,255,255,.15)"/><circle cx="10" cy="15" r="4" fill="#ff8a80" stroke="#ef5350" stroke-width="1.5"/><line x1="10" y1="19" x2="10" y2="22" stroke="#ef5350" stroke-width="2"/></svg>';
+  }
+
+  // ── حقن وريد / IV ──────────────────────────────────────────────────
+  if (t.includes('حقن وريد') || t.includes('وريد') || t.includes('iv ') || t.includes('intravenous')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="iv_a" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7e57c2"/><stop offset="100%" stop-color="#4527a0"/></linearGradient></defs><rect x="18" y="6" width="12" height="18" rx="3" fill="url(#iv_a)"/><rect x="20" y="8" width="8" height="14" rx="2" fill="#b39ddb" opacity=".4"/><rect x="22" y="8" width="3" height="14" fill="rgba(255,255,255,.2)" rx="1"/><rect x="22" y="24" width="4" height="10" rx="1" fill="#9575cd"/><rect x="20" y="33" width="8" height="2" rx="1" fill="#7e57c2"/><path d="M24 35 L20 42" stroke="#9575cd" stroke-width="1.5"/><path d="M24 35 L28 42" stroke="#9575cd" stroke-width="1.5"/><rect x="15" y="14" width="4" height="2" rx="1" fill="#ede7f6"/><rect x="29" y="14" width="4" height="2" rx="1" fill="#ede7f6"/></svg>';
+  }
+
+  // ── حقن (عام) / ampoule / inject ───────────────────────────────────
+  if (t.includes('حقن') || t.includes('inject') || t.includes('ampoule') || t.includes('أمبول')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="inj_a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#26c6da"/><stop offset="100%" stop-color="#00838f"/></linearGradient></defs><rect x="9" y="22" width="28" height="5" rx="2.5" fill="url(#inj_a)"/><rect x="37" y="23.5" width="5" height="2" rx="1" fill="#80deea"/><polygon points="9,22 5,24.5 9,27" fill="#00838f"/><rect x="16" y="18" width="4" height="13" rx="1.5" fill="rgba(255,255,255,.2)"/><rect x="22" y="18" width="2" height="13" rx="1" fill="rgba(255,255,255,.15)"/><circle cx="31" cy="20" r="3" fill="rgba(255,255,255,.15)" stroke="#80deea" stroke-width="1"/><line x1="31" y1="23" x2="31" y2="22" stroke="#80deea" stroke-width="1.5"/></svg>';
+  }
+
+  // ── بخاخ / spray / inhaler ─────────────────────────────────────────
+  if (t.includes('بخاخ') || t.includes('spray') || t.includes('inhaler') || t.includes('استنشاق')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="spray_a" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#2e7d32"/></linearGradient></defs><rect x="14" y="18" width="14" height="24" rx="4" fill="url(#spray_a)"/><rect x="24" y="14" width="8" height="10" rx="3" fill="#81c784"/><rect x="30" y="16" width="8" height="4" rx="2" fill="#a5d6a7"/><circle cx="34" cy="10" r="1.5" fill="#c8e6c9" opacity=".8"/><circle cx="37" cy="8" r="1" fill="#c8e6c9" opacity=".6"/><circle cx="39" cy="12" r="1.2" fill="#c8e6c9" opacity=".5"/><circle cx="36" cy="14" r="0.8" fill="#c8e6c9" opacity=".4"/><rect x="16" y="26" width="10" height="2" rx="1" fill="rgba(255,255,255,.25)"/><rect x="16" y="30" width="7" height="2" rx="1" fill="rgba(255,255,255,.15)"/></svg>';
+  }
+
+  // ── تحاميل ─────────────────────────────────────────────────────────
+  if (t.includes('تحاميل') || t.includes('suppository')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="supp_a" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffa726"/><stop offset="100%" stop-color="#e65100"/></linearGradient></defs><ellipse cx="24" cy="14" rx="8" ry="10" fill="url(#supp_a)"/><rect x="16" y="14" width="16" height="18" rx="0" fill="#ef6c00"/><ellipse cx="24" cy="32" rx="8" ry="4" fill="#e65100"/><ellipse cx="20" cy="11" rx="3" ry="5" fill="rgba(255,255,255,.2)" transform="rotate(-15 20 11)"/></svg>';
+  }
+
+  // ── لصقة / patch ───────────────────────────────────────────────────
+  if (t.includes('لصقة') || t.includes('patch') || t.includes('ضمادة')) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="patch_a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fdd835"/><stop offset="100%" stop-color="#f9a825"/></linearGradient></defs><rect x="8" y="16" width="32" height="16" rx="5" fill="url(#patch_a)"/><rect x="16" y="16" width="16" height="16" rx="3" fill="#fff9c4"/><circle cx="22" cy="24" r="2" fill="#f9a825"/><circle cx="26" cy="24" r="2" fill="#f9a825"/><rect x="8" y="20" width="8" height="8" rx="2" fill="rgba(249,168,37,.4)"/><rect x="32" y="20" width="8" height="8" rx="2" fill="rgba(249,168,37,.4)"/></svg>';
+  }
+
+  // ── افتراضي — حبة دواء عامة ────────────────────────────────────────
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><defs><linearGradient id="def_a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff6f00"/><stop offset="100%" stop-color="#ffa726"/></linearGradient><linearGradient id="def_b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1565c0"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs><rect x="6" y="18" width="36" height="12" rx="6" fill="url(#def_a)"/><rect x="24" y="18" width="18" height="12" rx="0" fill="url(#def_b)"/><rect x="30" y="18" width="12" height="12" rx="6" fill="url(#def_b)"/><line x1="24" y1="18" x2="24" y2="30" stroke="#fff" stroke-width="1.5" stroke-opacity=".6"/></svg>';
 }
 
 async function _rxLookupAndShow(name, db, container) {
@@ -4416,14 +4475,57 @@ async function _rxLookupAndShow(name, db, container) {
   }
 
   if (!found) {
+    // عرض رسالة "غير موجود في DB" + قسم AI
     container.innerHTML =
-      '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px">' +
+      '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:0">' +
         '<span style="font-size:1.4rem;opacity:.4">💊</span>' +
         '<div>' +
           '<div style="font-size:.7rem;color:var(--txt3)">لم يُعثر على الدواء في قاعدة البيانات</div>' +
           '<div style="font-size:.65rem;color:var(--txt3);margin-top:2px">تحقق من الاسم مع الصيدلاني</div>' +
         '</div>' +
       '</div>';
+    // مع ذلك نحمّل المعلومات الطبية
+    var aiUidNF = 'rx-ai-nf-' + name.replace(/[\s\W]+/g,'_') + '-' + (Math.random()*99999|0);
+    var aiNFEl = document.createElement('div');
+    aiNFEl.id = aiUidNF;
+    aiNFEl.style.cssText = 'margin-top:10px';
+    aiNFEl.innerHTML =
+      '<div style="background:linear-gradient(135deg,rgba(27,94,32,.22),rgba(46,125,50,.12));border:1.5px solid rgba(76,175,80,.45);border-radius:14px;padding:10px 13px;display:flex;align-items:center;gap:8px">' +
+        '<i class="fas fa-spinner fa-spin" style="color:#66bb6a;font-size:.85rem"></i>' +
+        '<span style="font-size:.75rem;color:#a5d6a7">جاري تحميل المعلومات الطبية...</span>' +
+      '</div>';
+    container.appendChild(aiNFEl);
+    (async function() {
+      try {
+        var aiPrompt2 =
+          'أنت صيدلاني خبير. أعطني معلومات موجزة ومنظمة عن دواء: ' + name +
+          '\nاكتب بالعربية بهذا التنسيق الحرفي فقط:\n' +
+          'الاستخدامات: (2-3 استخدامات رئيسية مفصولة بفاصلة)\n' +
+          'دواعي_الاستخدام: (متى يوصف هذا الدواء — جملة أو جملتان)\n' +
+          'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
+        var res2 = null;
+        if (typeof puter !== 'undefined' && puter.ai) {
+          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
+        }
+        if (!res2 && window.__OR_KEY_FB) { try { var orR2=await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt2); if(orR2) res2=orR2.text; } catch(e) {} }
+        if (!res2) throw new Error('no result');
+        var uM=res2.match(/الاستخدامات\s*:\s*([^\n]+)/i);
+        var iM=res2.match(/دواعي_?الاستخدام\s*:\s*([^\n]+)/i);
+        var sM=res2.match(/الآثار_?الجانبية\s*:\s*([^\n]+)/i);
+        var eNF=document.getElementById(aiUidNF);
+        if (!eNF) return;
+        eNF.innerHTML=
+          '<div style="display:flex;flex-direction:column;gap:8px">'+
+          (uM?'<div style="background:linear-gradient(135deg,rgba(27,94,32,.3),rgba(46,125,50,.18));border:1.5px solid rgba(76,175,80,.6);border-radius:12px;padding:10px 13px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:.9rem">✅</span><span style="font-size:.72rem;font-weight:900;color:#66bb6a">الاستخدامات</span></div><div style="font-size:.82rem;color:#c8e6c9;line-height:1.8">'+uM[1].trim()+'</div></div>':'')+
+          (iM?'<div style="background:linear-gradient(135deg,rgba(27,94,32,.22),rgba(56,142,60,.12));border:1.5px solid rgba(102,187,106,.45);border-radius:12px;padding:10px 13px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:.9rem">🩺</span><span style="font-size:.72rem;font-weight:900;color:#81c784">دواعي الاستخدام</span></div><div style="font-size:.82rem;color:#c8e6c9;line-height:1.8">'+iM[1].trim()+'</div></div>':'')+
+          (sM?'<div style="background:linear-gradient(135deg,rgba(27,94,32,.15),rgba(46,125,50,.08));border:1.5px solid rgba(129,199,132,.35);border-radius:12px;padding:10px 13px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:.9rem">⚠️</span><span style="font-size:.72rem;font-weight:900;color:#a5d6a7">الآثار الجانبية المحتملة</span></div><div style="font-size:.82rem;color:#b9deba;line-height:1.8">'+sM[1].trim()+'</div></div>':'')+
+          '<div style="font-size:.62rem;color:var(--txt3);text-align:center;padding:2px 0">⚕️ للتوعية فقط — استشر طبيبك أو صيدلانيك دائماً</div>'+
+          '</div>';
+      } catch(e) {
+        var eNF2=document.getElementById(aiUidNF);
+        if(eNF2) eNF2.innerHTML='<div style="background:rgba(27,94,32,.1);border:1px dashed rgba(76,175,80,.3);border-radius:12px;padding:9px 13px;font-size:.72rem;color:#a5d6a7;text-align:center">⚕️ تعذّر تحميل المعلومات الطبية</div>';
+      }
+    })();
     return;
   }
 
@@ -4443,6 +4545,93 @@ async function _rxLookupAndShow(name, db, container) {
           : '<div style="font-size:.72rem;color:var(--txt3);margin-top:5px">السعر غير متوفر</div>') +
       '</div>' +
     '</div>';
+
+  // ── قسم المعلومات الطبية بالـ AI (أخضر) ──
+  var aiUid = 'rx-ai-' + name.replace(/[\s\W]+/g,'_') + '-' + (Math.random()*99999|0);
+  var aiSection = document.createElement('div');
+  aiSection.id = aiUid;
+  aiSection.style.cssText = 'margin-top:10px';
+  aiSection.innerHTML =
+    '<div style="background:linear-gradient(135deg,rgba(27,94,32,.22),rgba(46,125,50,.12));border:1.5px solid rgba(76,175,80,.45);border-radius:14px;padding:10px 13px;display:flex;align-items:center;gap:8px">' +
+      '<i class="fas fa-spinner fa-spin" style="color:#66bb6a;font-size:.85rem"></i>' +
+      '<span style="font-size:.75rem;color:#a5d6a7">جاري تحميل المعلومات الطبية...</span>' +
+    '</div>';
+  container.appendChild(aiSection);
+
+  // جلب المعلومات الطبية
+  (async function() {
+    try {
+      var drugLabel = found.arabic || name;
+      var activeIng = found.active || '';
+      var aiPrompt =
+        'أنت صيدلاني خبير. أعطني معلومات موجزة ومنظمة عن دواء: ' + drugLabel +
+        (activeIng ? ' (المادة الفعالة: ' + activeIng + ')' : '') +
+        '\nاكتب بالعربية بهذا التنسيق الحرفي فقط بدون أي نص إضافي:\n' +
+        'الاستخدامات: (2-3 استخدامات رئيسية مفصولة بفاصلة)\n' +
+        'دواعي_الاستخدام: (متى يوصف هذا الدواء — جملة أو جملتان)\n' +
+        'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
+
+      var res = null;
+      if (typeof puter !== 'undefined' && puter.ai) {
+        try {
+          var pr = await puter.ai.chat(aiPrompt, {model:'gpt-4o-mini', temperature:0.2});
+          res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?pr.message.content:(pr&&pr.content?pr.content:null));
+        } catch(e) {}
+      }
+      if (!res && window.__OR_KEY_FB) {
+        try { var orR = await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt); if(orR) res=orR.text; } catch(e) {}
+      }
+      if (!res) throw new Error('no result');
+
+      var usesM = res.match(/الاستخدامات\s*:\s*([^\n]+)/i);
+      var indM  = res.match(/دواعي_?الاستخدام\s*:\s*([^\n]+)/i);
+      var sideM = res.match(/الآثار_?الجانبية\s*:\s*([^\n]+)/i);
+      var usesText = usesM ? usesM[1].trim() : '';
+      var indText  = indM  ? indM[1].trim()  : '';
+      var sideText = sideM ? sideM[1].trim() : '';
+
+      var el = document.getElementById(aiUid);
+      if (!el) return;
+      el.innerHTML =
+        '<div style="display:flex;flex-direction:column;gap:8px">' +
+
+        (usesText ?
+          '<div style="background:linear-gradient(135deg,rgba(27,94,32,.3),rgba(46,125,50,.18));border:1.5px solid rgba(76,175,80,.6);border-radius:12px;padding:10px 13px">' +
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">' +
+              '<span style="font-size:.9rem">✅</span>' +
+              '<span style="font-size:.72rem;font-weight:900;color:#66bb6a">الاستخدامات</span>' +
+            '</div>' +
+            '<div style="font-size:.82rem;color:#c8e6c9;line-height:1.8">' + usesText + '</div>' +
+          '</div>' : '') +
+
+        (indText ?
+          '<div style="background:linear-gradient(135deg,rgba(27,94,32,.22),rgba(56,142,60,.12));border:1.5px solid rgba(102,187,106,.45);border-radius:12px;padding:10px 13px">' +
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">' +
+              '<span style="font-size:.9rem">🩺</span>' +
+              '<span style="font-size:.72rem;font-weight:900;color:#81c784">دواعي الاستخدام</span>' +
+            '</div>' +
+            '<div style="font-size:.82rem;color:#c8e6c9;line-height:1.8">' + indText + '</div>' +
+          '</div>' : '') +
+
+        (sideText ?
+          '<div style="background:linear-gradient(135deg,rgba(27,94,32,.15),rgba(46,125,50,.08));border:1.5px solid rgba(129,199,132,.35);border-radius:12px;padding:10px 13px">' +
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">' +
+              '<span style="font-size:.9rem">⚠️</span>' +
+              '<span style="font-size:.72rem;font-weight:900;color:#a5d6a7">الآثار الجانبية المحتملة</span>' +
+            '</div>' +
+            '<div style="font-size:.82rem;color:#b9deba;line-height:1.8">' + sideText + '</div>' +
+          '</div>' : '') +
+
+        '<div style="font-size:.62rem;color:var(--txt3);text-align:center;padding:2px 0">⚕️ للتوعية فقط — استشر طبيبك أو صيدلانيك دائماً</div>' +
+        '</div>';
+    } catch(e) {
+      var el2 = document.getElementById(aiUid);
+      if (el2) el2.innerHTML =
+        '<div style="background:rgba(27,94,32,.1);border:1px dashed rgba(76,175,80,.3);border-radius:12px;padding:9px 13px;font-size:.72rem;color:#a5d6a7;text-align:center">' +
+          '⚕️ تعذّر تحميل المعلومات الطبية' +
+        '</div>';
+    }
+  })();
 }
 
 function _playForbiddenAlert() {
