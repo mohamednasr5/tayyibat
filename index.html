@@ -77,6 +77,7 @@
 <link rel="manifest" href="manifest.json">
 <!-- Puter.js SDK -->
 <script src="https://js.puter.com/v2/"></script>
+<script>window.puter = window.puter || {}; if(window.puter) window.puter.quiet = true;</script>
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-32.png">
@@ -3485,11 +3486,13 @@ var _puterLoginPromise = null;
 
 async function ensurePuterLogin() {
   if (_puterUser) return _puterUser;
+  if (typeof puter === 'undefined' || !puter.auth) return null;
   try {
     _puterUser = await puter.auth.getUser();
     _onPuterLoginSuccess(_puterUser);
     return _puterUser;
   } catch(e) {
+    // المستخدم غير مسجل - نفتح نافذة تسجيل الدخول فقط عند طلب AI
     try {
       _puterUser = await puter.auth.signIn();
       _onPuterLoginSuccess(_puterUser);
@@ -3545,7 +3548,7 @@ async function loginPuter() {
   }
 }
 
-async async function logoutPuter() {
+async function logoutPuter() {
   try {
     await puter.auth.signOut();
     _puterUser = null;
@@ -3566,16 +3569,20 @@ async function _puterAIChat(messages, options) {
 
 // تحقق من تسجيل الدخول عند بدء التطبيق
 window.addEventListener('load', function() {
+  // Suppress puter.js console branding
+  if (typeof puter !== 'undefined') puter.quiet = true;
   setTimeout(function() {
     if (typeof puter !== 'undefined' && puter.auth) {
+      // فقط تحقق صامت - لا نفتح نافذة تسجيل دخول تلقائياً
       puter.auth.getUser().then(function(user) {
         _puterUser = user;
         _onPuterLoginSuccess(user);
       }).catch(function() {
-        console.log('Puter: not logged in yet');
+        // غير مسجل - لا نفعل شيئاً، المستخدم سيضغط الزر بنفسه
+        console.log('Puter: user not signed in yet');
       });
     }
-  }, 1500);
+  }, 2500);
 });
 
 /* ── Global Puter Error Debug ── */
@@ -5814,7 +5821,7 @@ window.addEventListener('DOMContentLoaded', function() {
   autoLogin().then(function() { clearTimeout(safetyTimeout); });
 });
 </script>
-  <script src="https://js.puter.com/v2/"></script>
+  
 <script>
 (function () {
   "use strict";
@@ -7161,7 +7168,7 @@ async function _analyzePrescriptionImage(imgData){
     if(s!==-1&&e>s){
       try{ meds=JSON.parse(txt.substring(s,e+1)); }
       catch(je){
-        var clean=txt.substring(s,e+1).replace(/[ -]/g,' ').replace(/,\s*]/g,']').replace(/,\s*}/g,'}');
+        var clean=txt.substring(s,e+1).replace(/[\u0000-\u001F\u007F]/g,' ').replace(/,\s*\]/g,']').replace(/,\s*}/g,'}');
         try{ meds=JSON.parse(clean); }catch(je2){ meds=[]; }
       }
     }
