@@ -1912,7 +1912,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   </div>
 
   <div style="padding:12px 16px">
-    <div class="camera-view-wrap" id="pa-camera-viewport">
+    <div class="camera-view-wrap" id="pa-camera-viewport" onclick="(function(){ var ol=document.getElementById('tap-to-rescan'); if(ol){ ol.remove(); _startCameraAndScanNow(); } else if(paStreamRef){ captureSmartByMode(); } })()" style="cursor:pointer">
       <div class="scanner-laser-line" id="pa-laser" style="display:none"></div>
       <video id="pa-video-stream" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
       <div id="pa-camera-fallback-msg" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
@@ -3143,6 +3143,61 @@ async function sendPremiumCoachMsg() {
 /* ══════════ Product Scanner & Camera Analysis ══════════ */
 var paStreamRef = null;
 
+/* ── إيقاف الكاميرا وإظهار زر Tap-to-Scan ── */
+function _stopPaCamera() {
+  try {
+    if (paStreamRef) {
+      paStreamRef.getTracks().forEach(function(t){ t.stop(); });
+      paStreamRef = null;
+    }
+  } catch(e) {}
+  var video = document.getElementById('pa-video-stream');
+  var laser = document.getElementById('pa-laser');
+  if (video) { video.srcObject = null; video.style.display = 'none'; }
+  if (laser) laser.style.display = 'none';
+  clearInterval(window._autoScanInterval);
+  window._autoScanLock = false;
+  window._autoScanDone = false;
+
+  // أظهر تراكب "اضغط للمسح مجدداً"
+  var vp = document.getElementById('pa-camera-viewport');
+  if (vp) {
+    var old = vp.querySelector('#tap-to-rescan');
+    if (old) old.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'tap-to-rescan';
+    overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.72);border-radius:14px;gap:10px;z-index:10';
+    overlay.innerHTML =
+      '<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.12);border:2.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:1.8rem">📷</div>'
+      + '<div style="color:#fff;font-size:.88rem;font-weight:800;font-family:Tajawal,sans-serif">اضغط للمسح مجدداً</div>'
+      + '<div style="color:rgba(255,255,255,.5);font-size:.72rem;font-family:Tajawal,sans-serif">سيبدأ الفحص فوراً</div>';
+    overlay.onclick = function() {
+      overlay.remove();
+      _startCameraAndScanNow();
+    };
+    vp.appendChild(overlay);
+  }
+
+  var statusEl = document.getElementById('camera-status-text');
+  if (statusEl) statusEl.innerHTML = '<i class="fas fa-hand-pointer" style="margin-left:5px"></i> اضغط على الكاميرا للمسح مجدداً';
+}
+
+/* ── تشغيل الكاميرا ومسح فوري بمجرد جاهزيتها ── */
+function _startCameraAndScanNow() {
+  var statusEl = document.getElementById('camera-status-text');
+  if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
+  startPremiumCameraScanner(function() {
+    if (_scanMode === 'medicine') {
+      window._autoScanDone = false;
+      window._autoScanLock = false;
+      _startMedicineAutoScan();
+    } else {
+      // للأوضاع الأخرى: انتظر ثانية ثم امسح مباشرة
+      setTimeout(function() { captureSmartByMode(); }, 800);
+    }
+  });
+}
+
 function startPremiumCameraScanner(onReady) {
   var video    = document.getElementById('pa-video-stream');
   var fallback = document.getElementById('pa-camera-fallback-msg');
@@ -3430,6 +3485,10 @@ function setScanMode(mode) {
     'medicine': 'قراءة علبة الدواء',
     'report':   'قراءة التقارير'
   };
+  // ازل overlay "اضغط للمسح" عند تغيير الوضع
+  var _oldOverlay = document.getElementById('tap-to-rescan');
+  if (_oldOverlay) _oldOverlay.remove();
+
   if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
   var _vid = document.getElementById('pa-video-stream');
   var _already = _vid && _vid.srcObject && _vid.style.display !== 'none';
@@ -3519,8 +3578,8 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
 function _renderMedicineResult(text, source) {
   var resBox = document.getElementById("pa-scan-result");
   if (!resBox) return;
-
-  /* Parse sections */
+  // ── أوقف الكاميرا عند ظهور نتيجة الدواء ──
+  _stopPaCamera();
   var sections = {
     استخدام:    { key: 'الاستخدام',         color: '#2e7d32', bg: 'rgba(46,125,50,.13)', border: '#43a047', icon: '💚', label: 'الاستخدامات' },
     اثار:       { key: 'الآثار_الجانبية',   color: '#c62828', bg: 'rgba(198,40,40,.13)', border: '#ef5350', icon: '🔴', label: 'الآثار الجانبية وموانع الاستخدام' },
@@ -4177,6 +4236,8 @@ function _playCarcinogenAlert() {
 function _renderScanResult(text, source) {
   var resBox = document.getElementById("pa-scan-result");
   if (!resBox) return;
+  // ── أوقف الكاميرا عند ظهور النتيجة ──
+  _stopPaCamera();
   var items = _parseScanItems(text);
   if (items && items.length >= 2) {
     _renderMultiCards(resBox, items, source);
