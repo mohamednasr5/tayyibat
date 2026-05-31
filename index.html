@@ -1909,10 +1909,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <button id="scan-tab-report" onclick="setScanMode('report')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(156,39,176,.3);background:rgba(156,39,176,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
       <i class="fas fa-file-medical"></i> قراءة التقارير الطبية
     </button>
-
-    <button id="scan-tab-prescription" onclick="setScanMode('prescription')" style="grid-column:span 2;padding:11px;border-radius:10px;border:1.5px solid rgba(233,30,99,.45);background:linear-gradient(135deg,rgba(233,30,99,.18),rgba(156,39,176,.12));color:#f48fb1;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-      <i class="fas fa-file-prescription" style="font-size:1rem"></i> قراءة الروشتة الطبية
-    </button>
   </div>
 
   <div style="padding:12px 16px">
@@ -1921,10 +1917,17 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <video id="pa-video-stream" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
       <div id="pa-camera-fallback-msg" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
         <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4"></i>
-        اختر وضعاً أعلاه لبدء الكاميرا
+        اضغط "فتح الكاميرا" للبدء
       </div>
     </div>
-    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"><i class="fas fa-hand-pointer" style="margin-left:5px"></i> اختر وضع المسح أعلاه لبدء الكاميرا تلقائياً</span></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin:10px 0">
+      <button class="btn btn-gold" style="width:auto;padding:10px 18px;font-size:.82rem" onclick="startPremiumCameraScanner()">
+        <i class="fas fa-camera"></i> فتح الكاميرا
+      </button>
+      <button class="btn" style="width:auto;padding:10px 18px;font-size:.82rem;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;border:none" onclick="captureSmartByMode()">
+        <i class="fas fa-search"></i> التقط وحلل
+      </button>
+    </div>
     <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">
       <div style="flex:1;height:1px;background:var(--border)"></div>
       <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
@@ -1956,9 +1959,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
             style="flex:1;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;padding:0 12px;font-size:.88rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
             oninput="drugSearchDebounce(this.value)"
             onkeydown="if(event.key==='Enter') drugSearchByName(this.value)">
-          
+          <button onclick="drugSearchByCamera()" title="مسح بالكاميرا"
+            style="width:44px;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;background:rgba(33,150,243,.12);color:#42a5f5;font-size:1rem;cursor:pointer;flex-shrink:0;transition:all .2s">
+            <i class="fas fa-camera"></i>
+          </button>
         </div>
-        <div id="drug-db-status" style="font-size:.72rem;color:var(--txt3);text-align:center;margin-bottom:4px;min-height:16px"></div>
         <div id="drug-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto"></div>
       </div>
     </div>
@@ -3147,33 +3152,26 @@ async function sendPremiumCoachMsg() {
 /* ══════════ Product Scanner & Camera Analysis ══════════ */
 var paStreamRef = null;
 
-function startPremiumCameraScanner(onReady) {
-  var video    = document.getElementById('pa-video-stream');
+function startPremiumCameraScanner() {
+  var video = document.getElementById('pa-video-stream');
   var fallback = document.getElementById('pa-camera-fallback-msg');
-  var laser    = document.getElementById('pa-laser');
-  if (video && video.srcObject && video.style.display !== 'none') {
-    if (typeof onReady === 'function') onReady();
-    return;
-  }
+  var laser = document.getElementById('pa-laser');
+  
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width:{ideal:1280}, height:{ideal:720} } })
-    .then(function(stream) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
       paStreamRef = stream;
       video.srcObject = stream;
       video.style.display = 'block';
-      if (fallback) fallback.style.display = 'none';
-      if (laser) laser.style.display = 'block';
-      video.onloadedmetadata = function(){
-        if (typeof onReady === 'function') onReady();
-      };
+      fallback.style.display = 'none';
+      laser.style.display = 'block';
+      showToast('📸 تم تشغيل عدسة الكاميرا الخلفية بنجاح.');
     }).catch(function() {
-      if (fallback) fallback.textContent = '❌ لم يتم منح صلاحية الوصول للكاميرا، يرجى السماح من إعدادات المتصفح.';
+      fallback.textContent = '❌ لم يتم منح صلاحية الوصول للكاميرا، يرجى استخدام الإدخال النصي أدناه.';
     });
   } else {
-    if (fallback) fallback.textContent = '❌ المتصفح الحالي لا يدعم تشغيل تدفق الكاميرا.';
+    fallback.textContent = '❌ المتصفح الحالي لا يدعم تشغيل تدفق الكاميرا.';
   }
 }
-
 
 async function captureAndScanProductBlob() {
   var video  = document.getElementById("pa-video-stream");
@@ -3199,18 +3197,11 @@ async function captureAndScanProductBlob() {
         var code = barcodes[0].rawValue;
         resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div> <span>&#x2705; تم قراءة الباركود ' + code + ' - جاري التحليل...</span></div>';
         if (_scanMode === 'medicine') {
-          // Search LOCAL DB first, fallback to API
-          var _db = await _loadDrugDB();
-          var _found = _db ? _db.filter(function(d){ return String(d.id)===String(code); }) : [];
-          if (_found.length > 0) {
-            resBox.innerHTML = '';
-            _showDrugPriceCard(_found[0], resBox);
-          } else {
-            _fetchDrugFromEgyptdwa(code).then(function(drugInfo) {
-              if (drugInfo) _showDrugPriceCard(drugInfo, resBox);
-            });
-          }
-          await _analyzeMedicineWithAI(null, 'باركود الدواء: ' + code);
+          // Fetch real price from egyptdwa.com
+          _fetchDrugFromEgyptdwa(code).then(function(drugInfo) {
+            if (drugInfo) _showDrugPriceCard(drugInfo, resBox);
+          });
+          await _scanAnalyzeAI("باركود الدواء: " + code + " - قم بتحليل هذا الدواء طبياً مع ذكر الاستخدام والجرعة والآثار الجانبية والسعر التقريبي.");
         } else {
           await _scanAnalyzeAI("باركود المنتج: " + code + " - قم بتحليل هذا المنتج حسب نظام الطيبات.");
         }
@@ -3375,13 +3366,10 @@ async function _scanAnalyzeAI(ingredients) {
 /* scan mode: 'product' | 'food' | 'medicine' | 'report' */
 var _scanMode = 'product';
 function setScanMode(mode) {
-  clearInterval(window._autoScanInterval);
-  window._autoScanLock = false;
   _scanMode = mode;
   // Show drug search section only in medicine mode
   var _dss = document.getElementById('drug-search-section');
   if (_dss) _dss.style.display = (mode === 'medicine') ? 'block' : 'none';
-  if (mode === 'medicine') _preloadDrugDB(); // Start loading DB immediately
   var badge = document.getElementById('pa-camera-mode-badge');
   var modeLabels = {
     'product':  '📦 وضع قراءة المكونات',
@@ -3432,29 +3420,6 @@ function setScanMode(mode) {
   var cfg = modeConfigs[mode] || modeConfigs['product'];
   if (lbl) lbl.textContent = cfg.label;
   if (inp) inp.placeholder = cfg.placeholder;
-
-  // === تشغيل الكاميرا تلقائياً عند اختيار أي وضع ===
-  var _camStatusEl = document.getElementById('camera-status-text');
-  var _modeLabelsLocal = {
-    'product':  'مكونات العلبة',
-    'food':     'التعرف على الطعام',
-    'medicine': 'قراءة علبة الدواء',
-    'report':   'قراءة التقارير'
-  };
-  if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
-  var _vid = document.getElementById('pa-video-stream');
-  var _already = _vid && _vid.srcObject && _vid.style.display !== 'none';
-  if (!_already) {
-    startPremiumCameraScanner(function(){
-      if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
-      if (mode === 'medicine') _startMedicineAutoScan();
-      else if (mode === 'prescription') { var rb=document.getElementById('pa-scan-result'); if(rb)rb.innerHTML=_rxChoiceHTML(); setTimeout(function(){analyzePrescriptionFromCamera();},800); }
-    });
-  } else {
-    if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
-    if (mode === 'medicine') _startMedicineAutoScan();
-    else if (mode === 'prescription') { var rb2=document.getElementById('pa-scan-result'); if(rb2)rb2.innerHTML=_rxChoiceHTML(); setTimeout(function(){analyzePrescriptionFromCamera();},800); }
-  }
 }
 
 /* ══════════════════════════════════════════════
@@ -3564,40 +3529,23 @@ function _renderMedicineResult(text, source) {
     { color:'#00838f', bg:'rgba(0,131,143,.13)', border:'#26c6da', icon:'🩵', label:'الأسعار التقريبية', content: priceText, section:'price' }
   ];
 
-  var h = '<div style="margin-top:12px">';
-  h += '<div style="display:flex;align-items:center;gap:6px;padding:0 2px 10px">';
-  h += '<i class="fas fa-robot" style="color:#9c27b0;font-size:.85rem"></i>';
-  h += '<span style="font-size:.7rem;color:var(--txt3)">تحليل الذكاء الاصطناعي — '+(source||'AI')+'</span>';
-  h += '</div>';
-  h += '<div style="display:flex;flex-direction:column;gap:12px">';
+  var h = '<div style="margin-top:10px">';
+  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 8px">تحليل الدواء بواسطة: '+(source||'AI')+'</div>';
+  h += '<div style="display:flex;flex-direction:column;gap:10px">';
 
   boxes.forEach(function(box, idx) {
     if (!box.content) return;
-    var gradMap = {
-      '#43a047': 'linear-gradient(135deg,rgba(46,125,50,.22),rgba(56,142,60,.08))',
-      '#ef5350': 'linear-gradient(135deg,rgba(198,40,40,.22),rgba(229,57,53,.08))',
-      '#42a5f5': 'linear-gradient(135deg,rgba(21,101,192,.22),rgba(33,150,243,.08))',
-      '#26c6da': 'linear-gradient(135deg,rgba(0,131,143,.22),rgba(0,188,212,.08))'
-    };
-    var grad = gradMap[box.border] || box.bg;
-    h += '<div' + (box.section ? ' data-section="'+box.section+'"' : '') + ' style="background:'+grad+';border:2px solid '+box.border+';border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.35);animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
-    h += '<div style="background:linear-gradient(135deg,'+box.border+','+box.border+'cc);padding:10px 14px;display:flex;align-items:center;gap:10px">';
-    h += '<span style="font-size:1.15rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.4))">'+box.icon+'</span>';
-    h += '<strong style="color:#fff;font-size:.9rem;font-family:Tajawal,sans-serif;letter-spacing:.3px">'+box.label+'</strong>';
+    h += '<div' + (box.section ? ' data-section="'+box.section+'"' : '') + ' style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
+    h += '<span style="font-size:1rem">'+box.icon+'</span>';
+    h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
     h += '</div>';
-    h += '<div style="padding:14px 16px;font-size:.83rem;color:var(--txt);line-height:1.85;white-space:pre-wrap;direction:rtl">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    h += '<div style="padding:12px 14px;font-size:.82rem;color:var(--txt);line-height:1.7;white-space:pre-wrap">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
     h += '</div>';
   });
 
   h += '</div></div>';
-  // إذا كانت بطاقة قاعدة البيانات موجودة مسبقاً، أضف التحليل أسفلها
-  if (resBox.querySelector('[data-db-card]')) {
-    var aiDiv = document.createElement('div');
-    aiDiv.innerHTML = h;
-    resBox.appendChild(aiDiv);
-  } else {
-    resBox.innerHTML = h;
-  }
+  resBox.innerHTML = h;
 
   // Auto-fetch real price from egyptdwa.com after AI analysis
   (function() {
@@ -3618,7 +3566,7 @@ function _renderMedicineResult(text, source) {
         var badge = document.createElement('div');
         badge.style.cssText = "margin-top:8px;padding:8px 12px;background:rgba(0,131,143,.2);border:1.5px solid rgba(0,188,212,.5);border-radius:10px;display:flex;align-items:center;gap:10px";
         badge.innerHTML =
-          (drug.img ? '<img src="'+_drugImgUrl(drug.img)+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0">'
+          (drug.img ? '<img src="https://egyptdwa.com/dwa/'+drug.img+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0">'
                     : '<span style="font-size:1.4rem">&#x1F48A;</span>') +
           '<div>' +
             '<div style="font-size:.68rem;color:#80deea;margin-bottom:2px;font-weight:700">&#x1F4CB; سعر السوق الفعلي</div>' +
@@ -3719,32 +3667,23 @@ function _renderReportResult(text, source) {
     { color:'#1565c0', bg:'rgba(21,101,192,.13)', border:'#42a5f5', icon:'🔵', label:'توصيات الطبيب المعالج', content: recText }
   ];
 
-  var h = '<div style="margin-top:12px">';
-  h += '<div style="display:flex;align-items:center;gap:6px;padding:0 2px 10px">';
-  h += '<i class="fas fa-user-md" style="color:#9c27b0;font-size:.85rem"></i>';
-  h += '<span style="font-size:.7rem;color:var(--txt3)">تحليل الطبيب الذكي — '+(source||'AI')+'</span>';
-  h += '</div>';
+  var h = '<div style="margin-top:10px">';
+  h += '<div style="font-size:.7rem;color:var(--txt3);padding:0 4px 8px;display:flex;align-items:center;gap:6px"><i class="fas fa-user-md"></i> تحليل الطبيب الذكي: '+(source||'AI')+'</div>';
   if (hasWarning) {
-    h += '<div style="background:linear-gradient(135deg,rgba(198,40,40,.2),rgba(229,57,53,.1));border:2px solid #ef5350;border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:.83rem;color:#ef9a9a;animation:pageIn .3s ease both;box-shadow:0 4px 16px rgba(198,40,40,.25)">';
-    h += '<i class="fas fa-exclamation-triangle" style="margin-left:6px"></i> <strong style="color:#ef5350">تنبيه:</strong> يُنصح بمراجعة الطبيب للاطمئنان على هذه النتائج.';
+    h += '<div style="background:rgba(198,40,40,.15);border:2px solid #ef5350;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:.82rem;color:#ef9a9a;animation:pageIn .3s ease both">';
+    h += '<i class="fas fa-exclamation-triangle"></i> <strong>تنبيه:</strong> يُنصح بمراجعة الطبيب للاطمئنان على هذه النتائج.';
     h += '</div>';
   }
-  h += '<div style="display:flex;flex-direction:column;gap:12px">';
+  h += '<div style="display:flex;flex-direction:column;gap:10px">';
 
   boxes.forEach(function(box, idx) {
     if (!box.content) return;
-    var gradMap = {
-      '#43a047': 'linear-gradient(135deg,rgba(46,125,50,.22),rgba(56,142,60,.08))',
-      '#ef5350': 'linear-gradient(135deg,rgba(198,40,40,.22),rgba(229,57,53,.08))',
-      '#42a5f5': 'linear-gradient(135deg,rgba(21,101,192,.22),rgba(33,150,243,.08))'
-    };
-    var grad = gradMap[box.border] || box.bg;
-    h += '<div style="background:'+grad+';border:2px solid '+box.border+';border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.35);animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
-    h += '<div style="background:linear-gradient(135deg,'+box.border+','+box.border+'cc);padding:10px 14px;display:flex;align-items:center;gap:10px">';
-    h += '<span style="font-size:1.15rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.4))">'+box.icon+'</span>';
-    h += '<strong style="color:#fff;font-size:.9rem;font-family:Tajawal,sans-serif">'+box.label+'</strong>';
+    h += '<div style="background:'+box.bg+';border:2px solid '+box.border+';border-radius:14px;overflow:hidden;animation:pageIn .4s ease '+(idx*0.1).toFixed(2)+'s both">';
+    h += '<div style="background:'+box.border+';padding:8px 14px;display:flex;align-items:center;gap:8px">';
+    h += '<span style="font-size:1rem">'+box.icon+'</span>';
+    h += '<strong style="color:#fff;font-size:.88rem">'+box.label+'</strong>';
     h += '</div>';
-    h += '<div style="padding:14px 16px;font-size:.83rem;color:var(--txt);line-height:1.85;white-space:pre-wrap;direction:rtl">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    h += '<div style="padding:12px 14px;font-size:.82rem;color:var(--txt);line-height:1.7;white-space:pre-wrap">'+box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
     h += '</div>';
   });
 
@@ -3756,295 +3695,137 @@ function _renderReportResult(text, source) {
 
 
 /* ============================================================
-   DRUG SEARCH — Local DB (dawaadata.json) Integration
-   ============================================================
-   قاعدة البيانات: 29,438 دواء مصري مع الأسعار والصور
-   المصدر: egyptdwa.com (محلي — بدون CORS، فوري، يعمل offline)
+   DRUG SEARCH — egyptdwa.com Integration
    ============================================================ */
 
-var _drugDB = null;           // كل البيانات بعد التحميل
-var _drugDBLoading = false;
-var _drugDBCallbacks = [];
-
-// ★ غيّر هذا المسار إلى رابط raw من GitHub بعد رفع الملف
-var DRUG_DB_URL = 'https://raw.githubusercontent.com/mohamednasr5/tayyibat/main/dawaadata.json';
-
-async function _loadDrugDB() {
-  if (_drugDB) return _drugDB;
-  if (_drugDBLoading) {
-    return new Promise(function(resolve) { _drugDBCallbacks.push(resolve); });
-  }
-  _drugDBLoading = true;
-
-  // Try localStorage cache first (expires after 24h)
+async function _fetchDrugFromEgyptdwa(query) {
+  var form = new URLSearchParams();
+  form.append("search","1");
+  form.append("searchq", query);
   try {
-    var cached = localStorage.getItem('_drugDB_cache');
-    var cachedTime = localStorage.getItem('_drugDB_time');
-    if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < 86400000) {
-      _drugDB = JSON.parse(cached);
-      _buildDrugIndex(_drugDB); // بناء الفهرس من الكاش
-      _drugDBLoading = false;
-      _drugDBCallbacks.forEach(function(cb){ cb(_drugDB); });
-      _drugDBCallbacks = [];
-      return _drugDB;
-    }
-  } catch(e) {}
-
-  try {
-    var res = await fetch(DRUG_DB_URL);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    var arr = await res.json();
-    _drugDB = arr;
-    _buildDrugIndex(arr); // بناء الفهرس فور التحميل
-    // Cache it
-    try {
-      localStorage.setItem('_drugDB_cache', JSON.stringify(arr));
-      localStorage.setItem('_drugDB_time', Date.now().toString());
-    } catch(e) {} // quota exceeded — skip cache
-    _drugDBLoading = false;
-    _drugDBCallbacks.forEach(function(cb){ cb(_drugDB); });
-    _drugDBCallbacks = [];
-    return _drugDB;
+    var res = await fetch("https://egyptdwa.com/ajax/routing.php", {
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: form
+    });
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    var data = await res.json();
+    if (Array.isArray(data) && data.length > 0) return data[0];
+    return null;
   } catch(e) {
-    _drugDBLoading = false;
-    console.warn('Drug DB load failed:', e);
+    try {
+      var proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://egyptdwa.com/ajax/routing.php");
+      var res2 = await fetch(proxyUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body: new URLSearchParams({search:"1", searchq: query})
+      });
+      var data2 = await res2.json();
+      if (Array.isArray(data2) && data2.length > 0) return data2[0];
+    } catch(e2) {}
     return null;
   }
 }
 
-// بحث محلي فوري في قاعدة البيانات مع فهرس مُسبق البناء
-var _drugIndex = null; // فهرس البحث السريع
-
-function _buildDrugIndex(db) {
-  // بناء فهرس lowercase مرة واحدة فقط عند التحميل
-  _drugIndex = db.map(function(d, i) {
-    return {
-      i: i,
-      en: (d.name || '').toLowerCase(),
-      ar: (d.arabic || '').toLowerCase(),
-      ac: (d.active || '').toLowerCase()
-    };
-  });
-}
-
-function _searchDrugLocal(query, limit) {
-  if (!_drugDB || !query) return [];
-  limit = limit || 8;
-  var q = query.trim().toLowerCase().replace(/\s+/g, ' ');
-  if (q.length < 1) return [];
-
-  // Build index on first use
-  if (!_drugIndex) _buildDrugIndex(_drugDB);
-
-  var exact = [], starts = [], contains = [];
-  var idx = _drugIndex;
-  var total = idx.length;
-  for (var i = 0; i < total; i++) {
-    var x = idx[i];
-    if (x.en === q || x.ar === q) {
-      exact.push(_drugDB[x.i]);
-      if (exact.length >= limit) break;
-    } else if (x.en.startsWith(q) || x.ar.startsWith(q)) {
-      starts.push(_drugDB[x.i]);
-    } else if (x.en.includes(q) || x.ar.includes(q) || x.ac.includes(q)) {
-      contains.push(_drugDB[x.i]);
-    }
-    // Early exit once we have enough
-    if (starts.length + contains.length >= limit * 4) break;
-  }
-  return exact.concat(starts, contains).slice(0, limit);
-}
-
-// استبدال دوال egyptdwa بالبحث المحلي
-async function _fetchDrugFromEgyptdwa(query) {
-  var db = await _loadDrugDB();
-  if (db) {
-    var res = _searchDrugLocal(query, 1);
-    if (res.length > 0) return res[0];
-  }
-  // Fallback: egyptdwa.com live
-  try {
-    var form = new URLSearchParams();
-    form.append("search","1"); form.append("searchq", query);
-    var r = await fetch("https://egyptdwa.com/ajax/routing.php", {
-      method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body: form
-    });
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    var d2 = await r.json();
-    return Array.isArray(d2) && d2.length ? d2[0] : null;
-  } catch(e) {
-    try {
-      var form3 = new URLSearchParams();
-      form3.append("search","1"); form3.append("searchq", query);
-      var r3 = await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent("https://egyptdwa.com/ajax/routing.php"),{
-        method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body: form3
-      });
-      var d3 = await r3.json();
-      return Array.isArray(d3) && d3.length ? d3[0] : null;
-    } catch(e2) { return null; }
-  }
-}
-
 async function _fetchAllDrugsFromEgyptdwa(query) {
-  var db = await _loadDrugDB();
-  if (db) {
-    return _searchDrugLocal(query, 8);
-  }
+  var form = new URLSearchParams();
+  form.append("search","1");
+  form.append("searchq", query);
   try {
-    var form = new URLSearchParams();
-    form.append("search","1"); form.append("searchq", query);
-    var r = await fetch("https://egyptdwa.com/ajax/routing.php", {
-      method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body: form
+    var res = await fetch("https://egyptdwa.com/ajax/routing.php", {
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: form
     });
-    var d = await r.json();
-    return Array.isArray(d) ? d : [];
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    var data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch(e) {
     try {
-      var form2 = new URLSearchParams();
-      form2.append("search","1"); form2.append("searchq", query);
-      var r2 = await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent("https://egyptdwa.com/ajax/routing.php"),{
-        method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body: form2
+      var proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://egyptdwa.com/ajax/routing.php");
+      var res2 = await fetch(proxyUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body: new URLSearchParams({search:"1", searchq: query})
       });
-      var d2 = await r2.json();
-      return Array.isArray(d2) ? d2 : [];
+      var data2 = await res2.json();
+      return Array.isArray(data2) ? data2 : [];
     } catch(e2) { return []; }
   }
 }
 
-function _drugImgUrl(img) {
-  return img ? 'https://egyptdwa.com/dwa/' + img : '';
-}
-
 function _showDrugPriceCard(drug, container) {
   if (!container) return;
-  var imgSrc = _drugImgUrl(drug.img);
+  var imgSrc = drug.img ? "https://egyptdwa.com/dwa/" + drug.img : "";
+  var priceHtml = drug.price
+    ? '<span style="color:#26c6da;font-weight:800;font-size:1rem">&#x1F4B0; ' + drug.price + ' جنيه</span>'
+    : '<span style="color:var(--txt3);font-size:.8rem">السعر غير متوفر</span>';
   var card = document.createElement('div');
-  card.style.cssText = 'background:linear-gradient(160deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(0,188,212,.55);border-radius:20px;padding:18px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:14px;box-shadow:0 6px 28px rgba(0,188,212,.18)';
-  card.setAttribute('data-db-card','1');
+  card.style.cssText = "background:linear-gradient(135deg,rgba(0,131,143,.18),rgba(33,150,243,.1));border:2px solid rgba(0,188,212,.5);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;margin-bottom:12px;box-shadow:0 0 16px rgba(0,188,212,.2)";
   var imgHtml = imgSrc
-    ? '<img src="'+imgSrc+'" onerror="this.style.display=\'none\'" style="width:120px;height:120px;object-fit:cover;border-radius:14px;border:2px solid rgba(0,188,212,.45);box-shadow:0 4px 14px rgba(0,0,0,.5)">'
-    : '<div style="width:120px;height:120px;border-radius:14px;background:rgba(33,150,243,.12);display:flex;align-items:center;justify-content:center;font-size:3rem">💊</div>';
-  card.innerHTML =
-    imgHtml
-    +'<div style="width:100%">'
-    +'<div style="font-size:.62rem;color:#80deea;font-weight:700;margin-bottom:4px">📋 معلومات الدواء — قاعدة بيانات مصر</div>'
-    +'<div style="font-size:1.05rem;font-weight:900;color:#e3f2fd;margin-bottom:2px">'+(drug.arabic||'')+'</div>'
-    +(drug.name?'<div style="font-size:.78rem;color:#90caf9;margin-bottom:4px;font-style:italic">'+drug.name+'</div>':'')
-    +(drug.active?'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:4px 10px;font-size:.7rem;color:#b0bec5;margin-bottom:8px">🧪 '+drug.active+'</div>':'')
-    +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">'
-    +(drug.id?'<span style="background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.3);border-radius:20px;padding:2px 11px;font-size:.68rem;color:#90caf9">📋 #'+drug.id+'</span>':'')
-    +(drug.visits?'<span style="background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.3);border-radius:20px;padding:2px 11px;font-size:.68rem;color:#69f0ae">👁 '+Number(drug.visits).toLocaleString('ar-EG')+' مشاهدة</span>':'')
-    +'</div>'
-    +(drug.price
-      ?'<div style="background:linear-gradient(135deg,rgba(0,131,143,.28),rgba(0,188,212,.18));border:2px solid rgba(0,188,212,.65);border-radius:16px;padding:12px 24px"><div style="font-size:.65rem;color:#80deea;margin-bottom:3px;font-weight:700">💰 السعر في مصر</div><div style="font-size:1.9rem;font-weight:900;color:#26c6da;line-height:1.1">'+drug.price+' <span style="font-size:1.05rem;font-weight:700">جنيه</span></div></div>'
-      :'<div style="color:var(--txt3);font-size:.8rem">السعر غير متوفر</div>')
-    +'</div>';
+    ? '<img src="' + imgSrc + '" onerror="this.style.display=\'none\'" style="width:68px;height:68px;object-fit:cover;border-radius:10px;flex-shrink:0;border:1.5px solid rgba(255,255,255,.12)">'
+    : '<div style="width:68px;height:68px;border-radius:10px;background:rgba(33,150,243,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:2rem">&#x1F48A;</div>';
+  card.innerHTML = imgHtml +
+    '<div style="flex:1;min-width:0">' +
+      '<div style="font-size:.68rem;color:#80deea;margin-bottom:4px;font-weight:700">&#x1F4CB; معلومات الدواء — قاعدة بيانات مصر</div>' +
+      '<div style="font-size:.95rem;font-weight:800;color:var(--txt);margin-bottom:2px">' + (drug.arabic || '') + '</div>' +
+      (drug.arabic && drug.name ? '<div style="font-size:.75rem;color:var(--txt2);margin-bottom:3px">' + drug.name + '</div>' : '') +
+      (drug.active ? '<div style="font-size:.7rem;color:var(--txt3);margin-bottom:5px">' + drug.active + '</div>' : '') +
+      priceHtml +
+    '</div>';
   container.insertBefore(card, container.firstChild);
 }
 
+var _drugSearchTimer = null;
 function drugSearchDebounce(val) {
   clearTimeout(_drugSearchTimer);
-  var r = document.getElementById('drug-search-results');
-  if (!val || !val.trim()) {
+  if (!val || val.trim().length < 2) {
+    var r = document.getElementById('drug-search-results');
     if (r) r.innerHTML = '';
     return;
   }
-  // عرض نتائج فورية من DB المحلية أولاً (بدون انتظار)
-  if (_drugDB && val.trim().length >= 1) {
-    var quick = _searchDrugLocal(val.trim(), 5);
-    if (quick && quick.length && r) {
-      r.innerHTML = '<div style="text-align:center;padding:6px;color:var(--txt3);font-size:.72rem"><i class="fas fa-bolt" style="color:#ffa726"></i> نتائج فورية...</div>';
-    }
-  }
-  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 80);
+  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 400);
 }
 
 async function drugSearchByName(query) {
-  if (!query || query.trim().length < 1) return;
+  if (!query || query.trim().length < 2) return;
   var resultsDiv = document.getElementById('drug-search-results');
   if (!resultsDiv) return;
-  resultsDiv.innerHTML = '<div style="text-align:center;padding:16px;color:var(--txt3)"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</div>';
-  var db = await _loadDrugDB();
-  var rawDrugs = db ? _searchDrugLocal(query.trim(), 16) : await _fetchAllDrugsFromEgyptdwa(query.trim());
-  // إزالة المكررات: تكرار كامل في (name + arabic + active + price)
-  var seen = {};
-  var drugs = [];
-  (rawDrugs||[]).forEach(function(d){
-    var key = (d.name||'').trim().toLowerCase()+'|'+(d.arabic||'').trim()+'|'+(d.active||'').trim()+'|'+(d.price||'').toString().trim();
-    if (!seen[key]) { seen[key]=true; drugs.push(d); }
-  });
-  drugs = drugs.slice(0,8);
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:12px;color:var(--txt3);font-size:.82rem"><i class="fas fa-spinner fa-spin" style="margin-left:6px"></i> جاري البحث في قاعدة البيانات...</div>';
+  var drugs = await _fetchAllDrugsFromEgyptdwa(query.trim());
   resultsDiv.innerHTML = '';
   if (!drugs.length) {
-    resultsDiv.innerHTML = '<div style="text-align:center;padding:18px;color:var(--txt3)">⚠️ لم يتم العثور على نتائج</div>';
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:14px;color:var(--txt3);font-size:.82rem">&#x26A0;&#xFE0F; لم يتم العثور على نتائج لـ «' + query + '»</div>';
     return;
   }
-  drugs.forEach(function(drug) {
-    var imgSrc = _drugImgUrl(drug.img);
+  drugs.slice(0, 8).forEach(function(drug) {
+    var imgSrc = drug.img ? "https://egyptdwa.com/dwa/" + drug.img : "";
     var card = document.createElement('div');
-    card.style.cssText = 'background:linear-gradient(160deg,rgba(13,27,42,.96),rgba(8,18,38,.98));border:1.5px solid rgba(33,150,243,.32);border-radius:20px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;transition:all .25s;box-shadow:0 4px 24px rgba(0,0,0,.45);margin-bottom:4px';
-    var imgHtml = imgSrc
-      ? '<img src="'+imgSrc+'" onerror="this.style.display=\'none\'" style="width:130px;height:130px;object-fit:cover;border-radius:16px;border:2px solid rgba(33,150,243,.45);box-shadow:0 4px 18px rgba(0,0,0,.55)">'
-      : '<div style="width:130px;height:130px;border-radius:16px;background:rgba(33,150,243,.1);display:flex;align-items:center;justify-content:center;font-size:3.5rem">💊</div>';
-    var uid = 'dai-'+drug.id+'-'+(Math.random()*9999|0);
-    var metaBadges =
-      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0">'
-      +'<span style="background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.3);border-radius:20px;padding:2px 11px;font-size:.68rem;color:#90caf9">📋 #'+(drug.id||'')+'</span>'
-      +'<span style="background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.3);border-radius:20px;padding:2px 11px;font-size:.68rem;color:#69f0ae">👁 '+Number(drug.visits||0).toLocaleString('ar-EG')+' مشاهدة</span>'
-      +'</div>';
-    var priceBlock = drug.price
-      ? '<div style="background:linear-gradient(135deg,rgba(0,131,143,.28),rgba(0,188,212,.15));border:2px solid rgba(0,188,212,.65);border-radius:16px;padding:12px 26px;margin:8px 0"><div style="font-size:.67rem;color:#80deea;font-weight:700;margin-bottom:3px">💰 السعر في مصر</div><div style="font-size:1.9rem;font-weight:900;color:#26c6da;line-height:1.1">'+drug.price+' <span style="font-size:1.05rem;font-weight:700">جنيه</span></div></div>'
-      : '<div style="color:var(--txt3);font-size:.8rem;padding:8px">السعر غير متوفر</div>';
-    card.innerHTML =
-      imgHtml
-      +'<div style="width:100%">'
-      +'<div style="font-size:1.05rem;font-weight:900;color:#e3f2fd;margin-bottom:3px;line-height:1.3">'+(drug.arabic||'')+'</div>'
-      +'<div style="font-size:.8rem;color:#90caf9;margin-bottom:5px;font-style:italic">'+(drug.name||'')+'</div>'
-      +(drug.active?'<div style="background:rgba(255,255,255,.05);border-radius:9px;padding:5px 12px;font-size:.72rem;color:#b0bec5;margin-bottom:6px;direction:ltr">🧪 '+drug.active+'</div>':'')
-      +metaBadges
-      +priceBlock
-      +'<div id="'+uid+'" style="display:none;text-align:right;width:100%;margin-top:6px"></div>'
-      +'<button data-uid="'+uid+'" data-name="'+encodeURIComponent(drug.arabic||drug.name||'')+'" onclick="showDrugAI(this)" style="margin-top:8px;width:100%;padding:10px;background:linear-gradient(135deg,rgba(33,150,243,.18),rgba(0,188,212,.12));border:1.5px solid rgba(33,150,243,.42);border-radius:11px;color:#90caf9;font-size:.82rem;cursor:pointer;font-family:Tajawal,sans-serif;transition:all .2s" onmouseover="this.style.background=\'rgba(33,150,243,.32)\'" onmouseout="this.style.background=\'linear-gradient(135deg,rgba(33,150,243,.18),rgba(0,188,212,.12))\'">&#x1F916; الاستخدامات &amp; الجرعات &amp; الآثار الجانبية</button>'
-      +'</div>';
-    card.onmouseover=function(){this.style.borderColor='rgba(33,150,243,.72)';this.style.boxShadow='0 8px 32px rgba(33,150,243,.22)';};
-    card.onmouseout =function(){this.style.borderColor='rgba(33,150,243,.32)';this.style.boxShadow='0 4px 24px rgba(0,0,0,.45)';};
+    card.style.cssText = "background:rgba(255,255,255,.04);border:1px solid rgba(33,150,243,.25);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;transition:all .2s";
+    var imgEl = imgSrc
+      ? '<img src="' + imgSrc + '" onerror="this.style.display=\'none\'" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(255,255,255,.08)">'
+      : '<div style="width:56px;height:56px;border-radius:8px;background:rgba(33,150,243,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.5rem">&#x1F48A;</div>';
+    card.innerHTML = imgEl +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:.88rem;font-weight:800;color:var(--txt);margin-bottom:2px">' + (drug.arabic || '') + '</div>' +
+        '<div style="font-size:.75rem;color:var(--txt2);margin-bottom:2px">' + (drug.name || '') + '</div>' +
+        (drug.active ? '<div style="font-size:.7rem;color:var(--txt3);margin-bottom:3px">' + drug.active + '</div>' : '') +
+        (drug.price
+          ? '<span style="color:#26c6da;font-weight:800;font-size:.92rem">&#x1F4B0; ' + drug.price + ' جنيه</span>'
+          : '<span style="color:var(--txt3);font-size:.75rem">السعر غير متوفر</span>') +
+      '</div>';
+    card.onmouseover = function(){ this.style.background='rgba(33,150,243,.1)'; this.style.borderColor='rgba(33,150,243,.5)'; };
+    card.onmouseout  = function(){ this.style.background='rgba(255,255,255,.04)'; this.style.borderColor='rgba(33,150,243,.25)'; };
     resultsDiv.appendChild(card);
   });
 }
-
-async function showDrugAI(btn) {
-  btn.style.display = 'none';
-  var uid  = btn.getAttribute('data-uid');
-  var name = decodeURIComponent(btn.getAttribute('data-name'));
-  var el   = document.getElementById(uid);
-  if (!el) return;
-  el.style.display = 'block';
-  el.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div></div>';
-  try {
-    var res = await puter.ai.chat(
-      'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
-      '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...',
-      {model:'gpt-4o-mini', temperature:0.2}
-    );
-    var txt = typeof res==='string'?res:(res.message&&res.message.content||res.content||'');
-    var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
-    txt.trim().split('\n').forEach(function(line){
-      var m=line.match(/^\*\*([^*]+)\*\*[:\s]*(.*)/);
-      if(m) out+='<div style="margin-bottom:8px"><span style="color:#26c6da;font-weight:800;font-size:.84rem">'+m[1]+':</span> <span style="color:#e8e8e8">'+m[2]+'</span></div>';
-      else if(line.trim()) out+='<div style="color:#b0bec5;margin-bottom:4px">'+line+'</div>';
-    });
-    el.innerHTML = out+'</div>';
-  } catch(e) {
-    el.innerHTML='<div style="color:var(--txt3);font-size:.78rem;padding:10px;text-align:center">تعذّر تحميل المعلومات الطبية.</div>';
-  }
-}
-
 
 async function drugSearchByCamera() {
   var video = document.getElementById('pa-video-stream');
   var resDiv = document.getElementById('drug-search-results');
   if (!video || video.readyState < 2 || video.style.display === 'none') {
-    alert('افتح الكاميرا أولاً');
+    if (typeof showScanToast === 'function') showScanToast('افتح الكاميرا أولاً', '📷', 'unknown');
+    else alert('افتح الكاميرا أولاً');
     return;
   }
   if (resDiv) resDiv.innerHTML = '<div style="text-align:center;padding:12px;color:var(--txt3);font-size:.82rem"><i class="fas fa-spinner fa-spin" style="margin-left:6px"></i> جاري قراءة الصورة...</div>';
@@ -4053,6 +3834,7 @@ async function drugSearchByCamera() {
   canvas.height = video.videoHeight || 480;
   canvas.getContext('2d').drawImage(video, 0, 0);
 
+  // Try BarcodeDetector first (fast)
   if ('BarcodeDetector' in window) {
     try {
       var det = new BarcodeDetector({formats:["qr_code","ean_13","ean_8","code_128","code_39","upc_a","upc_e"]});
@@ -4066,16 +3848,18 @@ async function drugSearchByCamera() {
       }
     } catch(e) {}
   }
+
+  // AI fallback: extract drug name from image
   try {
     var imgData = canvas.toDataURL('image/jpeg', 0.85);
     var aiRes = await puter.ai.chat([{
-      role:'user',
-      content:[
+      role: 'user',
+      content: [
         {type:'text', text:'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.'},
         {type:'image_url', image_url:{url: imgData}}
       ]
     }], {model:'gpt-4o-mini', temperature:0});
-    var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message && aiRes.message.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
+    var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message?.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
     if (drugName && drugName.length > 1) {
       var inp2 = document.getElementById('drug-name-search-input');
       if (inp2) inp2.value = drugName;
@@ -4088,35 +3872,11 @@ async function drugSearchByCamera() {
   }
 }
 
-// Pre-load DB when entering medicine mode — shows progress
-// تحميل قاعدة البيانات تلقائياً عند بدء الصفحة
-(function(){ setTimeout(function(){ _loadDrugDB(); }, 2000); })();
-
-var _drugDBPreloaded = false;
-function _preloadDrugDB() {
-  if (_drugDBPreloaded) return;
-  _drugDBPreloaded = true;
-  var statusEl = document.getElementById('drug-db-status');
-  if (statusEl && !_drugDB) {
-    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:4px"></i> جاري تحميل قاعدة بيانات الأدوية...';
-  }
-  _loadDrugDB().then(function(db) {
-    if (!statusEl) return;
-    if (db) {
-      statusEl.innerHTML = '<span style="color:#4caf50">&#x2705; قاعدة البيانات جاهزة — ' + db.length.toLocaleString('ar-EG') + ' دواء</span>';
-      setTimeout(function(){ statusEl.innerHTML = ''; }, 3000);
-    } else {
-      statusEl.innerHTML = '<span style="color:#ef9a9a">&#x26A0; فشل التحميل — سيُستخدم البحث الحي</span>';
-    }
-  });
-}
-
 /* ============================================================ */
 
 function captureSmartByMode() {
   if (_scanMode === 'medicine') { analyzeMedicineFromCamera(); }
   else if (_scanMode === 'report') { analyzeReportFromCamera(); }
-  else if (_scanMode === 'prescription') { analyzePrescriptionFromCamera(); }
   else { captureAndScanProductBlob(); }
 }
 function analyzeSmartByMode() {
@@ -6831,448 +6591,5 @@ async function autoLogin() {
   hideLoader();
 }
 </script>
-
-<script>
-/* === مسح تلقائي لوضع الدواء === */
-window._autoScanInterval = null;
-window._autoScanLock = false;
-window._autoScanDone = false;
-
-function _startMedicineAutoScan() {
-  clearInterval(window._autoScanInterval);
-  window._autoScanLock = false;
-  window._autoScanDone = false;
-  var statusEl = document.getElementById('camera-status-text');
-  if (statusEl) statusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px;animation:pulse 1s infinite"></i> الكاميرا تعمل — جاري البحث عن الدواء...';
-  window._autoScanInterval = setInterval(function() {
-    if (window._autoScanDone) { clearInterval(window._autoScanInterval); return; }
-    var video = document.getElementById('pa-video-stream');
-    if (video && video.readyState >= 2 && video.style.display !== 'none') {
-      _autoScanMedicine();
-    }
-  }, 2000);
-}
-
-async function _autoScanMedicine() {
-  if (window._autoScanLock || window._autoScanDone) return;
-  window._autoScanLock = true;
-  var video  = document.getElementById('pa-video-stream');
-  var resBox = document.getElementById('pa-scan-result');
-  var statusEl = document.getElementById('camera-status-text');
-  try {
-    var canvas = document.createElement('canvas');
-    canvas.width  = video.videoWidth  || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-
-    // محاولة قراءة الباركود أولاً
-    if ('BarcodeDetector' in window) {
-      try {
-        var det = new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e','qr_code']});
-        var codes = await det.detect(canvas);
-        if (codes.length > 0) {
-          window._autoScanDone = true;
-          clearInterval(window._autoScanInterval);
-          var code = codes[0].rawValue;
-          if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;margin-left:5px"></i> تم قراءة الباركود: ' + code;
-          if (resBox) resBox.innerHTML = '<div style="padding:10px;text-align:center;font-size:.82rem;color:#26c6da"><i class="fas fa-check-circle" style="margin-left:6px"></i> باركود: '+code+'</div>';
-          var db = await _loadDrugDB();
-          if (db) {
-            var found = db.filter(function(d){ return String(d.id)===String(code); });
-            if (found.length > 0 && resBox) _showDrugPriceCard(found[0], resBox);
-          }
-          await _analyzeMedicineWithAI(null, 'باركود الدواء: ' + code);
-          window._autoScanLock = false;
-          return;
-        }
-      } catch(e) {}
-    }
-
-    // إذا لم يوجد باركود — استخراج اسم الدواء أولاً ثم البحث في قاعدة البيانات
-    var imgData = canvas.toDataURL('image/jpeg', 0.85);
-    if (resBox) resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.8rem"> يتعرف على اسم الدواء...</span></div>';
-    if (statusEl) statusEl.innerHTML = '<i class="fas fa-brain" style="color:#9c27b0;margin-left:5px"></i> يستخرج اسم الدواء من الصورة...';
-    window._autoScanDone = true;
-    clearInterval(window._autoScanInterval);
-
-    // الخطوة 1: استخراج اسم الدواء بسرعة من الصورة
-    var extractedName = null;
-    try {
-      var nameRes = await puter.ai.chat(
-        [{role:'user', content:[
-          {type:'image_url', image_url:{url:imgData}},
-          {type:'text', text:'انظر لهذه الصورة. استخرج اسم الدواء التجاري المكتوب على العلبة فقط. أجب باسم الدواء فقط بدون أي كلام آخر، باللغة العربية أو الإنجليزية حسب ما هو مكتوب.'}
-        ]}],
-        {model:'gpt-4o-mini', temperature:0}
-      );
-      var nameText = typeof nameRes === 'string' ? nameRes : (nameRes&&nameRes.message&&nameRes.message.content ? nameRes.message.content : (nameRes&&nameRes.content ? nameRes.content : null));
-      if (nameText) extractedName = nameText.trim().replace(/^["']+|["']+$/g,'').split('\n')[0].trim();
-    } catch(e) {}
-
-    // الخطوة 2: البحث في قاعدة البيانات المحلية وعرض البطاقة الحقيقية
-    if (extractedName) {
-      if (statusEl) statusEl.innerHTML = '<i class="fas fa-database" style="color:#2196f3;margin-left:5px"></i> يبحث في قاعدة البيانات: ' + extractedName + '...';
-      // عرض معاينة الصورة المُلتقطة
-      if (resBox) resBox.innerHTML = '<div style="text-align:center;margin-bottom:10px"><img src="'+imgData+'" style="max-width:100%;max-height:160px;border-radius:12px;border:2px solid rgba(33,150,243,.4);object-fit:contain"></div>';
-      var db = await _loadDrugDB();
-      if (db) {
-        var dbResults = _searchDrugLocal(extractedName, 1);
-        if (dbResults && dbResults.length > 0) {
-          _showDrugPriceCard(dbResults[0], resBox);
-          if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;margin-left:5px"></i> تم العثور في قاعدة البيانات: ' + (dbResults[0].arabic || dbResults[0].name);
-        } else {
-          if (statusEl) statusEl.innerHTML = '<i class="fas fa-search" style="color:#ff9800;margin-left:5px"></i> لم يُعثر في قاعدة البيانات، جاري التحليل بالذكاء الاصطناعي...';
-        }
-      }
-      // الخطوة 3: التحليل الكامل بالذكاء الاصطناعي يظهر أسفل بطاقة قاعدة البيانات
-      await _analyzeMedicineWithAI(imgData, extractedName);
-    } else {
-      await _analyzeMedicineWithAI(imgData, null);
-    }
-    if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;margin-left:5px"></i> تم تحليل الدواء بنجاح';
-  } catch(e) {}
-  window._autoScanLock = false;
-}
-/* ============================================ */
-</script>
-
-<script>
-/* === حماية الكود — ملكية خاصة بالمهندس محمد حماد === */
-(function(){
-  document.addEventListener('contextmenu',function(e){e.preventDefault();});
-  document.addEventListener('keydown',function(e){
-    if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','i','J','j','C','c'].indexOf(e.key)>-1)||(e.ctrlKey&&['U','u','S','s'].indexOf(e.key)>-1)){
-      e.preventDefault();return false;
-    }
-  });
-  function msg(){
-    try{console.clear();}catch(x){}
-    try{
-      console.log('%cتوقف!','color:#ef5350;font-size:52px;font-weight:900;font-family:Tajawal,Arial');
-      console.log('%c❤️ هذا الكود ملكية خاصة بالمهندس محمد حماد','color:#ffa726;font-size:20px;font-weight:bold;font-family:Tajawal,Arial');
-      console.log('%cيرجى التواصل معه عبر الواتساب:','color:#fff;font-size:14px;font-family:Tajawal,Arial');
-      console.log('%cwa.me/201279934735','color:#26c6da;font-size:20px;font-weight:900');
-    }catch(x){}
-  }
-  ['log','warn','error','info','debug','table','dir','trace'].forEach(function(k){
-    try{console[k]=function(){msg();};}catch(x){}
-  });
-  setInterval(function(){
-    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160)msg();
-  },800);
-  setInterval(function(){
-    var t=performance.now();
-    (function(){debugger;})();
-    if(performance.now()-t>100)msg();
-  },3000);
-})();
-/* ============================================================ */
-</script>
-
-<script>
-/* ===== Medical Prescription Reader Engine ===== */
-function _rxSaveHistory(r){try{var h=JSON.parse(localStorage.getItem('_rx_history')||'[]');h.unshift(r);if(h.length>50)h=h.slice(0,50);localStorage.setItem('_rx_history',JSON.stringify(h));}catch(e){}}
-function _rxGetHistory(){try{return JSON.parse(localStorage.getItem('_rx_history')||'[]');}catch(e){return[];}}
-function _rxConfColor(c){return c>=90?'#4caf50':c>=70?'#ffa726':'#ef5350';}
-function _rxConfLabel(c){return c>=90?'ثقة عالية':c>=70?'ثقة متوسطة':'ثقة منخفضة';}
-function _rxRetry(){var r=document.getElementById('pa-scan-result');if(r)r.innerHTML=_rxChoiceHTML();}
-function _rxOpenGallery(){
-  var inp=document.getElementById('_rx_gallery_input');
-  if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='_rx_gallery_input';
-    inp.style.display='none';
-    inp.onchange=function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();
-      rd.onload=function(ev){_analyzePrescriptionImage(ev.target.result);};rd.readAsDataURL(f);};
-    document.body.appendChild(inp);}
-  inp.click();
-}
-function _rxChoiceHTML(){
-  return '<div style="display:flex;flex-direction:column;gap:10px;padding:10px 0">'
-    +'<div style="font-size:.8rem;color:var(--txt3);text-align:center;margin-bottom:4px">اختر طريقة رفع الروشة:</div>'
-    +'<button onclick="startPremiumCameraScanner(function(){analyzePrescriptionFromCamera();})" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(233,30,99,.2),rgba(156,39,176,.15));border:1.5px solid rgba(233,30,99,.4);border-radius:12px;color:#f48fb1;font-size:.88rem;font-weight:800;cursor:pointer;font-family:Tajawal,sans-serif"><i class="fas fa-camera" style="margin-left:8px"></i> التقاط بالكاميرا</button>'
-    +'<button onclick="_rxOpenGallery()" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(33,150,243,.15),rgba(0,188,212,.1));border:1.5px solid rgba(33,150,243,.35);border-radius:12px;color:#90caf9;font-size:.88rem;font-weight:800;cursor:pointer;font-family:Tajawal,sans-serif"><i class="fas fa-image" style="margin-left:8px"></i> اختر من المعرس</button>'
-    +'</div>';
-}
-async function analyzePrescriptionFromCamera(){
-  var video=document.getElementById('pa-video-stream');
-  var resBox=document.getElementById('pa-scan-result');
-  if(!resBox)return;
-  if(!video||video.readyState<2||video.style.display==='none'){resBox.innerHTML=_rxChoiceHTML();return;}
-  var cv=document.createElement('canvas');
-  cv.width=video.videoWidth||640;cv.height=video.videoHeight||480;
-  cv.getContext('2d').drawImage(video,0,0);
-  var imgData=cv.toDataURL('image/jpeg',0.92);
-  resBox.innerHTML='<div style="text-align:center;margin-bottom:10px"><img src="'+imgData+'" style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid rgba(233,30,99,.4);object-fit:contain"></div>'
-    +'<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.82rem"> يحلل الروشة…</span></div>';
-  await _analyzePrescriptionImage(imgData);
-}
-async function _analyzePrescriptionImage(imgData){
-  var resBox=document.getElementById('pa-scan-result');
-  if(!resBox)return;
-  if(!resBox.innerHTML.includes('img src'))
-    resBox.innerHTML='<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.82rem"> جاري تحليل الروشة بـ puter.ai...</span></div>';
-
-  var prompt='أنت نظام متخصص في قراءة الروشات الطبية. حلّل الصورة واستخرج كل دواء.\nأرجع JSON array فقط بين [] بدون أي نص:\n[{"name_en":"","name_ar":"","form":"","strength":"","dose":"","frequency":"","timing":"","duration":"","notes":"","confidence":85}]\n- confidence 0-100\n- إذا الخط غير واضح اعطِ أقرب احتمال واخفض confidence\n- إذا لا يوجد دواء أرجع: []';
-
-  var meds=[];
-  try{
-    if(typeof puter==='undefined'||!puter.ai) throw new Error('puter not ready');
-    var res=await puter.ai.chat(
-      [{role:'user',content:[
-        {type:'image_url',image_url:{url:imgData}},
-        {type:'text',text:prompt}
-      ]}],
-      {model:'gpt-4o',temperature:0.1}
-    );
-    var txt=typeof res==='string'?res:((res&&res.message&&res.message.content)?res.message.content:(res&&res.content?res.content:''));
-    txt=txt.trim();
-    var s=txt.indexOf('['), e=txt.lastIndexOf(']');
-    if(s!==-1&&e>s){
-      try{ meds=JSON.parse(txt.substring(s,e+1)); }
-      catch(je){
-        var clean=txt.substring(s,e+1).replace(/[ -]/g,' ').replace(/,\s*]/g,']').replace(/,\s*}/g,'}');
-        try{ meds=JSON.parse(clean); }catch(je2){ meds=[]; }
-      }
-    }
-  }catch(e){
-    resBox.innerHTML='<div style="background:rgba(198,40,40,.1);border:1px solid rgba(239,83,80,.4);border-radius:12px;padding:16px;color:#ef9a9a;text-align:center;font-size:.82rem">'
-      +'<i class="fas fa-exclamation-circle" style="font-size:1.6rem;display:block;margin-bottom:8px;color:#ef5350"></i>'
-      +'<strong>تعذّر تحليل الروشة</strong><br>'
-      +'<span style="font-size:.74rem;color:var(--txt3);line-height:1.6">تأكد أن التطبيق يعمل على puter.com أو أن الاتصال بالإنترنت يعمل ثم حاول مرة أخرى.</span>'
-      +'</div>'+_rxChoiceHTML();
-    return;
-  }
-  if(!Array.isArray(meds)||!meds.length){
-    resBox.innerHTML='<div style="padding:16px;color:#ffa726;text-align:center;font-size:.85rem">&#8505;&#65039; لم يتم التعرف على أي دواء في الروشة.<br><span style="font-size:.74rem;color:var(--txt3)">تأكد من وضوح الصورة وأعد المحاولة.</span></div>'+_rxChoiceHTML();
-    return;
-  }
-  _rxSaveHistory({date:new Date().toISOString(),img:imgData,meds:meds});
-  _rxRenderResults(meds,imgData,resBox);
-}
-async function _rxRenderResults(meds,imgData,resBox){
-  var db=await _loadDrugDB();
-  var tc=Math.round(meds.reduce(function(s,m){return s+(m.confidence||0);},0)/meds.length);
-
-  var out='<div style="background:linear-gradient(135deg,rgba(233,30,99,.18),rgba(156,39,176,.12));border:2px solid rgba(233,30,99,.45);border-radius:18px;padding:14px 16px;margin-bottom:12px;text-align:center;box-shadow:0 4px 20px rgba(233,30,99,.15)">'
-    +'<div style="font-size:.72rem;color:#f48fb1;font-weight:700;margin-bottom:6px">&#128203; تحليل الروشة الطبية بالذكاء الاصطناعي</div>'
-    +'<div style="display:flex;justify-content:center;gap:16px;font-size:.78rem">'
-    +'<span style="color:#e0e0e0">&#128138; عدد الأدوية: <strong style="color:#f48fb1">'+meds.length+'</strong></span>'
-    +'<span style="color:#e0e0e0">&#127919; ثقة عامة: <strong style="color:'+_rxConfColor(tc)+'">'+tc+'%</strong></span>'
-    +'</div></div>';
-  out+='<div style="background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.3);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:.7rem;color:#ffa726;line-height:1.6">&#9888;&#65039; تحليل الروشة بالذكاء قد يحتوي على أخطاء. تحقق دائماً مع طبيب أو صيدلاني معتمد قبل استخدام أي دواء.</div>';
-
-  meds.forEach(function(med,i){
-    var conf=med.confidence||0,cc=_rxConfColor(conf),cl=_rxConfLabel(conf);
-    // البحث في قاعدة البيانات المحلية بالاسم العربي أو الإنجليزي
-    var dbResults=[];
-    if(db){
-      var q=(med.name_ar||med.name_en||'').trim();
-      if(q.length>1) dbResults=_searchDrugLocal(q,1);
-      if(!dbResults.length && med.name_en){
-        dbResults=_searchDrugLocal(med.name_en.split(' ')[0],1);
-      }
-    }
-    var dbM=dbResults.length?dbResults[0]:null;
-    var imgSrc=dbM?_drugImgUrl(dbM.img):'';
-    var price=dbM?dbM.price:null;
-    var mid='_rx_'+i;
-    var aiN=encodeURIComponent(med.name_ar||med.name_en||'');
-
-    out+='<div style="background:linear-gradient(160deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(233,30,99,.35);border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 6px 28px rgba(0,0,0,.45)">';
-
-    // هيدر الدواء
-    out+='<div style="background:linear-gradient(135deg,rgba(233,30,99,.3),rgba(156,39,176,.2));padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px">';
-    out+='<div style="display:flex;align-items:center;gap:10px">';
-    if(imgSrc){
-      out+='<img src="'+imgSrc+'" onerror="this.style.display='none'" style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,.25);flex-shrink:0">';
-    } else {
-      out+='<div style="width:52px;height:52px;border-radius:10px;background:rgba(233,30,99,.15);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0">&#128138;</div>';
-    }
-    out+='<div>';
-    out+='<div style="font-size:1rem;font-weight:900;color:#fce4ec;line-height:1.2">'+(med.name_ar||med.name_en||'غير معروف')+'</div>';
-    if(med.name_en)out+='<div style="font-size:.72rem;color:#f48fb1;font-style:italic;margin-top:2px">'+med.name_en+'</div>';
-    if(dbM&&dbM.arabic&&dbM.arabic!==med.name_ar)out+='<div style="font-size:.68rem;color:#ce93d8;margin-top:1px">'+dbM.arabic+'</div>';
-    out+='</div></div>';
-    out+='<span style="background:rgba(0,0,0,.4);border:1px solid '+cc+';border-radius:12px;padding:3px 10px;font-size:.68rem;color:'+cc+';white-space:nowrap">'+conf+'% '+cl+'</span>';
-    out+='</div>';
-
-    // تحذير ثقة منخفضة
-    if(conf<70)out+='<div style="background:rgba(255,152,0,.1);border-bottom:1px solid rgba(255,152,0,.25);padding:7px 14px;font-size:.7rem;color:#ffa726">&#9888;&#65039; لم يتم التعرف على الدواء بدرجة كافية — تحقق مع طبيب مرخص.</div>';
-
-    out+='<div style="padding:14px">';
-
-    // صورة DB كبيرة إن وجدت
-    if(imgSrc){
-      out+='<div style="text-align:center;margin-bottom:12px">';
-      out+='<img src="'+imgSrc+'" onerror="this.parentElement.style.display='none'" style="max-height:140px;max-width:100%;object-fit:contain;border-radius:14px;border:2px solid rgba(233,30,99,.3);box-shadow:0 4px 16px rgba(0,0,0,.5)">';
-      out+='</div>';
-    }
-
-    // بيانات DB (id, visits, active)
-    if(dbM){
-      out+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">';
-      if(dbM.id)out+='<span style="background:rgba(33,150,243,.12);border:1px solid rgba(33,150,243,.3);border-radius:20px;padding:2px 10px;font-size:.66rem;color:#90caf9">&#128203; #'+dbM.id+'</span>';
-      if(dbM.visits)out+='<span style="background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.3);border-radius:20px;padding:2px 10px;font-size:.66rem;color:#69f0ae">&#128065; '+Number(dbM.visits).toLocaleString('ar-EG')+' مشاهدة</span>';
-      if(dbM.active)out+='<span style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:2px 10px;font-size:.66rem;color:#b0bec5">&#129514; '+dbM.active+'</span>';
-      out+='</div>';
-    }
-
-    // معلومات الروشتة في مستطيلات ملونة
-    var rxInfo=[
-      {icon:'&#128138;',label:'الشكل',val:med.form,bg:'rgba(33,150,243,.1)',border:'rgba(33,150,243,.3)',color:'#90caf9'},
-      {icon:'&#9879;',label:'التركيز',val:med.strength,bg:'rgba(156,39,176,.1)',border:'rgba(156,39,176,.3)',color:'#ce93d8'},
-      {icon:'&#128196;',label:'الجرعة',val:med.dose,bg:'rgba(46,125,50,.12)',border:'rgba(76,175,80,.35)',color:'#a5d6a7'},
-      {icon:'&#128257;',label:'التكرار',val:med.frequency,bg:'rgba(255,152,0,.1)',border:'rgba(255,152,0,.3)',color:'#ffcc80'},
-      {icon:'&#9200;',label:'التوقيت',val:med.timing,bg:'rgba(0,131,143,.1)',border:'rgba(0,188,212,.3)',color:'#80deea'},
-      {icon:'&#128467;',label:'المدة',val:med.duration,bg:'rgba(233,30,99,.1)',border:'rgba(233,30,99,.3)',color:'#f48fb1'},
-    ].filter(function(x){return x.val&&x.val.trim();});
-
-    if(rxInfo.length){
-      out+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">';
-      rxInfo.forEach(function(it){
-        out+='<div style="background:'+it.bg+';border:1px solid '+it.border+';border-radius:10px;padding:7px 10px">';
-        out+='<div style="font-size:.62rem;color:'+it.color+';font-weight:700;margin-bottom:2px">'+it.icon+' '+it.label+'</div>';
-        out+='<div style="font-size:.78rem;color:#e0e0e0;line-height:1.4">'+it.val+'</div>';
-        out+='</div>';
-      });
-      out+='</div>';
-    }
-
-    if(med.notes)out+='<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px 10px;font-size:.72rem;color:#b0bec5;margin-bottom:10px">&#128221; '+med.notes+'</div>';
-
-    // سعر من قاعدة البيانات - مستطيل فيروزي
-    if(price){
-      out+='<div style="background:linear-gradient(135deg,rgba(0,131,143,.25),rgba(0,188,212,.15));border:2px solid rgba(0,188,212,.6);border-radius:14px;padding:10px 14px;margin-bottom:10px;text-align:center;box-shadow:0 3px 12px rgba(0,188,212,.2)">';
-      out+='<div style="font-size:.62rem;color:#80deea;font-weight:700;margin-bottom:3px">&#128176; السعر الحقيقي من قاعدة البيانات</div>';
-      out+='<div style="font-size:1.6rem;font-weight:900;color:#26c6da">'+price+' <span style="font-size:.9rem;font-weight:700">جنيه</span></div>';
-      out+='</div>';
-    }
-
-    // أزرار: الاستخدامات/الآثار/الجرعة (مستطيل اخضر/احمر/ازرق) + التفاعلات
-    out+='<div id="_rxboxes_'+i+'" style="display:flex;flex-direction:column;gap:8px"></div>';
-    out+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">';
-    out+='<button onclick="_rxLoadDrugBoxes('+i+',''+aiN+'')" id="_rxbtn_'+i+'" style="padding:9px;border-radius:10px;font-size:.74rem;cursor:pointer;font-family:Tajawal,sans-serif;font-weight:800;background:linear-gradient(135deg,rgba(46,125,50,.2),rgba(76,175,80,.1));border:1.5px solid rgba(76,175,80,.45);color:#a5d6a7">&#129302; استخدامات &amp; جرعة &amp; آثار</button>';
-    out+='<button onclick="_rxDrugInteractions(''+aiN+'')" style="padding:9px;border-radius:10px;font-size:.74rem;cursor:pointer;font-family:Tajawal,sans-serif;font-weight:800;background:rgba(233,30,99,.12);border:1.5px solid rgba(233,30,99,.3);color:#f48fb1">&#9888;&#65039; التفاعلات الدوائية</button>';
-    out+='</div>';
-
-    out+='</div></div>';
-  });
-    var aiN=encodeURIComponent(med.name_ar||med.name_en||'');
-    out+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">'
-      +'<button onclick="showDrugAI(this)" data-uid="'+mid+'" data-name="'+aiN+'" style="padding:7px;border-radius:9px;font-size:.72rem;cursor:pointer;font-family:Tajawal,sans-serif;font-weight:700;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.4);color:#90caf9">&#129302; الاستخدامات &amp; الآثار</button>'
-      +'<button onclick="_rxDrugInteractions(''+aiN+'')" style="padding:7px;border-radius:9px;font-size:.72rem;cursor:pointer;font-family:Tajawal,sans-serif;font-weight:700;background:rgba(233,30,99,.12);border:1px solid rgba(233,30,99,.3);color:#f48fb1">&#9888;&#65039; التفاعلات</button>'
-      +'</div><div id="'+mid+'" style="display:none;text-align:right;margin-top:6px"></div></div>';
-  });
-  out+='<div style="display:flex;gap:8px;margin-top:8px">'
-    +'<button onclick="_rxShareResults()" style="flex:1;padding:10px;background:rgba(33,150,243,.15);border:1.5px solid rgba(33,150,243,.3);border-radius:11px;color:#90caf9;font-size:.78rem;cursor:pointer;font-family:Tajawal,sans-serif">&#128228; مشاركة</button>'
-    +'<button onclick="_rxShowHistory()" style="flex:1;padding:10px;background:rgba(156,39,176,.12);border:1.5px solid rgba(156,39,176,.3);border-radius:11px;color:#ce93d8;font-size:.78rem;cursor:pointer;font-family:Tajawal,sans-serif">&#128203; سجل الروشات</button>'
-    +'<button onclick="_rxRetry()" style="flex:1;padding:10px;background:rgba(233,30,99,.12);border:1.5px solid rgba(233,30,99,.3);border-radius:11px;color:#f48fb1;font-size:.78rem;cursor:pointer;font-family:Tajawal,sans-serif">&#128247; التقاط جديد</button>'
-    +'</div>';
-  resBox.innerHTML=out;
-}
-
-async function _rxLoadDrugBoxes(idx, aiN) {
-  var btn = document.getElementById('_rxbtn_' + idx);
-  var boxDiv = document.getElementById('_rxboxes_' + idx);
-  if (!boxDiv) return;
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...'; }
-  var name = decodeURIComponent(aiN);
-  var prompt = 'أنت صيدلاني خبير. قدّم معلومات الدواء: ' + name + '\n'
-    + 'الرد بالتنسيق الحرفي التالي فقط بدون ** أو markdown:\n\n'
-    + 'الاستخدام:\nاذكر دواعي الاستعمال الرئيسية بوضوح\n\n'
-    + 'الآثار_الجانبية:\nاذكر الآثار الجانبية الشائعة والخطيرة وموانع الاستخدام\n\n'
-    + 'الجرعة:\nللبالغين: ...\nللأطفال: ...\nالرضع: ...\n\n'
-    + 'السعر:\nمصر: ... جنيه\nالسعودية: ... ريال\nالإمارات: ... درهم';
-  var result = null;
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var res = await puter.ai.chat(prompt, {model: 'gpt-4o-mini', temperature: 0.2});
-      var t = typeof res === 'string' ? res : (res && res.message && res.message.content ? res.message.content : (res && res.content ? res.content : null));
-      if (t) result = t;
-    }
-  } catch(e) {}
-  if (!result) { if(boxDiv) boxDiv.innerHTML = '<div style="color:var(--txt3);font-size:.75rem;padding:8px">تعذّر تحميل المعلومات.</div>'; return; }
-
-  // Parse sections
-  function extractSec(key, nextKeys) {
-    var rx = new RegExp(key + '\\s*:\\s*([\\s\\S]*?)(?=' + nextKeys.map(function(k){return k+'\\s*:';}).join('|') + '|$)', 'i');
-    var m = rx.exec(result);
-    return m ? m[1].trim() : '';
-  }
-  var usage = extractSec('الاستخدام', ['الآثار_الجانبية','الجرعة','السعر']);
-  var side  = extractSec('الآثار_الجانبية', ['الجرعة','السعر']);
-  var dose  = extractSec('الجرعة', ['السعر']);
-  var priceAI = extractSec('السعر', ['$$$']);
-
-  var boxes = [
-    {icon:'💚', label:'الاستخدامات', content: usage, grad:'linear-gradient(135deg,rgba(46,125,50,.22),rgba(56,142,60,.08))', border:'#43a047'},
-    {icon:'🔴', label:'الآثار الجانبية وموانع الاستخدام', content: side, grad:'linear-gradient(135deg,rgba(198,40,40,.22),rgba(229,57,53,.08))', border:'#ef5350'},
-    {icon:'🔵', label:'الجرعة للمرضى المختلفين', content: dose, grad:'linear-gradient(135deg,rgba(21,101,192,.22),rgba(33,150,243,.08))', border:'#42a5f5'},
-    {icon:'🩵', label:'الأسعار التقريبية', content: priceAI, grad:'linear-gradient(135deg,rgba(0,131,143,.22),rgba(0,188,212,.08))', border:'#26c6da'}
-  ];
-
-  var h = '';
-  boxes.forEach(function(box, bi) {
-    if (!box.content) return;
-    h += '<div style="background:' + box.grad + ';border:2px solid ' + box.border + ';border-radius:14px;overflow:hidden;margin-bottom:8px;animation:pageIn .4s ease ' + (bi*0.1).toFixed(2) + 's both;box-shadow:0 3px 14px rgba(0,0,0,.3)">';
-    h += '<div style="background:linear-gradient(135deg,' + box.border + ',' + box.border + 'cc);padding:8px 14px;display:flex;align-items:center;gap:8px">';
-    h += '<span style="font-size:1.1rem">' + box.icon + '</span>';
-    h += '<strong style="color:#fff;font-size:.86rem;font-family:Tajawal,sans-serif">' + box.label + '</strong>';
-    h += '</div>';
-    h += '<div style="padding:12px 14px;font-size:.8rem;color:var(--txt);line-height:1.8;white-space:pre-wrap;direction:rtl">' + box.content.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
-    h += '</div>';
-  });
-
-  if (boxDiv) boxDiv.innerHTML = h;
-  if (btn) btn.style.display = 'none';
-}
-
-async function _rxDrugInteractions(n){
-  var name=decodeURIComponent(n);
-  var popup=document.createElement('div');
-  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
-  popup.innerHTML='<div style="background:#0d1b2a;border:1.5px solid rgba(233,30,99,.4);border-radius:18px;padding:18px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    +'<div style="font-size:.9rem;font-weight:800;color:#f48fb1">&#9888;&#65039; تفاعلات: '+name+'</div>'
-    +'<button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;color:var(--txt3);font-size:1.3rem;cursor:pointer">&times;</button>'
-    +'</div><div id="_rx_ib" class="ai-thinking-wrap" style="padding:10px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div></div></div>';
-  document.body.appendChild(popup);
-  try{
-    var res=await puter.ai.chat('اذكر أهم التفاعلات الدوائية لدواء '+name+' بشكل موجز بالعربية (6-8 نقاط): التفاعلات مع أدوية أخرى والكحول والأطعمة.',{model:'gpt-4o-mini',temperature:0.2});
-    var txt=typeof res==='string'?res:(res.message&&res.message.content||'');
-    var b=document.getElementById('_rx_ib');
-    if(b)b.innerHTML='<div style="font-size:.8rem;line-height:1.8;color:#e0e0e0;text-align:right">'+txt.replace(/
-/g,'<br>')+'</div>';
-  }catch(e){}
-}
-function _rxShareResults(){
-  var txt=document.getElementById('pa-scan-result')?document.getElementById('pa-scan-result').innerText:'';
-  if(navigator.share)navigator.share({title:'نتائج قراءة الروشة',text:txt});
-  else if(navigator.clipboard)navigator.clipboard.writeText(txt).then(function(){if(typeof showToast==='function')showToast('تم نسخ النتائج');});
-}
-function _rxShowHistory(){
-  var hist=_rxGetHistory();
-  var popup=document.createElement('div');
-  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px';
-  var cards=hist.length?hist.map(function(r){
-    var d=new Date(r.date);
-    var ds=d.toLocaleDateString('ar-EG')+' '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
-    var ms=(r.meds||[]).map(function(m){return m.name_ar||m.name_en;}).join(' • ');
-    return '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(233,30,99,.25);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;gap:10px;align-items:center">'
-      +(r.img?'<img src="'+r.img+'" style="width:50px;height:50px;object-fit:cover;border-radius:8px;flex-shrink:0">':'')
-      +'<div style="flex:1"><div style="font-size:.72rem;color:#f48fb1;margin-bottom:2px">'+ds+'</div>'
-      +'<div style="font-size:.78rem;color:#e0e0e0">'+ms+'</div></div></div>';
-  }).join(''):'<div style="text-align:center;color:var(--txt3);padding:20px">لا يوجد سجل بعد</div>';
-  popup.innerHTML='<div style="background:#0d1b2a;border:1.5px solid rgba(233,30,99,.4);border-radius:18px;padding:16px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
-    +'<div style="font-size:.9rem;font-weight:800;color:#f48fb1">&#128203; سجل الروشات ('+hist.length+')</div>'
-    +'<button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;color:var(--txt3);font-size:1.3rem;cursor:pointer">&times;</button>'
-    +'</div>'+cards
-    +'<button onclick="localStorage.removeItem('_rx_history');this.closest('div[style*=fixed]').remove()" style="width:100%;padding:9px;background:rgba(244,67,54,.15);border:1px solid rgba(244,67,54,.3);border-radius:10px;color:#ef9a9a;font-size:.78rem;cursor:pointer;font-family:Tajawal,sans-serif;margin-top:8px">&#128465; حذف السجل كاملاً</button>'
-    +'</div>';
-  document.body.appendChild(popup);
-}
-/* ===== End Prescription Engine ===== */
-</script>
-
 </body>
 </html>
