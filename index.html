@@ -3238,7 +3238,7 @@ async function captureAndScanProductBlob() {
           {type:"text", text: vPrompt},
           {type:"image_url", image_url:{url: imgData}}
         ]}
-      ], {model:"gpt-5.4", temperature:0.3});
+      ], {model:"gpt-4o-mini", temperature:0.3});
       var text = typeof res==="string" ? res
         : res&&res.message&&res.message.content ? res.message.content
         : res&&res.content ? res.content : null;
@@ -3317,7 +3317,7 @@ async function _scanAnalyzeAI(ingredients) {
   /* ١. Puter.js */
   try {
     if (typeof puter !== "undefined" && puter.ai) {
-      var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
+      var res = await puter.ai.chat(prompt, {model:"gpt-4o-mini-nano", temperature:0.3});
       var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (t) result = {text:t, source:"Puter.js"};
     }
@@ -3477,7 +3477,7 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
         : prompt;
       var res = await puter.ai.chat(
         imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
+        {model: imgDataUrl ? "gpt-4o-mini" : "gpt-4o-mini-nano", temperature:0.3}
       );
       var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (t) result = {text:t, source:"AI Pharma"};
@@ -3628,7 +3628,7 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
         : prompt;
       var res = await puter.ai.chat(
         imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
+        {model: imgDataUrl ? "gpt-4o-mini" : "gpt-4o-mini-nano", temperature:0.3}
       );
       var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (t) result = {text:t, source:"AI Doctor"};
@@ -5453,7 +5453,7 @@ window.addEventListener('DOMContentLoaded', function() {
   var ZAI_MODEL        = "glm-4-flash";
   var MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
   var MISTRAL_MODEL    = "mistral-small-latest";
-  var PUTER_MODELS     = ["gpt-5.4-nano","gpt-5.4","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1"];
+  var PUTER_MODELS     = ["gpt-4o-mini-nano","gpt-4o-mini","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1"];
   var _history = [];
 
   function _zaiKey()     { return window.__GEMINI_KEY  || null; }
