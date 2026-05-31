@@ -3944,12 +3944,19 @@ function _showDrugPriceCard(drug, container) {
 
 function drugSearchDebounce(val) {
   clearTimeout(_drugSearchTimer);
-  if (!val || val.trim().length < 1) {
-    var r = document.getElementById('drug-search-results');
+  var r = document.getElementById('drug-search-results');
+  if (!val || !val.trim()) {
     if (r) r.innerHTML = '';
     return;
   }
-  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 120);
+  // عرض نتائج فورية من DB المحلية أولاً (بدون انتظار)
+  if (_drugDB && val.trim().length >= 1) {
+    var quick = _searchDrugLocal(val.trim(), 5);
+    if (quick && quick.length && r) {
+      r.innerHTML = '<div style="text-align:center;padding:6px;color:var(--txt3);font-size:.72rem"><i class="fas fa-bolt" style="color:#ffa726"></i> نتائج فورية...</div>';
+    }
+  }
+  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 80);
 }
 
 async function drugSearchByName(query) {
@@ -4082,6 +4089,9 @@ async function drugSearchByCamera() {
 }
 
 // Pre-load DB when entering medicine mode — shows progress
+// تحميل قاعدة البيانات تلقائياً عند بدء الصفحة
+(function(){ setTimeout(function(){ _loadDrugDB(); }, 2000); })();
+
 var _drugDBPreloaded = false;
 function _preloadDrugDB() {
   if (_drugDBPreloaded) return;
@@ -6999,23 +7009,40 @@ async function _analyzePrescriptionImage(imgData){
   var resBox=document.getElementById('pa-scan-result');
   if(!resBox)return;
   if(!resBox.innerHTML.includes('img src'))
-    resBox.innerHTML='<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.82rem"> جاري تحليل الروشة…</span></div>';
-  var prompt='أنت نظام متخصص في قراءة الروشات الطبية المكتوبة بخط اليد (عربي أو إنجليزي أو مختلط). حلّل الصورة وأخرج كل دواء كمصفوفة JSON فقط بدون أي نص إضافي:
-[{"name_en":"","name_ar":"","form":"","strength":"","dose":"","frequency":"","timing":"","duration":"","notes":"","confidence":85}]
-- confidence: 0-100
-- إذا الخط غير واضح أعطِ أقرب احتمال طبي واخفض الثقة
-- إذا لم تجد أي دواء أرجع: []';
+    resBox.innerHTML='<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.82rem"> جاري تحليل الروشة بـ puter.ai...</span></div>';
+
+  var prompt='أنت نظام متخصص في قراءة الروشات الطبية. حلّل الصورة واستخرج كل دواء.\nأرجع JSON array فقط بين [] بدون أي نص:\n[{"name_en":"","name_ar":"","form":"","strength":"","dose":"","frequency":"","timing":"","duration":"","notes":"","confidence":85}]\n- confidence 0-100\n- إذا الخط غير واضح اعطِ أقرب احتمال واخفض confidence\n- إذا لا يوجد دواء أرجع: []';
+
   var meds=[];
   try{
-    var res=await puter.ai.chat([{role:'user',content:[{type:'image_url',image_url:{url:imgData}},{type:'text',text:prompt}]}],{model:'gpt-4o',temperature:0.1});
-    var txt=typeof res==='string'?res:(res.message&&res.message.content||res.content||'');
-    var m=txt.match(/\[[\s\S]*\]/);if(m)meds=JSON.parse(m[0]);
+    if(typeof puter==='undefined'||!puter.ai) throw new Error('puter not ready');
+    var res=await puter.ai.chat(
+      [{role:'user',content:[
+        {type:'image_url',image_url:{url:imgData}},
+        {type:'text',text:prompt}
+      ]}],
+      {model:'gpt-4o',temperature:0.1}
+    );
+    var txt=typeof res==='string'?res:((res&&res.message&&res.message.content)?res.message.content:(res&&res.content?res.content:''));
+    txt=txt.trim();
+    var s=txt.indexOf('['), e=txt.lastIndexOf(']');
+    if(s!==-1&&e>s){
+      try{ meds=JSON.parse(txt.substring(s,e+1)); }
+      catch(je){
+        var clean=txt.substring(s,e+1).replace(/[ -]/g,' ').replace(/,\s*]/g,']').replace(/,\s*}/g,'}');
+        try{ meds=JSON.parse(clean); }catch(je2){ meds=[]; }
+      }
+    }
   }catch(e){
-    resBox.innerHTML='<div style="padding:14px;color:var(--txt3);text-align:center;font-size:.82rem">تعذّر تحليل الروشة. تأكد من جودة الصورة وحاول مرة أخرى.</div>';
+    resBox.innerHTML='<div style="background:rgba(198,40,40,.1);border:1px solid rgba(239,83,80,.4);border-radius:12px;padding:16px;color:#ef9a9a;text-align:center;font-size:.82rem">'
+      +'<i class="fas fa-exclamation-circle" style="font-size:1.6rem;display:block;margin-bottom:8px;color:#ef5350"></i>'
+      +'<strong>تعذّر تحليل الروشة</strong><br>'
+      +'<span style="font-size:.74rem;color:var(--txt3);line-height:1.6">تأكد أن التطبيق يعمل على puter.com أو أن الاتصال بالإنترنت يعمل ثم حاول مرة أخرى.</span>'
+      +'</div>'+_rxChoiceHTML();
     return;
   }
-  if(!meds.length){
-    resBox.innerHTML='<div style="padding:14px;color:#ffa726;text-align:center;font-size:.85rem">&#8505;&#65039; لم يتم التعرف على أي دواء. تأكد من وضوح صورة الروشة.</div>'+_rxChoiceHTML();
+  if(!Array.isArray(meds)||!meds.length){
+    resBox.innerHTML='<div style="padding:16px;color:#ffa726;text-align:center;font-size:.85rem">&#8505;&#65039; لم يتم التعرف على أي دواء في الروشة.<br><span style="font-size:.74rem;color:var(--txt3)">تأكد من وضوح الصورة وأعد المحاولة.</span></div>'+_rxChoiceHTML();
     return;
   }
   _rxSaveHistory({date:new Date().toISOString(),img:imgData,meds:meds});
