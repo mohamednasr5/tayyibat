@@ -1909,6 +1909,12 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <button id="scan-tab-report" onclick="setScanMode('report')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(156,39,176,.3);background:rgba(156,39,176,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
       <i class="fas fa-file-medical"></i> قراءة التقارير الطبية
     </button>
+    <!-- زر قراءة الروشتة - يمتد على العرض الكامل -->
+    <button id="scan-tab-prescription" onclick="setScanMode('prescription')" style="grid-column:1/-1;padding:11px;border-radius:12px;border:2px solid rgba(255,111,0,.35);background:rgba(255,111,0,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <i class="fas fa-prescription" style="font-size:1rem"></i>
+      <span>📋 قراءة روشتة الدكتور</span>
+      <span style="font-size:.65rem;background:rgba(255,111,0,.2);border:1px solid rgba(255,111,0,.4);border-radius:20px;padding:2px 8px;color:#ff8a50">جديد</span>
+    </button>
   </div>
 
   <div style="padding:12px 16px">
@@ -3425,19 +3431,21 @@ function setScanMode(mode) {
   // Show drug search section only in medicine mode
   var _dss = document.getElementById('drug-search-section');
   if (_dss) _dss.style.display = (mode === 'medicine') ? 'block' : 'none';
-  if (mode === 'medicine') _preloadDrugDB(); // Start loading DB immediately
+  if (mode === 'medicine') _preloadDrugDB();
   var badge = document.getElementById('pa-camera-mode-badge');
   var modeLabels = {
-    'product':  '📦 وضع قراءة المكونات',
-    'food':     '🍎 وضع التعرف على الطعام',
-    'medicine': '💊 وضع قراءة علبة الدواء',
-    'report':   '🩺 وضع قراءة التقارير الطبية'
+    'product':      '📦 وضع قراءة المكونات',
+    'food':         '🍎 وضع التعرف على الطعام',
+    'medicine':     '💊 وضع قراءة علبة الدواء',
+    'report':       '🩺 وضع قراءة التقارير الطبية',
+    'prescription': '📋 وضع قراءة روشتة الدكتور'
   };
   var modeBorderColors = {
-    'product':  '#2ec951',
-    'food':     'var(--gold)',
-    'medicine': '#2196f3',
-    'report':   '#9c27b0'
+    'product':      '#2ec951',
+    'food':         'var(--gold)',
+    'medicine':     '#2196f3',
+    'report':       '#9c27b0',
+    'prescription': '#ff6f00'
   };
   if (badge) {
     badge.style.display = 'block';
@@ -3446,10 +3454,11 @@ function setScanMode(mode) {
   }
   /* Reset all tab buttons */
   var tabs = {
-    product:  { el: document.getElementById('scan-tab-product'),  active: 'rgba(46,201,81,.5)',    activeBg: 'linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1))',    activeColor: '#2ec951',    inactiveBorder: 'rgba(46,201,81,.15)',    inactiveBg: 'rgba(46,201,81,.03)',    inactiveColor: 'var(--txt2)' },
-    food:     { el: document.getElementById('scan-tab-food'),     active: 'rgba(200,150,12,.6)',   activeBg: 'linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.08))', activeColor: 'var(--gold2)',inactiveBorder: 'rgba(200,150,12,.15)',   inactiveBg: 'rgba(200,150,12,.03)',   inactiveColor: 'var(--txt2)' },
-    medicine: { el: document.getElementById('scan-tab-medicine'), active: 'rgba(33,150,243,.6)',   activeBg: 'linear-gradient(135deg,rgba(33,150,243,.2),rgba(33,150,243,.08))', activeColor: '#2196f3',    inactiveBorder: 'rgba(33,150,243,.15)',   inactiveBg: 'rgba(33,150,243,.03)',   inactiveColor: 'var(--txt2)' },
-    report:   { el: document.getElementById('scan-tab-report'),   active: 'rgba(156,39,176,.6)',   activeBg: 'linear-gradient(135deg,rgba(156,39,176,.2),rgba(156,39,176,.08))', activeColor: '#ce93d8',    inactiveBorder: 'rgba(156,39,176,.15)',   inactiveBg: 'rgba(156,39,176,.03)',   inactiveColor: 'var(--txt2)' }
+    product:      { el: document.getElementById('scan-tab-product'),      active: 'rgba(46,201,81,.5)',    activeBg: 'linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1))',    activeColor: '#2ec951',    inactiveBorder: 'rgba(46,201,81,.15)',    inactiveBg: 'rgba(46,201,81,.03)',    inactiveColor: 'var(--txt2)' },
+    food:         { el: document.getElementById('scan-tab-food'),         active: 'rgba(200,150,12,.6)',   activeBg: 'linear-gradient(135deg,rgba(200,150,12,.2),rgba(200,150,12,.08))', activeColor: 'var(--gold2)',inactiveBorder: 'rgba(200,150,12,.15)',   inactiveBg: 'rgba(200,150,12,.03)',   inactiveColor: 'var(--txt2)' },
+    medicine:     { el: document.getElementById('scan-tab-medicine'),     active: 'rgba(33,150,243,.6)',   activeBg: 'linear-gradient(135deg,rgba(33,150,243,.2),rgba(33,150,243,.08))', activeColor: '#2196f3',    inactiveBorder: 'rgba(33,150,243,.15)',   inactiveBg: 'rgba(33,150,243,.03)',   inactiveColor: 'var(--txt2)' },
+    report:       { el: document.getElementById('scan-tab-report'),       active: 'rgba(156,39,176,.6)',   activeBg: 'linear-gradient(135deg,rgba(156,39,176,.2),rgba(156,39,176,.08))', activeColor: '#ce93d8',    inactiveBorder: 'rgba(156,39,176,.15)',   inactiveBg: 'rgba(156,39,176,.03)',   inactiveColor: 'var(--txt2)' },
+    prescription: { el: document.getElementById('scan-tab-prescription'), active: 'rgba(255,111,0,.7)',   activeBg: 'linear-gradient(135deg,rgba(255,111,0,.25),rgba(255,87,34,.12))',  activeColor: '#ff8a50',    inactiveBorder: 'rgba(255,111,0,.2)',     inactiveBg: 'rgba(255,111,0,.04)',    inactiveColor: 'var(--txt2)' }
   };
   Object.keys(tabs).forEach(function(k) {
     var t = tabs[k];
@@ -3468,10 +3477,11 @@ function setScanMode(mode) {
   var lbl = document.getElementById('pa-manual-label');
   var inp = document.getElementById('pa-manual-ingredients');
   var modeConfigs = {
-    'product':  { label: 'المكونات المكتوبة على العلبة',            placeholder: 'مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة' },
-    'food':     { label: 'اسم الطعام أو المنتج (بدون مكونات)',      placeholder: 'مثال: تفاحة، خبز بلدي، برتقالة، بيتزا...' },
-    'medicine': { label: 'اسم الدواء أو المادة الفعّالة',           placeholder: 'مثال: باراسيتامول 500mg أو Amoxicillin...' },
-    'report':   { label: 'اكتب نتائج التقرير أو وجّه الكاميرا إليه', placeholder: 'مثال: HBA1C=8.2، كوليسترول=240، ضغط 140/90...' }
+    'product':      { label: 'المكونات المكتوبة على العلبة',              placeholder: 'مثال: دقيق قمح، زيوت نباتية، سكر، مواد حافظة' },
+    'food':         { label: 'اسم الطعام أو المنتج (بدون مكونات)',        placeholder: 'مثال: تفاحة، خبز بلدي، برتقالة، بيتزا...' },
+    'medicine':     { label: 'اسم الدواء أو المادة الفعّالة',             placeholder: 'مثال: باراسيتامول 500mg أو Amoxicillin...' },
+    'report':       { label: 'اكتب نتائج التقرير أو وجّه الكاميرا إليه', placeholder: 'مثال: HBA1C=8.2، كوليسترول=240، ضغط 140/90...' },
+    'prescription': { label: 'وجّه الكاميرا للروشتة أو اكتب اسم الطبيب', placeholder: 'مثال: روشتة د. أحمد — أو اترك فارغاً واستخدم الكاميرا' }
   };
   var cfg = modeConfigs[mode] || modeConfigs['product'];
   if (lbl) lbl.textContent = cfg.label;
@@ -3480,10 +3490,11 @@ function setScanMode(mode) {
   // === تشغيل الكاميرا تلقائياً عند اختيار أي وضع ===
   var _camStatusEl = document.getElementById('camera-status-text');
   var _modeLabelsLocal = {
-    'product':  'مكونات العلبة',
-    'food':     'التعرف على الطعام',
-    'medicine': 'قراءة علبة الدواء',
-    'report':   'قراءة التقارير'
+    'product':      'مكونات العلبة',
+    'food':         'التعرف على الطعام',
+    'medicine':     'قراءة علبة الدواء',
+    'report':       'قراءة التقارير',
+    'prescription': 'قراءة الروشتة'
   };
   // ازل overlay "اضغط للمسح" عند تغيير الوضع
   var _oldOverlay = document.getElementById('tap-to-rescan');
@@ -4194,12 +4205,244 @@ function _preloadDrugDB() {
 function captureSmartByMode() {
   if (_scanMode === 'medicine') { analyzeMedicineFromCamera(); }
   else if (_scanMode === 'report') { analyzeReportFromCamera(); }
+  else if (_scanMode === 'prescription') { analyzePrescriptionFromCamera(); }
   else { captureAndScanProductBlob(); }
 }
 function analyzeSmartByMode() {
   if (_scanMode === 'medicine') { analyzeMedicineFromText(); }
   else if (_scanMode === 'report') { analyzeReportFromText(); }
+  else if (_scanMode === 'prescription') { analyzePrescriptionFromText(); }
   else { analyzeIngredientsTextDirect(); }
+}
+
+/* ══════════════════════════════════════════════════════
+   PRESCRIPTION READER — قارئ روشتة الدكتور
+══════════════════════════════════════════════════════ */
+
+async function analyzePrescriptionFromCamera() {
+  var video  = document.getElementById('pa-video-stream');
+  var resBox = document.getElementById('pa-scan-result');
+  if (!video || video.readyState < 2 || video.style.display === 'none') {
+    if (resBox) resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">افتح الكاميرا أولاً ثم اضغط تحليل.</p>';
+    return;
+  }
+  var canvas = document.createElement('canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  if (resBox) resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem"> جاري قراءة الروشتة بالذكاء الاصطناعي...</span></div>';
+  var imgData = canvas.toDataURL('image/jpeg', 0.9);
+  await _analyzePrescriptionWithAI(imgData, null);
+}
+
+async function analyzePrescriptionFromText() {
+  var inp = document.getElementById('pa-manual-ingredients');
+  var text = inp ? inp.value.trim() : '';
+  if (!text) { if (typeof showToast === 'function') showToast('أدخل ملاحظات الروشتة أولاً'); return; }
+  var resBox = document.getElementById('pa-scan-result');
+  if (resBox) resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem"> جاري تحليل الروشتة...</span></div>';
+  await _analyzePrescriptionWithAI(null, text);
+}
+
+async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
+  var resBox = document.getElementById('pa-scan-result');
+
+  var prompt =
+    'أنت صيدلاني وطبيب خبير متخصص في قراءة روشتات الأطباء المصريين والعرب.\n' +
+    'خط الأطباء صعب القراءة — حاول قراءته بأفضل ما يمكن واستخدم سياق الكلمة والاسم الطبي.\n\n' +
+    'المطلوب: استخرج كل الأدوية الموجودة في الروشتة وأجب بالتنسيق التالي الحرفي فقط (بدون ** أو markdown):\n\n' +
+    'دواء_1:\n' +
+    'الاسم: (اسم الدواء كما هو مكتوب)\n' +
+    'النوع: (برشام / شراب / مرهم / كريم / قطرة / حقن عضل / حقن وريد / تحاميل / بخاخ / غيرها)\n' +
+    'التركيز: (مثل 500mg أو 10ml أو غير محدد)\n' +
+    'الجرعة: (كما كتبها الطبيب بالعربية، مثل: حبة كل 8 ساعات لمدة 5 أيام)\n\n' +
+    'دواء_2:\n' +
+    'الاسم: ...\n' +
+    'النوع: ...\n' +
+    'التركيز: ...\n' +
+    'الجرعة: ...\n\n' +
+    'وهكذا مع كل دواء في الروشتة.\n' +
+    'ملاحظة: اذكر فقط الأدوية الموجودة فعلاً. إذا لم تستطع قراءة كلمة اكتب (غير واضح).\n' +
+    (textInput ? 'نص الروشتة: ' + textInput : 'انظر للصورة واستخرج جميع الأدوية منها.');
+
+  var result = null;
+
+  // 1. Puter.js (vision للصورة)
+  try {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var content = imgDataUrl
+        ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imgDataUrl } }]
+        : prompt;
+      var res = await puter.ai.chat(
+        imgDataUrl ? [{ role: 'user', content: content }] : prompt,
+        { model: imgDataUrl ? 'gpt-4o' : 'gpt-4o-mini', temperature: 0.2 }
+      );
+      var t = typeof res === 'string' ? res
+        : res && res.message && res.message.content ? res.message.content
+        : res && res.content ? res.content : null;
+      if (t) result = t;
+    }
+  } catch(e) {}
+
+  // 2. OpenRouter fallback
+  if (!result && window.ORKEYFB) {
+    try {
+      var oRes = await tryOpenRouter('deepseek/deepseek-chat', '', prompt);
+      if (oRes) result = oRes.text;
+    } catch(e) {}
+  }
+
+  if (!result) {
+    result = 'تعذر قراءة الروشتة. حاول تصوير الروشتة بإضاءة أفضل أو أدخل النص يدوياً.';
+    if (resBox) resBox.innerHTML = '<div style="padding:14px;color:#ff9800;font-size:.85rem;text-align:center">' + result + '</div>';
+    return;
+  }
+
+  await _renderPrescriptionResult(result);
+}
+
+async function _renderPrescriptionResult(text) {
+  var resBox = document.getElementById('pa-scan-result');
+  if (!resBox) return;
+  _stopPaCamera();
+
+  // استخراج الأدوية من النص
+  var drugs = _parsePrescriptionDrugs(text);
+
+  if (!drugs.length) {
+    resBox.innerHTML = '<div style="padding:16px;text-align:center;color:var(--txt2);font-size:.85rem">⚠️ لم يتم العثور على أدوية في الروشتة. حاول مرة أخرى بصورة أوضح.</div>';
+    return;
+  }
+
+  // عنوان الروشتة
+  var h = '<div style="margin-top:4px">';
+  h += '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(135deg,rgba(255,111,0,.18),rgba(255,87,34,.1));border:2px solid rgba(255,111,0,.5);border-radius:16px;margin-bottom:14px">';
+  h += '<span style="font-size:1.6rem">📋</span>';
+  h += '<div><div style="font-size:.95rem;font-weight:900;color:#ff8a50">قراءة الروشتة الطبية</div>';
+  h += '<div style="font-size:.72rem;color:var(--txt3);margin-top:2px">تم العثور على <strong style="color:#ff8a50">' + drugs.length + '</strong> دواء في الروشتة</div></div>';
+  h += '</div>';
+
+  // بطاقة لكل دواء (placeholder سيُملأ بعد DB lookup)
+  drugs.forEach(function(drug, idx) {
+    var typeIcon = _rxTypeIcon(drug.type);
+    h += '<div id="rx-card-' + idx + '" style="background:linear-gradient(160deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,111,0,.35);border-radius:20px;overflow:hidden;margin-bottom:12px;animation:pageIn .4s ease ' + (idx * 0.12).toFixed(2) + 's both">';
+    // Header
+    h += '<div style="background:linear-gradient(135deg,rgba(255,111,0,.3),rgba(255,87,34,.2));padding:10px 14px;display:flex;align-items:center;gap:10px">';
+    h += '<span style="font-size:1.4rem">' + typeIcon + '</span>';
+    h += '<div style="flex:1"><div style="font-size:1rem;font-weight:900;color:#ffe0b2">' + (drug.name || 'غير محدد') + '</div>';
+    h += '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">' + (drug.type || '') + (drug.concentration ? ' — ' + drug.concentration : '') + '</div></div>';
+    h += '<div style="font-size:.6rem;background:rgba(255,111,0,.25);border:1px solid rgba(255,111,0,.5);border-radius:12px;padding:3px 8px;color:#ff8a50;font-weight:700"># ' + (idx + 1) + '</div>';
+    h += '</div>';
+    // Dose
+    h += '<div style="padding:10px 14px 8px">';
+    h += '<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;border-right:3px solid #ff6f00">';
+    h += '<div style="font-size:.65rem;color:#ff8a50;font-weight:700;margin-bottom:4px">💊 الجرعة كما كتبها الطبيب</div>';
+    h += '<div style="font-size:.85rem;color:var(--txt);line-height:1.7">' + (drug.dose || 'راجع الطبيب') + '</div>';
+    h += '</div>';
+    // DB info placeholder
+    h += '<div id="rx-db-' + idx + '" style="margin-top:10px"></div>';
+    h += '</div></div>';
+  });
+
+  h += '</div>';
+  resBox.innerHTML = h;
+
+  // الآن ابحث في قاعدة البيانات لكل دواء
+  var db = null;
+  try { db = await _loadDrugDB(); } catch(e) {}
+
+  drugs.forEach(function(drug, idx) {
+    var dbEl = document.getElementById('rx-db-' + idx);
+    if (!dbEl) return;
+    _rxLookupAndShow(drug.name, db, dbEl);
+  });
+
+  // صوت الانتهاء
+  if (typeof _playMedicineDoneSound === 'function') _playMedicineDoneSound();
+}
+
+function _parsePrescriptionDrugs(text) {
+  var drugs = [];
+  // قسّم على "دواء_N:"
+  var blocks = text.split(/دواء_?\d+\s*:/i).filter(function(b){ return b.trim().length > 3; });
+  if (blocks.length === 0) {
+    // fallback: قسّم على سطر فارغ
+    blocks = text.split(/\n{2,}/);
+  }
+  blocks.forEach(function(block) {
+    var nameM  = block.match(/الاسم\s*:\s*([^\n]+)/i);
+    var typeM  = block.match(/النوع\s*:\s*([^\n]+)/i);
+    var concM  = block.match(/التركيز\s*:\s*([^\n]+)/i);
+    var doseM  = block.match(/الجرعة\s*:\s*([\s\S]*?)(?=الاسم|النوع|التركيز|دواء_|$)/i);
+    if (!nameM) return;
+    drugs.push({
+      name:          (nameM[1]||'').trim().replace(/[*_#]/g,''),
+      type:          (typeM  ? typeM[1]  : '').trim(),
+      concentration: (concM  ? concM[1]  : '').trim(),
+      dose:          (doseM  ? doseM[1]  : '').trim().replace(/\n/g, ' ')
+    });
+  });
+  return drugs;
+}
+
+function _rxTypeIcon(type) {
+  var t = (type||'').toLowerCase();
+  if (t.includes('برشام') || t.includes('tab') || t.includes('حبة'))  return '💊';
+  if (t.includes('شراب') || t.includes('syrup'))                       return '🍶';
+  if (t.includes('مرهم') || t.includes('كريم') || t.includes('cream'))return '🧴';
+  if (t.includes('قطرة') || t.includes('drop'))                        return '💧';
+  if (t.includes('حقن') || t.includes('inject') || t.includes('ampoule')) return '💉';
+  if (t.includes('بخاخ') || t.includes('spray'))                       return '🌬️';
+  if (t.includes('تحاميل'))                                             return '🟡';
+  return '💊';
+}
+
+async function _rxLookupAndShow(name, db, container) {
+  if (!name || name.includes('غير واضح')) {
+    container.innerHTML = '<div style="font-size:.72rem;color:var(--txt3);padding:6px 0">⚠️ الاسم غير واضح — لا يمكن البحث</div>';
+    return;
+  }
+  container.innerHTML = '<div style="font-size:.72rem;color:var(--txt3);padding:4px 0"><i class="fas fa-spinner fa-spin" style="margin-left:4px"></i> جاري البحث في قاعدة البيانات...</div>';
+
+  var found = null;
+  // بحث محلي أولاً
+  if (db) {
+    var local = _searchDrugLocal(name, 1);
+    if (local.length) found = local[0];
+  }
+  // fallback egyptdwa
+  if (!found) {
+    try { found = await _fetchDrugFromEgyptdwa(name); } catch(e) {}
+  }
+
+  if (!found) {
+    container.innerHTML =
+      '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px">' +
+        '<span style="font-size:1.4rem;opacity:.4">💊</span>' +
+        '<div>' +
+          '<div style="font-size:.7rem;color:var(--txt3)">لم يُعثر على الدواء في قاعدة البيانات</div>' +
+          '<div style="font-size:.65rem;color:var(--txt3);margin-top:2px">تحقق من الاسم مع الصيدلاني</div>' +
+        '</div>' +
+      '</div>';
+    return;
+  }
+
+  var imgSrc = _drugImgUrl(found.img);
+  container.innerHTML =
+    '<div style="background:linear-gradient(160deg,rgba(0,131,143,.15),rgba(0,188,212,.08));border:1.5px solid rgba(0,188,212,.45);border-radius:14px;padding:12px;display:flex;align-items:center;gap:12px">' +
+      (imgSrc
+        ? '<img src="' + imgSrc + '" onerror="this.style.display=\'none\'" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1.5px solid rgba(0,188,212,.4);flex-shrink:0">'
+        : '<div style="width:72px;height:72px;border-radius:10px;background:rgba(0,188,212,.1);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">💊</div>') +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:.65rem;color:#80deea;font-weight:700;margin-bottom:4px">🗄️ قاعدة البيانات</div>' +
+        '<div style="font-size:.9rem;font-weight:900;color:#e3f2fd;line-height:1.3">' + (found.arabic || '') + '</div>' +
+        (found.name ? '<div style="font-size:.72rem;color:#90caf9;font-style:italic;margin-top:2px">' + found.name + '</div>' : '') +
+        (found.active ? '<div style="background:rgba(255,255,255,.05);border-radius:6px;padding:3px 8px;font-size:.65rem;color:#b0bec5;margin-top:5px;direction:ltr">🧪 ' + found.active + '</div>' : '') +
+        (found.price
+          ? '<div style="margin-top:7px;background:linear-gradient(135deg,rgba(0,131,143,.3),rgba(0,188,212,.2));border:1.5px solid rgba(0,188,212,.6);border-radius:10px;padding:6px 12px;display:inline-block"><span style="font-size:.6rem;color:#80deea;font-weight:700">💰 السعر في مصر</span><br><span style="font-size:1.2rem;font-weight:900;color:#26c6da">' + found.price + '</span><span style="font-size:.75rem;font-weight:700;color:#26c6da"> جنيه</span></div>'
+          : '<div style="font-size:.72rem;color:var(--txt3);margin-top:5px">السعر غير متوفر</div>') +
+      '</div>' +
+    '</div>';
 }
 
 function _playForbiddenAlert() {
