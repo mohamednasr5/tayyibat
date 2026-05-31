@@ -3569,41 +3569,105 @@ function _renderMedicineResult(text, source) {
   h += '</div></div>';
   resBox.innerHTML = h;
 
-  // Auto-fetch real price from egyptdwa.com after AI analysis
+  // ── بعد عرض نتيجة الذكاء الاصطناعي: ابحث في قاعدة البيانات المحلية وأظهر بطاقة كاملة ──
   (function() {
     var nameForSearch = '';
     if (text) {
+      // محاولة استخراج الاسم من نص AI
       var nm = text.match(/(?:اسم[^::\n]*|الاسم[^::\n]*)[::]\s*([^\n\r،,]{2,40})/i);
       if (nm) nameForSearch = nm[1].trim();
       if (!nameForSearch) {
+        // أخذ أول سطر ذي محتوى
         var fl = text.split('\n').find(function(l){ return l.replace(/[*_#\s]/g,'').length > 2; });
         if (fl) nameForSearch = fl.replace(/[*_#]/g,'').trim().split(/\s+/).slice(0,3).join(' ');
       }
     }
-    if (nameForSearch) {
-      _fetchDrugFromEgyptdwa(nameForSearch).then(function(drug) {
-        if (!drug || !drug.price) return;
-        // Update the price section if displayed
-        var priceBoxes = resBox.querySelectorAll('[data-section="price"]');
-        var badge = document.createElement('div');
-        badge.style.cssText = "margin-top:8px;padding:8px 12px;background:rgba(0,131,143,.2);border:1.5px solid rgba(0,188,212,.5);border-radius:10px;display:flex;align-items:center;gap:10px";
-        badge.innerHTML =
-          (drug.img ? '<img src="'+_drugImgUrl(drug.img)+'" onerror="this.style.display=\'none\'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0">'
-                    : '<span style="font-size:1.4rem">&#x1F48A;</span>') +
-          '<div>' +
-            '<div style="font-size:.68rem;color:#80deea;margin-bottom:2px;font-weight:700">&#x1F4CB; سعر السوق الفعلي</div>' +
-            '<div style="font-size:.88rem;font-weight:800;color:var(--txt);margin-bottom:2px">' + (drug.arabic || drug.name || '') + '</div>' +
-            '<div style="font-size:1rem;font-weight:900;color:#26c6da">&#x1F4B0; ' + drug.price + ' جنيه</div>' +
-            (drug.active ? '<div style="font-size:.68rem;color:var(--txt3);margin-top:2px">' + drug.active + '</div>' : '') +
-          '</div>';
-        if (priceBoxes.length > 0) {
-          priceBoxes[0].appendChild(badge);
-        } else {
-          _showDrugPriceCard(drug, resBox);
-        }
-      }).catch(function(){});
+
+    // ── دالة إنشاء بطاقة DB كاملة (صورة + اسم + مادة فعالة + سعر) ──
+    function _insertDBCard(drug) {
+      if (!drug) return;
+      var imgSrc = _drugImgUrl(drug.img);
+      var dbCard = document.createElement('div');
+      dbCard.style.cssText = 'background:linear-gradient(160deg,rgba(10,22,40,.98),rgba(5,14,30,.99));border:2px solid rgba(0,188,212,.65);border-radius:20px;padding:18px 16px;display:flex;flex-direction:row;align-items:center;gap:14px;margin-top:14px;box-shadow:0 6px 28px rgba(0,188,212,.18);animation:pageIn .4s ease both';
+      var imgHtml = imgSrc
+        ? '<img src="'+imgSrc+'" onerror="this.style.display=\'none\'" style="width:90px;height:90px;object-fit:cover;border-radius:14px;border:2px solid rgba(0,188,212,.5);box-shadow:0 4px 14px rgba(0,0,0,.55);flex-shrink:0">'
+        : '<div style="width:90px;height:90px;border-radius:14px;background:rgba(33,150,243,.12);display:flex;align-items:center;justify-content:center;font-size:2.8rem;flex-shrink:0">💊</div>';
+      dbCard.innerHTML =
+        '<div style="font-size:.6rem;color:#80deea;font-weight:700;text-align:center;margin-bottom:4px;position:absolute;top:8px;right:12px">🗄️ قاعدة البيانات</div>'
+        + imgHtml
+        + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:.6rem;color:#80deea;font-weight:700;margin-bottom:5px">🗄️ معلومات قاعدة البيانات</div>'
+          + '<div style="font-size:.98rem;font-weight:900;color:#e3f2fd;margin-bottom:2px;line-height:1.3">'+(drug.arabic||'')+'</div>'
+          + (drug.name ? '<div style="font-size:.74rem;color:#90caf9;margin-bottom:5px;font-style:italic">'+drug.name+'</div>' : '')
+          + (drug.active ? '<div style="background:rgba(255,255,255,.06);border-radius:8px;padding:4px 10px;font-size:.68rem;color:#b0bec5;margin-bottom:8px;direction:ltr">🧪 '+drug.active+'</div>' : '')
+          + (drug.price
+            ? '<div style="background:linear-gradient(135deg,rgba(0,131,143,.28),rgba(0,188,212,.18));border:1.5px solid rgba(0,188,212,.6);border-radius:12px;padding:8px 14px;display:inline-block"><div style="font-size:.6rem;color:#80deea;font-weight:700;margin-bottom:2px">💰 السعر</div><div style="font-size:1.4rem;font-weight:900;color:#26c6da;line-height:1.1">'+drug.price+' <span style="font-size:.8rem;font-weight:700">جنيه</span></div></div>'
+            : '<div style="color:var(--txt3);font-size:.75rem">السعر غير متوفر</div>')
+        + '</div>';
+      dbCard.style.position = 'relative';
+      resBox.appendChild(dbCard);
     }
+
+    if (nameForSearch) {
+      // بحث محلي أولاً ثم egyptdwa كاحتياط
+      _loadDrugDB().then(function(db) {
+        var localResults = db ? _searchDrugLocal(nameForSearch, 1) : [];
+        if (localResults.length > 0) {
+          _insertDBCard(localResults[0]);
+        } else {
+          // fallback: egyptdwa
+          _fetchDrugFromEgyptdwa(nameForSearch).then(function(drug) {
+            if (drug) _insertDBCard(drug);
+          }).catch(function(){});
+        }
+      }).catch(function(){
+        _fetchDrugFromEgyptdwa(nameForSearch).then(function(drug) {
+          if (drug) _insertDBCard(drug);
+        }).catch(function(){});
+      });
+    }
+
+    // ── إنذار صوتي: تم الانتهاء من فحص الدواء ──
+    _playMedicineDoneSound();
   })();
+}
+
+/* ── صوت إنذار "تم فحص الدواء" ── */
+function _playMedicineDoneSound() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // نغمة ثلاثية: دو-مي-صول تصاعدية
+    var notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+    notes.forEach(function(freq, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+      gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + i * 0.18 + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.32);
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.35);
+    });
+    // نغمةختامية أطول
+    setTimeout(function(){
+      try {
+        var ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+        var osc2 = ctx2.createOscillator();
+        var gain2 = ctx2.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx2.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1046.5, ctx2.currentTime); // C6
+        gain2.gain.setValueAtTime(0.3, ctx2.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + 0.55);
+        osc2.start(ctx2.currentTime);
+        osc2.stop(ctx2.currentTime + 0.6);
+      } catch(e) {}
+    }, 600);
+  } catch(e) {}
 }
 
 /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
@@ -3909,7 +3973,12 @@ function drugSearchDebounce(val) {
     if (r) r.innerHTML = '';
     return;
   }
-  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 120);
+  // عرض مؤشر البحث فوراً عند أول حرف
+  var r2 = document.getElementById('drug-search-results');
+  if (r2 && !r2.innerHTML.includes('fa-spinner')) {
+    r2.innerHTML = '<div style="text-align:center;padding:10px;color:var(--txt3);font-size:.78rem"><i class="fas fa-search" style="margin-left:5px;opacity:.5"></i> جاري البحث...</div>';
+  }
+  _drugSearchTimer = setTimeout(function(){ drugSearchByName(val); }, 250);
 }
 
 async function drugSearchByName(query) {
@@ -6828,7 +6897,7 @@ async function _autoScanMedicine() {
           var db = await _loadDrugDB();
           if (db) {
             var found = db.filter(function(d){ return String(d.id)===String(code); });
-            if (found.length > 0 && resBox) _showDrugPriceCard(found[0], resBox);
+            if (found.length > 0 && resBox) { _showDrugPriceCard(found[0], resBox); if(typeof _playMedicineDoneSound==='function') _playMedicineDoneSound(); }
           }
           await _analyzeMedicineWithAI(null, 'باركود الدواء: ' + code);
           window._autoScanLock = false;
