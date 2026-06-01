@@ -908,6 +908,36 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
+/* ===== Smart Tool Buttons ===== */
+.smart-tool-btn {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  padding:14px 8px;border-radius:16px;border:1.5px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.04);cursor:pointer;font-family:'Tajawal',sans-serif;
+  transition:all .2s;text-align:center;position:relative;min-height:100px;
+}
+.smart-tool-btn:active{transform:scale(.96);}
+.trial-badge {
+  font-size:.6rem;color:var(--txt3);background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:2px 7px;margin-top:2px;
+}
+/* ===== Food Analysis Cards ===== */
+.food-card {
+  background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));
+  border:2px solid rgba(46,201,81,.35);border-radius:20px;overflow:hidden;margin-bottom:12px;
+  animation:pageIn .4s ease both;
+}
+.food-card-header{background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));padding:12px 14px;}
+.food-macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px;}
+.macro-cell{text-align:center;background:rgba(255,255,255,.04);border-radius:10px;padding:8px 4px;}
+.macro-val{font-size:1rem;font-weight:900;color:var(--gold2);}
+.macro-label{font-size:.6rem;color:var(--txt3);margin-top:2px;}
+/* ===== Drug Interaction ===== */
+.drug-input-row{display:flex;gap:8px;margin-bottom:10px;align-items:center;}
+.drug-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.4);border-radius:20px;padding:5px 12px;font-size:.78rem;color:#64b5f6;margin:4px;cursor:pointer;}
+.interaction-card{background:rgba(13,27,42,.97);border-radius:16px;padding:14px;margin-bottom:10px;border-right:4px solid #f44336;}
+.interaction-card.ok{border-color:#2ec951;}
+.interaction-card.warn{border-color:#ff9800;}
+/* Camera pages generic */
 .camera-view-wrap {
   width: 100%;
   max-width: 400px;
@@ -932,6 +962,27 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
   50% { top: 100%; }
   100% { top: 0%; }
 }
+@keyframes bbLaserScan {
+  0% { top: 20%; }
+  50% { top: 70%; }
+  100% { top: 20%; }
+}
+
+/* === Emergency Animations === */
+@keyframes emPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.12);opacity:.85} }
+@keyframes emSlideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes emWaterFlow { 0%{transform:translateY(-20px);opacity:0} 30%{opacity:1} 80%{opacity:.8} 100%{transform:translateY(60px);opacity:0} }
+@keyframes emShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+@keyframes emBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+@keyframes emRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes emFlicker { 0%,100%{opacity:1;transform:scale(1) rotate(-5deg)} 25%{opacity:.7;transform:scale(1.1) rotate(5deg)} 50%{opacity:.9;transform:scale(.95) rotate(-3deg)} 75%{opacity:.6;transform:scale(1.05) rotate(4deg)} }
+@keyframes emHeartBeat { 0%,100%{transform:scale(1)} 14%{transform:scale(1.3)} 28%{transform:scale(1)} 42%{transform:scale(1.2)} 70%{transform:scale(1)} }
+@keyframes emFadeStep { 0%{opacity:0;transform:translateY(20px) scale(.95)} 100%{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes emBoneBreak { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-15deg)} 75%{transform:rotate(15deg)} }
+@keyframes emBlink { 0%,100%{opacity:1} 50%{opacity:.2} }
+@keyframes emFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes emSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes emArrowMove { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(-10px);opacity:1} }
 
 .metric-progress-container {
   background: rgba(255,255,255,0.03);
@@ -1487,14 +1538,75 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="dis-tags" id="home-dis-tags"></div>
   </div>
 
-  <div id="pro-features-grid-view" style="display:flex; justify-content:center; padding:0 16px 14px;">
-    <button onclick="goPremiumFeatureView('scanner')" class="btn" style="background: linear-gradient(135deg, #102a45, #14355a); color:#fff; font-size:0.88rem; padding:12px 28px; border:1px solid var(--border); border-radius:14px; width:auto; display:inline-flex; align-items:center; gap:8px;"><i class="fas fa-qrcode" style="color:var(--gold2);"></i> ماسح المنتجات</button>
+  <!-- شبكة الأدوات الذكية الجديدة -->
+  <div id="pro-features-grid-view" style="padding:0 16px 14px;">
+    <div style="font-size:.78rem;font-weight:800;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><i class="fas fa-robot"></i> الأدوات الذكية — 3 استخدامات مجانية لكل أداة</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <!-- تصوير الطعام — ماسح الطعام مع السعرات والمغذيات -->
+      <button onclick="goSmartTool('food-scan')" class="smart-tool-btn" style="border-color:rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.12),rgba(0,201,167,.06));">
+        <i class="fas fa-camera" style="font-size:1.4rem;color:#2ec951"></i>
+        <span style="color:#2ec951;font-size:.85rem;font-weight:800">📸 تصوير الطعام</span>
+        <span style="font-size:.68rem;color:var(--txt3)">تعرّف وسعرات وبروتين وكارب</span>
+        <span class="trial-badge" id="trial-badge-food-scan">استخدامات مجانية: <b id="tb-food-scan">3</b></span>
+      </button>
+      <!-- ماسح المنتجات الذكي مع trial -->
+      <button onclick="goSmartToolScanner()" class="smart-tool-btn" style="border-color:rgba(200,150,12,.5);background:linear-gradient(135deg,rgba(200,150,12,.12),rgba(255,193,7,.06));">
+        <i class="fas fa-qrcode" style="font-size:1.4rem;color:var(--gold2)"></i>
+        <span style="color:var(--gold2);font-size:.85rem;font-weight:800">📦 ماسح المنتجات</span>
+        <span style="font-size:.68rem;color:var(--txt3)">مكونات العلب + الدواء</span>
+        <span class="trial-badge" id="trial-badge-scanner">استخدامات مجانية: <b id="tb-scanner">3</b></span>
+      </button>
+      <button onclick="goSmartTool('drug-interaction')" class="smart-tool-btn" style="border-color:rgba(33,150,243,.5);background:linear-gradient(135deg,rgba(33,150,243,.12),rgba(0,188,212,.06));">
+        <i class="fas fa-pills" style="font-size:1.4rem;color:#2196f3"></i>
+        <span style="color:#2196f3;font-size:.85rem;font-weight:800">💊 تفاعل الأدوية</span>
+        <span style="font-size:.68rem;color:var(--txt3)">كشف التداخلات الدوائية</span>
+        <span class="trial-badge" id="trial-badge-drug-interaction">استخدامات مجانية: <b id="tb-drug-interaction">3</b></span>
+      </button>
+      <button onclick="goSmartTool('drug-alt')" class="smart-tool-btn" style="border-color:rgba(156,39,176,.5);background:linear-gradient(135deg,rgba(156,39,176,.12),rgba(103,58,183,.06));">
+        <i class="fas fa-exchange-alt" style="font-size:1.4rem;color:#9c27b0"></i>
+        <span style="color:#9c27b0;font-size:.85rem;font-weight:800">🔄 بدائل الأدوية</span>
+        <span style="font-size:.68rem;color:var(--txt3)">مقارنة الأسعار والمادة الفعالة</span>
+        <span class="trial-badge" id="trial-badge-drug-alt">استخدامات مجانية: <b id="tb-drug-alt">3</b></span>
+      </button>
+      <button onclick="goSmartTool('xray')" class="smart-tool-btn" style="border-color:rgba(0,188,212,.5);background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(38,198,218,.06));">
+        <i class="fas fa-x-ray" style="font-size:1.4rem;color:#00bcd4"></i>
+        <span style="color:#00bcd4;font-size:.85rem;font-weight:800">🩻 قراءة الأشعة</span>
+        <span style="font-size:.68rem;color:var(--txt3)">X-Ray / MRI / CT</span>
+        <span class="trial-badge" id="trial-badge-xray">استخدامات مجانية: <b id="tb-xray">3</b></span>
+      </button>
+      <button onclick="goSmartTool('symptoms')" class="smart-tool-btn" style="border-color:rgba(255,152,0,.5);background:linear-gradient(135deg,rgba(255,152,0,.12),rgba(255,193,7,.06));">
+        <i class="fas fa-stethoscope" style="font-size:1.4rem;color:#ff9800"></i>
+        <span style="color:#ff9800;font-size:.85rem;font-weight:800">🩺 تحليل الأعراض</span>
+        <span style="font-size:.68rem;color:var(--txt3)">اقتراح تشخيص وعلاج</span>
+        <span class="trial-badge" id="trial-badge-symptoms">استخدامات مجانية: <b id="tb-symptoms">3</b></span>
+      </button>
+      <button onclick="goSmartTool('barcode-boycott')" class="smart-tool-btn" style="border-color:rgba(244,67,54,.5);background:linear-gradient(135deg,rgba(244,67,54,.12),rgba(229,57,53,.06));">
+        <i class="fas fa-barcode" style="font-size:1.4rem;color:#f44336"></i>
+        <span style="color:#f44336;font-size:.85rem;font-weight:800">🚫 كشف المقاطعة</span>
+        <span style="font-size:.68rem;color:var(--txt3)">مسح الباركود والبدائل</span>
+        <span class="trial-badge" id="trial-badge-barcode-boycott">استخدامات مجانية: <b id="tb-barcode-boycott">3</b></span>
+      </button>
+      <button onclick="goSmartTool('emergency')" class="smart-tool-btn" style="grid-column:1/-1;border-color:rgba(244,67,54,.8);background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(229,57,53,.1));border-width:2px;">
+        <i class="fas fa-ambulance" style="font-size:1.4rem;color:#f44336"></i>
+        <span style="color:#f44336;font-size:.95rem;font-weight:900">🚨 الطوارئ السريعة</span>
+        <span style="font-size:.72rem;color:var(--txt3)">إسعافات أولية فورية — مجاني دائماً</span>
+      </button>
+    </div>
   </div>
 
-  <div id="pro-sub-tabs-row" style="display:flex; gap:8px; padding:0 16px 12px; overflow-x:auto;">
-    <button onclick="goPremiumFeatureView('protocols')" class="ftab" style="font-size:0.75rem;"><i class="fas fa-file-medical-alt"></i> بروتوكولات الحالات</button>
-    <button onclick="goPremiumFeatureView('recipes')" class="ftab" style="font-size:0.75rem;"><i class="fas fa-mortar-pestle"></i> وصفات Pro</button>
-    <button onclick="goPremiumFeatureView('challenges')" class="ftab" style="font-size:0.75rem;"><i class="fas fa-trophy"></i> التحديات والمستويات</button>
+  <div id="pro-sub-tabs-row" style="display:flex; gap:8px; padding:0 16px 12px; overflow-x:auto; justify-content:center;">
+    <button onclick="goPremiumFeatureView('protocols')" class="ftab" style="font-size:0.75rem;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <span><i class="fas fa-file-medical-alt"></i> بروتوكولات الحالات</span>
+      <span id="ptb-protocols-wrap" class="trial-badge" style="font-size:.62rem;">مجاني: <b id="ptb-protocols">3</b></span>
+    </button>
+    <button onclick="goPremiumFeatureView('recipes')" class="ftab" style="font-size:0.75rem;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <span><i class="fas fa-mortar-pestle"></i> وصفات Pro</span>
+      <span id="ptb-recipes-wrap" class="trial-badge" style="font-size:.62rem;">مجاني: <b id="ptb-recipes">3</b></span>
+    </button>
+    <button onclick="goPremiumFeatureView('challenges')" class="ftab" style="font-size:0.75rem;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <span><i class="fas fa-trophy"></i> التحديات والمستويات</span>
+      <span id="ptb-challenges-wrap" class="trial-badge" style="font-size:.62rem;">مجاني: <b id="ptb-challenges">3</b></span>
+    </button>
   </div>
 
   <div class="home-ai-btn" onclick="goPage('ai')">
@@ -1812,7 +1924,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
           <tr><td>الذكاء الاصطناعي الأساسي</td><td>✓ متاح</td><td>✓ غير محدود فائض السرعة</td></tr>
           <tr><td>إعلانات جوجل</td><td>📢 تظهر الإعلانات</td><td>✓ بدون إعلانات نهائياً</td></tr>
           <tr><td>AI Health Analyzer (تحليل شامل)</td><td>✖ غير متاح</td><td>✓ تحليلات تفصيلية معمقة للدم والأعراض</td></tr>
-          <tr><td>ماسح المنتجات المتقدم ذكياً للكاميرا</td><td>✖ غير متاح</td><td>✓ مسح ومطابقة ذكية للمكونات محلياً</td></tr>
           <tr><td>المدرب الصحي المباشر (AI Coach)</td><td>✖ غير متاح</td><td>✓ دردشة مستمرة وحفظ تفاعلي كامل للمحادثات</td></tr>
           <tr><td>لوحة متابعة ورسوم بيانية ذكية للتحسن</td><td>✖ غير متاح</td><td>✓ تتبع كامل وحفظ عبر سحابة Firebase</td></tr>
           <tr><td>الوصفات والبروتوكولات العلاجية الحصرية</td><td>✖ غير متاح</td><td>✓ تحديث دوري مخصص لحالتك</td></tr>
@@ -1895,10 +2006,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 4px;line-height:1.6">صور أي طعام أو علبة منتج - الذكاء الاصطناعي يتعرف ويحلل فورًا</p>
   </div>
 
+  <!-- وضع المسح الحالي -->
+  <div id="pa-camera-mode-badge" style="display:none;margin:6px 16px 0;padding:6px 14px;border-radius:20px;border:1.5px solid #2ec951;background:rgba(46,201,81,.1);color:#2ec951;font-size:.78rem;font-weight:800;text-align:center;font-family:'Tajawal',sans-serif"></div>
+
   <!-- Camera Mode Tabs -->
   <div style="padding:8px 16px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-    <button id="scan-tab-product" onclick="setScanMode('product')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1));color:#2ec951;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
+    <button id="scan-tab-product" onclick="setScanModeWithTrial('product')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(46,201,81,.5);background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.1));color:#2ec951;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
       <i class="fas fa-barcode"></i> مكونات العلبة
+      <div style="font-size:.6rem;color:rgba(46,201,81,.8);margin-top:2px">متبقي: <span id="tb-scanner-inner">3</span></div>
     </button>
     <button id="scan-tab-food" onclick="setScanMode('food')" style="padding:9px;border-radius:10px;border:1.5px solid rgba(200,150,12,.3);background:rgba(200,150,12,.06);color:var(--txt2);font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer">
       <i class="fas fa-utensils"></i> التعرف على الطعام
@@ -1939,11 +2054,18 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         onkeydown="if(event.key==='Enter') analyzeIngredientsTextDirect()">
     </div>
     <div style="display:flex;justify-content:center;margin-bottom:4px">
-      <button class="btn" style="background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;width:auto;padding:12px 32px;border-radius:14px;display:flex;align-items:center;gap:8px;font-size:.9rem" onclick="analyzeSmartByMode()">
+      <button class="btn" style="background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;width:auto;padding:12px 32px;border-radius:14px;display:flex;align-items:center;gap:8px;font-size:.9rem" onclick="analyzeSmartByModeWithTrial()">
         <i class="fas fa-robot"></i> تحليل بالذكاء الاصطناعي
       </button>
     </div>
     <div id="pa-scan-result" style="text-align:right"></div>
+
+    <!-- زر الرجوع للرئيسية -->
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)">
+      <button onclick="goPage('home')" style="width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);color:var(--txt2);border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
+        <i class="fas fa-home"></i> العودة للرئيسية
+      </button>
+    </div>
 
     <!-- Drug Search Section (medicine mode only) -->
     <div id="drug-search-section" style="margin-top:16px;display:none">
@@ -1964,6 +2086,541 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <div id="drug-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🍕 صفحة تصوير وتحليل الطعام
+════════════════════════════════════════════ -->
+<div class="page" id="food-scan-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#2ec951,#00c9a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🍕 تصوير وتحليل الطعام</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:12px 16px 0;text-align:center">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(46,201,81,.15),rgba(0,201,167,.1));border-color:rgba(46,201,81,.4)">
+      <i class="fas fa-brain"></i> تعرّف تلقائي على أي طعام وحساب دقيق للمغذيات
+    </div>
+    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0;line-height:1.6">صوّر وجبتك أو اكتب اسمها — الذكاء الاصطناعي يحسب السعرات والبروتين والكارب والدهون</p>
+  </div>
+  <div style="padding:12px 16px">
+    <div class="camera-view-wrap" id="fs-camera-viewport" onclick="fsCameraCapture()" style="cursor:pointer">
+      <video id="fs-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
+      <div id="fs-fallback" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
+        <i class="fas fa-utensils" style="font-size:2.5rem;display:block;margin-bottom:8px;opacity:.4"></i>
+        اضغط لفتح الكاميرا وتصوير طعامك
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:10px 0">
+      <button onclick="fsOpenCamera()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:10px;font-size:.82rem">
+        <i class="fas fa-camera"></i> فتح الكاميرا
+      </button>
+      <label class="btn" style="flex:1;background:rgba(255,255,255,.06);color:var(--txt2);border:1.5px solid var(--border);padding:10px;font-size:.82rem;cursor:pointer;text-align:center">
+        <i class="fas fa-image"></i> رفع صورة
+        <input type="file" accept="image/*" onchange="fsLoadImage(event)" style="display:none">
+      </label>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:8px 0">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:.7rem;color:var(--txt3)">أو أدخل اسم الطعام</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="fs-food-text" placeholder="مثال: طبق أرز بالدجاج، تفاحة، كوباية لبن..." 
+        style="flex:1;height:44px;border:1.5px solid rgba(46,201,81,.3);border-radius:10px;padding:0 12px;font-size:.88rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
+        onkeydown="if(event.key==='Enter') fsAnalyzeText()">
+      <button onclick="fsAnalyzeText()" class="btn" style="width:auto;padding:0 16px;background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;border-radius:10px;font-size:.85rem">
+        <i class="fas fa-robot"></i> تحليل
+      </button>
+    </div>
+    <!-- نتائج التحليل -->
+    <div id="fs-result"></div>
+    <!-- قائمة الأطعمة الشائعة كبطاقات -->
+    <div style="margin-top:14px">
+      <div style="font-size:.82rem;font-weight:800;color:var(--gold2);margin-bottom:10px"><i class="fas fa-star"></i> أطعمة شائعة — اضغط للتحليل السريع</div>
+      <div id="fs-quick-foods" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     💊 صفحة تفاعل الأدوية
+════════════════════════════════════════════ -->
+<div class="page" id="drug-interaction-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#2196f3,#00bcd4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">💊 تفاعل الأدوية</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(33,150,243,.15),rgba(0,188,212,.1));border-color:rgba(33,150,243,.4)">
+      <i class="fas fa-exclamation-triangle" style="color:#f44336"></i> كشف التداخلات الدوائية الخطيرة
+    </div>
+    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 14px;text-align:center">أضف أكثر من دواء وسيكشف الذكاء الاصطناعي التداخلات المحتملة</p>
+    <div style="background:rgba(33,150,243,.08);border:1.5px solid rgba(33,150,243,.3);border-radius:16px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.82rem;font-weight:800;color:#64b5f6;margin-bottom:10px"><i class="fas fa-plus-circle"></i> إضافة دواء</div>
+      <div class="drug-input-row">
+        <input type="text" id="di-drug-input" placeholder="اسم الدواء بالعربي أو الإنجليزي..." 
+          style="flex:1;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;padding:0 12px;font-size:.88rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
+          onkeydown="if(event.key==='Enter') diAddDrug()">
+        <button onclick="diAddDrug()" class="btn" style="width:auto;padding:0 16px;background:rgba(33,150,243,.25);color:#64b5f6;border:1.5px solid rgba(33,150,243,.5);border-radius:10px">
+          <i class="fas fa-plus"></i> إضافة
+        </button>
+      </div>
+      <div id="di-drugs-list" style="display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:4px 0"></div>
+    </div>
+    <button onclick="diAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-search-plus"></i> تحليل التداخلات الدوائية
+    </button>
+    <div id="di-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🔄 صفحة بدائل الأدوية
+════════════════════════════════════════════ -->
+<div class="page" id="drug-alt-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#9c27b0,#673ab7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🔄 بدائل الأدوية</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(156,39,176,.15),rgba(103,58,183,.1));border-color:rgba(156,39,176,.4)">
+      <i class="fas fa-exchange-alt"></i> ابحث عن البديل المناسب وقارن الأسعار
+    </div>
+    <p style="font-size:.78rem;color:var(--txt2);margin:8px 0 14px;text-align:center">أدخل اسم الدواء لمعرفة المادة الفعالة والبدائل المتاحة</p>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input type="text" id="da-drug-input" placeholder="اسم الدواء المراد البحث عن بديله..." 
+        style="flex:1;height:48px;border:1.5px solid rgba(156,39,176,.4);border-radius:12px;padding:0 14px;font-size:.9rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
+        onkeydown="if(event.key==='Enter') daSearch()">
+      <button onclick="daSearch()" class="btn" style="width:auto;padding:0 18px;background:linear-gradient(135deg,rgba(156,39,176,.3),rgba(103,58,183,.2));color:#ce93d8;border:1.5px solid rgba(156,39,176,.5);border-radius:12px;font-size:.88rem">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+    <div id="da-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🩻 صفحة قراءة الأشعة
+════════════════════════════════════════════ -->
+<div class="page" id="xray-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#00bcd4,#26c6da);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🩻 قراءة الأشعة</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(0,188,212,.15),rgba(38,198,218,.1));border-color:rgba(0,188,212,.4)">
+      <i class="fas fa-x-ray"></i> تحليل أولي للأشعة — ليس تشخيصاً نهائياً
+    </div>
+    <div style="background:rgba(244,67,54,.1);border:1.5px solid rgba(244,67,54,.4);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ef9a9a;line-height:1.6">
+      ⚠️ <strong>تنبيه مهم:</strong> هذا التحليل للأغراض التعليمية والاسترشادية فقط. لا يُغني عن مراجعة الطبيب المختص لتشخيص دقيق.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <button onclick="xraySetType('xray')" id="xr-tab-xray" class="smart-tool-btn" style="min-height:60px;border-color:rgba(0,188,212,.5);background:linear-gradient(135deg,rgba(0,188,212,.2),rgba(0,188,212,.1))">
+        <i class="fas fa-lungs" style="color:#00bcd4"></i>
+        <span style="font-size:.72rem;color:#00bcd4;font-weight:800">أشعة سينية</span>
+      </button>
+      <button onclick="xraySetType('mri')" id="xr-tab-mri" class="smart-tool-btn" style="min-height:60px">
+        <i class="fas fa-brain" style="color:var(--txt2)"></i>
+        <span style="font-size:.72rem;color:var(--txt2);font-weight:800">رنين مغناطيسي</span>
+      </button>
+      <button onclick="xraySetType('ct')" id="xr-tab-ct" class="smart-tool-btn" style="min-height:60px">
+        <i class="fas fa-circle-notch" style="color:var(--txt2)"></i>
+        <span style="font-size:.72rem;color:var(--txt2);font-weight:800">مقطعية CT</span>
+      </button>
+    </div>
+    <!-- خيارات الإدخال: رفع أو كاميرا -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(0,188,212,.1);color:#00bcd4;border:2px dashed rgba(0,188,212,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="xr-upload-label">
+        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
+        رفع صورة الأشعة
+        <input type="file" accept="image/*" onchange="xrayLoadImage(event)" style="display:none">
+      </label>
+      <button onclick="xrayOpenCamera()" class="btn" id="xr-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(38,198,218,.1);color:#26c6da;border:2px dashed rgba(38,198,218,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+        <i class="fas fa-camera" style="font-size:1.4rem"></i>
+        تصوير الأشعة بالكاميرا
+      </button>
+    </div>
+
+    <!-- منطقة الكاميرا للأشعة -->
+    <div id="xr-camera-area" style="display:none;margin-bottom:12px;position:relative">
+      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(0,188,212,.4)">
+        <video id="xr-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
+        <div style="position:absolute;inset:0;pointer-events:none;border:3px solid rgba(0,188,212,.3);border-radius:12px"></div>
+        <!-- خطوط تأطير الأشعة -->
+        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #00bcd4;border-right:2px solid #00bcd4;border-radius:0 4px 0 0"></div>
+        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #00bcd4;border-left:2px solid #00bcd4;border-radius:4px 0 0 0"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #00bcd4;border-right:2px solid #00bcd4;border-radius:0 0 4px 0"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #00bcd4;border-left:2px solid #00bcd4;border-radius:0 0 0 4px"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="xrayCapturePhoto()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(0,188,212,.3),rgba(38,198,218,.2));color:#00e5ff;border:1.5px solid rgba(0,188,212,.5);padding:12px;font-size:.88rem;font-weight:800">
+          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط الصورة
+        </button>
+        <button onclick="xrayStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
+          <i class="fas fa-stop"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="xr-preview" style="display:none;margin-bottom:12px;text-align:center">
+      <img id="xr-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(0,188,212,.4)">
+      <div style="margin-top:6px;font-size:.72rem;color:#26c6da"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للتحليل</div>
+    </div>
+    <button onclick="xrayAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#006064,#00838f);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-search"></i> تحليل الأشعة بالذكاء الاصطناعي
+    </button>
+    <div id="xr-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🩺 صفحة تحليل الأعراض
+════════════════════════════════════════════ -->
+<div class="page" id="symptoms-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#ff9800,#ffc107);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🩺 تحليل الأعراض</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(255,152,0,.15),rgba(255,193,7,.1));border-color:rgba(255,152,0,.4)">
+      <i class="fas fa-stethoscope"></i> وصف أعراضك — الذكاء الاصطناعي يحللها كطبيب
+    </div>
+    <div style="background:rgba(244,67,54,.1);border:1.5px solid rgba(244,67,54,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ef9a9a;line-height:1.6">
+      ⚠️ هذا التحليل للاسترشاد فقط. في حالة الطوارئ اتصل بالإسعاف فوراً.
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label style="color:var(--gold2);font-weight:800">العمر</label>
+      <input type="number" id="sym-age" placeholder="عمرك بالسنوات" min="1" max="120" style="background:rgba(0,0,0,.3);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--txt);width:100%;font-family:Tajawal,sans-serif">
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label style="color:var(--gold2);font-weight:800">الجنس</label>
+      <div style="display:flex;gap:8px">
+        <button onclick="symSetGender('male')" id="sym-male" class="smart-tool-btn" style="flex:1;min-height:44px;border-color:rgba(33,150,243,.4)"><i class="fas fa-male" style="color:#2196f3"></i><span style="font-size:.78rem;color:#2196f3">ذكر</span></button>
+        <button onclick="symSetGender('female')" id="sym-female" class="smart-tool-btn" style="flex:1;min-height:44px"><i class="fas fa-female" style="color:var(--txt2)"></i><span style="font-size:.78rem;color:var(--txt2)">أنثى</span></button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label style="color:var(--gold2);font-weight:800">الأعراض التي تشعر بها <span style="color:#ef5350">*</span></label>
+      <textarea id="sym-symptoms" placeholder="صف أعراضك بالتفصيل... مثال: صداع شديد مع ارتفاع حرارة منذ يومين، ألم في الحلق، إرهاق عام..." 
+        style="width:100%;min-height:120px;background:rgba(0,0,0,.3);border:1.5px solid var(--border);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.9rem;outline:none;resize:vertical"></textarea>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label style="color:var(--gold2);font-weight:800">أمراض مزمنة معروفة (اختياري)</label>
+      <input type="text" id="sym-chronic" placeholder="مثال: سكري، ضغط، حساسية..." 
+        style="width:100%;background:rgba(0,0,0,.3);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;outline:none">
+    </div>
+    <button onclick="symAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-robot"></i> تحليل الأعراض بالذكاء الاصطناعي
+    </button>
+    <div id="sym-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     📦 صفحة كشف المنتجات المقاطعة
+════════════════════════════════════════════ -->
+<div class="page" id="barcode-boycott-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#f44336,#e53935);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📦 كشف المنتجات المقاطعة</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(244,67,54,.15),rgba(229,57,53,.1));border-color:rgba(244,67,54,.4)">
+      <i class="fas fa-barcode"></i> امسح الباركود أو صوّر المنتج واعرف بدائله المحلية
+    </div>
+
+    <!-- منطقة الكاميرا مع الليزر -->
+    <div style="position:relative;margin-bottom:10px">
+      <div class="camera-view-wrap" id="bb-camera-viewport" style="cursor:pointer;margin-bottom:0;position:relative;overflow:hidden" onclick="bbSmartCapture()">
+        <video id="bb-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
+        <canvas id="bb-barcode-canvas" style="display:none"></canvas>
+        <div id="bb-fallback" style="padding:60px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
+          <i class="fas fa-barcode" style="font-size:2.5rem;display:block;margin-bottom:8px;opacity:.4"></i>
+          اضغط لفتح الكاميرا ومسح الباركود أو المنتج
+        </div>
+        <!-- خط الليزر للمسح -->
+        <div id="bb-laser" style="display:none;position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,#f44336,#ff5722,#f44336,transparent);box-shadow:0 0 8px #f44336,0 0 16px rgba(244,67,54,.6);animation:bbLaserScan 2s ease-in-out infinite;top:40%"></div>
+        <!-- مؤشر المسح -->
+        <div id="bb-scan-indicator" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);border:1px solid rgba(244,67,54,.6);border-radius:20px;padding:4px 14px;font-size:.7rem;color:#f44336;white-space:nowrap"></div>
+      </div>
+    </div>
+
+    <!-- أزرار التحكم -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <button onclick="bbOpenCamera()" class="btn" style="background:rgba(244,67,54,.15);color:#f44336;border:1.5px solid rgba(244,67,54,.4);padding:10px;font-size:.82rem">
+        <i class="fas fa-camera"></i> فتح الكاميرا
+      </button>
+      <button onclick="bbCaptureNow()" class="btn" id="bb-capture-btn" style="background:rgba(255,87,34,.15);color:#ff5722;border:1.5px solid rgba(255,87,34,.4);padding:10px;font-size:.82rem;display:none">
+        <i class="fas fa-crosshairs"></i> التقاط وتحليل
+      </button>
+      <label class="btn" style="background:rgba(200,150,12,.1);color:var(--gold2);border:1.5px solid rgba(200,150,12,.3);padding:10px;font-size:.82rem;cursor:pointer;text-align:center;margin:0" id="bb-upload-label">
+        <i class="fas fa-image"></i> رفع صورة المنتج
+        <input type="file" accept="image/*" id="bb-upload-input" style="display:none" onchange="bbLoadFromFile(event)">
+      </label>
+      <button onclick="bbStopCamera()" id="bb-stop-btn" class="btn" style="background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);padding:10px;font-size:.82rem;display:none">
+        <i class="fas fa-stop"></i> إيقاف الكاميرا
+      </button>
+    </div>
+
+    <!-- حالة المسح -->
+    <div id="bb-scan-status" style="text-align:center;padding:5px 0;font-size:.75rem;color:var(--txt3);min-height:20px;margin-bottom:8px"></div>
+
+    <!-- إدخال يدوي -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:.7rem;color:var(--txt3)">أو أدخل اسم المنتج يدوياً</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <input type="text" id="bb-manual" placeholder="مثال: كوكاكولا، نستله، ماكدونالدز..." 
+        style="flex:1;height:42px;border:1.5px solid rgba(244,67,54,.3);border-radius:10px;padding:0 12px;font-size:.85rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
+        onkeydown="if(event.key==='Enter') bbAnalyzeText()">
+      <button onclick="bbAnalyzeText()" class="btn" style="width:auto;padding:0 14px;background:rgba(244,67,54,.2);color:#f44336;border:1.5px solid rgba(244,67,54,.4);border-radius:10px;font-size:.85rem">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <div id="bb-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🚨 صفحة الطوارئ السريعة
+════════════════════════════════════════════ -->
+<div class="page" id="emergency-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#f44336,#ff5722);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🚨 الطوارئ السريعة</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(255,87,34,.1));border-color:rgba(244,67,54,.5)">
+      <i class="fas fa-ambulance" style="color:#f44336"></i> إسعافات أولية فورية — مجانية دائماً
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <button onclick="emergencyShow('burns')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(255,87,34,.6);background:linear-gradient(135deg,rgba(255,87,34,.2),rgba(255,87,34,.05))">
+        <span style="font-size:1.8rem">🔥</span>
+        <span style="font-size:.85rem;font-weight:800;color:#ff7043">الحروق</span>
+      </button>
+      <button onclick="emergencyShow('wounds')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(244,67,54,.6);background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(244,67,54,.05))">
+        <span style="font-size:1.8rem">🩸</span>
+        <span style="font-size:.85rem;font-weight:800;color:#ef5350">الجروح</span>
+      </button>
+      <button onclick="emergencyShow('choking')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(33,150,243,.6);background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(33,150,243,.05))">
+        <span style="font-size:1.8rem">😮‍💨</span>
+        <span style="font-size:.85rem;font-weight:800;color:#42a5f5">الاختناق</span>
+      </button>
+      <button onclick="emergencyShow('poisoning')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(76,175,80,.6);background:linear-gradient(135deg,rgba(76,175,80,.2),rgba(76,175,80,.05))">
+        <span style="font-size:1.8rem">☠️</span>
+        <span style="font-size:.85rem;font-weight:800;color:#66bb6a">التسمم</span>
+      </button>
+      <button onclick="emergencyShow('fracture')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(156,39,176,.6);background:linear-gradient(135deg,rgba(156,39,176,.2),rgba(156,39,176,.05))">
+        <span style="font-size:1.8rem">🦴</span>
+        <span style="font-size:.85rem;font-weight:800;color:#ce93d8">الكسور</span>
+      </button>
+      <button onclick="emergencyShow('fainting')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(255,193,7,.6);background:linear-gradient(135deg,rgba(255,193,7,.2),rgba(255,193,7,.05))">
+        <span style="font-size:1.8rem">😵</span>
+        <span style="font-size:.85rem;font-weight:800;color:#ffc107">الإغماء</span>
+      </button>
+      <button onclick="emergencyShow('diabetic-coma')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(3,169,244,.6);background:linear-gradient(135deg,rgba(3,169,244,.2),rgba(3,169,244,.05))">
+        <span style="font-size:1.8rem">🩺</span>
+        <span style="font-size:.85rem;font-weight:800;color:#29b6f6">غيبوبة السكر</span>
+      </button>
+      <button onclick="emergencyShow('swallow-object')" class="smart-tool-btn" style="min-height:80px;border-color:rgba(255,152,0,.6);background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(255,152,0,.05))">
+        <span style="font-size:1.8rem">🔩</span>
+        <span style="font-size:.85rem;font-weight:800;color:#ffa726">ابتلاع شيء معدني</span>
+      </button>
+      <button onclick="emergencyShow('child-swallow')" class="smart-tool-btn" style="grid-column:1/-1;min-height:80px;border-color:rgba(233,30,99,.7);background:linear-gradient(135deg,rgba(233,30,99,.2),rgba(233,30,99,.05));border-width:2px">
+        <span style="font-size:1.8rem">👶</span>
+        <span style="font-size:.95rem;font-weight:900;color:#f48fb1">ابتلاع طفل لجسم غريب</span>
+        <span style="font-size:.68rem;color:var(--txt3)">أكثر الحالات خطورة عند الأطفال</span>
+      </button>
+    </div>
+    <div id="em-result" style="margin-top:14px"></div>
+    <!-- زر الاتصال بالإسعاف -->
+    <a href="tel:123" class="btn" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;padding:16px;border-radius:14px;font-size:1.05rem;font-weight:800;text-decoration:none">
+      <i class="fas fa-phone"></i> اتصل بالإسعاف 123
+    </a>
+  </div>
+</div>
+
+<!-- Modal الطوارئ المتحركة -->
+<div id="em-modal" style="display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.95);backdrop-filter:blur(16px);overflow-y:auto">
+  <div style="max-width:500px;margin:0 auto;padding:20px 16px 40px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div id="em-modal-title" style="font-size:1.2rem;font-weight:900;color:#fff"></div>
+      <button onclick="closeEmModal()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1rem;cursor:pointer">✕</button>
+    </div>
+    <!-- شريط التقدم -->
+    <div style="display:flex;gap:4px;margin-bottom:20px" id="em-step-dots"></div>
+    <!-- منطقة الأنيميشن -->
+    <div id="em-anim-area" style="background:rgba(255,255,255,.04);border-radius:20px;padding:20px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:16px;border:2px solid rgba(255,255,255,.1)"></div>
+    <!-- عنوان الخطوة -->
+    <div id="em-step-title" style="text-align:center;font-size:1rem;font-weight:900;color:#fff;margin-bottom:8px"></div>
+    <div id="em-step-text" style="text-align:center;font-size:.85rem;color:#b0c4de;line-height:1.7;margin-bottom:20px"></div>
+    <!-- أزرار التنقل -->
+    <div style="display:flex;gap:10px">
+      <button onclick="emPrevStep()" id="em-prev-btn" class="btn" style="flex:1;background:rgba(255,255,255,.08);color:#b0c4de;border:1px solid rgba(255,255,255,.15);padding:12px;font-size:.9rem">
+        <i class="fas fa-arrow-right"></i> السابق
+      </button>
+      <button onclick="emNextStep()" id="em-next-btn" class="btn" style="flex:2;background:linear-gradient(135deg,#c62828,#e53935);color:#fff;padding:12px;font-size:.9rem;font-weight:800">
+        التالي <i class="fas fa-arrow-left"></i>
+      </button>
+    </div>
+    <!-- زر الإسعاف دائماً ظاهر -->
+    <a href="tel:123" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;background:rgba(198,40,40,.2);border:1.5px solid rgba(198,40,40,.5);color:#ef5350;border-radius:12px;padding:12px;text-decoration:none;font-size:.88rem;font-weight:800;font-family:'Tajawal',sans-serif">
+      <i class="fas fa-phone-alt"></i> اتصل بالإسعاف 123
+    </a>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     💳 نافذة انتهاء التجربة المجانية — اشتراك كامل
+════════════════════════════════════════════ -->
+<style>
+.trial-method-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.15);border-radius:14px;overflow:hidden;margin-bottom:8px;transition:all .2s}
+.trial-method-card.open{border-color:rgba(46,201,81,.5);background:rgba(46,201,81,.06)}
+.trial-method-header{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.trial-method-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.trial-method-body{display:none;padding:0 14px 14px}
+.trial-method-card.open .trial-method-body{display:block}
+.trial-copy-row{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 12px;margin-bottom:8px;gap:8px}
+.trial-copy-lbl{font-size:.72rem;color:#8aa4c8}
+.trial-copy-val{font-weight:700;font-size:.85rem;color:#fff;direction:ltr;text-align:left}
+.trial-copy-btn{background:rgba(46,201,81,.2);border:1px solid rgba(46,201,81,.4);color:#2ec951;border-radius:7px;padding:5px 10px;font-size:.7rem;font-family:'Tajawal',sans-serif;cursor:pointer;flex-shrink:0;transition:all .15s}
+.trial-copy-btn:hover{background:rgba(46,201,81,.35)}
+.trial-copy-btn.copied{background:rgba(46,201,81,.5);color:#fff}
+.trial-note{font-size:.72rem;color:#8aa4c8;background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.2);border-radius:8px;padding:7px 10px;margin-top:6px}
+.trial-steps-badge{font-size:.72rem;color:#b0c4de;background:rgba(255,255,255,.05);border-radius:8px;padding:6px 10px;margin-bottom:8px;direction:rtl}
+</style>
+
+<div id="trial-expired-modal" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);align-items:flex-end;justify-content:center">
+  <div style="width:100%;max-width:500px;background:linear-gradient(145deg,#0a1628,#0f2040);border:2px solid rgba(255,193,7,.45);border-radius:28px 28px 0 0;padding:24px 18px 36px;max-height:94vh;overflow-y:auto;text-align:center" id="trial-modal-inner">
+    <!-- رأس النافذة -->
+    <div style="font-size:3.5rem;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(255,193,7,.8));animation:crownPulse 2s ease-in-out infinite">⏰</div>
+    <div style="font-family:'Amiri',serif;font-size:1.5rem;color:#ffc107;margin-bottom:6px;font-weight:700">لقد نفذت تجربتك المجانية</div>
+    <div style="font-size:.82rem;color:#b0c4de;margin-bottom:18px;line-height:1.6" id="trial-expired-feature-name">اشترك الآن لمواصلة الاستخدام في دقيقة واحدة</div>
+
+    <!-- خطوات بار -->
+    <div style="display:flex;justify-content:center;gap:0;margin-bottom:20px;max-width:320px;margin-left:auto;margin-right:auto">
+      <div id="trial-step1" style="flex:1;text-align:center;position:relative">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffc107,#ff8c00);color:#050e1f;font-weight:900;font-size:.75rem;display:flex;align-items:center;justify-content:center;margin:0 auto 4px">1</div>
+        <div style="font-size:.65rem;color:#ffc107;font-weight:700">اختر الخطة</div>
+        <div style="position:absolute;top:14px;left:calc(50% + 14px);right:0;height:2px;background:rgba(255,193,7,.25)"></div>
+      </div>
+      <div id="trial-step2" style="flex:1;text-align:center;position:relative">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);color:#8aa4c8;font-weight:900;font-size:.75rem;display:flex;align-items:center;justify-content:center;margin:0 auto 4px" id="trial-step2-circle">2</div>
+        <div style="font-size:.65rem;color:#8aa4c8;font-weight:700" id="trial-step2-lbl">الدفع</div>
+        <div style="position:absolute;top:14px;right:calc(50% + 14px);left:0;height:2px;background:rgba(255,255,255,.1)"></div>
+      </div>
+    </div>
+
+    <!-- الخطوة 1: اختيار الخطة -->
+    <div id="trial-plans-step" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;text-align:right">
+      <div onclick="selectTrialPlan('pro')" id="trial-plan-pro" class="trial-plan-card" style="background:rgba(255,193,7,.07);border:2px solid rgba(255,193,7,.5);border-radius:16px;padding:14px;cursor:pointer;transition:all .2s;position:relative">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ffc107,#ff8c00);color:#050e1f;font-size:.65rem;font-weight:800;padding:3px 14px;border-radius:20px;white-space:nowrap">👑 الباقة الوحيدة</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:900;color:#ffc107;font-size:.9rem;margin-bottom:4px">باقة طيبات PRO</div>
+            <div style="font-size:.72rem;color:#e8d5a3">ذكاء اصطناعي غير محدود • بدون إعلانات • أدوات طبية تخصصية</div>
+          </div>
+          <div style="text-align:left;flex-shrink:0;margin-right:10px">
+            <div style="font-size:1.4rem;font-weight:900;color:#ffc107">100</div>
+            <div style="font-size:.62rem;color:#e8d5a3">جنيه/شهر</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الخطوة 2: وسائل الدفع -->
+    <div id="trial-payment-section" style="display:none;text-align:right">
+      <div style="font-size:.8rem;font-weight:700;color:#ffc107;margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="fas fa-credit-card"></i> اختر طريقة الدفع:</div>
+
+      <!-- 1. فودافون كاش -->
+      <div class="trial-method-card" id="tm-vodafone" onclick="trialToggleMethodNew('vodafone')">
+        <div class="trial-method-header">
+          <div class="trial-method-icon" style="background:#fff0f0">📱</div>
+          <div><div style="font-weight:700;color:#fff;font-size:.88rem">فودافون كاش</div><div style="font-size:.7rem;color:#8aa4c8">تحويل فوري داخل مصر</div></div>
+          <i class="fas fa-chevron-down" style="margin-right:auto;color:#8aa4c8;font-size:.75rem;transition:transform .2s" id="tm-vodafone-icon"></i>
+        </div>
+        <div class="trial-method-body">
+          <div class="trial-copy-row"><div><div class="trial-copy-lbl">رقم المحفظة</div><div class="trial-copy-val">01279934735</div></div><button class="trial-copy-btn" onclick="trialCopy(event,'01279934735')">نسخ</button></div>
+          <div class="trial-note">💡 بعد التحويل، أرسل إيصال الدفع عبر الواتساب للتفعيل الفوري</div>
+        </div>
+      </div>
+
+      <!-- 2. برق السعودي -->
+      <div class="trial-method-card" id="tm-barq" onclick="trialToggleMethodNew('barq')">
+        <div class="trial-method-header">
+          <div class="trial-method-icon" style="background:#fff3e0">⚡</div>
+          <div><div style="font-weight:700;color:#fff;font-size:.88rem">تطبيق برق السعودي</div><div style="font-size:.7rem;color:#8aa4c8">تحويل دولي من السعودية</div></div>
+          <i class="fas fa-chevron-down" style="margin-right:auto;color:#8aa4c8;font-size:.75rem;transition:transform .2s" id="tm-barq-icon"></i>
+        </div>
+        <div class="trial-method-body">
+          <div class="trial-steps-badge">📋 اختر <strong>التحويل الدولي</strong> ← ثم <strong>مصر</strong> ← ثم <strong>ميزة</strong> ← ثم أدخل الرقم:</div>
+          <div class="trial-copy-row"><div><div class="trial-copy-lbl">رقم المستلم</div><div class="trial-copy-val">01279934735</div></div><button class="trial-copy-btn" onclick="trialCopy(event,'01279934735')">نسخ</button></div>
+          <div class="trial-note">💡 بعد التحويل، أرسل إيصال الدفع عبر الواتساب للتفعيل</div>
+        </div>
+      </div>
+
+      <!-- 3. إنستاباي -->
+      <div class="trial-method-card" id="tm-instapay" onclick="trialToggleMethodNew('instapay')">
+        <div class="trial-method-header">
+          <div class="trial-method-icon" style="background:#fff8e1">💛</div>
+          <div><div style="font-weight:700;color:#fff;font-size:.88rem">إنستاباي (InstaPay)</div><div style="font-size:.7rem;color:#8aa4c8">تحويل مباشر من داخل مصر</div></div>
+          <i class="fas fa-chevron-down" style="margin-right:auto;color:#8aa4c8;font-size:.75rem;transition:transform .2s" id="tm-instapay-icon"></i>
+        </div>
+        <div class="trial-method-body">
+          <a href="https://ipn.eg/S/engmohamednasr/instapay/8NShbl" target="_blank" style="display:block;text-align:center;background:linear-gradient(135deg,#ffc107,#ff8c00);color:#050e1f;font-weight:800;font-size:.88rem;padding:11px;border-radius:10px;text-decoration:none;margin-bottom:8px">🔗 افتح رابط الدفع عبر إنستاباي</a>
+          <div style="text-align:center;color:#8aa4c8;font-size:.72rem;margin-bottom:8px">— أو ادفع برقم الهاتف —</div>
+          <div class="trial-copy-row"><div><div class="trial-copy-lbl">رقم الهاتف (إنستاباي)</div><div class="trial-copy-val">01279934735</div></div><button class="trial-copy-btn" onclick="trialCopy(event,'01279934735')">نسخ</button></div>
+          <div class="trial-note">💡 أرسل الإيصال عبر الواتساب بعد إتمام الدفع</div>
+        </div>
+      </div>
+
+      <!-- 4. D360 بنكي -->
+      <div class="trial-method-card" id="tm-d360" onclick="trialToggleMethodNew('d360')">
+        <div class="trial-method-header">
+          <div class="trial-method-icon" style="background:#e8f5e9">🏦</div>
+          <div><div style="font-weight:700;color:#fff;font-size:.88rem">تحويل بنكي — بنك D360</div><div style="font-size:.7rem;color:#8aa4c8">تحويل عبر الأيبان السعودي</div></div>
+          <i class="fas fa-chevron-down" style="margin-right:auto;color:#8aa4c8;font-size:.75rem;transition:transform .2s" id="tm-d360-icon"></i>
+        </div>
+        <div class="trial-method-body">
+          <div class="trial-copy-row"><div><div class="trial-copy-lbl">اسم البنك</div><div class="trial-copy-val">D360</div></div></div>
+          <div class="trial-copy-row"><div><div class="trial-copy-lbl">صاحب الحساب</div><div class="trial-copy-val">أيمن نصر نصر</div></div><button class="trial-copy-btn" onclick="trialCopy(event,'أيمن نصر نصر')">نسخ</button></div>
+          <div class="trial-copy-row"><div><div class="trial-copy-lbl">رقم الأيبان (IBAN)</div><div class="trial-copy-val" style="font-size:.75rem">SA7636036036031909112576</div></div><button class="trial-copy-btn" onclick="trialCopy(event,'SA7636036036031909112576')">نسخ</button></div>
+          <div class="trial-note">⏱ قد يستغرق التحويل 1-24 ساعة. أرسل إيصال التحويل للتفعيل</div>
+        </div>
+      </div>
+
+      <!-- 5. PayPal / Visa -->
+      <div class="trial-method-card" id="tm-paypal" onclick="trialToggleMethodNew('paypal')">
+        <div class="trial-method-header">
+          <div class="trial-method-icon" style="background:#e3f2fd">💳</div>
+          <div><div style="font-weight:700;color:#fff;font-size:.88rem">فيزا / بايبال (PayPal)</div><div style="font-size:.7rem;color:#8aa4c8">دفع دولي آمن بالبطاقة البنكية</div></div>
+          <i class="fas fa-chevron-down" style="margin-right:auto;color:#8aa4c8;font-size:.75rem;transition:transform .2s" id="tm-paypal-icon"></i>
+        </div>
+        <div class="trial-method-body">
+          <div style="background:rgba(0,0,0,.3);border:1px solid rgba(0,112,186,.3);border-radius:10px;padding:12px;margin-bottom:8px;text-align:center">
+            <div style="font-size:.72rem;color:#8aa4c8;margin-bottom:4px">المبلغ المطلوب:</div>
+            <div id="trial-paypal-amount-display" style="font-size:1.2rem;font-weight:900;color:#64b5f6;margin-bottom:10px">اختر خطة أولاً</div>
+            <a id="trial-paypal-link" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#0070ba;color:#fff;font-family:'Tajawal',sans-serif;font-weight:700;font-size:.88rem;padding:11px;border-radius:10px;text-decoration:none">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/></svg>
+              ادفع الآن عبر PayPal / Visa
+            </a>
+          </div>
+          <div class="trial-note">💡 ستنتقل لصفحة PayPal الآمنة لإتمام الدفع بالبطاقة أو محفظة PayPal</div>
+        </div>
+      </div>
+
+      <!-- واتساب -->
+      <a id="trial-whatsapp-btn" href="https://wa.me/201279934735" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:linear-gradient(135deg,#25d366,#128C7E);border:none;border-radius:14px;padding:14px;text-align:center;font-weight:800;color:#fff;font-family:'Tajawal',sans-serif;font-size:.95rem;text-decoration:none;margin-top:4px;box-shadow:0 4px 16px rgba(37,211,102,.25)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        إرسال إيصال الدفع عبر الواتساب
+      </a>
+    </div>
+
+    <button onclick="closeTrialModal()" style="margin-top:14px;width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#8aa4c8;border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer">إغلاق</button>
   </div>
 </div>
 
@@ -2682,9 +3339,9 @@ async function autoLogin() {
       currentUser = Object.assign({}, u, { username: s });
       if (currentUser.pro && currentUser.pro.active === true) {
         if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-          window.isProUser = true;
+          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
         } else if (!currentUser.pro.expiresAt) {
-          window.isProUser = true;
+          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
         } else {
           currentUser.pro.active = false; window.isProUser = false;
         }
@@ -2786,7 +3443,7 @@ async function doLogin() {
     // فحص وتأمين تفعيل الحساب المطور الفاخر
     if (currentUser.pro && currentUser.pro.active === true) {
       if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
-        window.isProUser = true;
+        window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
       } else {
         currentUser.pro.active = false;
         window.isProUser = false;
@@ -2857,7 +3514,7 @@ function bootApp() {
       currentUser.pro = { active: false }; 
       window.isProUser = false; 
     } else {
-      window.isProUser = true;
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     }
   }
   buildDisGrid('dis-grid-auth', []);
@@ -2913,6 +3570,7 @@ function goPage(n) {
     document.getElementById('hero-bmi-status').innerHTML = '<span class="bmi-status-badge ' + bi.cls + '">' + bi.label + '</span>';
   }
   if (n === 'experiences') { loadExperiences(); checkUserExperience(); }
+  if (n === 'premium-scanner') { setTimeout(function(){ setScanMode('product'); }, 150); }
   if (n === 'profile' && currentUser && currentUser.bmi) {
     logActivity('analysis', 'اطّلع على تحليل حسابه الصحي (BMI)', 'bmi:' + currentUser.bmi + ' weight:' + (currentUser.weight||'-') + ' height:' + (currentUser.height||'-'));
   }
@@ -2920,21 +3578,43 @@ function goPage(n) {
 
 /* ══════════ دمج الميزات والصفحات الفرعية للـ PRO ══════════ */
 function goPremiumFeatureView(viewName) {
-  if(!window.isProUser) {
-    openProModal();
-    showToast('👑 هذه الميزة تتطلب الاشتراك وتفعيل الحساب المطور PRO');
-    return;
+  if (!window.isProUser) {
+    if (!canUseTool(viewName)) {
+      showTrialExpiredModal(viewName);
+      return;
+    }
+    incToolUsage(viewName);
+    updatePremiumTabBadges();
   }
   goPage('premium-' + viewName);
-  
   if(viewName === 'protocols') renderPremiumProtocolsData();
   if(viewName === 'recipes') renderPremiumRecipesData();
   if(viewName === 'challenges') renderPremiumChallengesData();
   if(viewName === 'tracker') loadAndRenderPremiumTrackerMetrics();
 }
 
+function updatePremiumTabBadges() {
+  ['protocols','recipes','challenges'].forEach(function(key) {
+    var wrap = document.getElementById('ptb-' + key + '-wrap');
+    if (!wrap) return;
+    if (window.isProUser) {
+      wrap.style.display = '';
+      wrap.style.background = 'rgba(46,201,81,.15)';
+      wrap.style.borderColor = 'rgba(46,201,81,.4)';
+      wrap.style.color = '#2ec951';
+      wrap.innerHTML = '♾️ غير محدود';
+    } else {
+      wrap.style.background = '';
+      wrap.style.borderColor = '';
+      wrap.style.color = '';
+      var rem = Math.max(0, FREE_TOOL_LIMIT - getToolUsage(key));
+      wrap.innerHTML = 'مجاني: <b id="ptb-' + key + '" style="color:' + (rem === 0 ? '#f44336' : (rem === 1 ? '#ff9800' : '')) + '">' + rem + '</b>';
+    }
+  });
+}
+
 function simulatePremiumUserActivationDirectly() {
-  window.isProUser = true;
+  window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
   if(currentUser) {
     currentUser.pro = { active: true, expiresAt: Date.now() + (1*3600000) };
     // حفظ التفعيل التجريبي محلياً وسحابياً فوراً
@@ -2964,7 +3644,7 @@ function syncPremiumUIStates() {
 
   /* إذا كان أحد المصدرين نشطاً اعتبره برو */
   if (!window.isProUser && bestExp > now) {
-    window.isProUser = true;
+    window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     if (currentUser) {
       currentUser.pro = currentUser.pro || {};
       currentUser.pro.active    = true;
@@ -3420,6 +4100,15 @@ async function _scanAnalyzeAI(ingredients) {
   };
 
   _renderScanResult(result.text, result.source);
+}
+
+/* دالة تحقق من التجربة المجانية قبل تفعيل وضع مكونات العلبة */
+function setScanModeWithTrial(mode) {
+  if (!canUseTool('scanner')) {
+    showTrialExpiredModal('scanner');
+    return;
+  }
+  setScanMode(mode);
 }
 
 /* scan mode: 'product' | 'food' | 'medicine' | 'report' */
@@ -4203,6 +4892,8 @@ function _preloadDrugDB() {
 /* ============================================================ */
 
 function captureSmartByMode() {
+  if (!canUseTool('scanner')) { showTrialExpiredModal('scanner'); return; }
+  incToolUsage('scanner');
   if (_scanMode === 'medicine') { analyzeMedicineFromCamera(); }
   else if (_scanMode === 'report') { analyzeReportFromCamera(); }
   else if (_scanMode === 'prescription') { analyzePrescriptionFromCamera(); }
@@ -4213,6 +4904,16 @@ function analyzeSmartByMode() {
   else if (_scanMode === 'report') { analyzeReportFromText(); }
   else if (_scanMode === 'prescription') { analyzePrescriptionFromText(); }
   else { analyzeIngredientsTextDirect(); }
+}
+
+/* ── wrapper للتحقق من التجربة المجانية لزر التحليل الرئيسي ── */
+function analyzeSmartByModeWithTrial() {
+  if (!canUseTool('scanner')) {
+    showTrialExpiredModal('scanner');
+    return;
+  }
+  incToolUsage('scanner');
+  analyzeSmartByMode();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -7088,7 +7789,7 @@ window.addEventListener('DOMContentLoaded', function() {
       try { localStorage.setItem('tayyibat_pro_expiry_bonus', newExpiry.toString()); } catch(e) {}
 
       /* تفعيل PRO في الجلسة الحالية */
-      window.isProUser = true;
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
       if (window.currentUser) {
         window.currentUser.pro = window.currentUser.pro || {};
         window.currentUser.pro.active    = true;
@@ -7240,9 +7941,9 @@ async function handleGoogleUserData(googleUser) {
 
   if (currentUser.pro && currentUser.pro.active === true) {
     if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-      window.isProUser = true;
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     } else if (!currentUser.pro.expiresAt) {
-      window.isProUser = true;
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     } else {
       currentUser.pro.active = false; window.isProUser = false;
     }
@@ -7512,8 +8213,8 @@ async function autoLogin() {
     if (u) {
       currentUser = Object.assign({}, u, { username: s });
       if (currentUser.pro && currentUser.pro.active === true) {
-        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) window.isProUser = true;
-        else if (!currentUser.pro.expiresAt) window.isProUser = true;
+        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
+        else if (!currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
         else { currentUser.pro.active = false; window.isProUser = false; }
       } else { window.isProUser = false; }
       bootApp(); setTimeout(refreshGiftFab, 700); return;
@@ -7602,7 +8303,7 @@ async function _autoScanMedicine() {
       e.preventDefault();return false;
     }
   });
-  function msg(){
+  window._msgProtect = function msg(){
     try{console.clear();}catch(x){}
     try{
       console.log('%cتوقف!','color:#ef5350;font-size:52px;font-weight:900;font-family:Tajawal,Arial');
@@ -7611,16 +8312,1294 @@ async function _autoScanMedicine() {
       console.log('%cwa.me/201279934735','color:#26c6da;font-size:20px;font-weight:900');
     }catch(x){}
   }
+})();
+
+/* ════════════════════════════════════════════════════════════
+   🆕 نظام التجارب المجانية — 3 استخدامات لكل أداة
+════════════════════════════════════════════════════════════ */
+var FREE_TOOL_LIMIT = 3;
+var TOOL_NAMES = {
+  'scanner': 'ماسح المنتجات الذكي',
+  'food-scan': 'تصوير وتحليل الطعام',
+  'drug-interaction': 'تفاعل الأدوية',
+  'drug-alt': 'بدائل الأدوية',
+  'xray': 'قراءة الأشعة',
+  'symptoms': 'تحليل الأعراض',
+  'barcode-boycott': 'كشف المنتجات المقاطعة',
+  'protocols': 'بروتوكولات الحالات',
+  'recipes': 'وصفات Pro',
+  'challenges': 'التحديات والمستويات'
+};
+var PAYPAL_LINKS = {
+  starter: 'https://www.paypal.com/ncp/payment/AWHQAVPDBNATQ',
+  pro: 'https://www.paypal.com/ncp/payment/5UTMT9NNFXFH6',
+  premium: 'https://www.paypal.com/ncp/payment/LFGFFVYRREXP2'
+};
+var _selectedTrialPlan = null;
+
+function getToolUsage(toolKey) {
+  try { return parseInt(localStorage.getItem('tayyibat_trial_' + toolKey) || '0'); } catch(e) { return 0; }
+}
+function incToolUsage(toolKey) {
+  try { localStorage.setItem('tayyibat_trial_' + toolKey, getToolUsage(toolKey) + 1); } catch(e) {}
+  updateTrialBadges();
+}
+function canUseTool(toolKey) {
+  if (window.isProUser) return true;
+  return getToolUsage(toolKey) < FREE_TOOL_LIMIT;
+}
+function updateTrialBadges() {
+  if (window.isProUser) {
+    // مشترك PRO — تغيير نص الشارات لـ "غير محدود ♾️"
+    document.querySelectorAll('.trial-badge').forEach(function(el) {
+      el.style.display = '';
+      el.style.background = 'rgba(46,201,81,.15)';
+      el.style.borderColor = 'rgba(46,201,81,.4)';
+      el.style.color = '#2ec951';
+      el.innerHTML = '♾️ غير محدود';
+    });
+    var innerBadge = document.getElementById('tb-scanner-inner');
+    if (innerBadge) { innerBadge.parentElement.innerHTML = '♾️ غير محدود'; }
+    return;
+  }
+  Object.keys(TOOL_NAMES).forEach(function(key) {
+    var remaining = Math.max(0, FREE_TOOL_LIMIT - getToolUsage(key));
+    var badge = document.getElementById('tb-' + key);
+    if (badge) {
+      badge.closest('.trial-badge').innerHTML = 'استخدامات مجانية: <b id="tb-' + key + '" style="color:' + (remaining === 0 ? '#f44336' : (remaining === 1 ? '#ff9800' : '')) + '">' + remaining + '</b>';
+    }
+  });
+  // sync inner scanner badge
+  var innerBadge = document.getElementById('tb-scanner-inner');
+  if (innerBadge) {
+    var rem = Math.max(0, FREE_TOOL_LIMIT - getToolUsage('scanner'));
+    innerBadge.textContent = rem;
+    innerBadge.style.color = rem === 0 ? '#f44336' : (rem === 1 ? '#ff9800' : '#2ec951');
+  }
+}
+/* دالة خاصة بزر ماسح المنتجات الخارجي */
+function goSmartToolScanner() {
+  if (!canUseTool('scanner')) {
+    showTrialExpiredModal('scanner');
+    return;
+  }
+  goPage('premium-scanner');
+  setTimeout(function(){ setScanMode('product'); }, 150);
+}
+
+function showTrialExpiredModal(toolKey) {
+  var modal = document.getElementById('trial-expired-modal');
+  var featureName = document.getElementById('trial-expired-feature-name');
+  if (featureName) featureName.textContent = 'ميزة "' + (TOOL_NAMES[toolKey] || toolKey) + '" تتطلب الاشتراك للاستمرار';
+  document.getElementById('trial-payment-section').style.display = 'none';
+  _selectedTrialPlan = null;
+  document.querySelectorAll('.trial-plan-card').forEach(function(c) {
+    c.style.borderColor = c.id === 'trial-plan-pro' ? 'rgba(255,193,7,.5)' : 'rgba(255,255,255,.15)';
+  });
+  if (modal) { modal.style.display = 'flex'; }
+  // تحديد خطة PRO تلقائياً لأنها الخطة الوحيدة
+  setTimeout(function() { selectTrialPlan('pro'); }, 100);
+}
+function closeTrialModal() {
+  var modal = document.getElementById('trial-expired-modal');
+  if (modal) modal.style.display = 'none';
+}
+var PAYPAL_AMOUNTS = {
+  pro: '2 دولار / شهرياً (≈ 100 جنيه)'
+};
+
+function selectTrialPlan(plan) {
+  _selectedTrialPlan = plan;
+  document.querySelectorAll('.trial-plan-card').forEach(function(c) {
+    var isPro = c.id === 'trial-plan-pro';
+    if (c.id === 'trial-plan-' + plan) {
+      c.style.borderColor = 'rgba(46,201,81,.8)';
+      c.style.background = 'rgba(46,201,81,.10)';
+      c.style.boxShadow = '0 4px 20px rgba(46,201,81,.2)';
+    } else {
+      c.style.borderColor = isPro ? 'rgba(255,193,7,.35)' : 'rgba(255,255,255,.1)';
+      c.style.background = isPro ? 'rgba(255,193,7,.04)' : 'rgba(255,255,255,.03)';
+      c.style.boxShadow = '';
+    }
+  });
+  var s2circle = document.getElementById('trial-step2-circle');
+  var s2lbl = document.getElementById('trial-step2-lbl');
+  if (s2circle) { s2circle.style.background = 'linear-gradient(135deg,#ffc107,#ff8c00)'; s2circle.style.color = '#050e1f'; s2circle.style.border = 'none'; }
+  if (s2lbl) s2lbl.style.color = '#ffc107';
+  var paySection = document.getElementById('trial-payment-section');
+  if (paySection) paySection.style.display = 'block';
+  var ppLink = document.getElementById('trial-paypal-link');
+  if (ppLink) ppLink.href = PAYPAL_LINKS[plan] || '#';
+  var ppAmount = document.getElementById('trial-paypal-amount-display');
+  if (ppAmount) ppAmount.textContent = PAYPAL_AMOUNTS[plan] || '';
+  var planNames = { pro: 'باقة طيبات PRO — 100 جنيه/شهر' };
+  var wa = document.getElementById('trial-whatsapp-btn');
+  if (wa) wa.href = 'https://wa.me/201279934735?text=' + encodeURIComponent('السلام عليكم، لقد قمت بالدفع وأرفق إيصال الاشتراك في ' + (planNames[plan] || plan) + ' 💳');
+  setTimeout(function(){
+    var ps = document.getElementById('trial-payment-section');
+    if (ps) ps.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function trialToggleMethodNew(method) {
+  var card = document.getElementById('tm-' + method);
+  var icon = document.getElementById('tm-' + method + '-icon');
+  if (!card) return;
+  var isOpen = card.classList.contains('open');
+  document.querySelectorAll('.trial-method-card').forEach(function(c) { c.classList.remove('open'); });
+  document.querySelectorAll('[id^="tm-"][id$="-icon"]').forEach(function(ic) { ic.style.transform = ''; });
+  if (!isOpen) {
+    card.classList.add('open');
+    if (icon) icon.style.transform = 'rotate(180deg)';
+  }
+}
+
+function trialCopy(event, text) {
+  event.stopPropagation();
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = event.target;
+    var orig = btn.textContent;
+    btn.textContent = 'تم ✓';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function trialToggleMethod(el, method) {
+  trialToggleMethodNew(method);
+}
+
+/* ── التحقق من الأداة قبل تشغيلها ── */
+function goSmartTool(toolKey) {
+  if (toolKey !== 'emergency' && !canUseTool(toolKey)) {
+    showTrialExpiredModal(toolKey);
+    return;
+  }
+  // خريطة مفاتيح الأدوات إلى أسماء الصفحات
+  var pageMap = {
+    'emergency':        'emergency',
+    'food-scan':        'food-scan',
+    'drug-interaction': 'drug-interaction',
+    'drug-alt':         'drug-alt',
+    'xray':             'xray',
+    'symptoms':         'symptoms',
+    'barcode-boycott':  'barcode-boycott',
+    'scanner':          'premium-scanner'
+  };
+  var pageName = pageMap[toolKey] || toolKey;
+  goPage(pageName);
+  // تهيئة خاصة بكل أداة
+  if (toolKey === 'food-scan') setTimeout(initFoodScan, 100);
+  if (toolKey === 'barcode-boycott') bbInit();
+  if (toolKey === 'xray') setTimeout(function(){ xraySetType('xray'); }, 100);
+  if (toolKey === 'scanner') setTimeout(function(){ setScanMode('product'); }, 150);
+}
+
+function checkToolAndRun(toolKey, fn) {
+  if (!canUseTool(toolKey)) { showTrialExpiredModal(toolKey); return; }
+  incToolUsage(toolKey);
+  fn();
+}
+
+/* ════════════════════════════════════════════════════════════
+   🍕 تصوير وتحليل الطعام
+════════════════════════════════════════════════════════════ */
+var _fsStream = null;
+var _fsCurrentImage = null;
+var QUICK_FOODS = [
+  {name:'أرز أبيض (100 جم)',cal:130,protein:2.7,carbs:28,fat:0.3},
+  {name:'دجاج مشوي (100 جم)',cal:165,protein:31,carbs:0,fat:3.6},
+  {name:'بيضة مسلوقة',cal:78,protein:6.3,carbs:0.6,fat:5.3},
+  {name:'خبز توست (شريحة)',cal:79,protein:2.7,carbs:15,fat:1},
+  {name:'تفاحة متوسطة',cal:95,protein:0.5,carbs:25,fat:0.3},
+  {name:'موزة متوسطة',cal:105,protein:1.3,carbs:27,fat:0.4},
+  {name:'لبن كامل (كوب 250مل)',cal:149,protein:8,carbs:12,fat:8},
+  {name:'عدس مطبوخ (100 جم)',cal:116,protein:9,carbs:20,fat:0.4},
+  {name:'سلطة خضراء (طبق)',cal:35,protein:2,carbs:7,fat:0.4},
+  {name:'شاورما لحم (100 جم)',cal:250,protein:22,carbs:5,fat:15},
+];
+
+function initFoodScan() {
+  var grid = document.getElementById('fs-quick-foods');
+  if (!grid || grid.children.length > 0) return;
+  QUICK_FOODS.forEach(function(f) {
+    var btn = document.createElement('button');
+    btn.style.cssText = 'background:rgba(46,201,81,.1);border:1px solid rgba(46,201,81,.3);border-radius:20px;padding:6px 12px;font-size:.72rem;color:#2ec951;font-family:Tajawal,sans-serif;cursor:pointer;transition:all .15s';
+    btn.textContent = f.name;
+    btn.onclick = function() { renderFoodCard(f); };
+    grid.appendChild(btn);
+  });
+}
+
+function fsOpenCamera() {
+  if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
+  var video = document.getElementById('fs-video');
+  var fallback = document.getElementById('fs-fallback');
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream) {
+      _fsStream = stream;
+      video.srcObject = stream;
+      video.style.display = 'block';
+      if (fallback) fallback.style.display = 'none';
+    }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
+  }
+}
+
+function fsCameraCapture() {
+  if (!_fsStream) { fsOpenCamera(); return; }
+  if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
+  var video = document.getElementById('fs-video');
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _fsCurrentImage = canvas.toDataURL('image/jpeg', 0.85);
+  incToolUsage('food-scan');
+  fsAnalyzeImage(_fsCurrentImage);
+  // stop camera
+  _fsStream.getTracks().forEach(function(t) { t.stop(); });
+  _fsStream = null;
+  video.style.display = 'none';
+  document.getElementById('fs-fallback').style.display = 'block';
+}
+
+function fsLoadImage(event) {
+  if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _fsCurrentImage = e.target.result;
+    incToolUsage('food-scan');
+    fsAnalyzeImage(_fsCurrentImage);
+  };
+  reader.readAsDataURL(file);
+}
+
+function fsAnalyzeText() {
+  if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
+  var text = document.getElementById('fs-food-text').value.trim();
+  if (!text) { showToast('أدخل اسم الطعام أولاً'); return; }
+  incToolUsage('food-scan');
+  var resBox = document.getElementById('fs-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل الطعام...</span></div>';
+  var prompt = 'أنت خبير تغذية متخصص.\nحلل الطعام التالي وأعطني معلومات غذائية دقيقة لكل 100 جرام منه:\nالطعام: ' + text + '\n\nأجب فقط بهذا التنسيق JSON (بدون أي نص آخر أو markdown):\n{"name_ar":"اسم الطعام بالعربي","name_en":"اسم الطعام بالإنجليزي","serving":"حجم الحصة الطبيعية بالجرام","calories":000,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"ملاحظة صحية مفيدة","items":[{"name":"صنف1 بالعربية","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000},{"name":"صنف2","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000}]}';
+  _callClaudeAPI(prompt, null).then(function(res) {
+    try {
+      var clean = res.replace(/```json|```/g,'').trim();
+      var data = JSON.parse(clean);
+      renderFoodAnalysisResult(data, resBox);
+    } catch(e) {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem;color:var(--txt)">' + res + '</div>';
+    }
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800;font-size:.85rem">تعذر التحليل، حاول مرة أخرى.</div>';
+  });
+}
+
+async function fsAnalyzeImage(imgDataUrl) {
+  var resBox = document.getElementById('fs-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل صورة الطعام... 🍕</span></div>';
+  var prompt = 'أنت خبير تغذية متخصص. انظر لهذه الصورة وتعرف على كل طعام/وجبة/صنف موجود في الصورة.\nلكل صنف تراه أعطه اسماً بالعربية والقيم الغذائية الدقيقة لكل 100 جرام.\n\nأجب فقط بهذا التنسيق JSON (بدون أي نص آخر أو markdown):\n{"name_ar":"اسم الوجبة الكاملة","serving":"الكمية التقديرية بالجرام","calories":000,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"نصيحة صحية","items":[{"name":"اسم الصنف بالعربية","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000},{"name":"صنف2","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000}]}';
+  try {
+    var res = await _callClaudeAPIWithImage(prompt, imgDataUrl);
+    try {
+      var clean = res.replace(/```json|```/g,'').trim();
+      var data = JSON.parse(clean);
+      renderFoodAnalysisResult(data, resBox);
+    } catch(e) {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+    }
+  } catch(e) {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800;font-size:.85rem">تعذر تحليل الصورة.</div>';
+  }
+}
+
+function renderFoodCard(food) {
+  var resBox = document.getElementById('fs-result');
+  if (!resBox) return;
+  var data = {
+    name_ar: food.name,
+    serving: '100',
+    calories: food.cal,
+    protein: food.protein,
+    carbs: food.carbs,
+    fat: food.fat,
+    fiber: 0,
+    notes: '',
+    items: [{
+      name: food.name,
+      cal_per_100g: food.cal,
+      protein_per_100g: food.protein,
+      carbs_per_100g: food.carbs,
+      fat_per_100g: food.fat,
+      estimated_grams: 100
+    }]
+  };
+  renderFoodAnalysisResult(data, resBox);
+}
+
+function renderFoodAnalysisResult(data, resBox) {
+  /* ── Build items bounding box cards ── */
+  var items = data.items || [];
+  // normalize: support both old (cal) and new (cal_per_100g) format
+  items = items.map(function(it) {
+    return {
+      name: it.name || '',
+      cal_per_100g: it.cal_per_100g || it.cal || 0,
+      protein_per_100g: it.protein_per_100g || it.protein || 0,
+      carbs_per_100g: it.carbs_per_100g || it.carbs || 0,
+      fat_per_100g: it.fat_per_100g || it.fat || 0,
+      estimated_grams: it.estimated_grams || 100
+    };
+  });
+
+  var itemsHtml = '';
+  if (items.length > 0) {
+    itemsHtml = '<div style="margin-top:14px">';
+    itemsHtml += '<div style="font-size:.78rem;font-weight:800;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="fas fa-th"></i> الأطعمة المكتشفة — مربعات التعرف الذكي</div>';
+    itemsHtml += '<div style="display:flex;flex-wrap:wrap;gap:10px">';
+    items.forEach(function(item, idx) {
+      var calColor = item.cal_per_100g < 80 ? '#2ec951' : item.cal_per_100g < 200 ? '#ffc107' : '#f44336';
+      var borderGlow = item.cal_per_100g < 80 ? 'rgba(46,201,81,.4)' : item.cal_per_100g < 200 ? 'rgba(255,193,7,.4)' : 'rgba(244,67,54,.4)';
+      var delay = (idx * 0.1).toFixed(1);
+      itemsHtml += '<div style="background:linear-gradient(145deg,rgba(13,27,42,.98),rgba(8,18,38,.99));border:2px solid ' + borderGlow + ';border-radius:16px;padding:12px;min-width:140px;flex:1;animation:pageIn .4s ease ' + delay + 's both;box-shadow:0 4px 18px rgba(0,0,0,.5),0 0 12px ' + borderGlow + '">';
+      /* Header: icon + name */
+      itemsHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      itemsHtml += '<div style="width:36px;height:36px;border-radius:10px;background:' + borderGlow.replace('.4','.2') + ';border:1.5px solid ' + borderGlow + ';display:flex;align-items:center;justify-content:center;font-size:1.3rem">🍽️</div>';
+      itemsHtml += '<div style="flex:1;min-width:0"><div style="font-size:.82rem;font-weight:900;color:#e3f2fd;line-height:1.2">' + item.name + '</div>';
+      itemsHtml += '<div style="font-size:.62rem;color:var(--txt3);margin-top:1px">تقدير: ~' + item.estimated_grams + ' جم</div></div>';
+      itemsHtml += '</div>';
+      /* Calories per 100g — main badge */
+      itemsHtml += '<div style="background:' + borderGlow.replace('.4','.15') + ';border:1.5px solid ' + borderGlow + ';border-radius:12px;padding:8px 10px;text-align:center;margin-bottom:8px">';
+      itemsHtml += '<div style="font-size:.58rem;font-weight:700;color:var(--txt3);margin-bottom:2px">سعرات / 100 جم</div>';
+      itemsHtml += '<div style="font-size:1.5rem;font-weight:900;color:' + calColor + ';line-height:1">' + Math.round(item.cal_per_100g) + '</div>';
+      itemsHtml += '<div style="font-size:.58rem;color:var(--txt3)">كيلوكالوري</div>';
+      itemsHtml += '</div>';
+      /* Macros mini grid */
+      itemsHtml += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">';
+      [['💪', 'بروتين', item.protein_per_100g, '#42a5f5'], ['🌾', 'كارب', item.carbs_per_100g, '#ffa726'], ['🫒', 'دهون', item.fat_per_100g, '#ef5350']].forEach(function(m) {
+        itemsHtml += '<div style="background:rgba(255,255,255,.04);border-radius:8px;padding:4px;text-align:center">';
+        itemsHtml += '<div style="font-size:.7rem">' + m[0] + '</div>';
+        itemsHtml += '<div style="font-size:.75rem;font-weight:800;color:' + m[3] + '">' + parseFloat(m[2]).toFixed(1) + '</div>';
+        itemsHtml += '<div style="font-size:.52rem;color:var(--txt3)">' + m[1] + '/100جم</div>';
+        itemsHtml += '</div>';
+      });
+      itemsHtml += '</div>';
+      itemsHtml += '</div>';
+    });
+    itemsHtml += '</div></div>';
+  }
+
+  /* ── Summary card ── */
+  var html = '<div class="food-card">';
+  html += '<div class="food-card-header" style="display:flex;align-items:center;gap:10px">';
+  html += '<span style="font-size:1.8rem">🍽️</span>';
+  html += '<div><div style="font-size:1rem;font-weight:900;color:#2ec951">' + (data.name_ar || 'وجبة') + '</div>';
+  html += '<div style="font-size:.72rem;color:var(--txt3)">الكمية التقديرية: ' + (data.serving || '100') + ' جرام</div></div>';
+  html += '</div>';
+  html += '<div class="food-macro-grid">';
+  [['🔥','إجمالي السعرات',data.calories||0,'كيلوكالوري'],['💪','بروتين',data.protein||0,'جم'],['🌾','كربوهيدرات',data.carbs||0,'جم'],['🫒','دهون',data.fat||0,'جم']].forEach(function(m) {
+    html += '<div class="macro-cell"><div class="macro-val">' + m[2] + '</div><div class="macro-label">' + m[0] + '<br>' + m[1] + '</div><div style="font-size:.58rem;color:var(--txt3)">' + m[3] + '</div></div>';
+  });
+  html += '</div>';
+  if (data.notes) html += '<div style="padding:0 14px 12px;font-size:.78rem;color:#81c784;background:rgba(46,201,81,.05);border-top:1px solid rgba(46,201,81,.15);padding-top:10px;line-height:1.6">💡 ' + data.notes + '</div>';
+  html += itemsHtml;
+  html += '</div>';
+  resBox.innerHTML = html;
+  resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ════════════════════════════════════════════════════════════
+   💊 تفاعل الأدوية
+════════════════════════════════════════════════════════════ */
+var _diDrugs = [];
+
+function diAddDrug() {
+  var inp = document.getElementById('di-drug-input');
+  var name = inp ? inp.value.trim() : '';
+  if (!name) { showToast('أدخل اسم الدواء'); return; }
+  if (_diDrugs.includes(name)) { showToast('تم إضافة هذا الدواء مسبقاً'); return; }
+  _diDrugs.push(name);
+  inp.value = '';
+  renderDiDrugsList();
+}
+
+function renderDiDrugsList() {
+  var list = document.getElementById('di-drugs-list');
+  if (!list) return;
+  list.innerHTML = _diDrugs.map(function(d, i) {
+    return '<div class="drug-chip" onclick="diRemoveDrug(' + i + ')"><i class="fas fa-pills"></i>' + d + ' <i class="fas fa-times" style="font-size:.65rem;opacity:.7"></i></div>';
+  }).join('');
+}
+
+function diRemoveDrug(i) {
+  _diDrugs.splice(i, 1);
+  renderDiDrugsList();
+}
+
+function diAnalyze() {
+  if (_diDrugs.length < 2) { showToast('أضف دواءين على الأقل للمقارنة'); return; }
+  if (!canUseTool('drug-interaction')) { showTrialExpiredModal('drug-interaction'); return; }
+  incToolUsage('drug-interaction');
+  var resBox = document.getElementById('di-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري فحص التداخلات الدوائية...</span></div>';
+  var prompt = 'أنت صيدلاني وطبيب خبير.\nافحص التداخلات الدوائية المحتملة بين الأدوية التالية:\n' + _diDrugs.map(function(d,i){ return (i+1)+'. '+d; }).join('\n') + '\n\nلكل تداخل محتمل، أذكر:\n- الدواءين المتفاعلان\n- مستوى الخطورة (خطير / تحذير / آمن نسبياً)\n- طبيعة التداخل\n- التوصية\n\nأجب بتنسيق JSON فقط بدون أي نص إضافي:\n{"interactions":[{"drug1":"دواء1","drug2":"دواء2","severity":"خطير/تحذير/آمن","description":"وصف التداخل","recommendation":"التوصية"},...],"summary":"ملخص عام","overall_risk":"مستوى الخطر الكلي"}';
+  _callClaudeAPI(prompt, null).then(function(res) {
+    try {
+      var clean = res.replace(/```json|```/g,'').trim();
+      var data = JSON.parse(clean);
+      renderDiResult(data, resBox);
+    } catch(e) {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+    }
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل، حاول مرة أخرى.</div>';
+  });
+}
+
+function renderDiResult(data, resBox) {
+  var sevColor = { 'خطير': '#f44336', 'تحذير': '#ff9800', 'آمن': '#2ec951', 'آمن نسبياً': '#4caf50' };
+  var sevIcon = { 'خطير': '🚨', 'تحذير': '⚠️', 'آمن': '✅', 'آمن نسبياً': '✅' };
+  var html = '<div style="background:rgba(33,150,243,.08);border:1.5px solid rgba(33,150,243,.3);border-radius:16px;padding:14px;margin-bottom:12px">';
+  html += '<div style="font-size:.88rem;font-weight:800;color:#64b5f6;margin-bottom:6px">📊 نتيجة الفحص</div>';
+  html += '<div style="font-size:.82rem;color:var(--txt);line-height:1.7">' + (data.summary || '') + '</div>';
+  if (data.overall_risk) html += '<div style="margin-top:8px;font-size:.78rem;font-weight:800;color:#f44336">مستوى الخطر الكلي: ' + data.overall_risk + '</div>';
+  html += '</div>';
+  (data.interactions || []).forEach(function(inter) {
+    var sev = inter.severity || 'تحذير';
+    var color = sevColor[sev] || '#ff9800';
+    html += '<div class="interaction-card ' + (sev === 'خطير' ? '' : sev.includes('آمن') ? 'ok' : 'warn') + '" style="border-color:' + color + '">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html += '<div style="font-size:.85rem;font-weight:800;color:' + color + '">' + (sevIcon[sev]||'⚠️') + ' ' + inter.drug1 + ' + ' + inter.drug2 + '</div>';
+    html += '<div style="font-size:.65rem;background:' + color + '22;border:1px solid ' + color + '66;color:' + color + ';border-radius:20px;padding:2px 8px">' + sev + '</div>';
+    html += '</div>';
+    html += '<div style="font-size:.8rem;color:var(--txt2);line-height:1.6;margin-bottom:6px">' + inter.description + '</div>';
+    if (inter.recommendation) html += '<div style="font-size:.75rem;color:#81c784;background:rgba(46,201,81,.08);border-radius:8px;padding:6px 10px"><i class="fas fa-lightbulb"></i> ' + inter.recommendation + '</div>';
+    html += '</div>';
+  });
+  resBox.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   🔄 بدائل الأدوية
+════════════════════════════════════════════════════════════ */
+function daSearch() {
+  var drug = document.getElementById('da-drug-input').value.trim();
+  if (!drug) { showToast('أدخل اسم الدواء'); return; }
+  if (!canUseTool('drug-alt')) { showTrialExpiredModal('drug-alt'); return; }
+  incToolUsage('drug-alt');
+  var resBox = document.getElementById('da-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري البحث عن البدائل...</span></div>';
+  var prompt = 'أنت صيدلاني خبير.\nأعطني معلومات كاملة عن دواء "' + drug + '" وبدائله المتاحة.\n\nأجب فقط بتنسيق JSON بدون أي نص إضافي:\n{"drug_name":"اسم الدواء المُدخل","active_ingredient":"المادة الفعالة بالعربي","active_ingredient_en":"المادة الفعالة بالإنجليزي","drug_class":"تصنيف الدواء","main_use":"الاستخدام الرئيسي","price_range":"نطاق السعر التقريبي","alternatives":[{"name":"اسم البديل","active":"مادته الفعالة","price":"سعره التقريبي","notes":"ملاحظة"},...],"warnings":"تحذيرات مهمة","note":"تنبيه للمراجعة الطبية"}';
+  _callClaudeAPI(prompt, null).then(function(res) {
+    try {
+      var clean = res.replace(/```json|```/g,'').trim();
+      var data = JSON.parse(clean);
+      renderDaResult(data, resBox);
+    } catch(e) {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+    }
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر البحث.</div>';
+  });
+}
+
+function renderDaResult(data, resBox) {
+  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(156,39,176,.35);border-radius:20px;overflow:hidden;margin-bottom:12px">';
+  html += '<div style="background:linear-gradient(135deg,rgba(156,39,176,.25),rgba(103,58,183,.15));padding:12px 14px">';
+  html += '<div style="font-size:1rem;font-weight:900;color:#ce93d8">💊 ' + (data.drug_name || '') + '</div>';
+  html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:2px">' + (data.active_ingredient || '') + ' — ' + (data.active_ingredient_en || '') + '</div>';
+  html += '</div>';
+  html += '<div style="padding:12px 14px">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
+  [['🏷️ التصنيف',data.drug_class],['💊 الاستخدام',data.main_use],['💰 السعر التقريبي',data.price_range]].forEach(function(r) {
+    if (r[1]) html += '<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:8px 10px"><div style="font-size:.65rem;color:var(--txt3)">' + r[0] + '</div><div style="font-size:.8rem;color:var(--txt);font-weight:700;margin-top:2px">' + r[1] + '</div></div>';
+  });
+  html += '</div>';
+  if (data.alternatives && data.alternatives.length > 0) {
+    html += '<div style="font-size:.82rem;font-weight:800;color:#ce93d8;margin-bottom:10px">🔄 البدائل المتاحة (' + data.alternatives.length + '):</div>';
+    data.alternatives.forEach(function(alt) {
+      html += '<div style="background:rgba(156,39,176,.08);border:1px solid rgba(156,39,176,.2);border-radius:12px;padding:10px 12px;margin-bottom:8px">';
+      html += '<div style="font-size:.85rem;font-weight:800;color:#e1bee7">' + alt.name + '</div>';
+      html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:3px">المادة الفعالة: ' + (alt.active || '-') + '</div>';
+      if (alt.price) html += '<div style="font-size:.72rem;color:#a5d6a7;margin-top:2px">💰 ' + alt.price + '</div>';
+      if (alt.notes) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:4px">' + alt.notes + '</div>';
+      html += '</div>';
+    });
+  }
+  if (data.warnings) html += '<div style="background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.75rem;color:#ef9a9a;line-height:1.6;margin-top:4px">⚠️ ' + data.warnings + '</div>';
+  if (data.note) html += '<div style="font-size:.72rem;color:var(--txt3);text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">📋 ' + data.note + '</div>';
+  html += '</div></div>';
+  resBox.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   🩻 قراءة الأشعة
+════════════════════════════════════════════════════════════ */
+var _xrType = 'xray';
+var _xrImageData = null;
+
+function xraySetType(type) {
+  _xrType = type;
+  ['xray','mri','ct'].forEach(function(t) {
+    var btn = document.getElementById('xr-tab-' + t);
+    if (!btn) return;
+    if (t === type) {
+      btn.style.borderColor = 'rgba(0,188,212,.6)';
+      btn.style.background = 'linear-gradient(135deg,rgba(0,188,212,.25),rgba(0,188,212,.1))';
+      btn.querySelector('i').style.color = '#00bcd4';
+      btn.querySelector('span').style.color = '#00bcd4';
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,.15)';
+      btn.style.background = 'rgba(255,255,255,.04)';
+    }
+  });
+}
+
+function xrayLoadImage(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _xrImageData = e.target.result;
+    var preview = document.getElementById('xr-preview');
+    var img = document.getElementById('xr-img-preview');
+    if (preview && img) { img.src = _xrImageData; preview.style.display = 'block'; }
+    document.getElementById('xr-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم رفع الصورة ✓</span><input type="file" accept="image/*" onchange="xrayLoadImage(event)" style="display:none">';
+  };
+  reader.readAsDataURL(file);
+}
+
+var _xrStream = null;
+
+function xrayOpenCamera() {
+  var area = document.getElementById('xr-camera-area');
+  var video = document.getElementById('xr-video');
+  if (!area || !video) return;
+  if (_xrStream) { xrayStopCamera(); return; }
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  .then(function(stream) {
+    _xrStream = stream;
+    video.srcObject = stream;
+    area.style.display = 'block';
+    document.getElementById('xr-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+  }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
+}
+
+function xrayStopCamera() {
+  if (_xrStream) { _xrStream.getTracks().forEach(function(t) { t.stop(); }); _xrStream = null; }
+  var area = document.getElementById('xr-camera-area');
+  if (area) area.style.display = 'none';
+  var btn = document.getElementById('xr-camera-btn');
+  if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير الأشعة بالكاميرا</span>';
+}
+
+function xrayCapturePhoto() {
+  var video = document.getElementById('xr-video');
+  if (!video || !_xrStream) { showToast('الكاميرا غير مفعلة'); return; }
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _xrImageData = canvas.toDataURL('image/jpeg', 0.92);
+  xrayStopCamera();
+  var preview = document.getElementById('xr-preview');
+  var img = document.getElementById('xr-img-preview');
+  if (preview && img) { img.src = _xrImageData; preview.style.display = 'block'; }
+  showToast('✅ تم التقاط الصورة — اضغط تحليل الآن');
+}
+
+function xrayAnalyze() {
+  if (!_xrImageData) { showToast('ارفع صورة الأشعة أولاً'); return; }
+  if (!canUseTool('xray')) { showTrialExpiredModal('xray'); return; }
+  incToolUsage('xray');
+  var resBox = document.getElementById('xr-result');
+  var typeNames = { xray: 'أشعة سينية (X-Ray)', mri: 'رنين مغناطيسي (MRI)', ct: 'أشعة مقطعية (CT Scan)' };
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل الأشعة...</span></div>';
+  var prompt = 'أنت طبيب أشعة خبير. انظر لهذه صورة ' + (typeNames[_xrType] || 'أشعة') + '.\n\nقدّم وصفاً مبدئياً للصورة من حيث:\n1. العضو أو المنطقة التشريحية المرئية\n2. الملاحظات العامة للصورة\n3. أي تغيرات أو مناطق تستوقف النظر (إن وجدت)\n4. التوصيات العامة\n\nتنبيه مهم في النهاية: هذا التحليل لأغراض استرشادية فقط وليس تشخيصاً طبياً نهائياً.';
+  _callClaudeAPIWithImage(prompt, _xrImageData).then(function(res) {
+    renderXrayResult(res, resBox, typeNames[_xrType]);
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر تحليل الصورة.</div>';
+  });
+}
+
+function renderXrayResult(text, resBox, typeName) {
+  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(0,188,212,.35);border-radius:20px;overflow:hidden">';
+  html += '<div style="background:linear-gradient(135deg,rgba(0,188,212,.25),rgba(38,198,218,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+  html += '<span style="font-size:1.6rem">🩻</span>';
+  html += '<div><div style="font-size:.92rem;font-weight:900;color:#00e5ff">تقرير تحليل الأشعة</div>';
+  html += '<div style="font-size:.68rem;color:#80deea;margin-top:2px">' + typeName + '</div></div>';
+  html += '</div>';
+  html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + text + '</div>';
+  html += '<div style="padding:10px 14px 14px;background:rgba(244,67,54,.08);border-top:1px solid rgba(244,67,54,.2)">';
+  html += '<div style="font-size:.72rem;color:#ef9a9a;line-height:1.6">⚠️ <strong>تنبيه هام:</strong> هذا التحليل للأغراض التعليمية والاسترشادية فقط ولا يُغني عن مراجعة طبيب الأشعة المختص لتشخيص دقيق وتقرير رسمي.</div>';
+  html += '</div></div>';
+  resBox.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   🩺 تحليل الأعراض
+════════════════════════════════════════════════════════════ */
+var _symGender = '';
+
+function symSetGender(g) {
+  _symGender = g;
+  var male = document.getElementById('sym-male');
+  var female = document.getElementById('sym-female');
+  if (!male || !female) return;
+  if (g === 'male') {
+    male.style.borderColor = 'rgba(33,150,243,.6)'; male.style.background = 'rgba(33,150,243,.15)';
+    male.querySelector('i').style.color = '#2196f3'; male.querySelector('span').style.color = '#2196f3';
+    female.style.borderColor = 'rgba(255,255,255,.15)'; female.style.background = 'rgba(255,255,255,.04)';
+  } else {
+    female.style.borderColor = 'rgba(233,30,99,.6)'; female.style.background = 'rgba(233,30,99,.15)';
+    female.querySelector('i').style.color = '#e91e63'; female.querySelector('span').style.color = '#e91e63';
+    male.style.borderColor = 'rgba(255,255,255,.15)'; male.style.background = 'rgba(255,255,255,.04)';
+  }
+}
+
+function symAnalyze() {
+  var symptoms = document.getElementById('sym-symptoms').value.trim();
+  if (!symptoms) { showToast('أدخل الأعراض أولاً'); return; }
+  if (!canUseTool('symptoms')) { showTrialExpiredModal('symptoms'); return; }
+  incToolUsage('symptoms');
+  var age = document.getElementById('sym-age').value || '—';
+  var chronic = document.getElementById('sym-chronic').value.trim();
+  var resBox = document.getElementById('sym-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل الأعراض...</span></div>';
+  var genderText = _symGender === 'male' ? 'ذكر' : _symGender === 'female' ? 'أنثى' : 'غير محدد';
+  var prompt = 'أنت طبيب عام خبير ومستشار صحي.\nالمريض: عمره ' + age + ' سنة، الجنس: ' + genderText + (chronic ? '، أمراض مزمنة: ' + chronic : '') + '.\nالأعراض: ' + symptoms + '\n\nقدم تحليلاً مهنياً يشمل:\n1. الاحتمالات التشخيصية الأكثر ترجيحاً (من الأكثر للأقل احتمالاً)\n2. الأسباب الشائعة لهذه الأعراض\n3. اقتراح علاج مناسب من الأدوية الشائعة المتاحة بدون وصفة (إن أمكن)\n4. العلامات الخطيرة التي تستوجب زيارة الطبيب فوراً\n5. نصائح منزلية مساعدة\n\nنبّه في النهاية أن هذا للاسترشاد فقط وليس تشخيصاً نهائياً.';
+  _callClaudeAPI(prompt, null).then(function(res) {
+    renderSymResult(res, resBox);
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل.</div>';
+  });
+}
+
+function renderSymResult(text, resBox) {
+  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:20px;overflow:hidden">';
+  html += '<div style="background:linear-gradient(135deg,rgba(255,152,0,.25),rgba(255,193,7,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+  html += '<span style="font-size:1.6rem">🩺</span>';
+  html += '<div style="font-size:.92rem;font-weight:900;color:#ffb300">تقرير تحليل الأعراض</div>';
+  html += '</div>';
+  html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + text + '</div>';
+  html += '<div style="padding:10px 14px 14px;background:rgba(244,67,54,.08);border-top:1px solid rgba(244,67,54,.2)">';
+  html += '<div style="font-size:.72rem;color:#ef9a9a;line-height:1.6">⚠️ هذا التحليل للاسترشاد فقط. استشر طبيبك للتشخيص والعلاج النهائي.</div>';
+  html += '</div></div>';
+  resBox.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   📦 كشف المنتجات المقاطعة — مع مسح تلقائي للباركود والاسم
+════════════════════════════════════════════════════════════ */
+var _bbStream = null;
+var _bbAutoScanInterval = null;
+var _bbScanLock = false;
+var _bbScanDone = false;
+
+function bbInit() {}
+
+function bbOpenCamera() {
+  if (!canUseTool('barcode-boycott')) { showTrialExpiredModal('barcode-boycott'); return; }
+  var video = document.getElementById('bb-video');
+  var fallback = document.getElementById('bb-fallback');
+  var laser = document.getElementById('bb-laser');
+  var indicator = document.getElementById('bb-scan-indicator');
+  var captureBtn = document.getElementById('bb-capture-btn');
+  var stopBtn = document.getElementById('bb-stop-btn');
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } })
+    .then(function(stream) {
+      _bbStream = stream;
+      video.srcObject = stream;
+      video.style.display = 'block';
+      if (fallback) fallback.style.display = 'none';
+      if (laser) laser.style.display = 'block';
+      if (indicator) { indicator.style.display = 'block'; indicator.textContent = '🔍 جاري البحث عن الباركود...'; }
+      if (captureBtn) captureBtn.style.display = '';
+      if (stopBtn) stopBtn.style.display = '';
+      _bbScanDone = false;
+      _bbScanLock = false;
+      _bbStartAutoScan();
+    }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
+  }
+}
+
+function bbStopCamera() {
+  clearInterval(_bbAutoScanInterval);
+  if (_bbStream) { _bbStream.getTracks().forEach(function(t) { t.stop(); }); _bbStream = null; }
+  var video = document.getElementById('bb-video');
+  var fallback = document.getElementById('bb-fallback');
+  var laser = document.getElementById('bb-laser');
+  var indicator = document.getElementById('bb-scan-indicator');
+  var captureBtn = document.getElementById('bb-capture-btn');
+  var stopBtn = document.getElementById('bb-stop-btn');
+  if (video) video.style.display = 'none';
+  if (fallback) fallback.style.display = '';
+  if (laser) laser.style.display = 'none';
+  if (indicator) indicator.style.display = 'none';
+  if (captureBtn) captureBtn.style.display = 'none';
+  if (stopBtn) stopBtn.style.display = 'none';
+}
+
+function bbSmartCapture() {
+  if (!_bbStream) { bbOpenCamera(); return; }
+  bbCaptureNow();
+}
+
+function bbCaptureNow() {
+  if (!_bbStream) { showToast('افتح الكاميرا أولاً'); return; }
+  if (!canUseTool('barcode-boycott')) { showTrialExpiredModal('barcode-boycott'); return; }
+  clearInterval(_bbAutoScanInterval);
+  _bbScanDone = true;
+  var video = document.getElementById('bb-video');
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var imgData = canvas.toDataURL('image/jpeg', 0.85);
+  incToolUsage('barcode-boycott');
+  bbStopCamera();
+  bbAnalyzeImage(imgData);
+}
+
+function bbLoadFromFile(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (!canUseTool('barcode-boycott')) { showTrialExpiredModal('barcode-boycott'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    incToolUsage('barcode-boycott');
+    bbAnalyzeImage(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function _bbStartAutoScan() {
+  clearInterval(_bbAutoScanInterval);
+  _bbAutoScanInterval = setInterval(function() {
+    if (_bbScanDone) { clearInterval(_bbAutoScanInterval); return; }
+    var video = document.getElementById('bb-video');
+    if (video && video.readyState >= 2 && video.style.display !== 'none') {
+      _bbAutoScanFrame();
+    }
+  }, 1500);
+}
+
+async function _bbAutoScanFrame() {
+  if (_bbScanLock || _bbScanDone) return;
+  _bbScanLock = true;
+  var video = document.getElementById('bb-video');
+  var indicator = document.getElementById('bb-scan-indicator');
+  var status = document.getElementById('bb-scan-status');
+  try {
+    var canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    // محاولة قراءة الباركود
+    if ('BarcodeDetector' in window) {
+      try {
+        var det = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','upc_a','upc_e','qr_code','data_matrix'] });
+        var codes = await det.detect(canvas);
+        if (codes.length > 0) {
+          _bbScanDone = true;
+          clearInterval(_bbAutoScanInterval);
+          var code = codes[0].rawValue;
+          if (indicator) indicator.textContent = '✅ تم قراءة الباركود: ' + code;
+          if (status) status.innerHTML = '<i class="fas fa-check-circle" style="color:#2ec951;margin-left:4px"></i> باركود: ' + code + ' — جاري التحليل...';
+          if (!canUseTool('barcode-boycott')) { showTrialExpiredModal('barcode-boycott'); _bbScanLock = false; return; }
+          incToolUsage('barcode-boycott');
+          bbStopCamera();
+          bbAnalyzeProduct('باركود رقم: ' + code, null);
+          _bbScanLock = false;
+          return;
+        }
+      } catch(e) {}
+    }
+    if (indicator) indicator.textContent = '🔍 يبحث عن الباركود...';
+    if (status) status.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:4px"></i> مسح تلقائي — وجّه الكاميرا نحو الباركود أو المنتج';
+  } catch(e) {}
+  _bbScanLock = false;
+}
+
+function bbCameraCapture() {
+  if (!_bbStream) { bbOpenCamera(); return; }
+  bbCaptureNow();
+}
+
+function bbAnalyzeText() {
+  var text = document.getElementById('bb-manual').value.trim();
+  if (!text) { showToast('أدخل اسم المنتج'); return; }
+  if (!canUseTool('barcode-boycott')) { showTrialExpiredModal('barcode-boycott'); return; }
+  incToolUsage('barcode-boycott');
+  bbAnalyzeProduct(text, null);
+}
+
+async function bbAnalyzeImage(imgData) {
+  var resBox = document.getElementById('bb-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري قراءة الباركود وتحليل المنتج...</span></div>';
+  var prompt = 'أنت خبير في تحليل المنتجات التجارية وأسواق الاستهلاك.\nانظر لهذه الصورة وتعرف على المنتج أو اقرأ الباركود إن وُجد.\nالمطلوب: أعطني اسم المنتج وبلد المنشأ والشركة المالكة وهل هو من المنتجات المستهدفة بحملات المقاطعة الشعبية وأفضل البدائل المحلية العربية.\n\nأجب بتنسيق JSON فقط:\n{"product_name":"اسم المنتج","country":"بلد المنشأ","company":"الشركة المالكة","parent_company":"الشركة الأم","boycott_status":"مستهدف/غير مستهدف/غير محدد","boycott_reason":"سبب المقاطعة إن وجد","local_alternatives":[{"name":"بديل محلي 1","country":"مصر/السعودية..."},{"name":"بديل محلي 2","country":"..."}],"note":"ملاحظة إضافية"}';
+  var res = await _callClaudeAPIWithImage(prompt, imgData).catch(function() { return null; });
+  if (!res) { resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل.</div>'; return; }
+  try {
+    var clean = res.replace(/```json|```/g,'').trim();
+    var data = JSON.parse(clean);
+    renderBbResult(data, resBox);
+  } catch(e) {
+    resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+  }
+}
+
+function bbAnalyzeProduct(name, imgData) {
+  var resBox = document.getElementById('bb-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل المنتج...</span></div>';
+  var prompt = 'أنت خبير في تحليل المنتجات التجارية.\nالمنتج المراد تحليله: "' + name + '".\nالمطلوب: بلد المنشأ، الشركة المالكة، الشركة الأم، هل هو من المنتجات المستهدفة بحملات المقاطعة الشعبية ولماذا، وأفضل البدائل المحلية العربية.\n\nأجب بتنسيق JSON فقط:\n{"product_name":"اسم المنتج","country":"بلد المنشأ","company":"الشركة المالكة","parent_company":"الشركة الأم","boycott_status":"مستهدف/غير مستهدف/غير محدد","boycott_reason":"سبب المقاطعة إن وجد","local_alternatives":[{"name":"بديل محلي 1","country":"..."},{"name":"بديل محلي 2","country":"..."}],"note":"ملاحظة"}';
+  _callClaudeAPI(prompt, null).then(function(res) {
+    try {
+      var clean = res.replace(/```json|```/g,'').trim();
+      var data = JSON.parse(clean);
+      renderBbResult(data, resBox);
+    } catch(e) {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+    }
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل.</div>';
+  });
+}
+
+function renderBbResult(data, resBox) {
+  var isBoycott = data.boycott_status && data.boycott_status.includes('مستهدف');
+  var borderColor = isBoycott ? 'rgba(244,67,54,.5)' : 'rgba(46,201,81,.35)';
+  var statusColor = isBoycott ? '#f44336' : '#2ec951';
+  var statusIcon = isBoycott ? '🚫' : '✅';
+  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid ' + borderColor + ';border-radius:20px;overflow:hidden">';
+  html += '<div style="background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(244,67,54,.05));padding:12px 14px">';
+  html += '<div style="font-size:1rem;font-weight:900;color:#ffe0b2">📦 ' + (data.product_name || '') + '</div>';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">';
+  html += '<span style="font-size:.72rem;background:' + statusColor + '22;border:1px solid ' + statusColor + '66;color:' + statusColor + ';border-radius:20px;padding:2px 10px;font-weight:800">' + statusIcon + ' ' + (data.boycott_status || '') + '</span>';
+  html += '<span style="font-size:.72rem;color:var(--txt3)">🌍 ' + (data.country || '') + '</span>';
+  html += '</div></div>';
+  html += '<div style="padding:12px 14px">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
+  [['🏢 الشركة المالكة', data.company], ['🌐 الشركة الأم', data.parent_company]].forEach(function(r) {
+    if (r[1]) html += '<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:8px 10px"><div style="font-size:.63rem;color:var(--txt3)">' + r[0] + '</div><div style="font-size:.8rem;color:var(--txt);font-weight:700;margin-top:2px">' + r[1] + '</div></div>';
+  });
+  html += '</div>';
+  if (data.boycott_reason) html += '<div style="background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.25);border-radius:10px;padding:10px;font-size:.78rem;color:#ef9a9a;line-height:1.6;margin-bottom:12px">⚠️ <strong>سبب المقاطعة:</strong> ' + data.boycott_reason + '</div>';
+  if (data.local_alternatives && data.local_alternatives.length > 0) {
+    html += '<div style="font-size:.82rem;font-weight:800;color:#2ec951;margin-bottom:8px">🌿 البدائل المحلية:</div>';
+    data.local_alternatives.forEach(function(alt) {
+      html += '<div style="background:rgba(46,201,81,.08);border:1px solid rgba(46,201,81,.2);border-radius:10px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">';
+      html += '<span style="font-size:.82rem;color:#a5d6a7;font-weight:700">✅ ' + alt.name + '</span>';
+      if (alt.country) html += '<span style="font-size:.65rem;color:var(--txt3)">🌍 ' + alt.country + '</span>';
+      html += '</div>';
+    });
+  }
+  if (data.note) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">📋 ' + data.note + '</div>';
+  html += '</div></div>';
+  resBox.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   🚨 الطوارئ السريعة
+════════════════════════════════════════════════════════════ */
+var EMERGENCY_DATA = {
+  burns: {
+    title: '🔥 إسعافات الحروق',
+    color: '#ff7043',
+    steps: [
+      { icon: '💧', title: 'تبريد فوري', text: 'ضع المنطقة تحت ماء بارد جاري (ليس ثلجاً) لمدة 10-20 دقيقة على الأقل' },
+      { icon: '👕', title: 'إزالة الملابس', text: 'أزل الملابس والمجوهرات من المنطقة المصابة إن أمكن بلطف' },
+      { icon: '🩹', title: 'تغطية الجرح', text: 'غطّ الحرق بضمادة معقمة أو قماش نظيف — لا تستخدم مواد دهنية أو معجون أسنان' },
+      { icon: '🚫', title: 'لا تفقأ الفقاعات', text: 'الفقاعات تحمي الجلد من العدوى — لا تفتحها أبداً' },
+      { icon: '🏥', title: 'متى تذهب للطوارئ', text: 'درجة ثالثة، منطقة واسعة، الوجه/اليدين/الأعضاء التناسلية، حروق طفل صغير' }
+    ]
+  },
+  wounds: {
+    title: '🩸 إسعافات الجروح',
+    color: '#ef5350',
+    steps: [
+      { icon: '🤲', title: 'اغسل يديك', text: 'اغسل يديك بالصابون قبل المساعدة لتجنب العدوى' },
+      { icon: '⬆️', title: 'ضغط مباشر', text: 'اضغط على الجرح بقماش نظيف لإيقاف النزيف — استمر 10-15 دقيقة دون رفع القماش' },
+      { icon: '🦵', title: 'رفع الطرف', text: 'ارفع الطرف المصاب فوق مستوى القلب إن أمكن لتقليل النزيف' },
+      { icon: '🧴', title: 'تنظيف الجرح', text: 'اغسل الجرح بماء نظيف وصابون — ثم ضع مطهراً (ديتول/بيتادين)' },
+      { icon: '🏥', title: 'متى تذهب للطوارئ', text: 'نزيف لا يتوقف، جرح عميق، أشياء مغروسة، جرح من حيوان' }
+    ]
+  },
+  choking: {
+    title: '😮‍💨 إسعافات الاختناق',
+    color: '#42a5f5',
+    steps: [
+      { icon: '❓', title: 'تأكد من الاختناق', text: 'اسأل: "هل تختنق؟" — إذا لم يستطع التحدث أو السعال فهو يختنق' },
+      { icon: '📞', title: 'استدعِ المساعدة', text: 'اطلب من أحد الاتصال بالإسعاف 123 فوراً بينما تساعد الشخص' },
+      { icon: '🤜', title: '5 ضربات على الظهر', text: 'أمل المريض للأمام، اضرب بين لوحَي الكتف 5 مرات بكعب يدك' },
+      { icon: '🫁', title: '5 ضغطات بطنية (هيمليك)', text: 'قف خلفه، ضع مشتت يديك تحت صدره، اضغط للداخل وللأعلى 5 مرات بقوة' },
+      { icon: '🔄', title: 'كرر', text: 'بادل بين 5 ضربات ظهر و5 ضغطات بطنية حتى خروج الجسم الغريب أو وصول الإسعاف' }
+    ]
+  },
+  poisoning: {
+    title: '☠️ إسعافات التسمم',
+    color: '#66bb6a',
+    steps: [
+      { icon: '📞', title: 'اتصل فوراً', text: 'اتصل بمركز السموم أو الإسعاف 123 فوراً — أخبرهم بالمادة المبتلعة' },
+      { icon: '🚫', title: 'لا تحث على التقيؤ', text: 'لا تجعله يتقيأ إلا بتعليمات طبية — قد يزيد الأذى لبعض المواد' },
+      { icon: '💧', title: 'الفم والجلد', text: 'إذا على الجلد: اشطف بماء كثير. إذا في العين: اغسل بماء بارد 15 دقيقة' },
+      { icon: '📦', title: 'احتفظ بالعبوة', text: 'خذ معك عبوة المادة السامة للمستشفى — يساعد الأطباء في تحديد العلاج' },
+      { icon: '🏥', title: 'أعراض خطيرة', text: 'التشنجات، فقدان الوعي، صعوبة التنفس — اذهب للطوارئ فوراً' }
+    ]
+  },
+  fracture: {
+    title: '🦴 إسعافات الكسور',
+    color: '#ce93d8',
+    steps: [
+      { icon: '🧊', title: 'لا تحرك المنطقة', text: 'لا تحاول تعديل العظمة أو تحريك المنطقة المصابة' },
+      { icon: '❄️', title: 'كمادة باردة', text: 'ضع كمادة ثلج مغلفة بقماش لتخفيف التورم — لا تضع الثلج مباشرة' },
+      { icon: '🦵', title: 'تثبيت الطرف', text: 'ثبّت الطرف في وضعه بلوح خشبي أو جريدة مدفوفة — لا تشدّ بإحكام شديد' },
+      { icon: '⬆️', title: 'رفع الطرف', text: 'ارفع الطرف المصاب فوق مستوى القلب لتقليل التورم' },
+      { icon: '🏥', title: 'اذهب للطوارئ', text: 'الكسور تتطلب أشعة وتجبيراً — لا تتأخر في الذهاب للمستشفى' }
+    ]
+  },
+  fainting: {
+    title: '😵 إسعافات الإغماء',
+    color: '#ffc107',
+    steps: [
+      { icon: '🛌', title: 'ضعه مستلقياً', text: 'أضجع الشخص على ظهره في مكان آمن' },
+      { icon: '🦵', title: 'ارفع الساقين', text: 'ارفع ساقيه 30 سم لتحسين تدفق الدم للرأس' },
+      { icon: '👔', title: 'أرخِ الملابس', text: 'أرخِ أي ملابس ضيقة حول الرقبة والصدر' },
+      { icon: '💨', title: 'هواء نقي', text: 'تأكد من توفر هواء كافٍ — ابعد المتجمعين وافتح النوافذ' },
+      { icon: '🏥', title: 'إذا لم يفِق', text: 'إذا لم يستعد وعيه خلال دقيقتين أو استمر الإغماء، اتصل بالإسعاف فوراً' }
+    ]
+  },
+  'diabetic-coma': {
+    title: '🩺 غيبوبة السكر (نقص/ارتفاع)',
+    color: '#29b6f6',
+    steps: [
+      { icon: '🔍', title: 'حدد النوع أولاً', text: 'نقص السكر: شحوب، تعرق، رعشة، تشوش. ارتفاع السكر: جفاف، تنفس غريب، قيء. كلاهما يسبب فقدان الوعي' },
+      { icon: '🍬', title: 'نقص السكر — أعطِه سكراً', text: 'إذا كان واعياً: أعطِه عصير برتقال أو ماء+سكر أو حلوى. لا تعطِ أي شيء للمغمى عليه عن طريق الفم' },
+      { icon: '📞', title: 'اتصل بالإسعاف فوراً', text: 'في كلتا الحالتين — اتصل بـ 123 أو خذه للطوارئ. أخبرهم أنه مريض سكري' },
+      { icon: '🛌', title: 'وضع الاسترداد', text: 'إذا كان فاقد الوعي: ضعه على جنبه (وضع الإنعاش) حتى لا يستنشق قيئه' },
+      { icon: '💉', title: 'الجلوكاجون', text: 'إذا توفر حقن الجلوكاجون عنده: حقنه في العضل فوراً وأخبر الإسعاف. لا تترك المريض وحيداً أبداً' }
+    ]
+  },
+  'swallow-object': {
+    title: '🔩 ابتلاع جسم معدني أو حاد',
+    color: '#ffa726',
+    steps: [
+      { icon: '🧘', title: 'لا تتسرع', text: 'معظم الأجسام الصغيرة الملساء تعبر الجهاز الهضمي وحدها. لكن الأجسام الحادة أو الكبيرة تحتاج تدخلاً طبياً' },
+      { icon: '🚫', title: 'لا تتقيأ', text: 'لا تحاول إخراج الجسم بالتقيؤ — قد يسبب ضرراً أكبر للمريء بالجسم الحاد عند العودة' },
+      { icon: '🚫', title: 'لا تأكل ولا تشرب', text: 'لا تعطِ طعاماً أو شراباً حتى يراه الطبيب — قد يحتاج تخديراً' },
+      { icon: '📞', title: 'اذهب للطوارئ فوراً', text: 'أي جسم حاد (إبرة، مشبك، بطارية زر، عملة معدنية) → طوارئ فوراً. بطارية الزر خاصة خطيرة جداً وتحرق الأنسجة' },
+      { icon: '🏥', title: 'أعراض الخطر', text: 'ألم في الصدر أو البطن، صعوبة البلع، غثيان شديد، دم → إسعاف فوري 123' }
+    ]
+  },
+  'child-swallow': {
+    title: '👶 ابتلاع طفل لجسم غريب',
+    color: '#f48fb1',
+    steps: [
+      { icon: '😰', title: 'لا تدخل يدك', text: 'لا تحاول إخراج الجسم بإدخال إصبعك — قد تدفعه لأعمق. انظر فقط إذا كنت ترى الجسم بوضوح تام' },
+      { icon: '📞', title: 'اتصل فوراً', text: 'اتصل بالإسعاف 123 أو خذه للطوارئ فوراً. أخبرهم عن الجسم المبتلع (حجمه، مادته، وقت الحادثة)' },
+      { icon: '😮‍💨', title: 'إذا اختنق', text: 'إذا لم يستطع الطفل الكلام أو التنفس: للرضع — ضربات الظهر ٥+ضغطات صدر ٥. للأطفال أكبر — هيمليك بلطف' },
+      { icon: '🔋', title: 'بطارية الزر = طوارئ قصوى', text: 'بطارية الزر الصغيرة تحرق الأنسجة بـ 2 ساعة. لا تنتظر أي عَرَض — اذهب للطوارئ فوراً حتى لو الطفل بخير' },
+      { icon: '🧘', title: 'هدّئ الطفل', text: 'أبقِ الطفل هادئاً — البكاء والصراخ قد يحرك الجسم. لا تعطِه أكلاً أو شراباً حتى يفحصه الطبيب' }
+    ]
+  }
+};
+
+function emergencyShow(type) {
+  var data = EMERGENCY_DATA[type];
+  if (!data) return;
+  // فتح الـ modal المتحرك
+  _emCurrentType = type;
+  _emCurrentStep = 0;
+  var modal = document.getElementById('em-modal');
+  var titleEl = document.getElementById('em-modal-title');
+  if (modal) modal.style.display = 'block';
+  if (titleEl) titleEl.innerHTML = '<span style="color:' + data.color + '">' + data.title + '</span>';
+  _emBuildDots(data.steps.length, data.color);
+  _emShowStep(0);
+  document.body.style.overflow = 'hidden';
+}
+
+var _emCurrentType = '';
+var _emCurrentStep = 0;
+
+function closeEmModal() {
+  var modal = document.getElementById('em-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function _emBuildDots(count, color) {
+  var dots = document.getElementById('em-step-dots');
+  if (!dots) return;
+  var html = '';
+  for (var i = 0; i < count; i++) {
+    html += '<div id="em-dot-' + i + '" style="flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.15);transition:background .3s"></div>';
+  }
+  dots.innerHTML = html;
+}
+
+function _emShowStep(stepIdx) {
+  var data = EMERGENCY_DATA[_emCurrentType];
+  if (!data) return;
+  var step = data.steps[stepIdx];
+  if (!step) return;
+  _emCurrentStep = stepIdx;
+  // تحديث النقاط
+  for (var i = 0; i < data.steps.length; i++) {
+    var dot = document.getElementById('em-dot-' + i);
+    if (dot) dot.style.background = i <= stepIdx ? data.color : 'rgba(255,255,255,.15)';
+  }
+  // عنوان وخطوة
+  var titleEl = document.getElementById('em-step-title');
+  var textEl = document.getElementById('em-step-text');
+  if (titleEl) titleEl.innerHTML = '<span style="color:' + data.color + '">' + (stepIdx + 1) + '. ' + step.title + '</span>';
+  if (textEl) { textEl.style.animation = 'none'; textEl.textContent = step.text; requestAnimationFrame(function() { textEl.style.animation = 'emSlideUp .4s ease forwards'; }); }
+  // الأنيميشن
+  var anim = document.getElementById('em-anim-area');
+  if (anim) {
+    anim.style.borderColor = 'rgba(' + _hexToRgb(data.color) + ',.3)';
+    anim.style.animation = 'none';
+    anim.innerHTML = _emGetStepAnimation(_emCurrentType, stepIdx, step, data.color);
+    requestAnimationFrame(function() { anim.style.animation = 'emFadeStep .4s ease forwards'; });
+  }
+  // الأزرار
+  var prevBtn = document.getElementById('em-prev-btn');
+  var nextBtn = document.getElementById('em-next-btn');
+  if (prevBtn) prevBtn.style.opacity = stepIdx === 0 ? '.4' : '1';
+  if (nextBtn) {
+    if (stepIdx === data.steps.length - 1) {
+      nextBtn.innerHTML = '<i class="fas fa-check-circle"></i> اكتمل — أغلق';
+    } else {
+      nextBtn.innerHTML = 'التالي <i class="fas fa-arrow-left"></i>';
+    }
+  }
+}
+
+function emNextStep() {
+  var data = EMERGENCY_DATA[_emCurrentType];
+  if (!data) return;
+  if (_emCurrentStep >= data.steps.length - 1) { closeEmModal(); return; }
+  _emShowStep(_emCurrentStep + 1);
+}
+
+function emPrevStep() {
+  if (_emCurrentStep <= 0) return;
+  _emShowStep(_emCurrentStep - 1);
+}
+
+function _hexToRgb(hex) {
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return r + ',' + g + ',' + b;
+}
+
+function _emGetStepAnimation(type, stepIdx, step, color) {
+  var anim = '';
+  // أنيميشن مخصص حسب النوع والخطوة
+  if (type === 'burns') {
+    var burnAnims = [
+      // خطوة 1: تبريد - ماء يسيل
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFlicker 1s infinite">💧</div><div style="display:flex;justify-content:center;gap:8px;margin-top:10px">' + Array(5).fill(0).map(function(v,i){ return '<div style="width:6px;height:40px;background:linear-gradient(180deg,#2196f3,#00bcd4);border-radius:4px;animation:emWaterFlow 1.2s ease-in-out infinite;animation-delay:' + (i*0.2) + 's;opacity:.8"></div>'; }).join('') + '</div><div style="margin-top:14px;font-size:.8rem;color:#90caf9">ماء بارد جاري — 10-20 دقيقة</div></div>',
+      // خطوة 2: إزالة ملابس
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBounce 1s infinite">👕</div><div style="margin-top:16px;display:flex;justify-content:center;gap:6px"><div style="width:20px;height:20px;border-radius:50%;background:#ff9800;animation:emPulse 1s infinite"></div><div style="width:20px;height:20px;border-radius:50%;background:#ff9800;animation:emPulse 1s infinite;animation-delay:.2s"></div><div style="width:20px;height:20px;border-radius:50%;background:#ff9800;animation:emPulse 1s infinite;animation-delay:.4s"></div></div><div style="margin-top:14px;font-size:.8rem;color:#ffe0b2">بلطف وبرفق من المنطقة المصابة</div></div>',
+      // خطوة 3: تغطية
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFloat 1.5s ease-in-out infinite">🩹</div><div style="margin-top:12px;background:rgba(255,255,255,.08);border-radius:12px;padding:10px;display:flex;align-items:center;gap:8px;justify-content:center"><i class="fas fa-ban" style="color:#f44336;font-size:1rem"></i><span style="font-size:.78rem;color:#ef9a9a">لا معجون أسنان — لا دهون</span></div></div>',
+      // خطوة 4: لا تفقأ
+      '<div style="text-align:center;padding:20px"><div style="font-size:2rem;margin-bottom:8px;color:#f44336;animation:emBlink 1s infinite">🚫</div><div style="font-size:4rem;animation:emFloat 2s ease-in-out infinite">🫧</div><div style="margin-top:12px;font-size:.82rem;color:#ffcdd2">الفقاعات تحمي الجلد من العدوى</div></div>',
+      // خطوة 5: اذهب للطوارئ
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emPulse 1s infinite">🏥</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">' + ['الحرق درجة 3','الوجه واليدين','الطفل الصغير','حرق واسع المساحة'].map(function(t){return '<div style="background:rgba(244,67,54,.1);border-radius:8px;padding:6px 12px;font-size:.75rem;color:#ef9a9a;text-align:right">⚠️ ' + t + '</div>';}).join('') + '</div></div>'
+    ];
+    anim = burnAnims[stepIdx] || burnAnims[0];
+  } else if (type === 'wounds') {
+    var woundAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBounce 1.2s infinite">🤲</div><div style="margin-top:14px;display:flex;justify-content:center;gap:6px">' + Array(5).fill(0).map(function(v,i){return '<div style="width:8px;height:8px;border-radius:50%;background:#4caf50;animation:emPulse .8s infinite;animation-delay:'+i*.15+'s"></div>';}).join('') + '</div><div style="margin-top:10px;font-size:.78rem;color:#a5d6a7">صابون وماء — 20 ثانية</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="position:relative;display:inline-block"><div style="width:80px;height:80px;border-radius:50%;background:rgba(244,67,54,.2);border:3px solid #ef5350;display:flex;align-items:center;justify-content:center;animation:emPulse 1s infinite"><i class="fas fa-hand-paper" style="font-size:2rem;color:#ef5350"></i></div><div style="position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:#f44336;animation:emBlink .6s infinite;font-size:.65rem;color:#fff;display:flex;align-items:center;justify-content:center">10م</div></div><div style="margin-top:12px;font-size:.8rem;color:#ef9a9a">ضغط مستمر لا ترفع القماش</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emArrowMove 1s infinite">⬆️</div><div style="font-size:4rem;margin-top:8px">🦵</div><div style="margin-top:12px;font-size:.8rem;color:#b0c4de">ارفع فوق مستوى القلب</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:flex;justify-content:center;gap:16px;margin-bottom:12px"><div style="font-size:3rem;animation:emBounce 1s infinite">🧴</div><div style="font-size:3rem;animation:emBounce 1s infinite;animation-delay:.3s">💧</div></div><div style="font-size:.78rem;color:#b0c4de;line-height:1.8">ماء + صابون ← ثم ديتول/بيتادين</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emPulse 1s infinite">🏥</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">' + ['نزيف لا يتوقف','جرح عميق جداً','جسم مغروس','عضة حيوان'].map(function(t){return '<div style="background:rgba(244,67,54,.1);border-radius:8px;padding:6px 12px;font-size:.75rem;color:#ef9a9a;text-align:right">🚨 ' + t + '</div>';}).join('') + '</div></div>'
+    ];
+    anim = woundAnims[stepIdx] || woundAnims[0];
+  } else if (type === 'choking') {
+    var chokingAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emShake 1.5s infinite">😮‍💨</div><div style="margin-top:12px;background:rgba(33,150,243,.1);border:1px solid rgba(33,150,243,.3);border-radius:12px;padding:10px;font-size:.8rem;color:#90caf9">اسأل: "هل تختنق؟"<br>هل يستطيع الكلام والسعال؟</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBlink .8s infinite">📞</div><div style="margin-top:12px;background:rgba(244,67,54,.15);border-radius:12px;padding:12px;font-size:1.5rem;font-weight:900;color:#f44336;letter-spacing:4px">1 2 3</div></div>',
+      '<div style="text-align:center;padding:20px"><svg width="100" height="120" viewBox="0 0 100 120"><ellipse cx="50" cy="30" rx="25" ry="28" fill="rgba(33,150,243,.15)" stroke="#42a5f5" stroke-width="2"/><line x1="50" y1="58" x2="50" y2="90" stroke="#42a5f5" stroke-width="3"/><line x1="50" y1="90" x2="25" y2="115" stroke="#42a5f5" stroke-width="3"/><line x1="50" y1="90" x2="75" y2="115" stroke="#42a5f5" stroke-width="3"/><animateTransform attributeName="transform" type="rotate" from="0 50 85" to="15 50 85" dur=".4s" repeatCount="indefinite" calcMode="spline" keySplines="0 0 1 1" values="0;15;0"/></svg><div style="margin-top:8px;font-size:.8rem;color:#90caf9">5 ضربات قوية بكعب اليد</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="position:relative;width:80px;height:80px;margin:0 auto"><div style="width:80px;height:80px;border-radius:50%;background:rgba(33,150,243,.1);border:2px solid #42a5f5;display:flex;align-items:center;justify-content:center;animation:emPulse 1s infinite"><span style="font-size:2rem">👊</span></div></div><div style="margin-top:12px;font-size:.8rem;color:#90caf9">5 ضغطات للداخل وللأعلى</div><div style="margin-top:6px;font-size:.72rem;color:var(--txt3)">مشبّك اليدين تحت الصدر</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:flex;align-items:center;justify-content:center;gap:16px"><div style="text-align:center"><div style="font-size:2.5rem;animation:emBounce 1s infinite">👊</div><div style="font-size:.65rem;color:#90caf9;margin-top:4px">ظهر ×5</div></div><div style="font-size:1.5rem;color:var(--txt3);animation:emBlink 1s infinite">⟷</div><div style="text-align:center"><div style="font-size:2.5rem;animation:emBounce 1s infinite;animation-delay:.3s">🫁</div><div style="font-size:.65rem;color:#90caf9;margin-top:4px">بطن ×5</div></div></div><div style="margin-top:14px;font-size:.78rem;color:#b0c4de">كرّر حتى خروج الجسم أو وصول الإسعاف</div></div>'
+    ];
+    anim = chokingAnims[stepIdx] || chokingAnims[0];
+  } else if (type === 'poisoning') {
+    var poisonAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBlink .7s infinite">📞</div><div style="margin-top:12px;font-size:1.8rem;font-weight:900;color:#66bb6a;letter-spacing:4px">1 2 3</div><div style="margin-top:8px;font-size:.78rem;color:#a5d6a7">أخبرهم بالمادة المبتلعة فوراً</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emShake 1s infinite;display:flex;justify-content:center"><span>🚫</span><span style="font-size:3rem;margin-top:10px">🤮</span></div><div style="margin-top:12px;background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#ef9a9a">لا تُحثّ على التقيؤ إلا بأمر طبي</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:flex;justify-content:center;gap:16px"><div style="text-align:center"><div style="font-size:3rem;animation:emWaterFlow 1.5s infinite">💧</div><div style="font-size:.7rem;color:#90caf9;margin-top:4px">الجلد</div></div><div style="text-align:center"><div style="font-size:3rem;animation:emWaterFlow 1.5s infinite;animation-delay:.3s">💧</div><div style="font-size:.7rem;color:#90caf9;margin-top:4px">العيون</div></div></div><div style="margin-top:12px;font-size:.78rem;color:#b0c4de">اشطف بماء كثير 15 دقيقة</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFloat 2s ease-in-out infinite">📦</div><div style="margin-top:12px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#a5d6a7">خذ عبوة المادة السامة للمستشفى</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emPulse 1s infinite">🏥</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">' + ['تشنجات','فقدان الوعي','صعوبة التنفس','قيء متكرر'].map(function(t){return '<div style="background:rgba(244,67,54,.1);border-radius:8px;padding:6px 12px;font-size:.75rem;color:#ef9a9a;text-align:right">🚨 ' + t + '</div>';}).join('') + '</div></div>'
+    ];
+    anim = poisonAnims[stepIdx] || poisonAnims[0];
+  } else if (type === 'fracture') {
+    var fractureAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBlink 1s infinite">🦴</div><div style="margin-top:12px;background:rgba(156,39,176,.1);border:1px solid rgba(156,39,176,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#ce93d8">لا تحرك العظمة المكسورة أبداً</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFloat 2s infinite">❄️</div><div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.06);border-radius:10px;padding:10px"><span style="font-size:.8rem;color:#e1bee7">ثلج</span><span style="font-size:1.2rem">→</span><span style="font-size:.8rem;color:#e1bee7">قماش</span><span style="font-size:1.2rem">→</span><span style="font-size:.8rem;color:#e1bee7">المنطقة</span></div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:flex;justify-content:center;align-items:center;gap:8px"><div style="width:12px;height:80px;background:linear-gradient(180deg,#ce93d8,#9c27b0);border-radius:4px;animation:emBounce 1.5s infinite"></div><div style="width:50px;height:100px;background:linear-gradient(180deg,rgba(156,39,176,.3),rgba(156,39,176,.1));border:2px solid #ce93d8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2rem">🦵</div><div style="width:12px;height:80px;background:linear-gradient(180deg,#ce93d8,#9c27b0);border-radius:4px;animation:emBounce 1.5s infinite;animation-delay:.2s"></div></div><div style="margin-top:12px;font-size:.8rem;color:#e1bee7">جبيرة على الجانبين</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emArrowMove 1s infinite">⬆️</div><div style="font-size:3rem">🦵</div><div style="margin-top:10px;font-size:.8rem;color:#e1bee7">ارفع الطرف فوق القلب</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emPulse 1s infinite">🏥</div><div style="margin-top:12px;font-size:.8rem;color:#e1bee7;line-height:1.8">الكسور تحتاج أشعة وتجبيراً<br>لا تتأخر في الذهاب للمستشفى</div></div>'
+    ];
+    anim = fractureAnims[stepIdx] || fractureAnims[0];
+  } else if (type === 'fainting') {
+    var faintAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFloat 2s ease-in-out infinite">😵</div><div style="margin-top:12px;display:flex;justify-content:center"><div style="width:60px;height:30px;border-radius:8px 8px 0 0;background:rgba(255,193,7,.15);border:2px solid rgba(255,193,7,.4);display:flex;align-items:center;justify-content:center;font-size:1.2rem">🛌</div></div><div style="margin-top:10px;font-size:.78rem;color:#fff9c4">أضجعه على ظهره في مكان آمن</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:4rem">🛌</div><div style="font-size:3rem;animation:emArrowMove 1s infinite">⬆️</div><div style="font-size:3rem">🦵</div><div style="margin-top:8px;font-size:.8rem;color:#fff9c4">ارفع الساقين 30 سم</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emShake .5s infinite">👔</div><div style="margin-top:12px;background:rgba(255,193,7,.1);border-radius:10px;padding:10px;font-size:.8rem;color:#fff9c4">أرخِ الياقة والحزام والملابس الضيقة</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:flex;justify-content:center;gap:12px"><div style="font-size:3rem;animation:emBounce 1s infinite">💨</div><div style="font-size:3rem;animation:emBounce 1s infinite;animation-delay:.2s">🪟</div></div><div style="margin-top:12px;font-size:.8rem;color:#fff9c4;line-height:1.8">أبعد المتجمعين — افتح النوافذ<br>هواء نقي كافٍ</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBlink .8s infinite">⏱️</div><div style="margin-top:10px;background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#ffcdd2">إذا لم يفق خلال دقيقتين → 123 فوراً</div></div>'
+    ];
+    anim = faintAnims[stepIdx] || faintAnims[0];
+  }
+  return anim || '<div style="text-align:center;padding:20px;font-size:4rem">' + step.icon + '</div>';
+}
+
+function _emGetNewEmergencyAnim(type, stepIdx, step, color) {
+  if (type === 'diabetic-coma') {
+    var diabAnims = [
+      // خطوة 1: حدد النوع
+      '<div style="text-align:center;padding:16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div style="background:rgba(41,182,246,.1);border:1.5px solid rgba(41,182,246,.4);border-radius:12px;padding:12px;text-align:center"><div style="font-size:2rem;animation:emBlink .8s infinite">💧</div><div style="font-size:.7rem;color:#29b6f6;margin-top:4px;font-weight:700">نقص السكر</div><div style="font-size:.62rem;color:var(--txt3);margin-top:2px">تعرق + رعشة</div></div><div style="background:rgba(255,152,0,.1);border:1.5px solid rgba(255,152,0,.4);border-radius:12px;padding:12px;text-align:center"><div style="font-size:2rem;animation:emPulse 1s infinite">🌡️</div><div style="font-size:.7rem;color:#ffa726;margin-top:4px;font-weight:700">ارتفاع السكر</div><div style="font-size:.62rem;color:var(--txt3);margin-top:2px">جفاف + تنفس غريب</div></div></div><div style="font-size:.75rem;color:#b0c4de">كلاهما يسبب فقدان الوعي</div></div>',
+      // خطوة 2: أعطِه سكراً
+      '<div style="text-align:center;padding:20px"><div style="display:flex;justify-content:center;gap:12px;margin-bottom:12px"><div style="font-size:3.5rem;animation:emBounce 1s infinite">🍬</div><div style="font-size:3.5rem;animation:emBounce 1s infinite;animation-delay:.2s">🧃</div></div><div style="background:rgba(41,182,246,.1);border:1px solid rgba(41,182,246,.3);border-radius:10px;padding:10px;font-size:.78rem;color:#90caf9;line-height:1.6">عصير برتقال — أو ماء وسكر<br><span style="color:#ef9a9a">❌ لا تعطِ أي شيء لمن فقد وعيه</span></div></div>',
+      // خطوة 3: اتصل
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBlink .7s infinite">📞</div><div style="margin-top:12px;font-size:1.8rem;font-weight:900;color:#29b6f6;letter-spacing:4px">1 2 3</div><div style="margin-top:8px;font-size:.78rem;color:#b0bde0">أخبرهم: مريض سكري</div></div>',
+      // خطوة 4: وضع الاسترداد
+      '<div style="text-align:center;padding:20px"><svg width="120" height="80" viewBox="0 0 120 80"><ellipse cx="60" cy="40" rx="55" ry="25" fill="rgba(41,182,246,.08)" stroke="rgba(41,182,246,.3)" stroke-width="1.5"/><ellipse cx="60" cy="38" rx="22" ry="24" fill="rgba(41,182,246,.15)" stroke="#29b6f6" stroke-width="2"/><line x1="60" y1="62" x2="60" y2="75" stroke="#29b6f6" stroke-width="3"/><line x1="60" y1="75" x2="35" y2="80" stroke="#29b6f6" stroke-width="2.5"/><line x1="60" y1="75" x2="85" y2="80" stroke="#29b6f6" stroke-width="2.5"/></svg><div style="margin-top:8px;font-size:.8rem;color:#90caf9">على الجنب — وضع الإنعاش</div></div>',
+      // خطوة 5: الجلوكاجون
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emPulse 1s infinite">💉</div><div style="margin-top:12px;background:rgba(41,182,246,.1);border:1px solid rgba(41,182,246,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#90caf9;line-height:1.6">حقن الجلوكاجون في العضل<br>لا تتركه وحيداً أبداً</div></div>'
+    ];
+    return diabAnims[stepIdx] || diabAnims[0];
+  } else if (type === 'swallow-object') {
+    var swallowAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFloat 2s ease-in-out infinite">🧘</div><div style="margin-top:12px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#ffe0b2;line-height:1.6">معظم الأجسام الصغيرة الملساء تعبر وحدها<br>لكن الحادة والكبيرة تحتاج طبيباً</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:4rem;display:flex;justify-content:center;gap:8px"><span style="animation:emShake 1s infinite">🚫</span><span style="font-size:3rem;animation:emFloat 1.5s infinite">🤮</span></div><div style="margin-top:12px;background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#ffcdd2">التقيؤ يضر أكثر مما ينفع مع الأجسام الحادة</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:flex;justify-content:center;gap:16px"><span style="font-size:3rem;position:relative"><span>🍔</span><span style="position:absolute;top:-5px;right:-5px;font-size:1.2rem">🚫</span></span><span style="font-size:3rem;position:relative"><span>💧</span><span style="position:absolute;top:-5px;right:-5px;font-size:1.2rem">🚫</span></span></div><div style="margin-top:12px;font-size:.8rem;color:#ffe0b2">لا أكل ولا شرب حتى يفحصه الطبيب</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:4rem;animation:emBlink .7s infinite">🏥</div><div style="margin-top:10px;background:rgba(244,67,54,.15);border:1.5px solid rgba(244,67,54,.4);border-radius:12px;padding:12px"><div style="font-size:.75rem;color:#ffcdd2;font-weight:800;margin-bottom:6px">⚡ بطارية الزر = طوارئ قصوى</div><div style="font-size:.72rem;color:#ef9a9a;line-height:1.6">تحرق الأنسجة خلال 2 ساعة<br>اذهب فوراً حتى لو بلا أعراض</div></div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emPulse 1s infinite">🏥</div><div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">' + ['ألم في الصدر أو البطن','صعوبة البلع','غثيان شديد','أي دم'].map(function(t){return '<div style="background:rgba(244,67,54,.1);border-radius:8px;padding:6px 12px;font-size:.75rem;color:#ef9a9a;text-align:right">🚨 ' + t + '</div>';}).join('') + '</div></div>'
+    ];
+    return swallowAnims[stepIdx] || swallowAnims[0];
+  } else if (type === 'child-swallow') {
+    var childAnims = [
+      '<div style="text-align:center;padding:20px"><div style="font-size:4rem;display:flex;justify-content:center;gap:8px"><span style="animation:emShake 1s infinite">🚫</span><span style="font-size:3rem">👆</span></div><div style="margin-top:12px;background:rgba(233,30,99,.08);border:1px solid rgba(233,30,99,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#f48fb1;line-height:1.6">لا تدخل إصبعك — قد تدفع الجسم أعمق<br>انظر فقط إذا رأيته بوضوح تام</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emBlink .7s infinite">📞</div><div style="margin-top:12px;font-size:1.8rem;font-weight:900;color:#f48fb1;letter-spacing:4px">1 2 3</div><div style="margin-top:8px;font-size:.78rem;color:#f8bbd9">أخبرهم: الجسم + حجمه + الوقت</div></div>',
+      '<div style="text-align:center;padding:20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="background:rgba(233,30,99,.08);border:1.5px solid rgba(233,30,99,.3);border-radius:12px;padding:12px;text-align:center"><div style="font-size:1.8rem;animation:emBounce 1s infinite">👶</div><div style="font-size:.65rem;color:#f48fb1;margin-top:4px;font-weight:700">الرضيع</div><div style="font-size:.6rem;color:var(--txt3);margin-top:3px;line-height:1.5">5 ضربات ظهر<br>+ 5 ضغطات صدر</div></div><div style="background:rgba(233,30,99,.08);border:1.5px solid rgba(233,30,99,.3);border-radius:12px;padding:12px;text-align:center"><div style="font-size:1.8rem;animation:emBounce 1s infinite;animation-delay:.3s">🧒</div><div style="font-size:.65rem;color:#f48fb1;margin-top:4px;font-weight:700">طفل أكبر</div><div style="font-size:.6rem;color:var(--txt3);margin-top:3px;line-height:1.5">هيمليك بلطف<br>حسب حجمه</div></div></div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:4rem;animation:emBlink .5s infinite">🔋</div><div style="margin-top:10px;background:rgba(244,67,54,.2);border:2px solid #ef5350;border-radius:12px;padding:12px"><div style="font-size:.8rem;color:#ffcdd2;font-weight:800;margin-bottom:6px">⚡ بطارية الزر = خطر قاتل</div><div style="font-size:.72rem;color:#ef9a9a;line-height:1.6">تحرق الأنسجة خلال ساعتين<br>اذهب للطوارئ فوراً حتى لو بلا أعراض<br>لا تنتظر!</div></div></div>',
+      '<div style="text-align:center;padding:20px"><div style="font-size:5rem;animation:emFloat 2s ease-in-out infinite">🧸</div><div style="margin-top:12px;background:rgba(233,30,99,.08);border:1px solid rgba(233,30,99,.3);border-radius:10px;padding:10px;font-size:.8rem;color:#f8bbd9;line-height:1.6">هدّئ الطفل — لا بكاء<br>لا أكل ولا شرب حتى يفحصه الطبيب</div></div>'
+    ];
+    return childAnims[stepIdx] || childAnims[0];
+  }
+  return null;
+}
+
+/* ════════════════════════════════════════════════════════════
+   🤖 وظائف استدعاء Claude API
+════════════════════════════════════════════════════════════ */
+async function _callClaudeAPI(prompt, systemPrompt) {
+  // محاولة 1: Anthropic API مباشرة
+  try {
+    var messages = [{ role: 'user', content: prompt }];
+    var body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: messages };
+    if (systemPrompt) body.system = systemPrompt;
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      var data = await res.json();
+      if (data.content && data.content[0] && data.content[0].text) return data.content[0].text;
+    }
+  } catch(e) {}
+  
+  // محاولة 2: استخدام الـ AI المدمج في التطبيق (Pollinations)
+  try {
+    var poRes = await fetch(window.__POLLINATIONS_ENDPOINT || 'https://text.pollinations.ai/openai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'openai', messages: [{ role: 'user', content: prompt }], max_tokens: 1000
+      })
+    });
+    if (poRes.ok) {
+      var poData = await poRes.json();
+      if (poData.choices && poData.choices[0]) return poData.choices[0].message.content;
+    }
+  } catch(e) {}
+
+  // محاولة 3: Puter.js
+  try {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var puRes = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.3 });
+      var t = typeof puRes === 'string' ? puRes : puRes && puRes.message ? puRes.message.content : null;
+      if (t) return t;
+    }
+  } catch(e) {}
+
+  throw new Error('All AI endpoints failed');
+}
+
+async function _callClaudeAPIWithImage(prompt, imgDataUrl) {
+  // محاولة Puter.js أولاً للصور
+  try {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var content = [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imgDataUrl } }];
+      var res = await puter.ai.chat([{ role: 'user', content: content }], { model: 'gpt-4o', temperature: 0.3 });
+      var t = typeof res === 'string' ? res : res && res.message ? res.message.content : null;
+      if (t) return t;
+    }
+  } catch(e) {}
+  
+  // محاولة Anthropic API مع الصورة
+  try {
+    var base64 = imgDataUrl.split(',')[1];
+    var mtype = imgDataUrl.split(';')[0].split(':')[1];
+    var body = {
+      model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: mtype, data: base64 } },
+        { type: 'text', text: prompt }
+      ]}]
+    };
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    if (r.ok) { var d = await r.json(); if (d.content && d.content[0]) return d.content[0].text; }
+  } catch(e) {}
+  
+  // إذا فشل كل شيء: ارجع لتحليل نصي فقط
+  return await _callClaudeAPI(prompt + '\n(لا توجد صورة متاحة، قدم تحليلاً عاماً)', null);
+}
+
+/* ════════════════════════════════════════════════════════════
+   تحديث الأزرار عند تحميل الصفحة
+════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+  updateTrialBadges();
+  updatePremiumTabBadges();
+});
+// تحديث فوري
+setTimeout(function(){ updateTrialBadges(); updatePremiumTabBadges(); }, 500);
+
+(function(){
   ['log','warn','error','info','debug','table','dir','trace'].forEach(function(k){
-    try{console[k]=function(){msg();};}catch(x){}
+    try{console[k]=function(){if(window._msgProtect)window._msgProtect();};}catch(x){}
   });
   setInterval(function(){
-    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160)msg();
+    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160){if(window._msgProtect)window._msgProtect();}
   },800);
   setInterval(function(){
     var t=performance.now();
     (function(){debugger;})();
-    if(performance.now()-t>100)msg();
+    if(performance.now()-t>100){if(window._msgProtect)window._msgProtect();}
   },3000);
 })();
 /* ============================================================ */
