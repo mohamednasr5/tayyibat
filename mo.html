@@ -207,12 +207,195 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
 #toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1.5px solid rgba(200,150,12,.4);border-radius:16px;padding:12px 20px;font-size:.85rem;font-weight:700;color:var(--txt);z-index:9000;transition:transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ─── RESPONSIVE ─── */
+/* ══════════════════════════════════════
+   MOBILE BOTTOM NAV
+══════════════════════════════════════ */
+#mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:rgba(10,22,40,.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(200,150,12,.15);
+  padding:0 0 env(safe-area-inset-bottom,0);
+  box-shadow:0 -4px 30px rgba(0,0,0,.5);
+}
+.mob-nav-scroll{
+  display:flex;overflow-x:auto;gap:0;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.mob-nav-scroll::-webkit-scrollbar{display:none}
+.mob-nav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 14px 10px;gap:3px;cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:.6rem;font-weight:700;
+  color:var(--txt3);white-space:nowrap;flex-shrink:0;
+  border-top:2px solid transparent;transition:all .2s;min-width:58px;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-nav-item i{font-size:1.1rem;transition:all .2s}
+.mob-nav-item.active{color:var(--gold2);border-top-color:var(--gold2)}
+.mob-nav-item.active i{filter:drop-shadow(0 0 6px rgba(200,150,12,.7))}
+.mob-nav-item:active{opacity:.7}
+
+/* ── Mobile page header ── */
+#mobile-header{
+  display:none;
+  position:fixed;top:0;left:0;right:0;z-index:400;
+  background:rgba(10,22,40,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(200,150,12,.15);
+  padding:12px 16px 10px;
+  padding-top:calc(12px + env(safe-area-inset-top,0));
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.mob-header-inner{display:flex;align-items:center;justify-content:space-between}
+.mob-header-logo{display:flex;align-items:center;gap:8px}
+.mob-header-icon{font-size:1.4rem}
+.mob-header-title{font-family:'Amiri',serif;font-size:1rem;background:linear-gradient(135deg,var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+.mob-header-section{font-size:.72rem;color:var(--txt3);font-weight:600}
+.mob-header-right{display:flex;align-items:center;gap:8px}
+.mob-status-dot{width:7px;height:7px;border-radius:50%;background:var(--green2);box-shadow:0 0 6px var(--green2);animation:blink 2s ease-in-out infinite;flex-shrink:0}
+.mob-refresh-btn{background:rgba(200,150,12,.12);border:1px solid rgba(200,150,12,.3);color:var(--gold2);border-radius:8px;padding:5px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:5px}
+
+/* ══════════════════════════════════════
+   RESPONSIVE RULES
+══════════════════════════════════════ */
 @media(max-width:768px){
-  .sidebar{display:none}
-  .main{margin-right:0;padding:14px}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .users-grid{grid-template-columns:1fr}
+  /* Hide desktop sidebar, show mobile nav */
+  .sidebar{display:none!important}
+  #mobile-nav{display:block}
+  #mobile-header{display:block}
+
+  /* Main content adjustments */
+  .main{
+    margin-right:0!important;
+    padding:12px 12px 90px!important;
+    padding-top:calc(70px + env(safe-area-inset-top,0))!important;
+  }
+
+  /* Grids → single or double column */
+  .stats-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
+  .users-grid{grid-template-columns:1fr!important}
+  .trial-tool-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
+
+  /* Page header hide on mobile (replaced by mobile-header) */
+  .page-header{display:none!important}
+
+  /* Charts stacked */
+  #section-overview > div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr!important
+  }
+  .chart-wrap{margin-bottom:12px}
+
+  /* Two column AI/obgyn charts stacked */
+  #section-trial > div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr!important;gap:10px!important
+  }
+
+  /* Tables — horizontal scroll */
+  .table-wrap{border-radius:12px!important;overflow:hidden!important}
+  .table-wrap > div[style*="overflow-x:auto"],
+  .table-wrap > table{overflow-x:auto!important;display:block!important}
+  table{min-width:550px}
+  td,th{padding:8px 10px!important;font-size:.75rem!important}
+
+  /* Filter bar wrap */
+  .filter-bar{flex-wrap:wrap!important;gap:6px!important}
+  .filter-btn{font-size:.7rem!important;padding:5px 10px!important}
+  .search-input{min-width:0!important;flex:1!important}
+
+  /* Section headers */
+  .section-header{flex-wrap:wrap;gap:8px}
+  .section-header > div{flex-wrap:wrap;gap:6px}
+
+  /* Pro section grids */
+  .pro-stat-mini{min-width:70px}
+
+  /* Trial user rows */
+  .trial-user-row{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  .trial-tools-pills{order:3;width:100%}
+
+  /* User detail modal full screen on mobile */
+  .udetail-box{
+    max-width:100%!important;max-height:95vh!important;
+    border-radius:20px 20px 0 0!important;
+    padding:18px 14px 24px!important;
+  }
+  #user-detail-modal{align-items:flex-end!important;padding:0!important}
+
+  /* Exp + gift modals */
+  .expmodal-box{max-width:100%!important;border-radius:20px 20px 0 0!important}
+  #exp-modal{align-items:flex-end!important;padding:0!important}
+  .modal-box{border-radius:20px 20px 0 0!important}
+
+  /* Pro mgmt cards */
+  .pro-mgmt-card{padding:12px!important}
+  .pro-mgmt-actions{flex-direction:column!important;gap:4px!important}
+  .pro-action-btn{font-size:.68rem!important;padding:5px 8px!important}
+
+  /* Udetail grid single col on small phones */
+  .udetail-grid{grid-template-columns:1fr 1fr}
+
+  /* Inline edit overlay */
+  #inline-edit-overlay{align-items:flex-end!important;padding:0!important}
+  .inline-edit-box{border-radius:20px 20px 0 0!important;max-width:100%!important}
+
+  /* Period table overflow */
+  #period-table{min-width:700px}
+
+  /* pro quick btns wrap */
+  .pro-quick-btns{gap:5px!important}
+  .pro-quick-btn{padding:6px 10px!important;font-size:.7rem!important}
+
+  /* Gift grid */
+  .gift-grid{grid-template-columns:1fr 1fr!important}
+
+  /* Section h/f bar */
+  .table-header{flex-wrap:wrap!important;gap:8px!important;padding:10px 12px!important}
+  .table-title{font-size:.82rem!important}
+
+  /* toast on mobile */
+  #toast{font-size:.78rem!important;padding:10px 16px!important;white-space:normal!important;text-align:center!important;max-width:90%!important}
+
+  /* Login box */
+  .login-box{border-radius:20px!important;padding:28px 20px!important}
+
+  /* Overview stats 2-col */
+  #overview-stats{grid-template-columns:1fr 1fr!important}
+  .stat-card{padding:12px!important}
+  .stat-val{font-size:1.6rem!important}
+
+  /* Bar chart labels truncate */
+  .bar-label{width:80px!important;font-size:.68rem!important}
+
+  /* Pagination */
+  .pagination{padding:8px!important;gap:4px!important}
+  .pag-btn{width:28px!important;height:28px!important;font-size:.72rem!important}
+
+  /* Danger zone btns */
+  .danger-btns{flex-direction:column!important;gap:7px!important}
+  .danger-btn{flex:none!important;width:100%!important}
+
+  /* Period filter bar stacked */
+  #section-period-cycles .filter-bar{flex-direction:column!important;align-items:stretch!important}
+  #section-period-cycles .filter-bar > *{width:100%!important}
+
+  /* Pro section list */
+  #pro-active-list .pro-mgmt-card,
+  #pro-inactive-list .pro-mgmt-card{flex-wrap:wrap;gap:8px}
+
+  /* Pro stats bar 2x2 on mobile */
+  .pro-stats-bar{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .pro-stat-mini{padding:10px!important}
+  .pro-stat-mini-val{font-size:1.3rem!important}
+
+  /* Users section header */
+  #section-users .section-header{flex-direction:column!important;align-items:stretch!important;gap:8px!important}
+  #section-users .section-header > div{justify-content:space-between}
+  #section-users #users-search{flex:1;min-width:0}
+
+  /* Activity filters scroll */
+  #activity-filters{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px}
+  #activity-filters .filter-btn{flex-shrink:0}
 }
 
 /* ─── PAGINATION ─── */
@@ -470,6 +653,65 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
 </style>
 </head>
 <body>
+
+<!-- ══ MOBILE HEADER ══ -->
+<div id="mobile-header">
+  <div class="mob-header-inner">
+    <div class="mob-header-logo">
+      <span class="mob-header-icon">🌿</span>
+      <div>
+        <div class="mob-header-title">طيبات</div>
+        <div class="mob-header-section" id="mob-section-label">نظرة عامة</div>
+      </div>
+    </div>
+    <div class="mob-header-right">
+      <div class="mob-status-dot"></div>
+      <button class="mob-refresh-btn" onclick="loadData()"><i class="fas fa-sync-alt"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MOBILE BOTTOM NAV ══ -->
+<div id="mobile-nav">
+  <div class="mob-nav-scroll">
+    <div class="mob-nav-item active" onclick="mobNav('overview',this)" data-label="نظرة عامة">
+      <i class="fas fa-chart-pie"></i>نظرة عامة
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('users',this)" data-label="المستخدمين">
+      <i class="fas fa-users"></i>المستخدمين
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('activity',this)" data-label="النشاط">
+      <i class="fas fa-bolt"></i>النشاط
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('pro',this)" data-label="إدارة PRO">
+      <i class="fas fa-crown"></i>PRO
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('trial',this)" data-label="التجربة">
+      <i class="fas fa-unlock-alt"></i>التجربة
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('gifts',this)" data-label="الهدايا">
+      <i class="fas fa-gift"></i>الهدايا
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('notifications',this)" data-label="الإشعارات">
+      <i class="fas fa-bell"></i>إشعارات
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('logins',this)" data-label="الدخول">
+      <i class="fas fa-sign-in-alt"></i>الدخول
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('analysis',this)" data-label="التحليلات">
+      <i class="fas fa-stethoscope"></i>تحليلات
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('inputs',this)" data-label="الإدخالات">
+      <i class="fas fa-pencil-alt"></i>إدخالات
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('shares',this)" data-label="المشاركات">
+      <i class="fas fa-share-alt"></i>مشاركات
+    </div>
+    <div class="mob-nav-item" onclick="mobNav('period-cycles',this)" data-label="دورات الحيض">
+      <i>🌸</i>دورات
+    </div>
+  </div>
+</div>
 
 <!-- Login Screen -->
 <div id="login-screen">
@@ -2572,15 +2814,55 @@ window.sendBroadcast = async () => {
 };
 
 // ─── Navigation ───
+const SECTION_LABELS = {
+  overview:'نظرة عامة', users:'المستخدمين', activity:'النشاط',
+  logins:'الدخول', analysis:'التحليلات', inputs:'الإدخالات',
+  shares:'المشاركات', gifts:'الهدايا', pro:'إدارة PRO',
+  notifications:'الإشعارات', trial:'التجربة المجانية',
+  'period-cycles':'دورات الحيض'
+};
+
 window.showSection = (id) => {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('section-'+id)?.classList.add('active');
   event?.currentTarget?.classList.add('active');
-  // Also mark sidebar by section
   document.querySelectorAll('.nav-item').forEach(n => {
     if (n.getAttribute('onclick')?.includes(`'${id}'`)) n.classList.add('active');
   });
+  // Sync mobile nav active state if called from desktop sidebar
+  if(window.innerWidth <= 768){
+    document.querySelectorAll('.mob-nav-item').forEach(i => {
+      i.classList.toggle('active', i.getAttribute('onclick')?.includes(`'${id}'`));
+    });
+    const lbl = document.getElementById('mob-section-label');
+    if (lbl) lbl.textContent = SECTION_LABELS[id] || id;
+  }
+  // Lazy-load period cycles
+  if (id === 'period-cycles' && typeof ALL_PERIOD_CYCLES !== 'undefined' && ALL_PERIOD_CYCLES.length === 0) {
+    loadPeriodCycles();
+  }
+  // Scroll to top on mobile
+  if(window.innerWidth <= 768) window.scrollTo({top:0,behavior:'smooth'});
+};
+
+window.mobNav = (id, el) => {
+  // Update active state
+  document.querySelectorAll('.mob-nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  // Show section
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+id)?.classList.add('active');
+  // Sync desktop sidebar
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', !!(n.getAttribute('onclick')?.includes(`'${id}'`)));
+  });
+  // Update mobile header label
+  const lbl = document.getElementById('mob-section-label');
+  if (lbl) lbl.textContent = el.dataset.label || SECTION_LABELS[id] || id;
+  // Lazy-load period cycles
+  if (id === 'period-cycles' && ALL_PERIOD_CYCLES.length === 0) loadPeriodCycles();
+  window.scrollTo({top:0,behavior:'smooth'});
 };
 
 // ─── Toast ───
@@ -3383,13 +3665,7 @@ window.exportPeriodCyclesExcel = function() {
 };
 
 // ── تحميل البيانات عند الدخول للقسم ──
-const _origShowSection = window.showSection;
-window.showSection = function(id) {
-  _origShowSection(id);
-  if (id === 'period-cycles' && ALL_PERIOD_CYCLES.length === 0) {
-    loadPeriodCycles();
-  }
-};
+// Period cycles lazy-load is now handled inside showSection and mobNav directly
 </script>
 </body>
 </html>
