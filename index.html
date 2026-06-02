@@ -3193,23 +3193,28 @@ async function obgynSend() {
     }
     var txt = '';
 
-    // محاولة 1: Puter.js — claude-haiku-4-5 (الأسرع)
+    // Puter.js فقط — claude-sonnet-4-6
     if (!txt && typeof puter !== 'undefined' && puter.ai) {
       try {
         var puterMsgs = [{ role: 'system', content: OBGYN_SYSTEM }, ...messages];
-        var puRes = await puter.ai.chat(puterMsgs, { model: 'claude-haiku-4-5', temperature: 0.7 });
-        txt = typeof puRes === 'string' ? puRes
-            : puRes && puRes.message && puRes.message.content ? puRes.message.content
-            : puRes && puRes.content ? puRes.content : '';
+        var puRes = await puter.ai.chat(puterMsgs, { model: 'claude-sonnet-4-6', stream: false });
+        txt = _puterExtractText(puRes) || '';
       } catch(e2) {}
     }
-
-    // محاولة 2 (احتياطي): Pollinations
+    // احتياطي: claude-haiku-4-5
+    if (!txt && typeof puter !== 'undefined' && puter.ai) {
+      try {
+        var puterMsgs2 = [{ role: 'system', content: OBGYN_SYSTEM }, ...messages];
+        var puRes2 = await puter.ai.chat(puterMsgs2, { model: 'claude-haiku-4-5', stream: false });
+        txt = _puterExtractText(puRes2) || '';
+      } catch(e3) {}
+    }
+    // احتياطي أخير: Pollinations
     if (!txt) {
       try {
         var poRes = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'openai', messages: [{ role: 'system', content: OBGYN_SYSTEM }, ...messages], max_tokens: 1000 }) });
         if (poRes.ok) { var pd = await poRes.json(); if (pd.choices && pd.choices[0]) txt = pd.choices[0].message.content; }
-      } catch(e3) {}
+      } catch(e4) {}
     }
     if (thinkDiv) thinkDiv.remove();
     if (txt) {
@@ -10800,21 +10805,36 @@ function dreamInterpret() {
     if (status) personalCtx += '\n- الحالة الاجتماعية: ' + status;
   }
   var prompt = 'أنت شيخ وعالم متخصص في علم تفسير الرؤى والأحلام، تحفظ كتب التفسير الكبرى مثل: "تعطير الأنام في تعبير المنام" لابن سيرين، و"تفسير الأحلام" لابن كثير، و"منتخب الكلام في تفسير الأحلام" وغيرها. تعتمد في تفسيرك بشكل رئيسي على منهج ومدرسة: ' + ref + '.\n\nحلم المستخدم:\n"' + dreamText + '"' + personalCtx + '\n\nفسّر هذا الحلم مراعياً الحالة الشخصية للرائي، واتبع هذا الترتيب:\n\n**أولاً — الحكم على الرؤيا:**\nهل هي رؤيا صالحة أم حلم من النفس أم وسواس؟\n\n**ثانياً — تفسير الرموز:**\nاذكر كل رمز بارز في الحلم وفسّره بجملة أو جملتين.\n\n**ثالثاً — المعنى الكلي:**\nفقرة قصيرة ومبسطة عن الرسالة العامة للحلم.\n\n**رابعاً — التوجيه العملي:**\nنصيحة مختصرة أو دعاء مناسب.\n\nقواعد: عربية فصيحة بسيطة — لا غموض — كن مباشراً — راعِ المعلومات الشخصية للرائي.';
-  _callClaudeAPI(prompt, null).then(function(res) {
-    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(103,58,183,.35);border-radius:20px;overflow:hidden">';
-    html += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.25),rgba(156,95,250,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
-    html += '<span style="font-size:1.6rem">🌙</span>';
-    html += '<div><div style="font-size:.92rem;font-weight:900;color:#ce93d8">تفسير الحلم</div>';
-    html += '<div style="font-size:.68rem;color:#b39ddb;margin-top:2px">بمنهج ' + ref + '</div></div>';
-    html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
-    html += '<div style="padding:10px 14px 14px;background:rgba(103,58,183,.08);border-top:1px solid rgba(103,58,183,.2)">';
-    html += '<div style="font-size:.72rem;color:#b39ddb;line-height:1.6">✨ التفسير للاسترشاد — والرؤيا الصالحة من الله والحلث من الشيطان.</div>';
-    html += '</div></div>';
-    resBox.innerHTML = html;
-  }).catch(function() {
-    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التفسير، حاول تاني.</div>';
-  });
+  // عرض الكارت فوراً مع streaming
+  var dCardHtml = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(103,58,183,.35);border-radius:20px;overflow:hidden">';
+  dCardHtml += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.25),rgba(156,95,250,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+  dCardHtml += '<span style="font-size:1.6rem">🌙</span>';
+  dCardHtml += '<div><div style="font-size:.92rem;font-weight:900;color:#ce93d8">تفسير الحلم</div>';
+  dCardHtml += '<div style="font-size:.68rem;color:#b39ddb;margin-top:2px">بمنهج ' + ref + '</div></div></div>';
+  dCardHtml += '<div id="dream-stream-text" style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line;min-height:40px"></div>';
+  dCardHtml += '<div style="padding:10px 14px 14px;background:rgba(103,58,183,.08);border-top:1px solid rgba(103,58,183,.2)">';
+  dCardHtml += '<div style="font-size:.72rem;color:#b39ddb;line-height:1.6">✨ التفسير للاسترشاد — والرؤيا الصالحة من الله والحلث من الشيطان.</div></div></div>';
+  resBox.innerHTML = dCardHtml;
+
+  (async function() {
+    var streamEl = document.getElementById('dream-stream-text');
+    var fullText = '';
+    if (typeof puter !== 'undefined' && puter.ai) {
+      try {
+        var sr = await puter.ai.chat(prompt, { model: 'claude-sonnet-4-6', stream: true });
+        for await (var part of sr) {
+          var chunk = part && part.text ? part.text : '';
+          if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
+        }
+      } catch(e1) {
+        try {
+          var r2 = await puter.ai.chat(prompt, { model: 'claude-haiku-4-5', stream: false });
+          fullText = _puterExtractText(r2) || '';
+          if (streamEl) streamEl.textContent = fullText || 'تعذر التفسير، حاول مرة أخرى.';
+        } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر التفسير، حاول مرة أخرى.'; }
+      }
+    } else { if (streamEl) streamEl.textContent = 'Puter غير متاح.'; }
+  })();
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -11647,28 +11667,53 @@ function _emGetNewEmergencyAnim(type, stepIdx, step, color) {
 /* ════════════════════════════════════════════════════════════
    🤖 وظائف استدعاء Claude API
 ════════════════════════════════════════════════════════════ */
-async function _callClaudeAPI(prompt, systemPrompt) {
-  // محاولة 1: Puter.js — claude-haiku-4-5 (الأسرع)
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var puterPrompt = systemPrompt ? systemPrompt + '\n\n' + prompt : prompt;
-      var puRes = await puter.ai.chat(puterPrompt, { model: 'claude-haiku-4-5', temperature: 0.7 });
-      var t = typeof puRes === 'string' ? puRes
-            : puRes && puRes.message && puRes.message.content ? puRes.message.content
-            : puRes && puRes.content ? puRes.content : null;
-      if (t) return t;
-    }
-  } catch(e) {}
+// ── مساعد: استخراج النص من رد Puter بشكل صحيح ──
+function _puterExtractText(res) {
+  if (!res) return null;
+  if (typeof res === 'string') return res;
+  // الطريقة الصحيحة حسب docs.puter.com: response.message.content[0].text
+  if (res.message && res.message.content) {
+    var c = res.message.content;
+    if (Array.isArray(c) && c[0] && c[0].text) return c[0].text;
+    if (typeof c === 'string') return c;
+  }
+  if (res.content) {
+    if (Array.isArray(res.content) && res.content[0] && res.content[0].text) return res.content[0].text;
+    if (typeof res.content === 'string') return res.content;
+  }
+  return null;
+}
 
-  // محاولة 2 (احتياطي): Pollinations
+async function _callClaudeAPI(prompt, systemPrompt) {
+  // Puter.js فقط — claude-sonnet-4-6 (الافتراضي) أو claude-haiku-4-5 (للسرعة)
+  if (typeof puter !== 'undefined' && puter.ai) {
+    // بناء المحادثة بصيغة messages للدعم الكامل لـ system prompt
+    var msgs = [];
+    if (systemPrompt) msgs.push({ role: 'system', content: systemPrompt });
+    msgs.push({ role: 'user', content: prompt });
+    // محاولة 1: claude-sonnet-4-6 (جودة أعلى)
+    try {
+      var res1 = await puter.ai.chat(msgs, { model: 'claude-sonnet-4-6', stream: false });
+      var t1 = _puterExtractText(res1);
+      if (t1) return t1;
+    } catch(e) {}
+    // محاولة 2: claude-haiku-4-5 (أسرع)
+    try {
+      var res2 = await puter.ai.chat(msgs, { model: 'claude-haiku-4-5', stream: false });
+      var t2 = _puterExtractText(res2);
+      if (t2) return t2;
+    } catch(e) {}
+  }
+
+  // احتياطي أخير: Pollinations
   try {
-    var msgs = systemPrompt
+    var msgs2 = systemPrompt
       ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }]
       : [{ role: 'user', content: prompt }];
     var poRes = await fetch(window.__POLLINATIONS_ENDPOINT || 'https://text.pollinations.ai/openai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'openai', messages: msgs, max_tokens: 900 })
+      body: JSON.stringify({ model: 'openai', messages: msgs2, max_tokens: 900 })
     });
     if (poRes.ok) {
       var poData = await poRes.json();
@@ -11680,36 +11725,32 @@ async function _callClaudeAPI(prompt, systemPrompt) {
 }
 
 async function _callClaudeAPIWithImage(prompt, imgDataUrl) {
-  // محاولة 1: Puter.js مع الصورة — claude-haiku-4-5 (الأسرع)
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var content = [
-        { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: imgDataUrl } }
-      ];
-      var res = await puter.ai.chat([{ role: 'user', content: content }], { model: 'claude-haiku-4-5', temperature: 0.7 });
-      var t = typeof res === 'string' ? res
-            : res && res.message && res.message.content ? res.message.content
-            : res && res.content ? res.content : null;
-      if (t) return t;
-    }
-  } catch(e) {}
-
-  // محاولة 2 (احتياطي): Puter مع gpt-4o للصور
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var content2 = [
-        { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: imgDataUrl } }
-      ];
-      var res2 = await puter.ai.chat([{ role: 'user', content: content2 }], { model: 'gpt-4o', temperature: 0.7 });
-      var t2 = typeof res2 === 'string' ? res2
-             : res2 && res2.message && res2.message.content ? res2.message.content
-             : res2 && res2.content ? res2.content : null;
+  // Puter.js فقط للصور — claude-sonnet-4-6 يدعم الرؤية (Vision)
+  if (typeof puter !== 'undefined' && puter.ai) {
+    // بناء content بصيغة Vision الصحيحة
+    var visionContent = [
+      { type: 'text', text: prompt },
+      { type: 'image_url', image_url: { url: imgDataUrl } }
+    ];
+    // محاولة 1: claude-sonnet-4-6 (Vision + جودة أعلى)
+    try {
+      var r1 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'claude-sonnet-4-6', stream: false });
+      var t1 = _puterExtractText(r1);
+      if (t1) return t1;
+    } catch(e) {}
+    // محاولة 2: claude-haiku-4-5 (Vision + أسرع)
+    try {
+      var r2 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'claude-haiku-4-5', stream: false });
+      var t2 = _puterExtractText(r2);
       if (t2) return t2;
-    }
-  } catch(e) {}
-
+    } catch(e) {}
+    // محاولة 3: gpt-4o (احتياطي للصور)
+    try {
+      var r3 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'gpt-4o', stream: false });
+      var t3 = _puterExtractText(r3);
+      if (t3) return t3;
+    } catch(e) {}
+  }
   // إذا فشل كل شيء: تحليل نصي فقط
   return await _callClaudeAPI(prompt + '\n(لا توجد صورة متاحة، قدم تحليلاً عاماً)', null);
 }
@@ -12438,51 +12479,67 @@ function zodiacRead() {
 
   var prompt = 'أنت منجّم وخبير في علم الأبراج الفلكية الغربية بخبرة عميقة.\n\nالشخص: ' + genderText + '، برجه: ' + data.ar + ' (' + data.en + ')، الفترة: ' + data.dates + '، العنصر: ' + data.element + '، الكوكب الحاكم: ' + data.planet + '.\n\nاكتب تقريراً شاملاً ومفصّلاً وفق هذا الهيكل بالضبط:\n\n**🌟 الشخصية والطباع**\nاشرح شخصية مولود برج ' + data.ar + ' بتفصيل حقيقي — تحدث عن طريقة تفكيره، نمط حياته، كيف يتعامل مع الناس، ما الذي يحرّكه من الداخل، وما يميّزه عن بقية الأبراج. اكتب فقرة كاملة من 5 إلى 6 جمل.\n\n**❤️ في الحب والعلاقات**\nاشرح بتفصيل كيف يكون ' + (genderText==='ذكر'?'مولود':'مولودة') + ' برج ' + data.ar + ' في الحب: كيف يُحب، ما الذي يبحث عنه في الشريك، كيف يتصرف في بداية العلاقة وفي استمرارها، ما أكثر ما يؤلمه عاطفياً، وما الذي يجعله يبقى في العلاقة أو يتركها. اكتب فقرة من 5 إلى 6 جمل.\n\n**💼 في العمل والطموح**\nاشرح بتفصيل نمط عمل مولود برج ' + data.ar + ': كيف يؤدي مهامه، هل هو قائد أم منفذ، أي البيئات تناسبه، أبرز المجالات التي يتألق فيها، وكيف يتعامل مع الضغط والمنافسة. اكتب فقرة من 4 إلى 5 جمل.\n\n**⚡ نقاط القوة والضعف**\nاذكر نقاط القوة (4 نقاط على الأقل مع شرح مختصر لكل منها) ونقاط الضعف (3 نقاط بصراحة مع شرح لماذا تمثّل تحدياً حقيقياً).\n\n**💡 النصيحة الذهبية لبرج ' + data.ar + '**\nاكتب نصيحة حقيقية ومعمّقة لمولود هذا البرج تساعده على استثمار طاقته بشكل صحيح — 3 إلى 4 جمل مباشرة وعملية.\n\nقواعد: عربي فصيح بسيط — جمل واضحة ومعبّرة — لا إجابات مختصرة جداً — اجعل القارئ يشعر أن الكلام يصفه بدقة.';
 
-  _callClaudeAPI(prompt, null).then(function(res) {
-    var c = data.color;
-    var c2 = data.color2;
+  // بناء الكارت مع منطقة streaming
+  var c = data.color;
+  var c2 = data.color2;
+  var cardHtml = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '44;border-radius:22px;overflow:hidden;margin-bottom:14px">';
+  cardHtml += '<div style="background:linear-gradient(135deg,' + c + '28,' + c + '10);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ' + c + '30">';
+  cardHtml += '<div style="flex-shrink:0">' + getZodiacSVG(sign, c, c2).replace('width="150" height="150"','width="62" height="62"') + '</div>';
+  cardHtml += '<div><div style="font-size:1.05rem;font-weight:900;color:' + c2 + '">' + data.ar + ' — ' + data.en + '</div>';
+  cardHtml += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + data.dates + ' • ' + data.element + ' • ' + data.planet + '</div></div></div>';
+  cardHtml += '<div id="zodiac-stream-text" style="padding:14px;font-size:.83rem;color:var(--txt);line-height:1.9;white-space:pre-line;min-height:60px"></div>';
+  cardHtml += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس — لا يُعد حقيقة علمية مثبتة.</div>';
+  cardHtml += '</div>';
+  resBox.innerHTML = cardHtml;
 
-    // Parse sections from response
-    var sections = _parseZodiacSections(res);
-
-    var html = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '44;border-radius:22px;overflow:hidden;margin-bottom:14px">';
-
-    // Header with animated mini-SVG
-    html += '<div style="background:linear-gradient(135deg,' + c + '28,' + c + '10);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ' + c + '30">';
-    html += '<div style="flex-shrink:0">' + getZodiacSVG(sign, c, c2).replace('width="150" height="150"','width="62" height="62"') + '</div>';
-    html += '<div><div style="font-size:1.05rem;font-weight:900;color:' + c2 + '">' + data.ar + ' — ' + data.en + '</div>';
-    html += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + data.dates + ' • ' + data.element + ' • ' + data.planet + '</div></div>';
-    html += '</div>';
-
-    // Section cards
-    var sectionDefs = [
-      { key: 'personality', icon: '🌟', title: 'الشخصية والطباع', grad: 'rgba(201,168,76,.15),rgba(201,168,76,.05)', border: 'rgba(201,168,76,.4)', tc: '#f0d060' },
-      { key: 'love', icon: '❤️', title: 'الحب والعلاقات', grad: 'rgba(236,64,122,.15),rgba(236,64,122,.05)', border: 'rgba(236,64,122,.4)', tc: '#f48fb1' },
-      { key: 'career', icon: '💼', title: 'العمل والطموح', grad: 'rgba(33,150,243,.15),rgba(33,150,243,.05)', border: 'rgba(33,150,243,.4)', tc: '#90caf9' },
-      { key: 'strength', icon: '⚡', title: 'القوة والضعف', grad: 'rgba(102,187,106,.15),rgba(102,187,106,.05)', border: 'rgba(102,187,106,.4)', tc: '#a5d6a7' },
-      { key: 'advice', icon: '💡', title: 'النصيحة الذهبية', grad: 'rgba(255,193,7,.18),rgba(255,193,7,.06)', border: 'rgba(255,193,7,.5)', tc: '#ffe082' }
-    ];
-
-    html += '<div style="padding:14px;display:flex;flex-direction:column;gap:10px">';
-    sectionDefs.forEach(function(s, idx) {
-      var content = sections[s.key] || '';
-      if (!content) return;
-      html += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,' + s.grad + ');border:1.5px solid ' + s.border + ';animation-delay:' + (idx*0.1).toFixed(2) + 's">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
-      html += '<span style="font-size:1.2rem">' + s.icon + '</span>';
-      html += '<span style="font-size:.82rem;font-weight:900;color:' + s.tc + '">' + s.title + '</span>';
-      html += '</div>';
-      html += '<div style="font-size:.82rem;color:var(--txt);line-height:1.8;white-space:pre-line">' + content + '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-
-    html += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس — لا يُعد حقيقة علمية مثبتة.</div>';
-    html += '</div>';
-    resBox.innerHTML = html;
-  }).catch(function() {
-    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل، حاول مرة أخرى.</div>';
-  });
+  (async function() {
+    var streamEl = document.getElementById('zodiac-stream-text');
+    var fullText = '';
+    if (typeof puter !== 'undefined' && puter.ai) {
+      try {
+        var sr = await puter.ai.chat(prompt, { model: 'claude-sonnet-4-6', stream: true });
+        for await (var part of sr) {
+          var chunk = part && part.text ? part.text : '';
+          if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
+        }
+      } catch(e1) {
+        try {
+          var r2 = await puter.ai.chat(prompt, { model: 'claude-haiku-4-5', stream: false });
+          fullText = _puterExtractText(r2) || '';
+          if (streamEl) streamEl.textContent = fullText || 'تعذر التحليل، حاول مرة أخرى.';
+        } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر التحليل، حاول مرة أخرى.'; }
+      }
+    } else { if (streamEl) streamEl.textContent = 'Puter غير متاح.'; }
+    // بعد اكتمال الرد — تحويل النص لكاردات
+    if (fullText) {
+      var sections = _parseZodiacSections(fullText);
+      var sectionDefs = [
+        { key: 'personality', icon: '🌟', title: 'الشخصية والطباع', grad: 'rgba(201,168,76,.15),rgba(201,168,76,.05)', border: 'rgba(201,168,76,.4)', tc: '#f0d060' },
+        { key: 'love', icon: '❤️', title: 'الحب والعلاقات', grad: 'rgba(236,64,122,.15),rgba(236,64,122,.05)', border: 'rgba(236,64,122,.4)', tc: '#f48fb1' },
+        { key: 'career', icon: '💼', title: 'العمل والطموح', grad: 'rgba(33,150,243,.15),rgba(33,150,243,.05)', border: 'rgba(33,150,243,.4)', tc: '#90caf9' },
+        { key: 'strength', icon: '⚡', title: 'القوة والضعف', grad: 'rgba(102,187,106,.15),rgba(102,187,106,.05)', border: 'rgba(102,187,106,.4)', tc: '#a5d6a7' },
+        { key: 'advice', icon: '💡', title: 'النصيحة الذهبية', grad: 'rgba(255,193,7,.18),rgba(255,193,7,.06)', border: 'rgba(255,193,7,.5)', tc: '#ffe082' }
+      ];
+      var cardsHtml = '';
+      sectionDefs.forEach(function(s, idx) {
+        var sc = sections[s.key] || '';
+        if (!sc) return;
+        cardsHtml += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,' + s.grad + ');border:1.5px solid ' + s.border + ';animation-delay:' + (idx*0.1).toFixed(2) + 's">';
+        cardsHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:1.2rem">' + s.icon + '</span><span style="font-size:.82rem;font-weight:900;color:' + s.tc + '">' + s.title + '</span></div>';
+        cardsHtml += '<div style="font-size:.82rem;color:var(--txt);line-height:1.8;white-space:pre-line">' + sc + '</div></div>';
+      });
+      if (cardsHtml) {
+        var newCardHtml = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '44;border-radius:22px;overflow:hidden;margin-bottom:14px">';
+        newCardHtml += '<div style="background:linear-gradient(135deg,' + c + '28,' + c + '10);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ' + c + '30">';
+        newCardHtml += '<div style="flex-shrink:0">' + getZodiacSVG(sign, c, c2).replace('width="150" height="150"','width="62" height="62"') + '</div>';
+        newCardHtml += '<div><div style="font-size:1.05rem;font-weight:900;color:' + c2 + '">' + data.ar + ' — ' + data.en + '</div>';
+        newCardHtml += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + data.dates + ' • ' + data.element + ' • ' + data.planet + '</div></div></div>';
+        newCardHtml += '<div style="padding:14px;display:flex;flex-direction:column;gap:10px">' + cardsHtml + '</div>';
+        newCardHtml += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس — لا يُعد حقيقة علمية مثبتة.</div></div>';
+        resBox.innerHTML = newCardHtml;
+      }
+    }
+  })();
 }
 
 // دالة تحليل الأقسام من النص
@@ -12536,59 +12593,67 @@ function zodiacTodayFortune() {
 
   var prompt = 'أنت منجّم خبير في علم الأبراج.\n\nاليوم: ' + todayStr + '\nالبرج: ' + data.ar + ' (' + data.en + ')\n\nاكتب توقعات اليوم لبرج ' + data.ar + ' في خمسة أقسام بالضبط وكل قسم جملتان أو ثلاث:\n\n**💼 العمل والمال**\nما يخص العمل والمال اليوم لمولود برج ' + data.ar + '.\n\n**❤️ الحب والعاطفة**\nما يخص الحياة العاطفية والمشاعر والعلاقات الرومانسية اليوم بتفصيل.\n\n**💚 الصحة والطاقة**\nما يخص الصحة والطاقة ومستوى الحيوية اليوم.\n\n**🔭 المستقبل القريب**\nما ينتظر مولود برج ' + data.ar + ' في الأيام والأسابيع القادمة من فرص وتحديات.\n\nثم أضف:\n**⭐ نجمة اليوم لبرج ' + data.ar + '**\nجملة واحدة ملخّصة ومحفّزة لهذا اليوم.\n\nقواعد: كن محدداً لبرج ' + data.ar + ' وليس كلاماً عاماً — عربي بسيط مباشر.';
 
-  _callClaudeAPI(prompt, null).then(function(res) {
-    var c = data.color;
-    var c2 = data.color2;
-    var sections = _parseFortuneSections(res);
+  var c = data.color;
+  var c2 = data.color2;
+  var fHeader = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '66;border-radius:22px;overflow:hidden;margin-bottom:14px">';
+  fHeader += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.3),rgba(201,168,76,.15));padding:14px 16px;border-bottom:1px solid ' + c + '40"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.8rem">🔮</span>';
+  fHeader += '<div><div style="font-size:.95rem;font-weight:900;color:' + c2 + '">حظ برج ' + data.ar + ' اليوم</div>';
+  fHeader += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + todayStr + '</div></div></div></div>';
+  fHeader += '<div id="fortune-stream-text" style="padding:14px;font-size:.83rem;color:var(--txt);line-height:1.9;white-space:pre-line;min-height:60px"></div>';
+  fHeader += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس فقط.</div></div>';
+  fortuneBox.innerHTML = fHeader;
+  setTimeout(function(){ fortuneBox.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
 
-    var html = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '66;border-radius:22px;overflow:hidden;margin-bottom:14px">';
-
-    // Header
-    html += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.3),rgba(201,168,76,.15));padding:14px 16px;border-bottom:1px solid ' + c + '40">';
-    html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<span style="font-size:1.8rem">🔮</span>';
-    html += '<div>';
-    html += '<div style="font-size:.95rem;font-weight:900;color:' + c2 + '">حظ برج ' + data.ar + ' اليوم</div>';
-    html += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + todayStr + '</div>';
-    html += '</div></div></div>';
-
-    // Fortune section cards
-    var fortuneSections = [
-      { key: 'work', icon: '💼', title: 'العمل والمال', grad: 'rgba(33,150,243,.15),rgba(33,150,243,.05)', border: 'rgba(33,150,243,.45)', tc: '#90caf9' },
-      { key: 'love', icon: '❤️', title: 'الحب والعاطفة', grad: 'rgba(233,30,99,.14),rgba(233,30,99,.05)', border: 'rgba(233,30,99,.45)', tc: '#f48fb1' },
-      { key: 'health', icon: '💚', title: 'الصحة والطاقة', grad: 'rgba(76,175,80,.14),rgba(76,175,80,.05)', border: 'rgba(76,175,80,.45)', tc: '#a5d6a7' },
-      { key: 'future', icon: '🔭', title: 'المستقبل القريب', grad: 'rgba(156,39,176,.14),rgba(156,39,176,.05)', border: 'rgba(156,39,176,.45)', tc: '#ce93d8' }
-    ];
-
-    html += '<div style="padding:14px;display:flex;flex-direction:column;gap:10px">';
-    fortuneSections.forEach(function(s, idx) {
-      var content = sections[s.key] || '';
-      if (!content) return;
-      html += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,' + s.grad + ');border:1.5px solid ' + s.border + ';animation-delay:' + (idx*0.15).toFixed(2) + 's">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
-      html += '<span style="font-size:1.4rem">' + s.icon + '</span>';
-      html += '<span style="font-size:.85rem;font-weight:900;color:' + s.tc + '">' + s.title + '</span>';
-      html += '</div>';
-      html += '<div style="font-size:.83rem;color:var(--txt);line-height:1.85">' + content + '</div>';
-      html += '</div>';
-    });
-
-    // Star of the day card
-    if (sections.star) {
-      html += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,rgba(201,168,76,.2),rgba(201,168,76,.06));border:1.5px solid rgba(201,168,76,.6);text-align:center;animation-delay:.45s">';
-      html += '<div style="font-size:1.1rem;margin-bottom:6px">⭐</div>';
-      html += '<div style="font-size:.82rem;font-weight:800;color:#f0d060;line-height:1.7">' + sections.star + '</div>';
-      html += '</div>';
+  (async function() {
+    var streamEl = document.getElementById('fortune-stream-text');
+    var fullText = '';
+    if (typeof puter !== 'undefined' && puter.ai) {
+      try {
+        var sr = await puter.ai.chat(prompt, { model: 'claude-sonnet-4-6', stream: true });
+        for await (var part of sr) {
+          var chunk = part && part.text ? part.text : '';
+          if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
+        }
+      } catch(e1) {
+        try {
+          var r2 = await puter.ai.chat(prompt, { model: 'claude-haiku-4-5', stream: false });
+          fullText = _puterExtractText(r2) || '';
+          if (streamEl) streamEl.textContent = fullText || 'تعذر تحميل التوقعات.';
+        } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر تحميل التوقعات.'; }
+      }
     }
-
-    html += '</div>';
-    html += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس فقط.</div>';
-    html += '</div>';
-    fortuneBox.innerHTML = html;
-    setTimeout(function(){ fortuneBox.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
-  }).catch(function() {
-    fortuneBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر تحميل التوقعات، حاول مرة أخرى.</div>';
-  });
+    if (fullText) {
+      var sections = _parseFortuneSections(fullText);
+      var fortuneSectionDefs = [
+        { key: 'work', icon: '💼', title: 'العمل والمال', grad: 'rgba(33,150,243,.15),rgba(33,150,243,.05)', border: 'rgba(33,150,243,.45)', tc: '#90caf9' },
+        { key: 'love', icon: '❤️', title: 'الحب والعاطفة', grad: 'rgba(233,30,99,.14),rgba(233,30,99,.05)', border: 'rgba(233,30,99,.45)', tc: '#f48fb1' },
+        { key: 'health', icon: '💚', title: 'الصحة والطاقة', grad: 'rgba(76,175,80,.14),rgba(76,175,80,.05)', border: 'rgba(76,175,80,.45)', tc: '#a5d6a7' },
+        { key: 'future', icon: '🔭', title: 'المستقبل القريب', grad: 'rgba(156,39,176,.14),rgba(156,39,176,.05)', border: 'rgba(156,39,176,.45)', tc: '#ce93d8' }
+      ];
+      var cardsHtml = '';
+      fortuneSectionDefs.forEach(function(s, idx) {
+        var sc = sections[s.key] || '';
+        if (!sc) return;
+        cardsHtml += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,' + s.grad + ');border:1.5px solid ' + s.border + ';animation-delay:' + (idx*0.15).toFixed(2) + 's">';
+        cardsHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:1.4rem">' + s.icon + '</span><span style="font-size:.85rem;font-weight:900;color:' + s.tc + '">' + s.title + '</span></div>';
+        cardsHtml += '<div style="font-size:.83rem;color:var(--txt);line-height:1.85">' + sc + '</div></div>';
+      });
+      if (sections.star) {
+        cardsHtml += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,rgba(201,168,76,.2),rgba(201,168,76,.06));border:1.5px solid rgba(201,168,76,.6);text-align:center;animation-delay:.45s">';
+        cardsHtml += '<div style="font-size:1.1rem;margin-bottom:6px">⭐</div><div style="font-size:.82rem;font-weight:800;color:#f0d060;line-height:1.7">' + sections.star + '</div></div>';
+      }
+      if (cardsHtml) {
+        var finalHtml = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '66;border-radius:22px;overflow:hidden;margin-bottom:14px">';
+        finalHtml += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.3),rgba(201,168,76,.15));padding:14px 16px;border-bottom:1px solid ' + c + '40"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.8rem">🔮</span>';
+        finalHtml += '<div><div style="font-size:.95rem;font-weight:900;color:' + c2 + '">حظ برج ' + data.ar + ' اليوم</div>';
+        finalHtml += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + todayStr + '</div></div></div></div>';
+        finalHtml += '<div style="padding:14px;display:flex;flex-direction:column;gap:10px">' + cardsHtml + '</div>';
+        finalHtml += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس فقط.</div></div>';
+        fortuneBox.innerHTML = finalHtml;
+        setTimeout(function(){ fortuneBox.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
+      }
+    }
+  })();
 }
 
 function _parseFortuneSections(text) {
@@ -12714,17 +12779,27 @@ async function _palmAnalyzeLiveFrame() {
   var liveStatus = document.getElementById('palm-live-status');
   var liveTxt = document.getElementById('palm-live-txt');
   try {
+    // التقاط إطار بجودة عالية
     var canvas = document.createElement('canvas');
     canvas.width = video.videoWidth || 1280;
     canvas.height = video.videoHeight || 960;
     canvas.getContext('2d').drawImage(video, 0, 0);
-    var imgData = canvas.toDataURL('image/jpeg', 0.88);
+    var imgData = canvas.toDataURL('image/jpeg', 0.92);
 
     if (liveStatus) liveStatus.textContent = '🧠 الذكاء الاصطناعي يرى كفك الآن...';
     if (liveTxt) liveTxt.textContent = 'يحلل...';
-    if (resBox && !resBox.querySelector('.palm-result-card')) {
-      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🖐 الذكاء الاصطناعي يقرأ كفك مباشرة...</span></div>';
-    }
+
+    // عرض منطقة البث الفوري
+    var modeLabels = { full: 'قراءة شاملة', love: 'الحياة العاطفية', career: 'المسار المهني', health: 'الصحة والحيوية' };
+    var streamContainer = '<div class="palm-result-card" style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">';
+    streamContainer += '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    streamContainer += '<span style="font-size:1.6rem">🖐</span>';
+    streamContainer += '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف — رؤية مباشرة</div>';
+    streamContainer += '<div style="font-size:.68rem;color:#ffccbc;margin-top:2px">' + (modeLabels[_palmMode] || 'قراءة شاملة') + '</div></div></div>';
+    streamContainer += '<div id="palm-stream-text" style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line;min-height:40px"></div>';
+    streamContainer += '<div style="padding:10px 14px 14px;background:rgba(255,87,34,.06);border-top:1px solid rgba(255,87,34,.15)">';
+    streamContainer += '<div style="font-size:.7rem;color:#ffab91;line-height:1.6">🔮 هذه القراءة للترفيه والاستئناس فقط ولا تُعدّ حقيقة علمية مثبتة.</div></div></div>';
+    if (resBox) resBox.innerHTML = streamContainer;
 
     var modePrompts = {
       full: 'قدّم قراءة شاملة تشمل: الشخصية، العواطف، المسار المهني، الصحة، والتوقعات العامة.',
@@ -12732,39 +12807,61 @@ async function _palmAnalyzeLiveFrame() {
       career: 'ركّز على المسار المهني والنجاح: خط القدر، الطموح، القدرات، الفرص المهنية.',
       health: 'ركّز على جانب الصحة والطاقة: خط الحياة، الحيوية، نقاط القوة والضعف الجسدية.'
     };
-    var prompt = 'أنت قارئ كف (palmist) خبير متخصص في علم قراءة الكف والخطوط والفلسفة الشرقية والغربية لهذا العلم.\n\nانظر إلى هذه الصورة لراحة اليد وحلّل ما تراه بدقة واحترافية.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nاتبع هذا الهيكل بالضبط في ردّك:\n\n**🖐 أولاً — شكل الكف والأصابع:**\nنوع الكف (ناري / ترابي / هوائي / مائي) وما يدل عليه من الشخصية.\n\n**📏 ثانياً — الخطوط الرئيسية:**\n• خط الحياة: وصف واضح ودلالته\n• خط القلب: وصف واضح ودلالته في العواطف\n• خط الرأس: وصف واضح ودلالته في التفكير\n• خط القدر (إن ظهر): وصف واضح ودلالته\n\n**✨ ثالثاً — ملاحظات خاصة:**\nأي علامات أو خطوط إضافية لافتة (خط الشمس، نجوم، مربعات، إلخ).\n\n**🔮 رابعاً — القراءة الشاملة:**\nفقرة واحدة واضحة تلخص شخصية صاحب الكف وأبرز ما يميزه.\n\nقواعد مهمة:\n- اكتب بالعربية الفصيحة البسيطة المفهومة تماماً\n- لا كلام غامض أو مبهم — كل جملة لها معنى واضح\n- كن محدداً وتفصيلياً بناءً على ما تراه في الصورة\n- في النهاية أضف: "هذه القراءة للترفيه والاستئناس فقط"\n\nإذا لم تر كفاً أو اليد غير واضحة، أجب فقط بكلمة: NOHAND';
 
-    var res = await _callClaudeAPIWithImage(prompt, imgData);
-    if (res && res.trim() === 'NOHAND') {
-      if (liveStatus) liveStatus.textContent = '🖐 لم أر الكف بوضوح — وجّه راحة يدك للكاميرا...';
+    var prompt = 'أنت قارئ كف (palmist) خبير.\n\nانظر بعناية لهذه الصورة وحلّل كف اليد الموجود فيها.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nهيكل ردّك:\n**🖐 شكل الكف:** نوع الكف (ناري/ترابي/هوائي/مائي) ودلالته.\n**📏 الخطوط:** خط الحياة، القلب، الرأس، القدر — كل خط في سطر مع دلالته.\n**✨ ملاحظات:** أي علامات إضافية لافتة.\n**🔮 القراءة الكاملة:** فقرة تلخص الشخصية وأبرز ما يميزها.\nاكتب بعربية مبسطة واضحة، وكن محدداً بناءً على ما تراه فعلاً.';
+
+    var streamEl = document.getElementById('palm-stream-text');
+    var fullText = '';
+    var gotContent = false;
+
+    // استخدام Puter مع streaming للبث الفوري
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var visionContent = [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: imgData } }
+      ];
+      try {
+        var streamRes = await puter.ai.chat(
+          [{ role: 'user', content: visionContent }],
+          { model: 'claude-sonnet-4-6', stream: true }
+        );
+        for await (var part of streamRes) {
+          var chunk = part && part.text ? part.text : '';
+          if (chunk) { fullText += chunk; gotContent = true; if (streamEl) streamEl.textContent = fullText; }
+        }
+      } catch(e1) {
+        // محاولة بدون streaming
+        try {
+          var r2 = await puter.ai.chat(
+            [{ role: 'user', content: visionContent }],
+            { model: 'claude-haiku-4-5', stream: false }
+          );
+          fullText = _puterExtractText(r2) || '';
+          if (fullText) { gotContent = true; if (streamEl) streamEl.textContent = fullText; }
+        } catch(e2) {}
+      }
+    }
+
+    if (!gotContent || !fullText.trim()) {
+      // الكف لم يُرَ — إعادة المحاولة
+      if (liveStatus) liveStatus.textContent = '🖐 وجّه راحة يدك للكاميرا بشكل أوضح...';
       if (liveTxt) liveTxt.textContent = 'يرى كفك...';
       if (resBox) resBox.innerHTML = '';
       _palmLiveLock = false;
       return;
     }
 
-    // وُجد كف — عرض النتيجة وإيقاف التحليل
+    // نجح التحليل
     _palmLiveDone = true;
     clearInterval(_palmLiveInterval);
     palmStopCamera();
-
-    var modeLabels = { full: 'قراءة شاملة', love: 'الحياة العاطفية', career: 'المسار المهني', health: 'الصحة والحيوية' };
-    var html = '<div class="palm-result-card" style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">';
-    html += '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
-    html += '<span style="font-size:1.6rem">🖐</span>';
-    html += '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف — رؤية مباشرة</div>';
-    html += '<div style="font-size:.68rem;color:#ffccbc;margin-top:2px">' + (modeLabels[_palmMode] || 'قراءة شاملة') + '</div></div>';
-    html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line">' + res + '</div>';
-    html += '<div style="padding:10px 14px 14px;background:rgba(255,87,34,.06);border-top:1px solid rgba(255,87,34,.15)">';
-    html += '<div style="font-size:.7rem;color:#ffab91;line-height:1.6">🔮 هذه القراءة للترفيه والاستئناس فقط ولا تُعدّ حقيقة علمية مثبتة.</div>';
-    html += '</div></div>';
-    if (resBox) resBox.innerHTML = html;
+    if (liveStatus) liveStatus.textContent = '✅ تمت قراءة كفك!';
     if (!canUseTool('palm')) { showTrialExpiredModal('palm'); return; }
     incToolUsage('palm');
   } catch(e) {
     if (liveStatus) liveStatus.textContent = '⚠️ جاري إعادة المحاولة...';
     if (liveTxt) liveTxt.textContent = 'يعيد المحاولة...';
+    if (resBox) resBox.innerHTML = '';
   }
   _palmLiveLock = false;
 }
@@ -12787,14 +12884,14 @@ function palmCapture() {
 }
 
 
-function palmAnalyze() {
-  // عند رفع صورة يدوياً (ليس الكاميرا)
+async function palmAnalyze() {
+  // عند رفع صورة يدوياً
   if (!_palmImageData) { showToast('ارفع صورة كفك أو صوّر عبر الكاميرا 🖐'); return; }
   if (!canUseTool('palm')) { showTrialExpiredModal('palm'); return; }
   incToolUsage('palm');
   var resBox = document.getElementById('palm-result');
-  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🖐 جاري قراءة كفك...</span></div>';
 
+  var modeLabels = { full: 'قراءة شاملة', love: 'الحياة العاطفية', career: 'المسار المهني', health: 'الصحة والحيوية' };
   var modePrompts = {
     full: 'قدّم قراءة شاملة تشمل: الشخصية، العواطف، المسار المهني، الصحة، والتوقعات العامة.',
     love: 'ركّز على الجانب العاطفي والعلاقات: خط القلب، الميل للحب، طبيعة العلاقات، الزواج.',
@@ -12802,24 +12899,50 @@ function palmAnalyze() {
     health: 'ركّز على جانب الصحة والطاقة: خط الحياة، الحيوية، نقاط القوة والضعف الجسدية.'
   };
 
-  var prompt = 'أنت قارئ كف (palmist) خبير متخصص في علم قراءة الكف والخطوط والفلسفة الشرقية والغربية لهذا العلم.\n\nانظر إلى هذه الصورة لراحة اليد وحلّل ما تراه بدقة واحترافية.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nاتبع هذا الهيكل بالضبط في ردّك:\n\n**🖐 أولاً — شكل الكف والأصابع:**\nنوع الكف (ناري / ترابي / هوائي / مائي) وما يدل عليه من الشخصية.\n\n**📏 ثانياً — الخطوط الرئيسية:**\n• خط الحياة: وصف واضح ودلالته\n• خط القلب: وصف واضح ودلالته في العواطف\n• خط الرأس: وصف واضح ودلالته في التفكير\n• خط القدر (إن ظهر): وصف واضح ودلالته\n\n**✨ ثالثاً — ملاحظات خاصة:**\nأي علامات أو خطوط إضافية لافتة (خط الشمس، نجوم، مربعات، إلخ).\n\n**🔮 رابعاً — القراءة الشاملة:**\nفقرة واحدة واضحة تلخص شخصية صاحب الكف وأبرز ما يميزه.\n\nقواعد مهمة:\n- اكتب بالعربية الفصيحة البسيطة المفهومة تماماً\n- لا كلام غامض أو مبهم — كل جملة لها معنى واضح\n- كن محدداً وتفصيلياً بناءً على ما تراه في الصورة\n- في النهاية أضف: "هذه القراءة للترفيه والاستئناس فقط"';
+  // عرض الكارت فوراً مع مؤشر التحميل
+  var cardHtml = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">';
+  cardHtml += '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+  cardHtml += '<span style="font-size:1.6rem">🖐</span>';
+  cardHtml += '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف</div>';
+  cardHtml += '<div style="font-size:.68rem;color:#ffccbc;margin-top:2px">' + (modeLabels[_palmMode] || 'قراءة شاملة') + '</div></div></div>';
+  cardHtml += '<div id="palm-upload-stream" style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line"><div class="ai-dots"><span></span><span></span><span></span></div></div>';
+  cardHtml += '<div style="padding:10px 14px 14px;background:rgba(255,87,34,.06);border-top:1px solid rgba(255,87,34,.15)">';
+  cardHtml += '<div style="font-size:.7rem;color:#ffab91;line-height:1.6">🔮 هذه القراءة للترفيه والاستئناس فقط ولا تُعدّ حقيقة علمية مثبتة.</div></div></div>';
+  resBox.innerHTML = cardHtml;
 
-  _callClaudeAPIWithImage(prompt, _palmImageData).then(function(res) {
-    var modeLabels = { full: 'قراءة شاملة', love: 'الحياة العاطفية', career: 'المسار المهني', health: 'الصحة والحيوية' };
-    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">';
-    html += '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
-    html += '<span style="font-size:1.6rem">🖐</span>';
-    html += '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف</div>';
-    html += '<div style="font-size:.68rem;color:#ffccbc;margin-top:2px">' + (modeLabels[_palmMode] || 'قراءة شاملة') + '</div></div>';
-    html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line">' + res + '</div>';
-    html += '<div style="padding:10px 14px 14px;background:rgba(255,87,34,.06);border-top:1px solid rgba(255,87,34,.15)">';
-    html += '<div style="font-size:.7rem;color:#ffab91;line-height:1.6">🔮 هذه القراءة للترفيه والاستئناس فقط ولا تُعدّ حقيقة علمية مثبتة.</div>';
-    html += '</div></div>';
-    resBox.innerHTML = html;
-  }).catch(function() {
-    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر تحليل الكف، حاول تاني.</div>';
-  });
+  var prompt = 'أنت قارئ كف (palmist) خبير.\n\nانظر بعناية لهذه الصورة وحلّل كف اليد الموجود فيها.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nهيكل ردّك:\n**🖐 شكل الكف:** نوع الكف (ناري/ترابي/هوائي/مائي) ودلالته.\n**📏 الخطوط:** خط الحياة، القلب، الرأس، القدر — كل خط في سطر مع دلالته.\n**✨ ملاحظات:** أي علامات إضافية لافتة.\n**🔮 القراءة الكاملة:** فقرة تلخص الشخصية وأبرز ما يميزها.\nاكتب بعربية مبسطة واضحة، وكن محدداً بناءً على ما تراه فعلاً.';
+
+  var streamEl = document.getElementById('palm-upload-stream');
+  var fullText = '';
+
+  if (typeof puter !== 'undefined' && puter.ai) {
+    var visionContent = [
+      { type: 'text', text: prompt },
+      { type: 'image_url', image_url: { url: _palmImageData } }
+    ];
+    // محاولة Streaming
+    try {
+      var streamRes = await puter.ai.chat(
+        [{ role: 'user', content: visionContent }],
+        { model: 'claude-sonnet-4-6', stream: true }
+      );
+      for await (var part of streamRes) {
+        var chunk = part && part.text ? part.text : '';
+        if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
+      }
+    } catch(e1) {
+      // بدون streaming
+      try {
+        var r2 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'claude-haiku-4-5', stream: false });
+        fullText = _puterExtractText(r2) || '';
+        if (streamEl && fullText) streamEl.textContent = fullText;
+      } catch(e2) {
+        if (streamEl) streamEl.textContent = 'تعذر تحليل الكف، حاول مرة أخرى.';
+      }
+    }
+  } else {
+    if (streamEl) streamEl.textContent = 'Puter غير متاح، تأكد من تحميل المكتبة.';
+  }
 }
 
 
