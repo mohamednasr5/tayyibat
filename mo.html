@@ -710,6 +710,9 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
     <div class="mob-nav-item" onclick="mobNav('period-cycles',this)" data-label="دورات الحيض">
       <i>🌸</i>دورات
     </div>
+    <div class="mob-nav-item" onclick="mobNav('remote-control',this)" data-label="التحكم عن بُعد">
+      <i class="fas fa-satellite-dish"></i>تحكم
+    </div>
   </div>
 </div>
 
@@ -1113,6 +1116,9 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
     <a class="nav-item" onclick="showSection('period-cycles')">
       <div class="nav-icon" style="background:rgba(233,30,99,.15)">🌸</div> دورات الحيض
     </a>
+    <a class="nav-item" onclick="showSection('remote-control')" style="border-color:rgba(33,150,243,.2)">
+      <div class="nav-icon" style="background:rgba(33,150,243,.15)"><i class="fas fa-satellite-dish" style="color:#2196f3"></i></div> التحكم عن بُعد
+    </a>
   </div>
 
   <div style="padding:16px;margin-top:20px;border-top:1px solid var(--border)">
@@ -1477,6 +1483,111 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
       <div class="chart-wrap">
         <div class="chart-title" id="period-detail-title">📊 تاريخ دورات المستخدمة</div>
         <div id="period-detail-timeline" style="display:flex;flex-direction:column;gap:12px;margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ REMOTE CONTROL ══ -->
+  <div class="section" id="section-remote-control">
+    <div class="page-header">
+      <div class="page-title">📡 التحكم عن بُعد في صفحة Index</div>
+      <div class="header-meta">
+        <div id="rc-status-dot" style="width:10px;height:10px;border-radius:50%;background:#4a6285;box-shadow:0 0 8px #4a6285;transition:all .4s"></div>
+        <div id="rc-status-label" style="font-size:.75rem;color:var(--txt3);font-weight:700">انتظار اتصال...</div>
+      </div>
+    </div>
+
+    <!-- حالة الاتصال -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
+      <div style="font-size:.85rem;font-weight:800;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-wifi" style="color:var(--blue2)"></i> حالة الاتصال بصفحة Index
+      </div>
+      <div id="rc-user-info" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+          <div id="rc-connected-user" style="font-size:.9rem;font-weight:900;color:var(--gold2)">—</div>
+          <div style="font-size:.6rem;color:var(--txt3);margin-top:3px;font-weight:700">المستخدم المتصل</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+          <div id="rc-current-page" style="font-size:.9rem;font-weight:900;color:var(--blue2)">—</div>
+          <div style="font-size:.6rem;color:var(--txt3);margin-top:3px;font-weight:700">الصفحة الحالية</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+          <div id="rc-last-seen" style="font-size:.9rem;font-weight:900;color:var(--green2)">—</div>
+          <div style="font-size:.6rem;color:var(--txt3);margin-top:3px;font-weight:700">آخر اتصال</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- أوامر التنقل -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
+      <div style="font-size:.85rem;font-weight:800;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-compass" style="color:var(--gold2)"></i> أوامر التنقل السريع
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">
+        <button onclick="rcNavigate('home')" style="background:linear-gradient(135deg,rgba(13,71,161,.2),rgba(33,150,243,.1));border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px 8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:800;color:#64b5f6;text-align:center;transition:all .2s">
+          <i class="fas fa-home" style="display:block;font-size:1.2rem;margin-bottom:5px"></i>الرئيسية
+        </button>
+        <button onclick="rcOpenZodiac()" style="background:linear-gradient(135deg,rgba(100,181,246,.15),rgba(100,181,246,.05));border:1.5px solid rgba(100,181,246,.4);border-radius:12px;padding:12px 8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:800;color:#90caf9;text-align:center;transition:all .2s">
+          <i class="fas fa-star" style="display:block;font-size:1.2rem;margin-bottom:5px"></i>صفحة البرج
+        </button>
+        <button onclick="rcNavigate('diet')" style="background:linear-gradient(135deg,rgba(26,122,46,.15),rgba(46,201,81,.05));border:1.5px solid rgba(46,201,81,.3);border-radius:12px;padding:12px 8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:800;color:#66bb6a;text-align:center;transition:all .2s">
+          <i class="fas fa-utensils" style="display:block;font-size:1.2rem;margin-bottom:5px"></i>الدايت
+        </button>
+        <button onclick="rcNavigate('ai')" style="background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(168,85,247,.05));border:1.5px solid rgba(124,58,237,.3);border-radius:12px;padding:12px 8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:800;color:#ab47bc;text-align:center;transition:all .2s">
+          <i class="fas fa-robot" style="display:block;font-size:1.2rem;margin-bottom:5px"></i>الذكاء الاصطناعي
+        </button>
+        <button onclick="rcNavigate('fasting')" style="background:linear-gradient(135deg,rgba(229,57,53,.12),rgba(244,67,54,.05));border:1.5px solid rgba(244,67,54,.3);border-radius:12px;padding:12px 8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:800;color:#ef5350;text-align:center;transition:all .2s">
+          <i class="fas fa-moon" style="display:block;font-size:1.2rem;margin-bottom:5px"></i>الصيام
+        </button>
+        <button onclick="rcNavigate('profile')" style="background:linear-gradient(135deg,rgba(156,39,176,.12),rgba(186,104,200,.05));border:1.5px solid rgba(156,39,176,.3);border-radius:12px;padding:12px 8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:800;color:#ba68c8;text-align:center;transition:all .2s">
+          <i class="fas fa-user" style="display:block;font-size:1.2rem;margin-bottom:5px"></i>الملف
+        </button>
+      </div>
+    </div>
+
+    <!-- أوامر المستخدم -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px">
+        <div style="font-size:.82rem;font-weight:800;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-lock-open" style="color:var(--green2)"></i> إعادة تعيين التجارب
+        </div>
+        <p style="font-size:.73rem;color:var(--txt3);line-height:1.7;margin-bottom:12px">إعادة تعيين كل محاولات الأدوات المجانية في الجهاز المتصل حالياً</p>
+        <button onclick="rcResetTrial()" style="width:100%;background:linear-gradient(135deg,var(--green),var(--green2));border:none;color:#050e1f;border-radius:12px;padding:11px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer">
+          <i class="fas fa-redo"></i> إعادة التعيين الآن
+        </button>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px">
+        <div style="font-size:.82rem;font-weight:800;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-sync-alt" style="color:var(--blue2)"></i> إعادة تحميل الصفحة
+        </div>
+        <p style="font-size:.73rem;color:var(--txt3);line-height:1.7;margin-bottom:12px">إرسال أمر لإعادة تحميل صفحة Index في الجهاز المتصل</p>
+        <button onclick="rcReload()" style="width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;color:#fff;border-radius:12px;padding:11px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer">
+          <i class="fas fa-redo-alt"></i> إعادة التحميل
+        </button>
+      </div>
+    </div>
+
+    <!-- إرسال إشعار فوري -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
+      <div style="font-size:.85rem;font-weight:800;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-comment-dots" style="color:var(--gold2)"></i> إرسال رسالة فورية (Toast)
+      </div>
+      <input id="rc-notify-text" type="text" placeholder="اكتب رسالتك هنا..." style="width:100%;background:#0d1f3c;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none;margin-bottom:10px">
+      <button onclick="rcNotify()" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:#050e1f;border-radius:12px;padding:11px;font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer">
+        <i class="fas fa-paper-plane"></i> إرسال الآن
+      </button>
+    </div>
+
+    <!-- سجل الأوامر -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:.85rem;font-weight:800;color:var(--txt);display:flex;align-items:center;gap:8px">
+          <i class="fas fa-history" style="color:var(--txt3)"></i> سجل الأوامر المُرسلة
+        </div>
+        <button onclick="document.getElementById('rc-log').innerHTML=''" style="background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.25);color:#ef5350;border-radius:8px;padding:4px 10px;font-family:'Tajawal',sans-serif;font-size:.72rem;cursor:pointer">مسح</button>
+      </div>
+      <div id="rc-log" style="max-height:220px;overflow-y:auto;padding:8px">
+        <div style="text-align:center;padding:20px;color:var(--txt3);font-size:.78rem">لم يتم إرسال أي أوامر بعد</div>
       </div>
     </div>
   </div>
@@ -3666,6 +3777,114 @@ window.exportPeriodCyclesExcel = function() {
 
 // ── تحميل البيانات عند الدخول للقسم ──
 // Period cycles lazy-load is now handled inside showSection and mobNav directly
+
+/* ══════════════════════════════════════════════════════
+   📡 BroadcastChannel — التحكم في صفحة Index
+══════════════════════════════════════════════════════ */
+(function() {
+  var ch;
+  try { ch = new BroadcastChannel('tayyibat_admin_channel'); }
+  catch(e) { console.warn('BroadcastChannel not supported'); return; }
+
+  // تحديث مؤشر الاتصال
+  function setRcConnected(connected, user, page) {
+    var dot = document.getElementById('rc-status-dot');
+    var lbl = document.getElementById('rc-status-label');
+    var userEl = document.getElementById('rc-connected-user');
+    var pageEl = document.getElementById('rc-current-page');
+    var seenEl = document.getElementById('rc-last-seen');
+    if (!dot) return;
+    if (connected) {
+      dot.style.background = '#2ec951';
+      dot.style.boxShadow = '0 0 10px #2ec951';
+      if (lbl) { lbl.textContent = 'متصل ✓'; lbl.style.color = '#2ec951'; }
+      if (userEl) userEl.textContent = (user && (user.nameAr || user.username)) || 'مستخدم متصل';
+      if (pageEl) pageEl.textContent = page || '—';
+    } else {
+      dot.style.background = '#ef5350';
+      dot.style.boxShadow = '0 0 8px #ef5350';
+      if (lbl) { lbl.textContent = 'غير متصل'; lbl.style.color = '#ef5350'; }
+    }
+    if (seenEl) seenEl.textContent = new Date().toLocaleTimeString('ar-EG');
+  }
+
+  // تسجيل أمر في السجل
+  function logCommand(icon, label, detail) {
+    var log = document.getElementById('rc-log');
+    if (!log) return;
+    var item = document.createElement('div');
+    item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;animation:fadeIn .3s ease';
+    item.innerHTML = '<span style="font-size:1.1rem">' + icon + '</span><div style="flex:1"><div style="color:var(--txt);font-weight:700">' + label + '</div>' + (detail ? '<div style="color:var(--txt3);font-size:.68rem;margin-top:2px">' + detail + '</div>' : '') + '</div><div style="color:var(--txt3);font-size:.65rem;white-space:nowrap">' + new Date().toLocaleTimeString('ar-EG') + '</div>';
+    // Remove placeholder
+    if (log.querySelector('div[style*="text-align:center"]')) log.innerHTML = '';
+    log.insertBefore(item, log.firstChild);
+    // Keep max 30 items
+    while (log.children.length > 30) log.removeChild(log.lastChild);
+  }
+
+  // استقبال رسائل من Index
+  ch.addEventListener('message', function(e) {
+    var msg = e.data;
+    if (!msg || !msg.type) return;
+    if (msg.type === 'INDEX_READY' || msg.type === 'INDEX_HEARTBEAT') {
+      setRcConnected(true, msg.user, msg.page);
+    } else if (msg.type === 'USER_INFO') {
+      setRcConnected(true, msg.user, msg.page);
+    }
+  });
+
+  // ── دوال الأوامر ──
+  window.rcNavigate = function(page) {
+    ch.postMessage({ type: 'NAVIGATE', page: page });
+    logCommand('🧭', 'انتقال للصفحة: ' + page);
+    showToast('📡 تم إرسال أمر الانتقال: ' + page);
+  };
+
+  window.rcOpenZodiac = function() {
+    ch.postMessage({ type: 'OPEN_ZODIAC' });
+    logCommand('⭐', 'فتح صفحة البرج الفلكي');
+    showToast('📡 تم إرسال أمر فتح البرج');
+  };
+
+  window.rcResetTrial = function() {
+    if (!confirm('إعادة تعيين كل التجارب في الجهاز المتصل؟')) return;
+    ch.postMessage({ type: 'RESET_TRIAL' });
+    logCommand('🔄', 'إعادة تعيين التجارب');
+    showToast('✅ تم إرسال أمر إعادة التعيين');
+  };
+
+  window.rcReload = function() {
+    if (!confirm('إعادة تحميل صفحة Index في الجهاز المتصل؟')) return;
+    ch.postMessage({ type: 'RELOAD' });
+    logCommand('🔃', 'إعادة تحميل الصفحة');
+    showToast('✅ تم إرسال أمر إعادة التحميل');
+  };
+
+  window.rcNotify = function() {
+    var txt = document.getElementById('rc-notify-text')?.value.trim();
+    if (!txt) { showToast('⚠️ اكتب رسالة أولاً'); return; }
+    ch.postMessage({ type: 'NOTIFY', message: txt });
+    logCommand('💬', 'رسالة إشعار', txt);
+    showToast('✅ تم إرسال الرسالة');
+    document.getElementById('rc-notify-text').value = '';
+  };
+
+  // طلب معلومات المستخدم دورياً
+  setInterval(function() {
+    ch.postMessage({ type: 'REQUEST_USER_INFO' });
+  }, 15000);
+
+  // إرسال طلب أولي عند فتح قسم التحكم
+  var origShowSection = window.showSection;
+  window.showSection = function(id) {
+    origShowSection(id);
+    if (id === 'remote-control') {
+      ch.postMessage({ type: 'REQUEST_USER_INFO' });
+    }
+  };
+
+  window._adminChannel = ch;
+})();
 </script>
 </body>
 </html>
