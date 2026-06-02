@@ -231,6 +231,11 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1767845591267587" crossorigin="anonymous"></script>
 
 <!-- ═══════════════════════════════════════════════════
+     Puter.js — AI مجاني بدون API key
+════════════════════════════════════════════════════ -->
+<script src="https://js.puter.com/v2/"></script>
+
+<!-- ═══════════════════════════════════════════════════
      Preconnect & Performance
 ════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://www.gstatic.com">
@@ -3189,13 +3194,21 @@ async function obgynSend() {
     if (_obgynMsgs.length > 1) {
       messages = _obgynMsgs.slice(-6).map(function(m) { return { role: m.role, content: m.content }; });
     }
-    var body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: messages, system: OBGYN_SYSTEM };
-    var res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     var txt = '';
-    if (res.ok) {
-      var data = await res.json();
-      if (data.content && data.content[0]) txt = data.content[0].text;
-    }
+    // ── Puter.js → Claude مجاناً ──
+    try {
+      if (typeof puter !== 'undefined' && puter.ai) {
+        var puMsgs = [{ role: 'user', content: OBGYN_SYSTEM + '\n\n' + messages[messages.length-1].content }];
+        if (messages.length > 1) puMsgs = messages;
+        var puRes = await puter.ai.chat(puMsgs, { model: PUTER_CLAUDE_MODEL });
+        if (typeof puRes === 'string') txt = puRes;
+        else if (puRes && puRes.message && puRes.message.content) {
+          var mc = puRes.message.content;
+          txt = Array.isArray(mc) ? (mc[0] && mc[0].text ? mc[0].text : '') : mc;
+        }
+      }
+    } catch(ePu) {}
+    // ── احتياطي: Pollinations ──
     if (!txt) {
       var poRes = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'openai', messages: [{ role: 'system', content: OBGYN_SYSTEM }, ...messages], max_tokens: 1000 }) });
       if (poRes.ok) { var pd = await poRes.json(); if (pd.choices && pd.choices[0]) txt = pd.choices[0].message.content; }
@@ -5608,7 +5621,7 @@ async function captureAndScanProductBlob() {
           {type:"text", text: vPrompt},
           {type:"image_url", image_url:{url: imgData}}
         ]}
-      ], {model:"gpt-5.4", temperature:0.3});
+      ], {model:"claude-sonnet-4-6", temperature:0.3});
       var text = typeof res==="string" ? res
         : res&&res.message&&res.message.content ? res.message.content
         : res&&res.content ? res.content : null;
@@ -5687,7 +5700,7 @@ async function _scanAnalyzeAI(ingredients) {
   /* ١. Puter.js */
   try {
     if (typeof puter !== "undefined" && puter.ai) {
-      var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
+      var res = await puter.ai.chat(prompt, {model:'claude-sonnet-4-6', temperature:0.3});
       var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (t) result = {text:t, source:"Puter.js"};
     }
@@ -5906,7 +5919,7 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
         : prompt;
       var res = await puter.ai.chat(
         imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
+        {model: 'claude-sonnet-4-6', temperature:0.3}
       );
       var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (t) result = {text:t, source:"AI Pharma"};
@@ -6121,7 +6134,7 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
         : prompt;
       var res = await puter.ai.chat(
         imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
+        {model: 'claude-sonnet-4-6', temperature:0.3}
       );
       var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (t) result = {text:t, source:"AI Doctor"};
@@ -6453,7 +6466,7 @@ async function showDrugAI(btn) {
     var res = await puter.ai.chat(
       'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
       '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...',
-      {model:'gpt-4o-mini', temperature:0.2}
+      {model:'claude-haiku-4-5', temperature:0.2}
     );
     var txt = typeof res==='string'?res:(res.message&&res.message.content||res.content||'');
     var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
@@ -6503,7 +6516,7 @@ async function drugSearchByCamera() {
         {type:'text', text:'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.'},
         {type:'image_url', image_url:{url: imgData}}
       ]
-    }], {model:'gpt-4o-mini', temperature:0});
+    }], {model:'claude-haiku-4-5', temperature:0});
     var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message && aiRes.message.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
     if (drugName && drugName.length > 1) {
       var inp2 = document.getElementById('drug-name-search-input');
@@ -6637,7 +6650,7 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
         : prompt;
       var res = await puter.ai.chat(
         imgDataUrl ? [{ role: 'user', content: content }] : prompt,
-        { model: imgDataUrl ? 'gpt-4o' : 'gpt-4o-mini', temperature: 0.2 }
+        { model: 'claude-sonnet-4-6', temperature: 0.2 }
       );
       var t = typeof res === 'string' ? res
         : res && res.message && res.message.content ? res.message.content
@@ -6862,7 +6875,7 @@ async function _rxLookupAndShow(name, db, container) {
           'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
         var res2 = null;
         if (typeof puter !== 'undefined' && puter.ai) {
-          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
+          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'claude-haiku-4-5',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
         }
         if (!res2 && window.__OR_KEY_FB) { try { var orR2=await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt2); if(orR2) res2=orR2.text; } catch(e) {} }
         if (!res2) throw new Error('no result');
@@ -6931,7 +6944,7 @@ async function _rxLookupAndShow(name, db, container) {
       var res = null;
       if (typeof puter !== 'undefined' && puter.ai) {
         try {
-          var pr = await puter.ai.chat(aiPrompt, {model:'gpt-4o-mini', temperature:0.2});
+          var pr = await puter.ai.chat(aiPrompt, {model:'claude-haiku-4-5', temperature:0.2});
           res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?pr.message.content:(pr&&pr.content?pr.content:null));
         } catch(e) {}
       }
@@ -8607,7 +8620,7 @@ window.addEventListener('DOMContentLoaded', function() {
   var ZAI_MODEL        = "glm-4-flash";
   var MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
   var MISTRAL_MODEL    = "mistral-small-latest";
-  var PUTER_MODELS     = ["gpt-5.4-nano","gpt-5.4","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1"];
+  var PUTER_MODELS     = ["claude-haiku-4-5","claude-sonnet-4-6","claude-sonnet-4-6"];
   var _history = [];
 
   function _zaiKey()     { return window.__GEMINI_KEY  || null; }
@@ -11634,82 +11647,75 @@ function _emGetNewEmergencyAnim(type, stepIdx, step, color) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   🤖 وظائف استدعاء Claude API
+   🤖 وظائف استدعاء Claude AI عبر Puter.js المجاني
+   ✅ لا API key — لا رصيد — مجاني تماماً
+   المصدر: https://developer.puter.com/tutorials/free-unlimited-claude-35-sonnet-api/
 ════════════════════════════════════════════════════════════ */
+
+/* نموذج Claude المستخدم عبر Puter */
+var PUTER_CLAUDE_MODEL = 'claude-sonnet-4-6';        // نصوص
+var PUTER_CLAUDE_VISION_MODEL = 'claude-sonnet-4-6'; // صور + نصوص
+
+/* ── استدعاء Claude النصي عبر Puter (مجاني ✅) ── */
 async function _callClaudeAPI(prompt, systemPrompt) {
-  // محاولة 1: Anthropic API مباشرة
+  // ── المحاولة الأولى: Puter.js → Claude Sonnet مجاناً ──
   try {
-    var messages = [{ role: 'user', content: prompt }];
-    var body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: messages };
-    if (systemPrompt) body.system = systemPrompt;
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      var data = await res.json();
-      if (data.content && data.content[0] && data.content[0].text) return data.content[0].text;
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var msgs = [];
+      if (systemPrompt) msgs.push({ role: 'user', content: systemPrompt + '\n\n' + prompt });
+      else msgs.push({ role: 'user', content: prompt });
+
+      var puRes = await puter.ai.chat(msgs, { model: PUTER_CLAUDE_MODEL });
+      var txt = null;
+      if (typeof puRes === 'string') txt = puRes;
+      else if (puRes && puRes.message && puRes.message.content) {
+        var mc = puRes.message.content;
+        txt = Array.isArray(mc) ? (mc[0] && mc[0].text ? mc[0].text : JSON.stringify(mc)) : mc;
+      } else if (puRes && puRes.text) txt = puRes.text;
+      if (txt) return txt;
     }
-  } catch(e) {}
-  
-  // محاولة 2: استخدام الـ AI المدمج في التطبيق (Pollinations)
+  } catch(ePuter) { console.warn('Puter Claude failed:', ePuter); }
+
+  // ── المحاولة الثانية: Pollinations AI (احتياطي) ──
   try {
-    var poRes = await fetch(window.__POLLINATIONS_ENDPOINT || 'https://text.pollinations.ai/openai', {
+    var poRes = await fetch('https://text.pollinations.ai/openai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'openai', messages: [{ role: 'user', content: prompt }], max_tokens: 1000
-      })
+      body: JSON.stringify({ model: 'openai', messages: [{ role: 'user', content: prompt }], max_tokens: 1000 })
     });
     if (poRes.ok) {
       var poData = await poRes.json();
       if (poData.choices && poData.choices[0]) return poData.choices[0].message.content;
     }
-  } catch(e) {}
+  } catch(ePo) {}
 
-  // محاولة 3: Puter.js
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var puRes = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.3 });
-      var t = typeof puRes === 'string' ? puRes : puRes && puRes.message ? puRes.message.content : null;
-      if (t) return t;
-    }
-  } catch(e) {}
-
-  throw new Error('All AI endpoints failed');
+  throw new Error('AI غير متاح حالياً، حاول مجدداً');
 }
 
+/* ── استدعاء Claude مع صورة عبر Puter (مجاني ✅) ── */
 async function _callClaudeAPIWithImage(prompt, imgDataUrl) {
-  // محاولة Puter.js أولاً للصور
+  // ── Puter.js → Claude Vision ──
   try {
     if (typeof puter !== 'undefined' && puter.ai) {
-      var content = [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imgDataUrl } }];
-      var res = await puter.ai.chat([{ role: 'user', content: content }], { model: 'gpt-4o', temperature: 0.3 });
-      var t = typeof res === 'string' ? res : res && res.message ? res.message.content : null;
-      if (t) return t;
+      var content = [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: imgDataUrl } }
+      ];
+      var res = await puter.ai.chat([{ role: 'user', content: content }], {
+        model: PUTER_CLAUDE_VISION_MODEL
+      });
+      var txt = null;
+      if (typeof res === 'string') txt = res;
+      else if (res && res.message && res.message.content) {
+        var mc = res.message.content;
+        txt = Array.isArray(mc) ? (mc[0] && mc[0].text ? mc[0].text : JSON.stringify(mc)) : mc;
+      } else if (res && res.text) txt = res.text;
+      if (txt) return txt;
     }
-  } catch(e) {}
-  
-  // محاولة Anthropic API مع الصورة
-  try {
-    var base64 = imgDataUrl.split(',')[1];
-    var mtype = imgDataUrl.split(';')[0].split(':')[1];
-    var body = {
-      model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-      messages: [{ role: 'user', content: [
-        { type: 'image', source: { type: 'base64', media_type: mtype, data: base64 } },
-        { type: 'text', text: prompt }
-      ]}]
-    };
-    var r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-    });
-    if (r.ok) { var d = await r.json(); if (d.content && d.content[0]) return d.content[0].text; }
-  } catch(e) {}
-  
-  // إذا فشل كل شيء: ارجع لتحليل نصي فقط
-  return await _callClaudeAPI(prompt + '\n(لا توجد صورة متاحة، قدم تحليلاً عاماً)', null);
+  } catch(eVision) { console.warn('Puter Vision failed:', eVision); }
+
+  // ── إذا فشلت الصورة: نصي فقط ──
+  return await _callClaudeAPI(prompt + '\n(لا توجد صورة، قدم تحليلاً عاماً)', null);
 }
 
 /* ════════════════════════════════════════════════════════════
