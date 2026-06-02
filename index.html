@@ -747,7 +747,18 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .wvm-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
 .wvm-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s;cursor:pointer}
 .wvm-dot.active{background:var(--gold);width:22px;border-radius:4px}
-/* ══ Settings Toggle Switch ══ */
+/* ══ Palm Countdown Animation ══ */
+@keyframes palmCountPulse {
+  0%   { transform: scale(1);    opacity: 1; }
+  50%  { transform: scale(1.15); opacity: .7; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@keyframes palmFlash {
+  0%   { opacity: 1; }
+  30%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 .settings-toggle {
   position: relative;
   display: inline-block;
@@ -2686,11 +2697,22 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
         <div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-top:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:4px 0 0 0"></div>
         <div style="position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-right:2px solid #ff5722;border-radius:0 0 4px 0"></div>
         <div style="position:absolute;bottom:10px;left:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:0 0 0 4px"></div>
+        <!-- عداد تنازلي تلقائي -->
+        <div id="palm-countdown-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+          <div id="palm-countdown-num" style="font-size:5rem;font-weight:900;color:#ff8a65;line-height:1;text-shadow:0 0 30px rgba(255,87,34,.8);animation:palmCountPulse .9s ease-in-out infinite"></div>
+          <div style="font-size:.85rem;color:#ffccbc;font-weight:700">ثبّت كفك داخل الإطار</div>
+        </div>
+        <!-- مؤشر التحليل التلقائي -->
+        <div id="palm-analyzing-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.7);flex-direction:column;align-items:center;justify-content:center;gap:12px">
+          <div style="font-size:2.5rem">🖐</div>
+          <div style="font-size:.9rem;color:#ff8a65;font-weight:800">جاري تحليل الكف...</div>
+          <div class="ai-dots"><span></span><span></span><span></span></div>
+        </div>
       </div>
-      <div style="text-align:center;font-size:.7rem;color:#ff8a65;margin-top:6px">🖐 ضع كفك داخل الإطار — افتح يدك بشكل طبيعي</div>
+      <div id="palm-camera-hint" style="text-align:center;font-size:.75rem;color:#ff8a65;margin-top:8px;font-weight:700">🖐 ضع كفك داخل الإطار — التحليل يبدأ تلقائياً خلال <span id="palm-hint-secs">3</span> ثوانٍ</div>
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="palmCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,87,34,.35),rgba(255,138,101,.2));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:12px;font-size:.88rem;font-weight:800">
-          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط الصورة
+        <button onclick="palmCaptureNow()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,87,34,.35),rgba(255,138,101,.2));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:10px;font-size:.85rem;font-weight:800">
+          <i class="fas fa-bolt" style="margin-left:5px"></i> تحليل الآن
         </button>
         <button onclick="palmStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
           <i class="fas fa-stop"></i>
@@ -10219,6 +10241,8 @@ function incToolUsage(toolKey) {
 }
 function canUseTool(toolKey) {
   if (window.isProUser) return true;
+  // البرج الفلكي مجاني غير محدود
+  if (toolKey === 'zodiac') return true;
   return getToolUsage(toolKey) < FREE_TOOL_LIMIT;
 }
 function updateTrialBadges() {
@@ -11727,13 +11751,16 @@ function zodiacDetect() {
     pisces:      { traits: [['🌊','الحدس الخارق','يشعر بما لا يُقال ولا يُرى — يلتقط مشاعر الآخرين ونواياهم قبل أن ينبسوا بكلمة واحدة'],['🎨','الخيال الإبداعي الواسع','يعيش في عالم حالم مليء بالألوان والإلهام، وهذا يمنحه طاقة إبداعية نادرة في الفن والكتابة والموسيقى'],['💜','التعاطف العميق','يحمل همّ الآخرين كأنه همّه — قلبه مفتوح ومشاعره صادقة، ويُشعر من حوله بالقبول والأمان'],['🔮','الروحانية والارتباط بعالم آخر','يحس بوجود بُعد روحاني في كل شيء، ولديه علاقة عميقة مع العالم الداخلي والمعنوي']], lucky:'7', color:'#26a69a', color2:'#e0f2f1', stone:'أكوامارين', day:'الخميس' }
   };
 
+  // ── تعريف td أولاً قبل أي استخدام ──
+  var td = traitDefs[_zodSign] || traitDefs.pisces;
+
   // ── بطاقة العمر المفصّلة ──
   var ageCard = document.getElementById('zodiac-age-card');
-  var yearVal = parseInt(document.getElementById('zod-year')?.value);
-  var monthVal = parseInt(document.getElementById('zod-month')?.value);
-  var dayVal = parseInt(document.getElementById('zod-day')?.value);
+  var yearVal = parseInt(document.getElementById('zod-year') ? document.getElementById('zod-year').value : 0);
+  var monthVal = parseInt(document.getElementById('zod-month') ? document.getElementById('zod-month').value : 0);
+  var dayVal = parseInt(document.getElementById('zod-day') ? document.getElementById('zod-day').value : 0);
   if (ageCard) {
-    if (yearVal && yearVal >= 1920 && yearVal <= 2025 && monthVal && dayVal) {
+    if (yearVal && yearVal >= 1920 && yearVal <= new Date().getFullYear() && monthVal && dayVal) {
       var birthDate = new Date(yearVal, monthVal - 1, dayVal);
       var now = new Date();
       var diffMs = now - birthDate;
@@ -11743,51 +11770,44 @@ function zodiacDetect() {
         var totalHrs = Math.floor(totalMin / 60);
         var totalDays = Math.floor(totalHrs / 24);
         var totalWeeks = Math.floor(totalDays / 7);
-        // حساب السنوات والأشهر الدقيقة
         var ageYears = now.getFullYear() - birthDate.getFullYear();
         var ageMonths = now.getMonth() - birthDate.getMonth();
         if (now.getDate() < birthDate.getDate()) ageMonths--;
         if (ageMonths < 0) { ageYears--; ageMonths += 12; }
         var ageDaysRem = Math.floor((now - new Date(now.getFullYear(), now.getMonth(), birthDate.getDate())) / 86400000);
         if (isNaN(ageDaysRem) || ageDaysRem < 0) ageDaysRem = 0;
-
-        // عداد تشغيل حي
-        if (window._zodAgeInterval) clearInterval(window._zodAgeInterval);
-        function updateAgeCounters() {
-          var n = new Date();
-          var df = n - birthDate;
-          var ts = Math.floor(df/1000);
-          var tm = Math.floor(ts/60);
-          var th = Math.floor(tm/60);
-          var td2 = Math.floor(th/24);
-          var tw = Math.floor(td2/7);
-          // حساب الأشهر الكاملة
-          var ay = n.getFullYear() - birthDate.getFullYear();
-          var am = n.getMonth() - birthDate.getMonth();
-          if (n.getDate() < birthDate.getDate()) am--;
-          if (am < 0) { ay--; am += 12; }
-          var totMonths = ay * 12 + am;
-          var tdEl = document.getElementById('zod-total-days');
-          var twEl = document.getElementById('zod-total-weeks');
-          var tminEl = document.getElementById('zod-total-min');
-          var tsecEl = document.getElementById('zod-total-sec');
-          var thEl = document.getElementById('zod-total-hrs');
-          var tmEl = document.getElementById('zod-total-months');
-          var tyEl = document.getElementById('zod-total-years-num');
-          if (tdEl) tdEl.textContent = td2.toLocaleString('ar-EG');
-          if (twEl) twEl.textContent = tw.toLocaleString('ar-EG');
-          if (tminEl) tminEl.textContent = tm.toLocaleString('ar-EG');
-          if (tsecEl) tsecEl.textContent = ts.toLocaleString('ar-EG');
-          if (thEl) thEl.textContent = th.toLocaleString('ar-EG');
-          if (tmEl) tmEl.textContent = totMonths.toLocaleString('ar-EG');
-          if (tyEl) tyEl.textContent = ay.toLocaleString('ar-EG');
-        }
-        window._zodAgeInterval = setInterval(updateAgeCounters, 1000);
-
         var totalMonths = ageYears * 12 + ageMonths;
+
+        // عداد حي — يتحدث كل ثانية
+        if (window._zodAgeInterval) clearInterval(window._zodAgeInterval);
+        (function(bd) {
+          window._zodAgeInterval = setInterval(function() {
+            var n = new Date();
+            var df = n - bd;
+            var ts = Math.floor(df / 1000);
+            var tm = Math.floor(ts / 60);
+            var th = Math.floor(tm / 60);
+            var td2 = Math.floor(th / 24);
+            var tw = Math.floor(td2 / 7);
+            var ay = n.getFullYear() - bd.getFullYear();
+            var am = n.getMonth() - bd.getMonth();
+            if (n.getDate() < bd.getDate()) am--;
+            if (am < 0) { ay--; am += 12; }
+            var totM = ay * 12 + am;
+            var e;
+            e = document.getElementById('zod-total-sec');    if (e) e.textContent = ts.toLocaleString('ar-EG');
+            e = document.getElementById('zod-total-min');    if (e) e.textContent = tm.toLocaleString('ar-EG');
+            e = document.getElementById('zod-total-hrs');    if (e) e.textContent = th.toLocaleString('ar-EG');
+            e = document.getElementById('zod-total-days');   if (e) e.textContent = td2.toLocaleString('ar-EG');
+            e = document.getElementById('zod-total-weeks');  if (e) e.textContent = tw.toLocaleString('ar-EG');
+            e = document.getElementById('zod-total-months'); if (e) e.textContent = totM.toLocaleString('ar-EG');
+            e = document.getElementById('zod-total-years-num'); if (e) e.textContent = ay.toLocaleString('ar-EG');
+          }, 1000);
+        })(birthDate);
+
         ageCard.style.display = 'block';
         ageCard.innerHTML =
-          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + td.color + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both;width:100%">' +
+          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + td.color + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both">' +
             '<div style="background:linear-gradient(135deg,' + td.color + '30,' + td.color + '12);padding:12px 16px;border-bottom:1px solid ' + td.color + '30;display:flex;align-items:center;gap:10px">' +
               '<span style="font-size:1.6rem">⏳</span>' +
               '<div>' +
@@ -11796,40 +11816,37 @@ function zodiacDetect() {
               '</div>' +
             '</div>' +
             '<div style="padding:14px 16px">' +
-              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + td.color + '15;border-radius:14px;border:1.5px solid ' + td.color + '33">' +
-                '<div style="font-size:2.4rem;font-weight:900;color:' + td.color + ';line-height:1">' + ageYears + '</div>' +
-                '<div style="font-size:.78rem;color:var(--txt2);margin-top:4px;font-weight:700">سنة' + (ageMonths ? ' و ' + ageMonths + ' شهر' : '') + (ageDaysRem ? ' و ' + ageDaysRem + ' يوم' : '') + '</div>' +
+              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + td.color + '18;border-radius:14px;border:1.5px solid ' + td.color + '44">' +
+                '<div id="zod-total-years-num" style="font-size:2.6rem;font-weight:900;color:' + td.color + ';line-height:1">' + ageYears.toLocaleString('ar-EG') + '</div>' +
+                '<div style="font-size:.78rem;color:var(--txt2);margin-top:4px;font-weight:700">🔢 إجمالي السنوات' + (ageMonths ? ' — ' + ageMonths + ' شهر و' + ageDaysRem + ' يوم' : '') + '</div>' +
               '</div>' +
               '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-years-num" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + ageYears.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🔢 سنة</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-months" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + totalMonths.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">📆 شهر</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-months" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalMonths.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">📆 شهر</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-weeks" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + totalWeeks.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">🗓️ أسبوع</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-weeks" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalWeeks.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🗓️ أسبوع</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-days" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + totalDays.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">📅 يوم</div>' +
                 '</div>' +
               '</div>' +
-              '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-days" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalDays.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">📅 يوم</div>' +
+              '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-hrs" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalHrs.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">🕐 ساعة</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-hrs" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalHrs.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">🕐 ساعة</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-min" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalMin.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">⏱️ دقيقة</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-min" style="font-size:.95rem;font-weight:900;color:' + td.color2 + '">' + totalMin.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⏱️ دقيقة</div>' +
-                '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-sec" style="font-size:.95rem;font-weight:900;color:' + td.color + ';animation:zodAgeCountUp .3s ease">' + totalSec.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⚡ ثانية</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '55;border-radius:12px;padding:10px 6px;text-align:center;position:relative;overflow:hidden">' +
+                  '<div style="position:absolute;inset:0;background:' + td.color + '10;animation:zodAgeCountUp 1s ease infinite"></div>' +
+                  '<div id="zod-total-sec" style="position:relative;font-size:1rem;font-weight:900;color:' + td.color + '">' + totalSec.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="position:relative;font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">⚡ ثانية</div>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -11842,7 +11859,6 @@ function zodiacDetect() {
     }
   }
 
-  var td = traitDefs[_zodSign] || traitDefs.pisces;
   var tc = document.getElementById('zodiac-trait-cards');
   tc.innerHTML = '';
 
@@ -12325,9 +12341,7 @@ function zodiacRead() {
   var month = document.getElementById('zod-month').value;
   var day = document.getElementById('zod-day').value;
   if (!month || !day) { showToast('اختر الشهر واليوم أولاً 📅'); return; }
-  if (!_zodGender) { showToast('اختر النوع (ذكر / أنثى) أولاً'); return; }
-  if (!canUseTool('zodiac')) { showTrialExpiredModal('zodiac'); return; }
-  incToolUsage('zodiac');
+  if (!_zodGender) _zodGender = 'male';
 
   zodiacDetect();
   var sign = _zodSign || getZodiacSign(month, day);
@@ -12568,42 +12582,110 @@ function palmLoadImage(event) {
   reader.readAsDataURL(file);
 }
 
+var _palmCountdownTimer = null;
+var _palmCountdownSec = 3;
+
 function palmOpenCamera() {
   var area = document.getElementById('palm-camera-area');
   var video = document.getElementById('palm-video');
   if (!area || !video) return;
   if (_palmStream) { palmStopCamera(); return; }
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } })
-  .then(function(stream) {
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }
+  }).then(function(stream) {
     _palmStream = stream;
     video.srcObject = stream;
     area.style.display = 'block';
-    document.getElementById('palm-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+    document.getElementById('palm-camera-btn').innerHTML =
+      '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+    // ابدأ العداد التنازلي تلقائياً بعد ثانية من فتح الكاميرا
+    setTimeout(palmStartCountdown, 1000);
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
+function palmStartCountdown() {
+  if (!_palmStream) return;
+  _palmCountdownSec = 3;
+  var overlay = document.getElementById('palm-countdown-overlay');
+  var numEl   = document.getElementById('palm-countdown-num');
+  var hintSec = document.getElementById('palm-hint-secs');
+  if (overlay) { overlay.style.display = 'flex'; }
+  if (numEl)   { numEl.textContent = _palmCountdownSec; }
+  if (hintSec) hintSec.textContent = _palmCountdownSec;
+
+  if (_palmCountdownTimer) clearInterval(_palmCountdownTimer);
+  _palmCountdownTimer = setInterval(function() {
+    if (!_palmStream) { clearInterval(_palmCountdownTimer); return; }
+    _palmCountdownSec--;
+    if (numEl)   numEl.textContent = _palmCountdownSec > 0 ? _palmCountdownSec : '📸';
+    if (hintSec) hintSec.textContent = Math.max(0, _palmCountdownSec);
+    if (_palmCountdownSec <= 0) {
+      clearInterval(_palmCountdownTimer);
+      palmCaptureAndAnalyze();
+    }
+  }, 1000);
+}
+
+function palmCaptureNow() {
+  // إلغاء العداد وتصوير فوري
+  if (_palmCountdownTimer) clearInterval(_palmCountdownTimer);
+  var overlay = document.getElementById('palm-countdown-overlay');
+  if (overlay) overlay.style.display = 'none';
+  palmCaptureAndAnalyze();
+}
+
+function palmCaptureAndAnalyze() {
+  var video = document.getElementById('palm-video');
+  if (!video || !_palmStream) { showToast('الكاميرا غير مفعلة'); return; }
+
+  // وميض الشاشة
+  var area = document.getElementById('palm-camera-area');
+  if (area) { area.style.animation = 'palmFlash .3s ease'; setTimeout(function(){ area.style.animation=''; }, 300); }
+
+  // إخفاء العداد وإظهار التحليل
+  var countdown = document.getElementById('palm-countdown-overlay');
+  var analyzing = document.getElementById('palm-analyzing-overlay');
+  if (countdown) countdown.style.display = 'none';
+  if (analyzing) analyzing.style.display = 'flex';
+
+  // التقاط الصورة
+  var canvas = document.createElement('canvas');
+  canvas.width  = video.videoWidth  || 1280;
+  canvas.height = video.videoHeight || 960;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _palmImageData = canvas.toDataURL('image/jpeg', 0.92);
+
+  // إيقاف الكاميرا وإظهار المعاينة
+  palmStopCamera();
+  var preview = document.getElementById('palm-preview');
+  var img     = document.getElementById('palm-img-preview');
+  if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
+  if (analyzing) analyzing.style.display = 'none';
+
+  // بدء التحليل فوراً
+  palmAnalyze();
+}
+
 function palmStopCamera() {
+  if (_palmCountdownTimer) { clearInterval(_palmCountdownTimer); _palmCountdownTimer = null; }
   if (_palmStream) { _palmStream.getTracks().forEach(function(t) { t.stop(); }); _palmStream = null; }
   var area = document.getElementById('palm-camera-area');
   if (area) area.style.display = 'none';
+  var overlay = document.getElementById('palm-countdown-overlay');
+  if (overlay) overlay.style.display = 'none';
+  var analyzing = document.getElementById('palm-analyzing-overlay');
+  if (analyzing) analyzing.style.display = 'none';
   var btn = document.getElementById('palm-camera-btn');
   if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير كفك الآن</span>';
+  var hintSec = document.getElementById('palm-hint-secs');
+  if (hintSec) hintSec.textContent = '3';
 }
 
 function palmCapture() {
-  var video = document.getElementById('palm-video');
-  if (!video || !_palmStream) { showToast('الكاميرا غير مفعلة'); return; }
-  var canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth || 1280;
-  canvas.height = video.videoHeight || 960;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  _palmImageData = canvas.toDataURL('image/jpeg', 0.95);
-  palmStopCamera();
-  var preview = document.getElementById('palm-preview');
-  var img = document.getElementById('palm-img-preview');
-  if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
-  showToast('✅ تم التقاط صورة الكف — اضغط اقرأ كفّي');
+  // احتياط: نادياً الدالة الجديدة
+  palmCaptureAndAnalyze();
 }
+
 
 function palmAnalyze() {
   if (!_palmImageData) { showToast('صوّر أو ارفع صورة كفك أولاً 🖐'); return; }
