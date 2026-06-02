@@ -4887,53 +4887,9 @@ function hideLoader() {
 }
 
 /* ══════════ Auto Login ══════════ */
-async function autoLogin() {
-  var s = getSession();
-  if (!s) { hideLoader(); return; }
-  try {
-    // تحقق هل المستخدم سجّل بجوجل
-    var snap = await window.__firebaseGet(
-      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
-    );
-    if (snap.exists()) {
-      var data = snap.val();
-      if (data.loginMethod === 'google' && window.firebaseAuth) {
-        var done = await Promise.race([
-          new Promise(function(resolve) {
-            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
-              unsub();
-              if (user && user.uid === s) {
-                try { await handleGoogleUserData(user); resolve(true); }
-                catch(e) { resolve(false); }
-              } else { resolve(false); }
-            });
-          }),
-          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
-        ]);
-        if (done) return;
-        hideLoader(); return;
-      }
-    }
-    // دخول عادي username/password
-    var u = await dbGetUser(s);
-    if (u) {
-      currentUser = Object.assign({}, u, { username: s });
-      if (currentUser.pro && currentUser.pro.active === true) {
-        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
-        } else if (!currentUser.pro.expiresAt) {
-          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
-        } else {
-          currentUser.pro.active = false; window.isProUser = false;
-        }
-      } else { window.isProUser = false; }
-      bootApp(); setTimeout(refreshGiftFab, 700); return;
-    }
-  } catch(e) {}
-  hideLoader();
-}
 
 /* ══════════ Auth UI ══════════ */
+
 function switchAuthTab(t) {
   document.getElementById('login-form').classList.toggle('hidden', t !== 'login');
   document.getElementById('register-form').classList.toggle('hidden', t !== 'register');
@@ -5011,33 +4967,49 @@ async function doLogin() {
   if (!u || !p) { showAuthError('login', '❌ أدخل اسم المستخدم وكلمة المرور'); return; }
   var b = document.getElementById('btn-login');
   b.disabled = true; b.innerHTML = '<span class="btn-spinner"></span> جاري التحقق...';
+  // انتظر Firebase إذا لم يكن جاهزاً بعد
+  if (!window.__firebaseReady) {
+    await new Promise(function(resolve) {
+      var t = 0;
+      var iv = setInterval(function() {
+        if (window.__firebaseReady || t++ > 30) { clearInterval(iv); resolve(); }
+      }, 100);
+    });
+  }
+  // ── جلب بيانات المستخدم (الجزء الوحيد الذي يحتاج try/catch للشبكة) ──
+  var user = null;
   try {
-    var user = await dbGetUser(u);
-    if (!user) { showAuthError('login', '❌ اسم المستخدم غير موجود'); return; }
-    var match = false;
-    try { match = decodePass(user.password) === p; } catch(ex) {}
-    if (!match) match = (user.password === p);
-    if (!match) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); return; }
-    currentUser = Object.assign({}, user, { username: u });
-    saveSession(u);
-    
-    // فحص وتأمين تفعيل الحساب المطور الفاخر
-    if (currentUser.pro && currentUser.pro.active === true) {
-      if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
-        window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
-      } else {
-        currentUser.pro.active = false;
-        window.isProUser = false;
-      }
+    user = await dbGetUser(u);
+  } catch(e) {
+    showAuthError('login', '❌ خطأ في الاتصال، تحقق من الإنترنت');
+    b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+    return;
+  }
+
+  // ── التحقق من البيانات ──
+  if (!user) { showAuthError('login', '❌ اسم المستخدم غير موجود'); b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'; return; }
+  var match = false;
+  try { match = decodePass(user.password) === p; } catch(ex) {}
+  if (!match) match = (user.password === p);
+  if (!match) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'; return; }
+
+  // ── تسجيل الدخول ناجح ──
+  b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+  currentUser = Object.assign({}, user, { username: u });
+  saveSession(u);
+  if (currentUser.pro && currentUser.pro.active === true) {
+    if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
+      window.isProUser = true;
     } else {
-      window.isProUser = false;
+      currentUser.pro.active = false; window.isProUser = false;
     }
-    
-    try { await dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
-    logActivity('login', 'سجّل دخولاً للتطبيق', 'من صفحة تسجيل الدخول');
-    playSound('success'); showToast('✅ أهلاً ' + user.name); bootApp(); setTimeout(refreshGiftFab, 700);
-  } catch(e) { showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً'); }
-  finally { b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'; }
+  } else { window.isProUser = false; }
+  try { dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
+  try { logActivity('login', 'سجّل دخولاً للتطبيق', 'من صفحة تسجيل الدخول'); } catch(e) {}
+  try { playSound('success'); } catch(e) {}
+  showToast('✅ أهلاً ' + (user.nameAr || user.name || u));
+  bootApp();
+  setTimeout(refreshGiftFab, 700);
 }
 
 async function doRegister() {
@@ -5058,19 +5030,27 @@ async function doRegister() {
   if (!g) { showAuthError('reg', '❌ اختر الجنس'); return; }
   var b = document.getElementById('btn-register');
   b.disabled = true; b.innerHTML = '<span class="btn-spinner"></span> جاري الإنشاء...';
-  try {
-    var ex = await dbGetUser(u);
-    if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز، اختر آخر'); return; }
-    var bmi = (w && h) ? +(w / ((h / 100) * (h / 100))).toFixed(1) : 0;
-    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), phone: phone || '', created: Date.now(), pro: { active: false } };
-    await dbSaveUser(u, ud);
-    currentUser = Object.assign({}, ud);
-    saveSession(u);
-    window.isProUser = false;
-    selectedDiseases = [];
-    playSound('success'); showToast('✅ تم إنشاء الحساب بنجاح'); bootApp(); setTimeout(refreshGiftFab, 700);
-  } catch(e) { showAuthError('reg', '❌ خطأ في الإنشاء، حاول مجدداً'); }
-  finally { b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب'; }
+  var ex = null;
+  try { ex = await dbGetUser(u); } catch(e) {
+    showAuthError('reg', '❌ خطأ في الاتصال، تحقق من الإنترنت');
+    b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب'; return;
+  }
+  if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز، اختر آخر'); b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب'; return; }
+  var bmi = (w && h) ? +(w / ((h / 100) * (h / 100))).toFixed(1) : 0;
+  var ud = { name: n, nameAr: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), phone: phone || '', created: Date.now(), pro: { active: false } };
+  try { await dbSaveUser(u, ud); } catch(e) {
+    showAuthError('reg', '❌ خطأ في حفظ البيانات، حاول مجدداً');
+    b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب'; return;
+  }
+  b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب';
+  currentUser = Object.assign({}, ud);
+  saveSession(u);
+  window.isProUser = false;
+  selectedDiseases = [];
+  try { playSound('success'); } catch(e) {}
+  showToast('✅ تم إنشاء الحساب بنجاح');
+  bootApp();
+  setTimeout(refreshGiftFab, 700);
 }
 
 function doLogout() {
@@ -8608,11 +8588,23 @@ window.addEventListener('appinstalled', function() {
 window.addEventListener('DOMContentLoaded', function() {
   adaptBannerForPlatform();
   startQuotesAnimation();
-  var safetyTimeout = setTimeout(function() { hideLoader(); }, 4000);
-  autoLogin().then(function() { clearTimeout(safetyTimeout); });
+  var safetyTimeout = setTimeout(function() { hideLoader(); }, 6000);
+  // انتظار Firebase قبل autoLogin (يحل مشكلة "خطأ في الاتصال")
+  var fbWait = 0;
+  function tryAutoLogin() {
+    if (window.__firebaseReady) {
+      autoLogin().then(function() { clearTimeout(safetyTimeout); });
+    } else if (fbWait < 30) {   // انتظر حتى 3 ثوانٍ
+      fbWait++;
+      setTimeout(tryAutoLogin, 100);
+    } else {
+      // Firebase لم يستجب — سجّل دخول من localStorage فقط
+      autoLogin().then(function() { clearTimeout(safetyTimeout); });
+    }
+  }
+  setTimeout(tryAutoLogin, 100);
 });
 </script>
-  <script src="https://js.puter.com/v2/"></script>
 <script>
 (function () {
   "use strict";
@@ -10079,13 +10071,14 @@ async function autoLogin() {
     if (u) {
       currentUser = Object.assign({}, u, { username: s });
       if (currentUser.pro && currentUser.pro.active === true) {
-        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
-        else if (!currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
+        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) { window.isProUser = true; }
+        else if (!currentUser.pro.expiresAt) { window.isProUser = true; }
         else { currentUser.pro.active = false; window.isProUser = false; }
       } else { window.isProUser = false; }
-      bootApp(); setTimeout(refreshGiftFab, 700); return;
+      try { bootApp(); } catch(bootErr) { console.error('bootApp error:', bootErr); hideLoader(); }
+      setTimeout(refreshGiftFab, 700); return;
     }
-  } catch(e) {}
+  } catch(e) { /* Firebase غير متاح — سيستخدم localStorage */ }
   hideLoader();
 }
 </script>
