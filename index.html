@@ -413,6 +413,25 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 /* stars bg */
 .lg-star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:lgTwinkle var(--d,2s) ease-in-out infinite var(--dl,0s)}
 @keyframes lgTwinkle{0%,100%{opacity:.1}50%{opacity:.8}}
+/* ── Zodiac Enhanced Animations ── */
+@keyframes zodPlaceholderPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+@keyframes zodNameIn{0%{opacity:0;transform:scale(.5) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes zodBtnPop{0%{opacity:0;transform:scale(.8) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes zodCardIn{0%{opacity:0;transform:translateY(24px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes zodSvgFloat{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-7px) rotate(1.5deg)}66%{transform:translateY(-3px) rotate(-1deg)}}
+@keyframes zodGlowPulse{0%,100%{filter:drop-shadow(0 0 10px rgba(201,168,76,.5))}50%{filter:drop-shadow(0 0 26px rgba(201,168,76,.9))}}
+@keyframes zodFortuneCardIn{0%{opacity:0;transform:translateX(30px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes zodParticleFloat{0%{transform:translateY(0) translateX(0);opacity:.9}100%{transform:translateY(-50px) translateX(var(--px,8px));opacity:0}}
+@keyframes zodStarTwinkle{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes zodOrbitSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes zodAgeCountUp{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes zodPulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(100,181,246,.3)}50%{box-shadow:0 0 0 8px rgba(100,181,246,.0)}}
+.zod-trait-card{border-radius:16px;padding:14px 12px;position:relative;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both}
+.zod-trait-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent);pointer-events:none}
+.zod-fortune-card{border-radius:18px;padding:16px 14px;position:relative;overflow:hidden;animation:zodFortuneCardIn .6s ease both}
+.zod-svg-container{animation:zodSvgFloat 4s ease-in-out infinite;cursor:pointer;transition:filter .4s}
+.zod-svg-container:hover{animation:zodGlowPulse .8s ease-in-out infinite alternate}
+.zod-age-counter{animation:zodAgeCountUp .5s ease both;animation-delay:.3s}
 .page{position:fixed;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:var(--nav);background:var(--bg);opacity:0;visibility:hidden;pointer-events:none}
 .page.active{opacity:1;visibility:visible;pointer-events:auto;animation:pageIn .4s ease}
 @keyframes pageIn{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
@@ -728,8 +747,53 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .wvm-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
 .wvm-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s;cursor:pointer}
 .wvm-dot.active{background:var(--gold);width:22px;border-radius:4px}
-#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gradient(135deg,rgba(8,20,45,.97),rgba(17,34,68,.97));border:1.5px solid rgba(200,150,12,.35);border-radius:24px;padding:14px 22px;font-size:.88rem;font-weight:800;color:var(--txt);z-index:4000;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);pointer-events:none;white-space:normal;backdrop-filter:blur(16px);max-width:min(92vw,420px);min-width:260px;text-align:center;box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.03) inset;line-height:1.9}
-#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+/* ══ Settings Toggle Switch ══ */
+.settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.settings-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.settings-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.15);
+  border-radius: 34px;
+  transition: background .3s;
+  border: 1.5px solid rgba(255,255,255,.12);
+}
+.settings-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border-radius: 50%;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.settings-toggle input:checked + .settings-toggle-slider {
+  background: linear-gradient(135deg, #2ec951, #1a9e3a);
+  border-color: rgba(46,201,81,.4);
+}
+.settings-toggle input:checked + .settings-toggle-slider::before {
+  right: calc(100% - 22px);
+}
+top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gradient(135deg,rgba(8,20,45,.97),rgba(17,34,68,.97));border:1.5px solid rgba(200,150,12,.35);border-radius:24px;padding:14px 42px 14px 22px;font-size:.88rem;font-weight:800;color:var(--txt);z-index:4000;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);pointer-events:none;white-space:normal;backdrop-filter:blur(16px);max-width:min(92vw,420px);min-width:260px;text-align:center;box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.03) inset;line-height:1.9}
+#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+#toast-close{position:absolute;top:8px;left:10px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;line-height:1;padding:0}
+#toast-close:hover{background:rgba(229,57,53,.3);border-color:rgba(229,57,53,.5);color:#fff}
 .sound-btn{position:fixed;top:14px;left:14px;z-index:200;width:36px;height:36px;border-radius:50%;background:rgba(5,14,31,.8);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem;color:var(--txt2)}
 .fast-details-content{font-size:.85rem;line-height:1.8;color:var(--txt2)}
 .fast-details-content h4{color:var(--gold2);margin:14px 0 6px;font-size:.95rem}
@@ -1619,11 +1683,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <span style="font-size:.68rem;color:var(--txt3)">مقارنة الأسعار والمادة الفعالة</span>
         <span class="trial-badge" id="trial-badge-drug-alt">استخدامات مجانية: <b id="tb-drug-alt">3</b></span>
       </button>
-      <button onclick="goSmartTool('xray')" class="smart-tool-btn" style="border-color:rgba(0,188,212,.5);background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(38,198,218,.06));">
-        <i class="fas fa-x-ray" style="font-size:1.4rem;color:#00bcd4"></i>
-        <span style="color:#00bcd4;font-size:.85rem;font-weight:800">🩻 قراءة الأشعة</span>
-        <span style="font-size:.68rem;color:var(--txt3)">X-Ray / MRI / CT</span>
-        <span class="trial-badge" id="trial-badge-xray">استخدامات مجانية: <b id="tb-xray">3</b></span>
+      <button onclick="goSmartTool('dream')" class="smart-tool-btn" style="border-color:rgba(103,58,183,.5);background:linear-gradient(135deg,rgba(103,58,183,.12),rgba(156,95,250,.06));">
+        <i class="fas fa-moon" style="font-size:1.4rem;color:#9c5ffa"></i>
+        <span style="color:#9c5ffa;font-size:.85rem;font-weight:800">🌙 تفسير الأحلام</span>
+        <span style="font-size:.68rem;color:var(--txt3)">بمنهج ابن كثير وابن سيرين</span>
+        <span class="trial-badge" id="trial-badge-dream">استخدامات مجانية: <b id="tb-dream">3</b></span>
       </button>
       <button onclick="goSmartTool('symptoms')" class="smart-tool-btn" style="border-color:rgba(255,152,0,.5);background:linear-gradient(135deg,rgba(255,152,0,.12),rgba(255,193,7,.06));">
         <i class="fas fa-stethoscope" style="font-size:1.4rem;color:#ff9800"></i>
@@ -1636,6 +1700,34 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
         <span style="color:#f44336;font-size:.85rem;font-weight:800">🚫 كشف المقاطعة</span>
         <span style="font-size:.68rem;color:var(--txt3)">مسح الباركود والبدائل</span>
         <span class="trial-badge" id="trial-badge-barcode-boycott">استخدامات مجانية: <b id="tb-barcode-boycott">3</b></span>
+      </button>
+      <!-- بطاقة معرفة الصور المزيفة -->
+      <button onclick="goSmartTool('fake-image')" class="smart-tool-btn" style="border-color:rgba(255,152,0,.5);background:linear-gradient(135deg,rgba(255,152,0,.12),rgba(255,193,7,.06));">
+        <i class="fas fa-search-plus" style="font-size:1.4rem;color:#ff9800"></i>
+        <span style="color:#ff9800;font-size:.85rem;font-weight:800">🔍 كشف الصور المزيفة</span>
+        <span style="font-size:.68rem;color:var(--txt3)">AI • فلاتر • تعديل رقمي</span>
+        <span class="trial-badge" id="trial-badge-fake-image">استخدامات مجانية: <b id="tb-fake-image">3</b></span>
+      </button>
+      <!-- بطاقة حل الواجبات -->
+      <button onclick="goSmartTool('homework')" class="smart-tool-btn" style="border-color:rgba(33,150,243,.5);background:linear-gradient(135deg,rgba(33,150,243,.12),rgba(30,136,229,.06));">
+        <i class="fas fa-book-open" style="font-size:1.4rem;color:#2196f3"></i>
+        <span style="color:#2196f3;font-size:.85rem;font-weight:800">🧠 حل الواجبات</span>
+        <span style="font-size:.68rem;color:var(--txt3)">مناهج مصرية — ابتدائي لثانوي</span>
+        <span class="trial-badge" id="trial-badge-homework">استخدامات مجانية: <b id="tb-homework">3</b></span>
+      </button>
+      <!-- بطاقة قراءة الكف -->
+      <button onclick="goSmartTool('palm')" class="smart-tool-btn" style="border-color:rgba(255,87,34,.5);background:linear-gradient(135deg,rgba(255,87,34,.12),rgba(255,138,101,.06));">
+        <i class="fas fa-hand-paper" style="font-size:1.4rem;color:#ff5722"></i>
+        <span style="color:#ff5722;font-size:.85rem;font-weight:800">🖐 قراءة الكف</span>
+        <span style="font-size:.68rem;color:var(--txt3)">تحليل خطوط اليد والشخصية</span>
+        <span class="trial-badge" id="trial-badge-palm">استخدامات مجانية: <b id="tb-palm">3</b></span>
+      </button>
+      <!-- بطاقة البرج الفلكي -->
+      <button onclick="goSmartTool('zodiac')" class="smart-tool-btn" style="border-color:rgba(100,181,246,.5);background:linear-gradient(135deg,rgba(13,71,161,.15),rgba(100,181,246,.06));">
+        <i class="fas fa-star" style="font-size:1.4rem;color:#64b5f6"></i>
+        <span style="color:#64b5f6;font-size:.85rem;font-weight:800">⭐ برجك الفلكي</span>
+        <span style="font-size:.68rem;color:var(--txt3)">خواصك + برج اليوم</span>
+        <span class="trial-badge" id="trial-badge-zodiac">استخدامات مجانية: <b id="tb-zodiac">3</b></span>
       </button>
       <!-- زر تتبع الدورة الشهرية -->
       <button onclick="goPage('period-tracker')" class="smart-tool-btn" style="border-color:rgba(233,30,99,.5);background:linear-gradient(135deg,rgba(233,30,99,.12),rgba(216,27,96,.06));">
@@ -1738,6 +1830,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
       <div class="dev-sig-name" style="margin-top:8px">المهندس محمد حماد</div>
       <div class="social-links">
         <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" class="social-icon" style="background:linear-gradient(135deg,#1877f2,#0a66c2);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .3s"><i class="fab fa-facebook-f"></i></a>
+        <a href="tel:00201279934735" class="social-icon" style="background:linear-gradient(135deg,#2ecc71,#1a9e50);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .3s"><i class="fas fa-phone"></i></a>
+        <a href="https://wa.me/201279934735" target="_blank" class="social-icon" style="background:linear-gradient(135deg,#25d366,#128c3e);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .3s"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://elmashaher.com/characters/mohamed-nasr-hammad" target="_blank" class="social-icon" style="background:linear-gradient(135deg,#1db954,#0f8c3a);color:#fff;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:900;font-family:Georgia,serif;transition:all .3s;letter-spacing:-1px">M</a>
       </div>
     </div>
   </div>
@@ -2048,6 +2143,44 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
     </div>
     <div id="admin-button-container" style="display:none">
     </div>
+
+    <!-- ══ بطاقة الإعدادات ══ -->
+    <div class="prof-card" id="settings-card" style="margin-bottom:12px">
+      <div class="prof-card-title"><span><i class="fas fa-cog" style="color:var(--gold2)"></i> الإعدادات</span></div>
+
+      <!-- التذكيرات والإشعارات -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.85rem;font-weight:800;color:var(--txt);margin-bottom:3px">
+            <i class="fas fa-bell" style="color:#ffa726;margin-left:6px;font-size:.8rem"></i> التذكيرات والإشعارات
+          </div>
+          <div style="font-size:.68rem;color:var(--txt3);line-height:1.5">تذكيرات شرب الماء، الصيام، والتنبيهات الصحية الدورية</div>
+        </div>
+        <div style="flex-shrink:0;margin-right:12px">
+          <label class="settings-toggle" id="lbl-reminders-toggle">
+            <input type="checkbox" id="toggle-reminders" onchange="applyRemindersSetting(this.checked)">
+            <span class="settings-toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- أيقونة هدية اليوم -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.85rem;font-weight:800;color:var(--txt);margin-bottom:3px">
+            <i class="fas fa-gift" style="color:#f06292;margin-left:6px;font-size:.8rem"></i> أيقونة هدية اليوم
+          </div>
+          <div style="font-size:.68rem;color:var(--txt3);line-height:1.5">إظهار أو إخفاء زر هدية اليوم العائم على الشاشة</div>
+        </div>
+        <div style="flex-shrink:0;margin-right:12px">
+          <label class="settings-toggle" id="lbl-gift-toggle">
+            <input type="checkbox" id="toggle-gift-fab" onchange="applyGiftFabSetting(this.checked)">
+            <span class="settings-toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
     <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
   </div>
 </div>
@@ -2299,85 +2432,396 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 </div>
 
 <!-- ════════════════════════════════════════════
-     🩻 صفحة قراءة الأشعة
+     🌙 صفحة تفسير الأحلام
 ════════════════════════════════════════════ -->
-<div class="page" id="xray-page">
+<div class="page" id="dream-page">
   <div class="app-header"><div class="header-row">
-    <div class="header-title" style="background:linear-gradient(135deg,#00bcd4,#26c6da);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🩻 قراءة الأشعة</div>
+    <div class="header-title" style="background:linear-gradient(135deg,#9c5ffa,#ce93d8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🌙 تفسير الأحلام</div>
     <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
   </div></div>
   <div style="padding:14px 16px">
-    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(0,188,212,.15),rgba(38,198,218,.1));border-color:rgba(0,188,212,.4)">
-      <i class="fas fa-x-ray"></i> تحليل أولي للأشعة — ليس تشخيصاً نهائياً
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(103,58,183,.15),rgba(156,95,250,.1));border-color:rgba(103,58,183,.4)">
+      <i class="fas fa-moon"></i> مفسّر أحلام محترف — بمنهج ابن كثير وابن سيرين
     </div>
-    <div style="background:rgba(244,67,54,.1);border:1.5px solid rgba(244,67,54,.4);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ef9a9a;line-height:1.6">
-      ⚠️ <strong>تنبيه مهم:</strong> هذا التحليل للأغراض التعليمية والاسترشادية فقط. لا يُغني عن مراجعة الطبيب المختص لتشخيص دقيق.
+    <div style="background:rgba(103,58,183,.1);border:1.5px solid rgba(103,58,183,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ce93d8;line-height:1.6">
+      ✨ اكتب حلمك بتفاصيل وضوحه وأي رموز بارزة — هيتفسرله بأسلوب علمي مبسط بالعربي
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-      <button onclick="xraySetType('xray')" id="xr-tab-xray" class="smart-tool-btn" style="min-height:60px;border-color:rgba(0,188,212,.5);background:linear-gradient(135deg,rgba(0,188,212,.2),rgba(0,188,212,.1))">
-        <i class="fas fa-lungs" style="color:#00bcd4"></i>
-        <span style="font-size:.72rem;color:#00bcd4;font-weight:800">أشعة سينية</span>
-      </button>
-      <button onclick="xraySetType('mri')" id="xr-tab-mri" class="smart-tool-btn" style="min-height:60px">
-        <i class="fas fa-brain" style="color:var(--txt2)"></i>
-        <span style="font-size:.72rem;color:var(--txt2);font-weight:800">رنين مغناطيسي</span>
-      </button>
-      <button onclick="xraySetType('ct')" id="xr-tab-ct" class="smart-tool-btn" style="min-height:60px">
-        <i class="fas fa-circle-notch" style="color:var(--txt2)"></i>
-        <span style="font-size:.72rem;color:var(--txt2);font-weight:800">مقطعية CT</span>
-      </button>
+    <div class="field" style="margin-bottom:12px">
+      <label style="color:#9c5ffa;font-weight:800;display:block;margin-bottom:6px">📝 اكتب حلمك هنا</label>
+      <textarea id="dream-input" placeholder="ابدأ بكتابة تفاصيل حلمك هنا... كلما زادت التفاصيل، كان التفسير أكثر دقة." rows="5" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(103,58,183,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
     </div>
-    <!-- خيارات الإدخال: رفع أو كاميرا -->
+
+    <!-- قسم التفاصيل الشخصية -->
+    <div id="dream-personal-wrap" style="background:rgba(103,58,183,.08);border:1.5px solid rgba(103,58,183,.25);border-radius:16px;padding:14px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleDreamPersonal()">
+        <div style="font-size:.85rem;font-weight:900;color:#ce93d8">إضافة تفاصيل شخصية (اختياري)</div>
+        <i class="fas fa-chevron-up" id="dream-personal-icon" style="color:#9c5ffa;font-size:.8rem"></i>
+      </div>
+      <div id="dream-personal-fields" style="margin-top:12px">
+        <!-- الجنس والفئة العمرية -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:6px">الجنس</label>
+            <div style="display:flex;gap:6px">
+              <button onclick="dreamSetGender('female')" id="dream-female" class="smart-tool-btn" style="flex:1;min-height:38px;border-color:rgba(233,30,99,.4)">
+                <i class="fas fa-venus" style="color:#e91e63;font-size:.85rem"></i>
+                <span style="font-size:.68rem;color:#e91e63">أنثى</span>
+              </button>
+              <button onclick="dreamSetGender('male')" id="dream-male" class="smart-tool-btn" style="flex:1;min-height:38px">
+                <i class="fas fa-mars" style="color:var(--txt2);font-size:.85rem"></i>
+                <span style="font-size:.68rem;color:var(--txt2)">ذكر</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:6px">الفئة العمرية</label>
+            <select id="dream-age" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(103,58,183,.3);border-radius:10px;padding:8px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.78rem">
+              <option value="">...اختر</option>
+              <option value="أقل من 18 سنة">أقل من 18</option>
+              <option value="18-25 سنة">18–25</option>
+              <option value="26-35 سنة">26–35</option>
+              <option value="36-50 سنة">36–50</option>
+              <option value="أكبر من 50 سنة">+50</option>
+            </select>
+          </div>
+        </div>
+        <!-- الحالة النفسية والاجتماعية -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:6px">الحالة النفسية</label>
+            <select id="dream-mood" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(103,58,183,.3);border-radius:10px;padding:8px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.78rem">
+              <option value="">...اختر</option>
+              <option value="مستقر ومرتاح">مستقر ومرتاح</option>
+              <option value="قلق ومتوتر">قلق ومتوتر</option>
+              <option value="حزين أو مكتئب">حزين أو مكتئب</option>
+              <option value="سعيد ومتفائل">سعيد ومتفائل</option>
+              <option value="خائف أو قلق">خائف أو قلق</option>
+              <option value="مشغول بأمر ما">مشغول بأمر ما</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:6px">الحالة الاجتماعية</label>
+            <select id="dream-status" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(103,58,183,.3);border-radius:10px;padding:8px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.78rem">
+              <option value="">...اختر</option>
+              <option value="أعزب/عزباء">أعزب/عزباء</option>
+              <option value="متزوج/متزوجة">متزوج/متزوجة</option>
+              <option value="مخطوب/مخطوبة">مخطوب/مخطوبة</option>
+              <option value="مطلق/مطلقة">مطلق/مطلقة</option>
+              <option value="أرمل/أرملة">أرمل/أرملة</option>
+            </select>
+          </div>
+        </div>
+        <!-- مرجع التفسير -->
+        <div>
+          <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:6px">مرجع التفسير</label>
+          <select id="dream-ref" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(103,58,183,.3);border-radius:10px;padding:8px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.82rem">
+            <option value="ابن سيرين">ابن سيرين</option>
+            <option value="ابن كثير">ابن كثير</option>
+            <option value="النابلسي">النابلسي</option>
+            <option value="الشيخ الصالح">الشيخ الصالح</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="dreamInterpret()" class="btn" style="width:100%;background:linear-gradient(135deg,#4a148c,#7b1fa2);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-star-and-crescent"></i> اكتشف التفسير
+    </button>
+    <div id="dream-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🔍 صفحة كشف الصور المزيفة
+════════════════════════════════════════════ -->
+<div class="page" id="fake-image-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#ff9800,#ffc107);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🔍 كشف الصور المزيفة</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(255,152,0,.15),rgba(255,193,7,.1));border-color:rgba(255,152,0,.4)">
+      <i class="fas fa-search-plus"></i> تحليل احترافي — صورة حقيقية أم مزيفة؟
+    </div>
+    <div style="background:rgba(255,152,0,.08);border:1.5px solid rgba(255,152,0,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ffcc80;line-height:1.6">
+      📸 صوّر أو ارفع أي صورة وهيكشف لك: هل هي حقيقية، مولودة بـ AI، أو معدّلة بفلاتر
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(0,188,212,.1);color:#00bcd4;border:2px dashed rgba(0,188,212,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="xr-upload-label">
+      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,152,0,.1);color:#ff9800;border:2px dashed rgba(255,152,0,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="fi-upload-label">
         <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
-        رفع صورة الأشعة
-        <input type="file" accept="image/*" onchange="xrayLoadImage(event)" style="display:none">
+        رفع صورة
+        <input type="file" accept="image/*" onchange="fakeImageLoad(event)" style="display:none">
       </label>
-      <button onclick="xrayOpenCamera()" class="btn" id="xr-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(38,198,218,.1);color:#26c6da;border:2px dashed rgba(38,198,218,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+      <button onclick="fakeImageOpenCamera()" class="btn" id="fi-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,193,7,.1);color:#ffc107;border:2px dashed rgba(255,193,7,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
         <i class="fas fa-camera" style="font-size:1.4rem"></i>
-        تصوير الأشعة بالكاميرا
+        تصوير بالكاميرا
+      </button>
+    </div>
+    <div id="fi-camera-area" style="display:none;margin-bottom:12px;position:relative">
+      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(255,152,0,.4)">
+        <video id="fi-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
+        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #ff9800;border-right:2px solid #ff9800;border-radius:0 4px 0 0"></div>
+        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #ff9800;border-left:2px solid #ff9800;border-radius:4px 0 0 0"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #ff9800;border-right:2px solid #ff9800;border-radius:0 0 4px 0"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #ff9800;border-left:2px solid #ff9800;border-radius:0 0 0 4px"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="fakeImageCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,152,0,.3),rgba(255,193,7,.2));color:#ffc107;border:1.5px solid rgba(255,152,0,.5);padding:12px;font-size:.88rem;font-weight:800">
+          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط
+        </button>
+        <button onclick="fakeImageStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
+          <i class="fas fa-stop"></i>
+        </button>
+      </div>
+    </div>
+    <div id="fi-preview" style="display:none;margin-bottom:12px;text-align:center">
+      <img id="fi-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(255,152,0,.4)">
+      <div style="margin-top:6px;font-size:.72rem;color:#ffc107"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للتحليل</div>
+    </div>
+    <button onclick="fakeImageAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#e65100,#f57c00);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-microscope"></i> حلّل الصورة
+    </button>
+    <div id="fi-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🧠 صفحة حل الواجبات
+════════════════════════════════════════════ -->
+<div class="page" id="homework-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#2196f3,#64b5f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🧠 حل الواجبات</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(33,150,243,.15),rgba(100,181,246,.1));border-color:rgba(33,150,243,.4)">
+      <i class="fas fa-chalkboard-teacher"></i> مدرّسك الذكي — كل المناهج المصرية
+    </div>
+    <div style="background:rgba(33,150,243,.08);border:1.5px solid rgba(33,150,243,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#90caf9;line-height:1.6">
+      📚 صوّر السؤال أو اكتبه — هيجاوب عليك إجابة نموذجية زي كتاب الإجابات بالضبط
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(33,150,243,.1);color:#2196f3;border:2px dashed rgba(33,150,243,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="hw-upload-label">
+        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
+        رفع صورة السؤال
+        <input type="file" accept="image/*" onchange="hwLoadImage(event)" style="display:none">
+      </label>
+      <button onclick="hwOpenCamera()" class="btn" id="hw-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(100,181,246,.1);color:#64b5f6;border:2px dashed rgba(100,181,246,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+        <i class="fas fa-camera" style="font-size:1.4rem"></i>
+        تصوير السؤال
+      </button>
+    </div>
+    <div id="hw-camera-area" style="display:none;margin-bottom:12px;position:relative">
+      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(33,150,243,.4)">
+        <video id="hw-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
+        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 4px 0 0"></div>
+        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:4px 0 0 0"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 0 4px 0"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:0 0 0 4px"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button onclick="hwCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(33,150,243,.3),rgba(100,181,246,.2));color:#64b5f6;border:1.5px solid rgba(33,150,243,.5);padding:12px;font-size:.88rem;font-weight:800">
+          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط
+        </button>
+        <button onclick="hwStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
+          <i class="fas fa-stop"></i>
+        </button>
+      </div>
+    </div>
+    <div id="hw-preview" style="display:none;margin-bottom:12px;text-align:center">
+      <img id="hw-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(33,150,243,.4)">
+      <div style="margin-top:6px;font-size:.72rem;color:#64b5f6"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للحل</div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:6px">أو اكتب السؤال نصياً (اختياري)</label>
+      <textarea id="hw-text-input" placeholder="مثال: احسب مساحة مثلث قاعدته 6 سم وارتفاعه 4 سم" rows="3" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
+    </div>
+    <button onclick="hwSolve()" class="btn" style="width:100%;background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-graduation-cap"></i> حلّ السؤال
+    </button>
+    <div id="hw-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     🖐 صفحة قراءة الكف
+════════════════════════════════════════════ -->
+<div class="page" id="palm-page">
+  <div class="app-header"><div class="header-row">
+    <div class="header-title" style="background:linear-gradient(135deg,#ff5722,#ff8a65);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🖐 قراءة الكف</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+    <div class="ai-hero-badge" style="background:linear-gradient(135deg,rgba(255,87,34,.15),rgba(255,138,101,.1));border-color:rgba(255,87,34,.4)">
+      <i class="fas fa-hand-paper"></i> قارئ كف متخصص — يحلل خطوط يدك وشخصيتك
+    </div>
+    <div style="background:rgba(255,87,34,.08);border:1.5px solid rgba(255,87,34,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ffccbc;line-height:1.6">
+      🖐 صوّر راحة يدك اليسرى بوضوح — تأكد الإضاءة كويسة والخطوط ظاهرة
+    </div>
+
+    <!-- خيارات الإدخال -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,87,34,.1);color:#ff5722;border:2px dashed rgba(255,87,34,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="palm-upload-label">
+        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
+        رفع صورة الكف
+        <input type="file" accept="image/*" onchange="palmLoadImage(event)" style="display:none">
+      </label>
+      <button onclick="palmOpenCamera()" class="btn" id="palm-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,138,101,.1);color:#ff8a65;border:2px dashed rgba(255,138,101,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+        <i class="fas fa-camera" style="font-size:1.4rem"></i>
+        تصوير كفك الآن
       </button>
     </div>
 
-    <!-- منطقة الكاميرا للأشعة -->
-    <div id="xr-camera-area" style="display:none;margin-bottom:12px;position:relative">
-      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(0,188,212,.4)">
-        <video id="xr-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
-        <div style="position:absolute;inset:0;pointer-events:none;border:3px solid rgba(0,188,212,.3);border-radius:12px"></div>
-        <!-- خطوط تأطير الأشعة -->
-        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #00bcd4;border-right:2px solid #00bcd4;border-radius:0 4px 0 0"></div>
-        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #00bcd4;border-left:2px solid #00bcd4;border-radius:4px 0 0 0"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #00bcd4;border-right:2px solid #00bcd4;border-radius:0 0 4px 0"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #00bcd4;border-left:2px solid #00bcd4;border-radius:0 0 0 4px"></div>
+    <!-- منطقة الكاميرا -->
+    <div id="palm-camera-area" style="display:none;margin-bottom:12px;position:relative">
+      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(255,87,34,.4)">
+        <video id="palm-video" autoplay playsinline style="width:100%;max-height:300px;object-fit:cover;display:block"></video>
+        <!-- إطار توجيهي لوضع الكف -->
+        <div style="position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center">
+          <div style="width:65%;height:80%;border:2px dashed rgba(255,138,101,.7);border-radius:16px;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:2.5rem;opacity:.4">🖐</span>
+          </div>
+        </div>
+        <div style="position:absolute;top:10px;right:10px;width:28px;height:28px;border-top:2px solid #ff5722;border-right:2px solid #ff5722;border-radius:0 4px 0 0"></div>
+        <div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-top:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:4px 0 0 0"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-right:2px solid #ff5722;border-radius:0 0 4px 0"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:0 0 0 4px"></div>
       </div>
+      <div style="text-align:center;font-size:.7rem;color:#ff8a65;margin-top:6px">🖐 ضع كفك داخل الإطار — افتح يدك بشكل طبيعي</div>
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="xrayCapturePhoto()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(0,188,212,.3),rgba(38,198,218,.2));color:#00e5ff;border:1.5px solid rgba(0,188,212,.5);padding:12px;font-size:.88rem;font-weight:800">
+        <button onclick="palmCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,87,34,.35),rgba(255,138,101,.2));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:12px;font-size:.88rem;font-weight:800">
           <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط الصورة
         </button>
-        <button onclick="xrayStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
+        <button onclick="palmStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
           <i class="fas fa-stop"></i>
         </button>
       </div>
     </div>
 
-    <div id="xr-preview" style="display:none;margin-bottom:12px;text-align:center">
-      <img id="xr-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(0,188,212,.4)">
-      <div style="margin-top:6px;font-size:.72rem;color:#26c6da"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للتحليل</div>
+    <!-- معاينة الصورة -->
+    <div id="palm-preview" style="display:none;margin-bottom:12px;text-align:center">
+      <img id="palm-img-preview" style="max-width:100%;max-height:280px;border-radius:12px;border:2px solid rgba(255,87,34,.4)">
+      <div style="margin-top:6px;font-size:.72rem;color:#ff8a65"><i class="fas fa-check-circle"></i> تم تحميل صورة الكف — جاهز للتحليل</div>
     </div>
-    <button onclick="xrayAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#006064,#00838f);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
-      <i class="fas fa-search"></i> تحليل الأشعة بالذكاء الاصطناعي
+
+    <!-- نوع التحليل -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:.8rem;color:var(--gold2);font-weight:800;margin-bottom:8px">اختر نوع القراءة:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="palmSetMode('full')" id="palm-mode-full" class="smart-tool-btn" style="min-height:50px;border-color:rgba(255,87,34,.6);background:linear-gradient(135deg,rgba(255,87,34,.2),rgba(255,87,34,.1))">
+          <i class="fas fa-hand-sparkles" style="color:#ff5722;font-size:1.1rem"></i>
+          <span style="font-size:.75rem;color:#ff5722;font-weight:800">قراءة شاملة</span>
+        </button>
+        <button onclick="palmSetMode('love')" id="palm-mode-love" class="smart-tool-btn" style="min-height:50px">
+          <i class="fas fa-heart" style="color:var(--txt2);font-size:1.1rem"></i>
+          <span style="font-size:.75rem;color:var(--txt2);font-weight:800">الحياة العاطفية</span>
+        </button>
+        <button onclick="palmSetMode('career')" id="palm-mode-career" class="smart-tool-btn" style="min-height:50px">
+          <i class="fas fa-briefcase" style="color:var(--txt2);font-size:1.1rem"></i>
+          <span style="font-size:.75rem;color:var(--txt2);font-weight:800">المسار المهني</span>
+        </button>
+        <button onclick="palmSetMode('health')" id="palm-mode-health" class="smart-tool-btn" style="min-height:50px">
+          <i class="fas fa-heartbeat" style="color:var(--txt2);font-size:1.1rem"></i>
+          <span style="font-size:.75rem;color:var(--txt2);font-weight:800">الصحة والحيوية</span>
+        </button>
+      </div>
+    </div>
+
+    <button onclick="palmAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#bf360c,#e64a19);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-magic"></i> اقرأ كفّي
     </button>
-    <div id="xr-result"></div>
+    <div id="palm-result"></div>
   </div>
 </div>
 
+
+
 <!-- ════════════════════════════════════════════
-     🩺 صفحة تحليل الأعراض
+     ⭐ صفحة البرج الفلكي
 ════════════════════════════════════════════ -->
-<div class="page" id="symptoms-page">
+<div class="page" id="zodiac-page">
   <div class="app-header"><div class="header-row">
-    <div class="header-title" style="background:linear-gradient(135deg,#ff9800,#ffc107);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🩺 تحليل الأعراض</div>
+    <div class="header-title" style="background:linear-gradient(135deg,#64b5f6,#e1f5fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⭐ برجك الفلكي</div>
+    <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
+  </div></div>
+  <div style="padding:14px 16px">
+
+    <!-- SVG البرج المتحرك - محسّن -->
+    <div id="zodiac-svg-wrap" style="display:flex;flex-direction:column;align-items:center;margin-bottom:8px;min-height:180px;justify-content:center;position:relative">
+      <div class="zodiac-placeholder-msg" style="text-align:center;color:var(--txt3);font-size:.8rem;padding:20px 0">
+        <div style="font-size:2.5rem;margin-bottom:8px;animation:zodPlaceholderPulse 2s ease-in-out infinite">✨</div>
+        <div>اختر تاريخ ميلادك لتظهر رمز برجك</div>
+      </div>
+    </div>
+
+    <!-- اسم البرج + بطاقات الخصائص الفورية -->
+    <div id="zodiac-name-wrap" style="display:none;margin-bottom:16px">
+      <div style="text-align:center;margin-bottom:12px">
+        <div id="zodiac-sign-name" style="font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#64b5f6,#e1f5fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:zodNameIn .6s cubic-bezier(.34,1.56,.64,1) both"></div>
+        <div id="zodiac-sign-dates" style="font-size:.72rem;color:var(--txt3);margin-top:2px"></div>
+        <div id="zodiac-sign-element" style="font-size:.75rem;color:#90caf9;margin-top:4px;font-weight:700"></div>
+      </div>
+      <!-- بطاقات الخصائص الفورية -->
+      <div id="zodiac-trait-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"></div>
+      <!-- بطاقة العمر المفصّلة -->
+      <div id="zodiac-age-card" style="display:none;margin-bottom:14px"></div>
+    </div>
+
+    <!-- حقول الإدخال -->
+    <div style="background:rgba(13,71,161,.12);border:1.5px solid rgba(100,181,246,.3);border-radius:16px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.82rem;color:#90caf9;font-weight:800;margin-bottom:10px">📅 أدخل بياناتك</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:4px">النوع</label>
+          <div style="display:flex;gap:6px">
+            <button onclick="zodiacSetGender('male')" id="zod-male" class="smart-tool-btn" style="flex:1;min-height:40px;border-color:rgba(33,150,243,.4)">
+              <i class="fas fa-mars" style="color:#2196f3;font-size:.9rem"></i>
+              <span style="font-size:.7rem;color:#2196f3">ذكر</span>
+            </button>
+            <button onclick="zodiacSetGender('female')" id="zod-female" class="smart-tool-btn" style="flex:1;min-height:40px">
+              <i class="fas fa-venus" style="color:var(--txt2);font-size:.9rem"></i>
+              <span style="font-size:.7rem;color:var(--txt2)">أنثى</span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:4px">الشهر</label>
+          <select id="zod-month" onchange="zodiacDetect()" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(100,181,246,.3);border-radius:10px;padding:10px 8px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.82rem">
+            <option value="">-- الشهر --</option>
+            <option value="1">يناير</option><option value="2">فبراير</option>
+            <option value="3">مارس</option><option value="4">أبريل</option>
+            <option value="5">مايو</option><option value="6">يونيو</option>
+            <option value="7">يوليو</option><option value="8">أغسطس</option>
+            <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
+            <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:4px">اليوم</label>
+          <input type="number" id="zod-day" min="1" max="31" placeholder="مثال: 15" onchange="zodiacDetect()" oninput="zodiacDetect()" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(100,181,246,.3);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem">
+        </div>
+        <div>
+          <label style="font-size:.72rem;color:var(--txt3);display:block;margin-bottom:4px">سنة الميلاد</label>
+          <input type="number" id="zod-year" min="1920" max="2025" placeholder="مثال: 1990" oninput="zodiacDetect()" onchange="zodiacDetect()" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(100,181,246,.3);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem">
+        </div>
+      </div>
+    </div>
+
+    <button onclick="zodiacRead()" class="btn" style="width:100%;background:linear-gradient(135deg,#0d47a1,#1565c0,#0a2d6e);color:#fff;padding:16px;border-radius:16px;margin-bottom:10px;font-size:1rem;font-weight:900;box-shadow:0 6px 24px rgba(13,71,161,.5);letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <span style="font-size:1.3rem">⭐</span> اكتشف برجي وخواصه <span style="font-size:1.3rem">⭐</span>
+    </button>
+    <!-- زر توقعات اليوم يظهر فقط عند اختيار برج -->
+    <button id="zod-today-btn" onclick="zodiacTodayFortune()" class="btn" style="display:none;width:100%;background:linear-gradient(135deg,#6a1b9a,#9c27b0,#4a0072);color:#fff;padding:16px;border-radius:16px;margin-bottom:14px;font-size:1rem;font-weight:900;box-shadow:0 6px 24px rgba(106,27,154,.5);animation:zodBtnPop .5s cubic-bezier(.34,1.56,.64,1) both;display:flex;align-items:center;justify-content:center;gap:10px">
+      <span style="font-size:1.3rem">🔮</span> معرفة توقعات برجي اليوم <span style="font-size:1.3rem">🔮</span>
+    </button>
+    <div id="zodiac-result"></div>
+    <div id="zodiac-fortune-result"></div>
+  </div>
+</div>
+
+
     <button onclick="goPage('home')" style="background:none;border:none;color:var(--txt2);font-size:1.2rem"><i class="fas fa-arrow-left"></i></button>
   </div></div>
   <div style="padding:14px 16px">
@@ -3659,7 +4103,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="toast"><button id="toast-close" onclick="dismissToast()" aria-label="إغلاق">✕</button><span id="toast-text"></span></div>
 
 <div id="pwa-banner">
   <div class="pwa-icon">🌿</div>
@@ -7107,9 +7551,42 @@ async function claimChallengePointsXp(challengeId) {
   }
 }
 
+/* ══════════ Settings Toggles ══════════ */
+function applyRemindersSetting(enabled) {
+  localStorage.setItem('tayyibat_reminders_enabled', enabled ? 'true' : 'false');
+  showToast(enabled ? '🔔 التذكيرات والإشعارات مفعّلة' : '🔕 التذكيرات والإشعارات مطفأة');
+}
+
+function applyGiftFabSetting(enabled) {
+  localStorage.setItem('tayyibat_gift_fab_enabled', enabled ? 'true' : 'false');
+  var fab = document.getElementById('daily-reward-fab');
+  if (fab) fab.style.display = enabled ? '' : 'none';
+  showToast(enabled ? '🎁 هدية اليوم مفعّلة' : '🎁 هدية اليوم مخفية');
+}
+
+function loadSettingsToggles() {
+  var remEl = document.getElementById('toggle-reminders');
+  var giftEl = document.getElementById('toggle-gift-fab');
+  if (remEl) {
+    var remVal = localStorage.getItem('tayyibat_reminders_enabled');
+    remEl.checked = remVal !== 'false'; // افتراضي مفعّل
+  }
+  if (giftEl) {
+    var giftVal = localStorage.getItem('tayyibat_gift_fab_enabled');
+    giftEl.checked = giftVal !== 'false'; // افتراضي مفعّل
+  }
+  // تطبيق حالة هدية اليوم فوراً
+  var fab = document.getElementById('daily-reward-fab');
+  if (fab && localStorage.getItem('tayyibat_gift_fab_enabled') === 'false') {
+    fab.style.display = 'none';
+  }
+}
+
 /* ══════════ Smart Notifications & Reminder Engine ══════════ */
 function triggerSmartPeriodicReminders() {
   if(!window.isProUser) return;
+  // تحقق من إعداد التذكيرات
+  if (localStorage.getItem('tayyibat_reminders_enabled') === 'false') return;
   var tipsArr = [
     "💧 تنبيه صحي: يرجى شرب كوب ماء دافئ الآن لتنشيط الفلترة الكلوية.",
     "🛌 حان وقت النوم المثالي لإراحة الكبد وإتمام الصيانة الخلوية للنظام.",
@@ -7140,9 +7617,22 @@ function refreshGiftFab() {
 
 window.addEventListener('load', function(){ setTimeout(refreshGiftFab, 800); });
 
+function dismissToast() {
+  var t = document.getElementById('toast');
+  t.classList.remove('show');
+  clearTimeout(tTimer);
+}
+
 function showToast(m, d) {
-  d = d || 2500; var t = document.getElementById('toast');
-  t.textContent = m; t.classList.add('show');
+  // تحقق من إعداد التذكيرات — إذا مطفأة لا تظهر التذكيرات الدورية
+  if (m && (m.indexOf('💧') === 0 || m.indexOf('🛌') === 0 || m.indexOf('⏱️') === 0)) {
+    if (localStorage.getItem('tayyibat_reminders_enabled') === 'false') return;
+  }
+  d = d || 2500;
+  var t = document.getElementById('toast');
+  var txt = document.getElementById('toast-text');
+  if (txt) txt.textContent = m; else t.textContent = m;
+  t.classList.add('show');
   clearTimeout(tTimer); tTimer = setTimeout(function() { t.classList.remove('show'); }, d);
 }
 
@@ -8632,12 +9122,22 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 </button>
 
+<!-- Dismiss zone (X) — appears on long press -->
+<div id="fab-dismiss-zone" style="display:none;position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9999;pointer-events:none">
+  <div id="fab-dismiss-inner" style="width:52px;height:52px;border-radius:50%;background:rgba(220,38,38,.85);border:2.5px solid rgba(255,100,100,.7);box-shadow:0 0 20px rgba(220,38,38,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s">
+    <i class="fas fa-times" style="color:#fff;font-size:1.4rem"></i>
+  </div>
+</div>
+
 <script>
-/* ── سحب أيقونة الهدية اليومية (لمس + ماوس) ── */
+/* ── سحب أيقونة الهدية اليومية (لمس + ماوس) + إخفاء بالسحب للـ X ── */
 (function(){
-  var FAB_KEY = 'fabRewardPos';
-  var SIZE    = 66;
-  var MARGIN  = 10;
+  var FAB_KEY     = 'fabRewardPos';
+  var FAB_HIDDEN  = 'fabRewardHiddenSession';
+  var SIZE        = 66;
+  var MARGIN      = 10;
+  var DISMISS_R   = 40;   // نصف قطر منطقة الـ X بالبيكسل
+  var LONG_MS     = 600;  // مدة الضغط المستمر بالملي ثانية
 
   function getNavH() {
     var nav = document.getElementById('bottom-nav');
@@ -8678,21 +9178,73 @@ window.addEventListener('DOMContentLoaded', function() {
     return false;
   }
 
+  function getDismissZoneCenter() {
+    var zone = document.getElementById('fab-dismiss-zone');
+    if (!zone) return null;
+    var r = zone.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2 };
+  }
+
+  function isOverDismiss(cx, cy) {
+    var c = getDismissZoneCenter();
+    if (!c) return false;
+    var dx = cx - c.x, dy = cy - c.y;
+    return Math.sqrt(dx*dx + dy*dy) < DISMISS_R + SIZE/2;
+  }
+
+  function showDismissZone(show) {
+    var zone = document.getElementById('fab-dismiss-zone');
+    if (!zone) return;
+    if (show) {
+      zone.style.display = 'block';
+      zone.style.pointerEvents = 'none';
+      // animate in
+      var inner = document.getElementById('fab-dismiss-inner');
+      if (inner) { inner.style.transform = 'scale(0)'; setTimeout(function(){ inner.style.transform = 'scale(1)'; }, 20); }
+    } else {
+      zone.style.display = 'none';
+    }
+  }
+
+  function highlightDismiss(on) {
+    var inner = document.getElementById('fab-dismiss-inner');
+    if (!inner) return;
+    inner.style.background = on ? 'rgba(239,68,68,1)' : 'rgba(220,38,38,.85)';
+    inner.style.transform  = on ? 'scale(1.2)' : 'scale(1)';
+  }
+
   function initFabDrag() {
     var fab = document.getElementById('daily-reward-fab');
     if (!fab) return;
 
-    // ضع الموضع المحفوظ أو الافتراضي
+    // إذا كان مخفياً في هذه الجلسة لا تظهره — معالجته في showFab
     if (!loadPos(fab)) {
       var navH = getNavH();
       var defY = window.innerHeight - SIZE - navH - 18;
       applyPos(fab, MARGIN + 4, defY);
     }
 
-    var dragging  = false;
-    var moved     = false;
-    var startX    = 0, startY = 0;
-    var fabStartX = 0, fabStartY = 0;
+    var dragging   = false;
+    var moved      = false;
+    var longPress  = false;
+    var longTimer  = null;
+    var startX     = 0, startY = 0;
+    var fabStartX  = 0, fabStartY = 0;
+
+    function startLongTimer(cx, cy) {
+      clearTimeout(longTimer);
+      longPress = false;
+      longTimer = setTimeout(function(){
+        longPress = true;
+        showDismissZone(true);
+        // اهتزاز خفيف
+        if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+      }, LONG_MS);
+    }
+
+    function cancelLongTimer() {
+      clearTimeout(longTimer);
+    }
 
     function onStart(cx, cy) {
       dragging  = true;
@@ -8702,29 +9254,48 @@ window.addEventListener('DOMContentLoaded', function() {
       fabStartX = fab.getBoundingClientRect().left;
       fabStartY = fab.getBoundingClientRect().top;
       fab.classList.add('dragging');
+      startLongTimer(cx, cy);
     }
 
     function onMove(cx, cy) {
       if (!dragging) return;
       var dx = cx - startX;
       var dy = cy - startY;
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
-      if (!moved) return;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        moved = true;
+        cancelLongTimer();
+        if (!longPress) showDismissZone(false);
+      }
+      if (!moved && !longPress) return;
       var c = clampPos(fabStartX + dx, fabStartY + dy);
       applyPos(fab, c.x, c.y);
+      // إبراز منطقة الـ X عند الاقتراب
+      if (longPress) highlightDismiss(isOverDismiss(cx, cy));
     }
 
     function onEnd(cx, cy) {
       if (!dragging) return;
       dragging = false;
+      cancelLongTimer();
       fab.classList.remove('dragging');
 
-      if (!moved) {
-        // لم يتحرك — نقرة عادية
+      if (longPress && isOverDismiss(cx, cy)) {
+        // إخفاء الأيقونة لهذه الجلسة فقط
+        showDismissZone(false);
+        fab.style.display = 'none';
+        try { sessionStorage.setItem(FAB_HIDDEN, '1'); } catch(e){}
+        return;
+      }
+
+      showDismissZone(false);
+      highlightDismiss(false);
+
+      if (!moved && !longPress) {
+        // نقرة عادية
         toggleDailyRewardPanel();
         return;
       }
-      // استقرار: حفظ الموضع النهائي
+      // حفظ الموضع
       var rect = fab.getBoundingClientRect();
       var c    = clampPos(rect.left, rect.top);
       applyPos(fab, c.x, c.y);
@@ -8741,7 +9312,7 @@ window.addEventListener('DOMContentLoaded', function() {
       if (!dragging) return;
       var t = e.touches[0];
       onMove(t.clientX, t.clientY);
-      if (moved) e.preventDefault();
+      if (moved || longPress) e.preventDefault();
     }, {passive:false});
 
     document.addEventListener('touchend', function(e){
@@ -8767,7 +9338,6 @@ window.addEventListener('DOMContentLoaded', function() {
       onEnd(e.clientX, e.clientY);
     });
 
-    // عند تغيير حجم الشاشة: أعد الضبط داخل الحدود
     window.addEventListener('resize', function(){
       var rect = fab.getBoundingClientRect();
       var c    = clampPos(rect.left, rect.top);
@@ -8781,16 +9351,29 @@ window.addEventListener('DOMContentLoaded', function() {
   } else {
     initFabDrag();
   }
+
   // احتياط: إذا أُظهر الزر لاحقاً
   var _fabObserver = new MutationObserver(function(ml){
     ml.forEach(function(m){
       if (m.type==='attributes' && m.attributeName==='style') {
         var fab = document.getElementById('daily-reward-fab');
-        if (fab && fab.style.display !== 'none' && !fab._dragReady) {
+        if (!fab) return;
+        // إذا كان مخفياً في الجلسة لا تُظهره
+        try {
+          if (sessionStorage.getItem(FAB_HIDDEN) === '1' && fab.style.display !== 'none') {
+            fab.style.display = 'none';
+            return;
+          }
+          if (localStorage.getItem('tayyibat_gift_fab_enabled') === 'false' && fab.style.display !== 'none') {
+            fab.style.display = 'none';
+            return;
+          }
+        } catch(e){}
+        if (fab.style.display !== 'none' && !fab._dragReady) {
           fab._dragReady = true;
           var rect = fab.getBoundingClientRect();
-          if (!rect.top && !rect.left) { // لم يُضبط بعد
-            var navH = getNavH();
+          if (!rect.top && !rect.left) {
+            var navH = (document.getElementById('bottom-nav') || {offsetHeight:60}).offsetHeight || 60;
             applyPos(fab, MARGIN + 4, window.innerHeight - SIZE - navH - 18);
             loadPos(fab);
           }
@@ -9599,6 +10182,11 @@ var TOOL_NAMES = {
   'drug-interaction': 'تفاعل الأدوية',
   'drug-alt': 'بدائل الأدوية',
   'xray': 'قراءة الأشعة',
+  'dream': 'تفسير الأحلام',
+  'fake-image': 'كشف الصور المزيفة',
+  'homework': 'حل الواجبات',
+  'palm': 'قراءة الكف',
+  'zodiac': 'البرج الفلكي',
   'symptoms': 'تحليل الأعراض',
   'barcode-boycott': 'كشف المنتجات المقاطعة',
   'protocols': 'بروتوكولات الحالات',
@@ -9793,7 +10381,11 @@ function goSmartTool(toolKey) {
     'food-scan':        'food-scan',
     'drug-interaction': 'drug-interaction',
     'drug-alt':         'drug-alt',
-    'xray':             'xray',
+    'dream':            'dream',
+    'fake-image':       'fake-image',
+    'homework':         'homework',
+    'palm':             'palm',
+    'zodiac':           'zodiac',
     'symptoms':         'symptoms',
     'barcode-boycott':  'barcode-boycott',
     'scanner':          'premium-scanner'
@@ -9803,7 +10395,6 @@ function goSmartTool(toolKey) {
   // تهيئة خاصة بكل أداة
   if (toolKey === 'food-scan') setTimeout(initFoodScan, 100);
   if (toolKey === 'barcode-boycott') bbInit();
-  if (toolKey === 'xray') setTimeout(function(){ xraySetType('xray'); }, 100);
   if (toolKey === 'scanner') setTimeout(function(){ setScanMode('product'); }, 150);
 }
 
@@ -10148,109 +10739,233 @@ function renderDaResult(data, resBox) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   🩻 قراءة الأشعة
+   🌙 تفسير الأحلام
 ════════════════════════════════════════════════════════════ */
-var _xrType = 'xray';
-var _xrImageData = null;
+var _dreamGender = '';
+function dreamSetGender(g) {
+  _dreamGender = g;
+  var male = document.getElementById('dream-male');
+  var female = document.getElementById('dream-female');
+  if (!male || !female) return;
+  if (g==='male') {
+    male.style.borderColor='rgba(33,150,243,.6)'; male.style.background='rgba(33,150,243,.15)';
+    male.querySelector('i').style.color='#2196f3'; male.querySelector('span').style.color='#2196f3';
+    female.style.borderColor='rgba(255,255,255,.15)'; female.style.background='rgba(255,255,255,.04)';
+    female.querySelector('i').style.color='var(--txt2)'; female.querySelector('span').style.color='var(--txt2)';
+  } else {
+    female.style.borderColor='rgba(233,30,99,.6)'; female.style.background='rgba(233,30,99,.15)';
+    female.querySelector('i').style.color='#e91e63'; female.querySelector('span').style.color='#e91e63';
+    male.style.borderColor='rgba(255,255,255,.15)'; male.style.background='rgba(255,255,255,.04)';
+    male.querySelector('i').style.color='var(--txt2)'; male.querySelector('span').style.color='var(--txt2)';
+  }
+}
+function toggleDreamPersonal() {
+  var fields = document.getElementById('dream-personal-fields');
+  var icon = document.getElementById('dream-personal-icon');
+  if (!fields || !icon) return;
+  var isHidden = fields.style.display === 'none';
+  fields.style.display = isHidden ? 'block' : 'none';
+  icon.className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+}
+function dreamInterpret() {
+  var dreamText = document.getElementById('dream-input').value.trim();
+  if (!dreamText) { showToast('اكتب حلمك الأول ✍️'); return; }
+  if (!canUseTool('dream')) { showTrialExpiredModal('dream'); return; }
+  incToolUsage('dream');
+  var resBox = document.getElementById('dream-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🌙 بيتفسر حلمك...</span></div>';
 
-function xraySetType(type) {
-  _xrType = type;
-  ['xray','mri','ct'].forEach(function(t) {
-    var btn = document.getElementById('xr-tab-' + t);
-    if (!btn) return;
-    if (t === type) {
-      btn.style.borderColor = 'rgba(0,188,212,.6)';
-      btn.style.background = 'linear-gradient(135deg,rgba(0,188,212,.25),rgba(0,188,212,.1))';
-      btn.querySelector('i').style.color = '#00bcd4';
-      btn.querySelector('span').style.color = '#00bcd4';
-    } else {
-      btn.style.borderColor = 'rgba(255,255,255,.15)';
-      btn.style.background = 'rgba(255,255,255,.04)';
-    }
+  var gender = _dreamGender === 'male' ? 'ذكر' : _dreamGender === 'female' ? 'أنثى' : '';
+  var ageGroup = (document.getElementById('dream-age') || {}).value || '';
+  var mood = (document.getElementById('dream-mood') || {}).value || '';
+  var status = (document.getElementById('dream-status') || {}).value || '';
+  var ref = (document.getElementById('dream-ref') || {}).value || 'ابن سيرين';
+  var personalCtx = '';
+  if (gender || ageGroup || mood || status) {
+    personalCtx = '\n\nمعلومات عن صاحب الحلم:';
+    if (gender) personalCtx += '\n- الجنس: ' + gender;
+    if (ageGroup) personalCtx += '\n- الفئة العمرية: ' + ageGroup;
+    if (mood) personalCtx += '\n- الحالة النفسية: ' + mood;
+    if (status) personalCtx += '\n- الحالة الاجتماعية: ' + status;
+  }
+  var prompt = 'أنت شيخ وعالم متخصص في علم تفسير الرؤى والأحلام، تحفظ كتب التفسير الكبرى مثل: "تعطير الأنام في تعبير المنام" لابن سيرين، و"تفسير الأحلام" لابن كثير، و"منتخب الكلام في تفسير الأحلام" وغيرها. تعتمد في تفسيرك بشكل رئيسي على منهج ومدرسة: ' + ref + '.\n\nحلم المستخدم:\n"' + dreamText + '"' + personalCtx + '\n\nفسّر هذا الحلم مراعياً الحالة الشخصية للرائي، واتبع هذا الترتيب:\n\n**أولاً — الحكم على الرؤيا:**\nهل هي رؤيا صالحة أم حلم من النفس أم وسواس؟\n\n**ثانياً — تفسير الرموز:**\nاذكر كل رمز بارز في الحلم وفسّره بجملة أو جملتين.\n\n**ثالثاً — المعنى الكلي:**\nفقرة قصيرة ومبسطة عن الرسالة العامة للحلم.\n\n**رابعاً — التوجيه العملي:**\nنصيحة مختصرة أو دعاء مناسب.\n\nقواعد: عربية فصيحة بسيطة — لا غموض — كن مباشراً — راعِ المعلومات الشخصية للرائي.';
+  _callClaudeAPI(prompt, null).then(function(res) {
+    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(103,58,183,.35);border-radius:20px;overflow:hidden">';
+    html += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.25),rgba(156,95,250,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:1.6rem">🌙</span>';
+    html += '<div><div style="font-size:.92rem;font-weight:900;color:#ce93d8">تفسير الحلم</div>';
+    html += '<div style="font-size:.68rem;color:#b39ddb;margin-top:2px">بمنهج ' + ref + '</div></div>';
+    html += '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
+    html += '<div style="padding:10px 14px 14px;background:rgba(103,58,183,.08);border-top:1px solid rgba(103,58,183,.2)">';
+    html += '<div style="font-size:.72rem;color:#b39ddb;line-height:1.6">✨ التفسير للاسترشاد — والرؤيا الصالحة من الله والحلث من الشيطان.</div>';
+    html += '</div></div>';
+    resBox.innerHTML = html;
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التفسير، حاول تاني.</div>';
   });
 }
 
-function xrayLoadImage(event) {
+/* ════════════════════════════════════════════════════════════
+   🔍 كشف الصور المزيفة
+════════════════════════════════════════════════════════════ */
+var _fiImageData = null;
+var _fiStream = null;
+
+function fakeImageLoad(event) {
   var file = event.target.files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    _xrImageData = e.target.result;
-    var preview = document.getElementById('xr-preview');
-    var img = document.getElementById('xr-img-preview');
-    if (preview && img) { img.src = _xrImageData; preview.style.display = 'block'; }
-    document.getElementById('xr-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم رفع الصورة ✓</span><input type="file" accept="image/*" onchange="xrayLoadImage(event)" style="display:none">';
+    _fiImageData = e.target.result;
+    var preview = document.getElementById('fi-preview');
+    var img = document.getElementById('fi-img-preview');
+    if (preview && img) { img.src = _fiImageData; preview.style.display = 'block'; }
+    document.getElementById('fi-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="fakeImageLoad(event)" style="display:none">';
   };
   reader.readAsDataURL(file);
 }
 
-var _xrStream = null;
-
-function xrayOpenCamera() {
-  var area = document.getElementById('xr-camera-area');
-  var video = document.getElementById('xr-video');
+function fakeImageOpenCamera() {
+  var area = document.getElementById('fi-camera-area');
+  var video = document.getElementById('fi-video');
   if (!area || !video) return;
-  if (_xrStream) { xrayStopCamera(); return; }
+  if (_fiStream) { fakeImageStopCamera(); return; }
   navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
   .then(function(stream) {
-    _xrStream = stream;
-    video.srcObject = stream;
-    area.style.display = 'block';
-    document.getElementById('xr-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+    _fiStream = stream; video.srcObject = stream; area.style.display = 'block';
+    document.getElementById('fi-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
-function xrayStopCamera() {
-  if (_xrStream) { _xrStream.getTracks().forEach(function(t) { t.stop(); }); _xrStream = null; }
-  var area = document.getElementById('xr-camera-area');
-  if (area) area.style.display = 'none';
-  var btn = document.getElementById('xr-camera-btn');
-  if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير الأشعة بالكاميرا</span>';
+function fakeImageStopCamera() {
+  if (_fiStream) { _fiStream.getTracks().forEach(function(t) { t.stop(); }); _fiStream = null; }
+  var area = document.getElementById('fi-camera-area'); if (area) area.style.display = 'none';
+  var btn = document.getElementById('fi-camera-btn');
+  if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير بالكاميرا</span>';
 }
 
-function xrayCapturePhoto() {
-  var video = document.getElementById('xr-video');
-  if (!video || !_xrStream) { showToast('الكاميرا غير مفعلة'); return; }
+function fakeImageCapture() {
+  var video = document.getElementById('fi-video');
+  if (!video || !_fiStream) { showToast('الكاميرا غير مفعلة'); return; }
   var canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
+  canvas.width = video.videoWidth || 640; canvas.height = video.videoHeight || 480;
   canvas.getContext('2d').drawImage(video, 0, 0);
-  _xrImageData = canvas.toDataURL('image/jpeg', 0.92);
-  xrayStopCamera();
-  var preview = document.getElementById('xr-preview');
-  var img = document.getElementById('xr-img-preview');
-  if (preview && img) { img.src = _xrImageData; preview.style.display = 'block'; }
-  showToast('✅ تم التقاط الصورة — اضغط تحليل الآن');
+  _fiImageData = canvas.toDataURL('image/jpeg', 0.92);
+  fakeImageStopCamera();
+  var preview = document.getElementById('fi-preview'); var img = document.getElementById('fi-img-preview');
+  if (preview && img) { img.src = _fiImageData; preview.style.display = 'block'; }
+  showToast('✅ تم التقاط الصورة');
 }
 
-function xrayAnalyze() {
-  if (!_xrImageData) { showToast('ارفع صورة الأشعة أولاً'); return; }
-  if (!canUseTool('xray')) { showTrialExpiredModal('xray'); return; }
-  incToolUsage('xray');
-  var resBox = document.getElementById('xr-result');
-  var typeNames = { xray: 'أشعة سينية (X-Ray)', mri: 'رنين مغناطيسي (MRI)', ct: 'أشعة مقطعية (CT Scan)' };
-  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل الأشعة...</span></div>';
-  var prompt = 'أنت طبيب أشعة خبير. انظر لهذه صورة ' + (typeNames[_xrType] || 'أشعة') + '.\n\nقدّم وصفاً مبدئياً للصورة من حيث:\n1. العضو أو المنطقة التشريحية المرئية\n2. الملاحظات العامة للصورة\n3. أي تغيرات أو مناطق تستوقف النظر (إن وجدت)\n4. التوصيات العامة\n\nتنبيه مهم في النهاية: هذا التحليل لأغراض استرشادية فقط وليس تشخيصاً طبياً نهائياً.';
-  _callClaudeAPIWithImage(prompt, _xrImageData).then(function(res) {
-    renderXrayResult(res, resBox, typeNames[_xrType]);
+function fakeImageAnalyze() {
+  if (!_fiImageData) { showToast('ارفع أو صوّر الصورة أولاً'); return; }
+  if (!canUseTool('fake-image')) { showTrialExpiredModal('fake-image'); return; }
+  incToolUsage('fake-image');
+  var resBox = document.getElementById('fi-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🔍 بيحلل الصورة...</span></div>';
+  var prompt = 'أنت خبير متخصص في الجنايات الرقمية وتحليل الصور وكشف التزوير والتعديل.\n\nحلل الصورة دي بشكل احترافي وقدّم تقرير شامل يتضمن:\n\n1. **الحكم الرئيسي**: هل الصورة حقيقية أم مزيفة أم معدّلة؟\n2. **نسبة الثقة**: نسبة مئوية من 0% لـ 100% إنها حقيقية\n3. **نوع التعديل** (لو موجود): \n   - مولودة بالذكاء الاصطناعي (AI Generated)\n   - معدّلة بـ Photoshop أو برامج مشابهة\n   - فلاتر مكثفة\n   - تعديل جزئي في عناصر معينة\n4. **المؤشرات التقنية**: اللي لفت نظرك في الصورة (إضاءة، ظلال، حواف، بكسلات، تناسق)\n5. **التقرير النهائي**: ملخص احترافي\n\nاستخدم أسلوب واضح ومباشر.';
+  _callClaudeAPIWithImage(prompt, _fiImageData).then(function(res) {
+    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:20px;overflow:hidden">';
+    html += '<div style="background:linear-gradient(135deg,rgba(255,152,0,.25),rgba(255,193,7,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:1.6rem">🔍</span>';
+    html += '<div><div style="font-size:.92rem;font-weight:900;color:#ffc107">تقرير تحليل الصورة</div>';
+    html += '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">كشف التزوير والذكاء الاصطناعي</div></div>';
+    html += '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
+    html += '</div>';
+    resBox.innerHTML = html;
   }).catch(function() {
-    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر تحليل الصورة.</div>';
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل، حاول تاني.</div>';
   });
 }
 
-function renderXrayResult(text, resBox, typeName) {
-  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(0,188,212,.35);border-radius:20px;overflow:hidden">';
-  html += '<div style="background:linear-gradient(135deg,rgba(0,188,212,.25),rgba(38,198,218,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
-  html += '<span style="font-size:1.6rem">🩻</span>';
-  html += '<div><div style="font-size:.92rem;font-weight:900;color:#00e5ff">تقرير تحليل الأشعة</div>';
-  html += '<div style="font-size:.68rem;color:#80deea;margin-top:2px">' + typeName + '</div></div>';
-  html += '</div>';
-  html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + text + '</div>';
-  html += '<div style="padding:10px 14px 14px;background:rgba(244,67,54,.08);border-top:1px solid rgba(244,67,54,.2)">';
-  html += '<div style="font-size:.72rem;color:#ef9a9a;line-height:1.6">⚠️ <strong>تنبيه هام:</strong> هذا التحليل للأغراض التعليمية والاسترشادية فقط ولا يُغني عن مراجعة طبيب الأشعة المختص لتشخيص دقيق وتقرير رسمي.</div>';
-  html += '</div></div>';
-  resBox.innerHTML = html;
+/* ════════════════════════════════════════════════════════════
+   🧠 حل الواجبات
+════════════════════════════════════════════════════════════ */
+var _hwImageData = null;
+var _hwStream = null;
+
+function hwLoadImage(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _hwImageData = e.target.result;
+    var preview = document.getElementById('hw-preview'); var img = document.getElementById('hw-img-preview');
+    if (preview && img) { img.src = _hwImageData; preview.style.display = 'block'; }
+    document.getElementById('hw-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="hwLoadImage(event)" style="display:none">';
+  };
+  reader.readAsDataURL(file);
 }
+
+function hwOpenCamera() {
+  var area = document.getElementById('hw-camera-area'); var video = document.getElementById('hw-video');
+  if (!area || !video) return;
+  if (_hwStream) { hwStopCamera(); return; }
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  .then(function(stream) {
+    _hwStream = stream; video.srcObject = stream; area.style.display = 'block';
+    document.getElementById('hw-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+  }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
+}
+
+function hwStopCamera() {
+  if (_hwStream) { _hwStream.getTracks().forEach(function(t) { t.stop(); }); _hwStream = null; }
+  var area = document.getElementById('hw-camera-area'); if (area) area.style.display = 'none';
+  var btn = document.getElementById('hw-camera-btn');
+  if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير السؤال</span>';
+}
+
+function hwCapture() {
+  var video = document.getElementById('hw-video');
+  if (!video || !_hwStream) { showToast('الكاميرا غير مفعلة'); return; }
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640; canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _hwImageData = canvas.toDataURL('image/jpeg', 0.92);
+  hwStopCamera();
+  var preview = document.getElementById('hw-preview'); var img = document.getElementById('hw-img-preview');
+  if (preview && img) { img.src = _hwImageData; preview.style.display = 'block'; }
+  showToast('✅ تم التقاط السؤال — اضغط حل');
+}
+
+function hwSolve() {
+  var textInput = document.getElementById('hw-text-input') ? document.getElementById('hw-text-input').value.trim() : '';
+  if (!_hwImageData && !textInput) { showToast('صوّر السؤال أو اكتبه أولاً 📚'); return; }
+  if (!canUseTool('homework')) { showTrialExpiredModal('homework'); return; }
+  incToolUsage('homework');
+  var resBox = document.getElementById('hw-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🧠 بيحل السؤال...</span></div>';
+  var systemPrompt = 'أنت مدرس خبير ومتخصص في كل المناهج المصرية من الابتدائي للثانوي العام. بتعرف كل الكتب والمناهج المعتمدة من وزارة التربية والتعليم المصرية. بتشرح وتجاوب بأسلوب واضح ومبسط وبتدي إجابات نموذجية كاملة زي ما في كتاب الإجابات بالضبط. لو السؤال تصوير قديم أو مش واضح — استنتج السؤال وجاوب عليه.';
+  var prompt = 'السؤال ده من ماده دراسية مصرية:\n' + (textInput ? textInput + '\n' : '') + '\nالمطلوب:\n1. اكتب السؤال كما هو (لو من صورة)\n2. الإجابة النموذجية الكاملة خطوة بخطوة\n3. الشرح المبسط لو محتاج\n4. أي قوانين أو معلومات مهمة متعلقة بالسؤال';
+  var apiCall = _hwImageData ? _callClaudeAPIWithImage(prompt, _hwImageData) : _callClaudeAPI(prompt, systemPrompt);
+  apiCall.then(function(res) {
+    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">';
+    html += '<div style="background:linear-gradient(135deg,rgba(33,150,243,.25),rgba(100,181,246,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:1.6rem">🧠</span>';
+    html += '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>';
+    html += '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">المناهج المصرية</div></div>';
+    html += '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
+    html += '</div>';
+    resBox.innerHTML = html;
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر الحل، حاول تاني.</div>';
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   🩻 قراءة الأشعة (محتفظ للتوافق الخلفي - غير مستخدم في الواجهة)
+════════════════════════════════════════════════════════════ */
+var _xrType = 'xray';
+var _xrImageData = null;
+function xraySetType(type) { _xrType = type; }
+function xrayLoadImage(event) {}
+function xrayOpenCamera() {}
+function xrayStopCamera() {}
+function xrayCapturePhoto() {}
+function xrayAnalyze() {}
 
 /* ════════════════════════════════════════════════════════════
    🩺 تحليل الأعراض
@@ -10892,11 +11607,1043 @@ async function _callClaudeAPIWithImage(prompt, imgDataUrl) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   تحديث الأزرار عند تحميل الصفحة
+   ⭐ البرج الفلكي — Zodiac
 ════════════════════════════════════════════════════════════ */
+var _zodGender = '';
+var _zodSign = null;
+
+var ZODIAC_DATA = {
+  aries:       { ar:'الحمل',       en:'Aries',       dates:'21 مارس – 19 أبريل',   element:'نار 🔥', planet:'المريخ',  color:'#ef5350', color2:'#ffcdd2' },
+  taurus:      { ar:'الثور',       en:'Taurus',      dates:'20 أبريل – 20 مايو',    element:'تراب 🌍', planet:'الزهرة', color:'#66bb6a', color2:'#c8e6c9' },
+  gemini:      { ar:'الجوزاء',     en:'Gemini',      dates:'21 مايو – 20 يونيو',    element:'هواء 💨', planet:'عطارد', color:'#ffca28', color2:'#fff9c4' },
+  cancer:      { ar:'السرطان',     en:'Cancer',      dates:'21 يونيو – 22 يوليو',   element:'ماء 💧', planet:'القمر',   color:'#26c6da', color2:'#e0f7fa' },
+  leo:         { ar:'الأسد',       en:'Leo',         dates:'23 يوليو – 22 أغسطس',   element:'نار 🔥', planet:'الشمس',   color:'#ffa726', color2:'#fff3e0' },
+  virgo:       { ar:'العذراء',     en:'Virgo',       dates:'23 أغسطس – 22 سبتمبر', element:'تراب 🌍', planet:'عطارد', color:'#ab47bc', color2:'#f3e5f5' },
+  libra:       { ar:'الميزان',     en:'Libra',       dates:'23 سبتمبر – 22 أكتوبر', element:'هواء 💨', planet:'الزهرة',color:'#ec407a', color2:'#fce4ec' },
+  scorpio:     { ar:'العقرب',      en:'Scorpio',     dates:'23 أكتوبر – 21 نوفمبر', element:'ماء 💧', planet:'المريخ',  color:'#8d6e63', color2:'#efebe9' },
+  sagittarius: { ar:'القوس',       en:'Sagittarius', dates:'22 نوفمبر – 21 ديسمبر', element:'نار 🔥', planet:'المشتري',color:'#42a5f5', color2:'#e3f2fd' },
+  capricorn:   { ar:'الجدي',       en:'Capricorn',   dates:'22 ديسمبر – 19 يناير',  element:'تراب 🌍', planet:'زحل',   color:'#78909c', color2:'#eceff1' },
+  aquarius:    { ar:'الدلو',       en:'Aquarius',    dates:'20 يناير – 18 فبراير',  element:'هواء 💨', planet:'زحل',    color:'#5c6bc0', color2:'#e8eaf6' },
+  pisces:      { ar:'الحوت',       en:'Pisces',      dates:'19 فبراير – 20 مارس',   element:'ماء 💧', planet:'نبتون',   color:'#26a69a', color2:'#e0f2f1' }
+};
+
+function getZodiacSign(month, day) {
+  var m = parseInt(month), d = parseInt(day);
+  if ((m===3&&d>=21)||(m===4&&d<=19)) return 'aries';
+  if ((m===4&&d>=20)||(m===5&&d<=20)) return 'taurus';
+  if ((m===5&&d>=21)||(m===6&&d<=20)) return 'gemini';
+  if ((m===6&&d>=21)||(m===7&&d<=22)) return 'cancer';
+  if ((m===7&&d>=23)||(m===8&&d<=22)) return 'leo';
+  if ((m===8&&d>=23)||(m===9&&d<=22)) return 'virgo';
+  if ((m===9&&d>=23)||(m===10&&d<=22)) return 'libra';
+  if ((m===10&&d>=23)||(m===11&&d<=21)) return 'scorpio';
+  if ((m===11&&d>=22)||(m===12&&d<=21)) return 'sagittarius';
+  if ((m===12&&d>=22)||(m===1&&d<=19)) return 'capricorn';
+  if ((m===1&&d>=20)||(m===2&&d<=18)) return 'aquarius';
+  return 'pisces';
+}
+
+function getTodaySign() {
+  var now = new Date();
+  return getZodiacSign(now.getMonth()+1, now.getDate());
+}
+
+function zodiacSetGender(g) {
+  _zodGender = g;
+  var male = document.getElementById('zod-male');
+  var female = document.getElementById('zod-female');
+  if (!male || !female) return;
+  if (g==='male') {
+    male.style.borderColor='rgba(33,150,243,.6)'; male.style.background='rgba(33,150,243,.15)';
+    male.querySelector('i').style.color='#2196f3'; male.querySelector('span').style.color='#2196f3';
+    female.style.borderColor='rgba(255,255,255,.15)'; female.style.background='rgba(255,255,255,.04)';
+    female.querySelector('i').style.color='var(--txt2)'; female.querySelector('span').style.color='var(--txt2)';
+  } else {
+    female.style.borderColor='rgba(233,30,99,.6)'; female.style.background='rgba(233,30,99,.15)';
+    female.querySelector('i').style.color='#e91e63'; female.querySelector('span').style.color='#e91e63';
+    male.style.borderColor='rgba(255,255,255,.15)'; male.style.background='rgba(255,255,255,.04)';
+    male.querySelector('i').style.color='var(--txt2)'; male.querySelector('span').style.color='var(--txt2)';
+  }
+}
+
+function zodiacDetect() {
+  var month = document.getElementById('zod-month').value;
+  var day = document.getElementById('zod-day').value;
+  if (!month || !day || day < 1 || day > 31) return;
+  _zodSign = getZodiacSign(month, day);
+  var data = ZODIAC_DATA[_zodSign];
+  if (!data) return;
+
+  // إظهار SVG المتحرك بأسلوب بطاقة كبيرة
+  var svgWrap = document.getElementById('zodiac-svg-wrap');
+  // توليد نجوم متناثرة
+  var starsHtml = '';
+  for (var si = 0; si < 12; si++) {
+    var sx = Math.random() * 260 - 50;
+    var sy = Math.random() * 200 - 30;
+    var ss = (Math.random() * 4 + 2).toFixed(1);
+    var sd = (Math.random() * 2.5 + 0.5).toFixed(2);
+    var dl = (Math.random() * 2).toFixed(2);
+    starsHtml += '<div style="position:absolute;left:' + sx + 'px;top:' + sy + 'px;width:' + ss + 'px;height:' + ss + 'px;background:' + data.color + ';border-radius:50%;animation:zodStarTwinkle ' + sd + 's ease-in-out infinite ' + dl + 's;opacity:.7"></div>';
+  }
+  svgWrap.innerHTML =
+    '<div style="position:relative;display:inline-block;padding:20px">' +
+    starsHtml +
+    '<div class="zod-svg-container" style="filter:drop-shadow(0 0 24px ' + data.color + '88);position:relative;z-index:2">' +
+    getZodiacSVG(_zodSign, data.color, data.color2).replace('width="150" height="150"','width="170" height="170"') +
+    '</div>' +
+    // دائرة مدارية متحركة
+    '<div style="position:absolute;inset:0;pointer-events:none;z-index:1">' +
+    '<svg viewBox="0 0 210 210" width="210" height="210" style="position:absolute;top:0;left:0">' +
+    '<circle cx="105" cy="105" r="90" fill="none" stroke="' + data.color + '" stroke-width="1" stroke-dasharray="6 8" opacity=".25">' +
+      '<animateTransform attributeName="transform" type="rotate" from="0 105 105" to="360 105 105" dur="18s" repeatCount="indefinite"/>' +
+    '</circle>' +
+    '<circle r="6" fill="' + data.color + '" opacity=".85"><animateMotion dur="5s" repeatCount="indefinite" path="M105,15 a90,90 0 1,1 0.01,0 Z"/><animate attributeName="opacity" values=".85;.3;.85" dur="5s" repeatCount="indefinite"/><animate attributeName="r" values="6;3;6" dur="5s" repeatCount="indefinite"/></circle>' +
+    '<circle r="4" fill="' + data.color2 + '" opacity=".6"><animateMotion dur="8s" repeatCount="indefinite" path="M105,22 a83,83 0 1,0 0.01,0 Z"/><animate attributeName="opacity" values=".3;.8;.3" dur="4s" repeatCount="indefinite"/></circle>' +
+    '<circle r="2.5" fill="#ffffff" opacity=".5"><animateMotion dur="12s" repeatCount="indefinite" path="M105,8 a97,97 0 1,1 0.01,0 Z"/><animate attributeName="opacity" values=".5;1;.5" dur="6s" repeatCount="indefinite"/></circle>' +
+    '</svg>' +
+    '</div>' +
+    '</div>';
+
+  var nameWrap = document.getElementById('zodiac-name-wrap');
+  nameWrap.style.display = 'block';
+  document.getElementById('zodiac-sign-name').textContent = data.ar + ' (' + data.en + ')';
+  document.getElementById('zodiac-sign-dates').textContent = data.dates;
+  document.getElementById('zodiac-sign-element').textContent = 'عنصر: ' + data.element + ' • الكوكب: ' + data.planet;
+
+  // بطاقات الخصائص الفورية
+  var traitDefs = {
+    aries:       { traits: [['🔥','الطاقة والحيوية','مولود الحمل يمتلك طاقة لا تنضب — يندفع نحو الحياة بشغف وعزيمة، ويصعب إيقافه حين يقرر شيئاً'],['⚡','الشجاعة والإقدام','لا يعرف التردد، يخوض التحديات بجرأة نادرة ويواجه المخاوف بصدر رحب'],['👑','القيادة الفطرية','يولد قائداً بالغريزة — يستطيع استقطاب الآخرين وتحريكهم نحو الهدف بطريقة مؤثرة'],['💪','الإرادة الفولاذية','عزيمته تفوق حجم العقبات، وحين يسقط يقف أسرع من أي برج آخر']], lucky:'9', color:'#ef5350', color2:'#ffcdd2', stone:'ياقوت أحمر', day:'الثلاثاء' },
+    taurus:      { traits: [['🌿','الثبات والرسوخ','مثل الجبل لا يتزعزع — قراراته مدروسة وشخصيته راسخة لا تتأثر بالعواصف'],['💎','تقدير الجودة والقيمة','يختار الأفضل دائماً، ذوقه رفيع وعينه ترصد الجمال والجودة الحقيقية في كل مكان'],['🎨','العشق للفن والجمال','يتأثر بالموسيقى والألوان والطبيعة بشكل عميق، ولديه حس فني متطور وأصيل'],['🤝','الوفاء المطلق','صديق الثور صديق العمر — إخلاصه لمن يحب لا حدود له ولا يتزعزع بمرور الزمن']], lucky:'6', color:'#66bb6a', color2:'#c8e6c9', stone:'زمرد', day:'الجمعة' },
+    gemini:      { traits: [['💬','التواصل والفصاحة','يتحدث بطلاقة مذهلة ويجيد التعبير عن أفكاره المعقدة بأسلوب مبسط ومشوّق'],['🧠','الذكاء والفضول','عقله لا يتوقف عن التفكير والتساؤل، يشغله كل جديد ويجيد استيعاب المعلومات بسرعة خارقة'],['✨','عشق التنوع','لا يحتمل الرتابة — يحتاج إلى تنويع مستمر في حياته اليومية وأصدقائه وأفكاره'],['🌀','المرونة الاستثنائية','يتأقلم مع أي بيئة وأي موقف ببراعة، ويجيد إيجاد الحل الإبداعي في أصعب الأوقات']], lucky:'5', color:'#ffca28', color2:'#fff9c4', stone:'عقيق أصفر', day:'الأربعاء' },
+    cancer:      { traits: [['💙','العاطفة العميقة','يشعر بكل شيء بعمق كبير — أفراحه مضاعفة وأحزانه تمس القلب مباشرة، وهذا ما يجعله شخصاً لا يُنسى'],['🏠','الحنان وروح العائلة','يهتم بمن يحب بطريقة تجعلهم يحسون بالدفء والأمان الحقيقي، بيته ملاذ لكل من يعرفه'],['🔮','الحدس الخارق','يستشعر نوايا الآخرين قبل أن يتكلموا، ويقرأ الطاقات والمشاعر المخفية بدقة مذهلة'],['🌙','الخيال والإبداع','يعيش في عالم من الخيال الخصب والأحلام الجميلة، وهذا ينعكس في إبداعه وطريقة تعبيره']], lucky:'2', color:'#26c6da', color2:'#e0f7fa', stone:'لؤلؤ', day:'الاثنين' },
+    leo:         { traits: [['☀️','الكاريزما الساحرة','يملأ أي مكان بحضوره النوراني — الأنظار تتجه إليه تلقائياً ويترك أثراً لا يمحى في نفوس من يلقاهم'],['🎭','الجرأة والمسرحية','لا يخشى الأضواء بل يزدهر تحتها، يقدم نفسه بثقة ويجيد التعبير عن شخصيته الفريدة بجرأة'],['❤️','الكرم اللامحدود','يعطي بلا حساب — وقته وماله وحبه ومجهوده، ويشعر بسعادة حقيقية حين يرى الآخرين سعيدين'],['🦁','الكبرياء والعزة','يقدّر كرامته ولا يقبل الإهانة، ولكن كبرياؤه نابع من ثقة حقيقية بالنفس لا من غرور']], lucky:'1', color:'#ffa726', color2:'#fff3e0', stone:'زبرجد ذهبي', day:'الأحد' },
+    virgo:       { traits: [['📋','الدقة المتناهية','لا يفوته أي تفصيل مهما كان صغيراً — عقله التحليلي يرصد كل شيء ويُنظّمه بعناية'],['🧹','النظام والتخطيط','يعيش وفق نظام محكم، لديه خطة لكل شيء ويشعر بقلق حقيقي حين تتعطل خططه'],['🔍','التفكير العميق','يحلل قبل أن يحكم، يدرس كل جانب من جوانب المسألة قبل أن يتخذ قراراً'],['💼','الإتقان في كل شيء','لا يرضى بالمقبول — يسعى دائماً للكمال في عمله وحياته ويضع لنفسه معايير عالية']], lucky:'5', color:'#ab47bc', color2:'#f3e5f5', stone:'كارنيليان', day:'الأربعاء' },
+    libra:       { traits: [['⚖️','العدل والإنصاف','يكره الظلم بكل أشكاله ويسعى دائماً لإيجاد الحل العادل الذي يرضي جميع الأطراف'],['🕊️','طلب السلام والوئام','يتجنب الصراع قدر المستطاع ويُفضل الحوار والتفاهم على أي شكل من أشكال المواجهة'],['🌹','الذوق الرفيع','يقدّر الجمال والأناقة — اختياراته في الملبس والمسكن والأشخاص تعكس ذوقاً فريداً ومميزاً'],['🤝','الدبلوماسية والحكمة','يتعامل مع الجميع برقي وذكاء اجتماعي عالٍ، ويستطيع إيجاد أرضية مشتركة مع أي شخص']], lucky:'6', color:'#ec407a', color2:'#fce4ec', stone:'لازورد', day:'الجمعة' },
+    scorpio:     { traits: [['🔮','الغموض والعمق','أعمق بكثير مما يظهر — طبقاته الداخلية ثرية ومعقدة، ومن يعرفه جيداً يكتشف عالماً كاملاً'],['💀','القوة والصلابة','لا يُساوم على مبادئه ولا يرضخ للضغط — هو أحد أقوى الأبراج في التحمل والصمود'],['🧲','الجاذبية الغامضة','يستقطب الأنظار بهدوء — شخصيته المغامِرة والغامضة تجعل الناس يريدون معرفة المزيد عنه'],['🔑','الإصرار على بلوغ الهدف','إذا قرر شيئاً لن يتوقف حتى يصل — قدرته على الإصرار وتجاوز العقبات لا مثيل لها']], lucky:'8', color:'#8d6e63', color2:'#efebe9', stone:'توباز أسود', day:'الثلاثاء' },
+    sagittarius: { traits: [['🎯','الطموح الواسع','أهدافه كبيرة ومرمى بصره بعيد — لا يقنع بالقريب ويسعى دائماً لما هو أعلى وأبعد'],['🌍','روح المغامرة','يعشق الاكتشاف والسفر والتجارب الجديدة، ويشعر بالاختناق حين تضيق عليه الحدود'],['📚','الفلسفة والمعنى','يبحث دائماً عن الحكمة والمعنى الأعمق للحياة، ومحادثاته تترك أثراً عقلياً وفكرياً'],['😂','التفاؤل الحيوي','ينظر لكل موقف بعين الأمل والإيجابية، وضحكته ومرحه يُضيئان أجواء المكان']], lucky:'3', color:'#42a5f5', color2:'#e3f2fd', stone:'فيروز', day:'الخميس' },
+    capricorn:   { traits: [['🏆','الطموح الصاعد','يصعد سلم النجاح خطوة بخطوة بصبر وثبات — غايته الوصول للقمة ولا شيء يصرفه عن ذلك'],['⏰','الانضباط المحكم','منظم في وقته ومواعيده والتزاماته — يعتبر الانضباط قيمة أصيلة لا تفاوض فيها'],['🪨','الصبر الاستراتيجي','يتحمل المشقة من أجل الهدف البعيد، ولديه قدرة نادرة على الانتظار والمثابرة'],['💡','الحكمة العملية','تفكيره استراتيجي وعملي، يرى الصورة الكبيرة ويضع خططاً محكمة بعيدة المدى']], lucky:'8', color:'#78909c', color2:'#eceff1', stone:'عقيق أسود', day:'السبت' },
+    aquarius:    { traits: [['🌊','الإبداع الثوري','أفكاره مختلفة وسابقة لعصرها — يرى ما لا يراه الآخرون ويطرح حلولاً تبدو جريئة لكنها تغيّر القواعد'],['🤖','عشق التقدم والتكنولوجيا','يتعلق بكل ما هو مستقبلي ومتطور، ويحتضن التكنولوجيا والعلم بشغف لا ينتهي'],['👽','الاستقلالية التامة','يسير على دربه الخاص دون الاكتراث بآراء الآخرين — الأصالة بالنسبة له أهم من القبول'],['🌐','الإنسانية والاهتمام بالعالم','يهتم بالقضايا الإنسانية الكبرى وله رؤية مجتمعية واسعة تتجاوز مصلحته الشخصية']], lucky:'4', color:'#5c6bc0', color2:'#e8eaf6', stone:'عقيق لازوردي', day:'السبت' },
+    pisces:      { traits: [['🌊','الحدس الخارق','يشعر بما لا يُقال ولا يُرى — يلتقط مشاعر الآخرين ونواياهم قبل أن ينبسوا بكلمة واحدة'],['🎨','الخيال الإبداعي الواسع','يعيش في عالم حالم مليء بالألوان والإلهام، وهذا يمنحه طاقة إبداعية نادرة في الفن والكتابة والموسيقى'],['💜','التعاطف العميق','يحمل همّ الآخرين كأنه همّه — قلبه مفتوح ومشاعره صادقة، ويُشعر من حوله بالقبول والأمان'],['🔮','الروحانية والارتباط بعالم آخر','يحس بوجود بُعد روحاني في كل شيء، ولديه علاقة عميقة مع العالم الداخلي والمعنوي']], lucky:'7', color:'#26a69a', color2:'#e0f2f1', stone:'أكوامارين', day:'الخميس' }
+  };
+
+  // ── بطاقة العمر المفصّلة ──
+  var ageCard = document.getElementById('zodiac-age-card');
+  var yearVal = parseInt(document.getElementById('zod-year')?.value);
+  var monthVal = parseInt(document.getElementById('zod-month')?.value);
+  var dayVal = parseInt(document.getElementById('zod-day')?.value);
+  if (ageCard) {
+    if (yearVal && yearVal >= 1920 && yearVal <= 2025 && monthVal && dayVal) {
+      var birthDate = new Date(yearVal, monthVal - 1, dayVal);
+      var now = new Date();
+      var diffMs = now - birthDate;
+      if (diffMs > 0) {
+        var totalSec = Math.floor(diffMs / 1000);
+        var totalMin = Math.floor(totalSec / 60);
+        var totalHrs = Math.floor(totalMin / 60);
+        var totalDays = Math.floor(totalHrs / 24);
+        var totalWeeks = Math.floor(totalDays / 7);
+        // حساب السنوات والأشهر الدقيقة
+        var ageYears = now.getFullYear() - birthDate.getFullYear();
+        var ageMonths = now.getMonth() - birthDate.getMonth();
+        if (now.getDate() < birthDate.getDate()) ageMonths--;
+        if (ageMonths < 0) { ageYears--; ageMonths += 12; }
+        var ageDaysRem = Math.floor((now - new Date(now.getFullYear(), now.getMonth(), birthDate.getDate())) / 86400000);
+        if (isNaN(ageDaysRem) || ageDaysRem < 0) ageDaysRem = 0;
+
+        // عداد تشغيل حي
+        if (window._zodAgeInterval) clearInterval(window._zodAgeInterval);
+        function updateAgeCounters() {
+          var n = new Date();
+          var df = n - birthDate;
+          var ts = Math.floor(df/1000);
+          var tm = Math.floor(ts/60);
+          var th = Math.floor(tm/60);
+          var td2 = Math.floor(th/24);
+          var tw = Math.floor(td2/7);
+          // حساب الأشهر الكاملة
+          var ay = n.getFullYear() - birthDate.getFullYear();
+          var am = n.getMonth() - birthDate.getMonth();
+          if (n.getDate() < birthDate.getDate()) am--;
+          if (am < 0) { ay--; am += 12; }
+          var totMonths = ay * 12 + am;
+          var tdEl = document.getElementById('zod-total-days');
+          var twEl = document.getElementById('zod-total-weeks');
+          var tminEl = document.getElementById('zod-total-min');
+          var tsecEl = document.getElementById('zod-total-sec');
+          var thEl = document.getElementById('zod-total-hrs');
+          var tmEl = document.getElementById('zod-total-months');
+          var tyEl = document.getElementById('zod-total-years-num');
+          if (tdEl) tdEl.textContent = td2.toLocaleString('ar-EG');
+          if (twEl) twEl.textContent = tw.toLocaleString('ar-EG');
+          if (tminEl) tminEl.textContent = tm.toLocaleString('ar-EG');
+          if (tsecEl) tsecEl.textContent = ts.toLocaleString('ar-EG');
+          if (thEl) thEl.textContent = th.toLocaleString('ar-EG');
+          if (tmEl) tmEl.textContent = totMonths.toLocaleString('ar-EG');
+          if (tyEl) tyEl.textContent = ay.toLocaleString('ar-EG');
+        }
+        window._zodAgeInterval = setInterval(updateAgeCounters, 1000);
+
+        var totalMonths = ageYears * 12 + ageMonths;
+        ageCard.style.display = 'block';
+        ageCard.innerHTML =
+          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + td.color + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both;width:100%">' +
+            '<div style="background:linear-gradient(135deg,' + td.color + '30,' + td.color + '12);padding:12px 16px;border-bottom:1px solid ' + td.color + '30;display:flex;align-items:center;gap:10px">' +
+              '<span style="font-size:1.6rem">⏳</span>' +
+              '<div>' +
+                '<div style="font-size:.88rem;font-weight:900;color:' + td.color + '">⏳ بطاقة العمر المفصّلة</div>' +
+                '<div style="font-size:.68rem;color:var(--txt3);margin-top:2px">عداد حي يتحدث كل ثانية ⚡</div>' +
+              '</div>' +
+            '</div>' +
+            '<div style="padding:14px 16px">' +
+              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + td.color + '15;border-radius:14px;border:1.5px solid ' + td.color + '33">' +
+                '<div style="font-size:2.4rem;font-weight:900;color:' + td.color + ';line-height:1">' + ageYears + '</div>' +
+                '<div style="font-size:.78rem;color:var(--txt2);margin-top:4px;font-weight:700">سنة' + (ageMonths ? ' و ' + ageMonths + ' شهر' : '') + (ageDaysRem ? ' و ' + ageDaysRem + ' يوم' : '') + '</div>' +
+              '</div>' +
+              '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-years-num" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + ageYears.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🔢 سنة</div>' +
+                '</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-months" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalMonths.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">📆 شهر</div>' +
+                '</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-weeks" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalWeeks.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🗓️ أسبوع</div>' +
+                '</div>' +
+              '</div>' +
+              '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-days" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalDays.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">📅 يوم</div>' +
+                '</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-hrs" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalHrs.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">🕐 ساعة</div>' +
+                '</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-min" style="font-size:.95rem;font-weight:900;color:' + td.color2 + '">' + totalMin.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⏱️ دقيقة</div>' +
+                '</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-sec" style="font-size:.95rem;font-weight:900;color:' + td.color + ';animation:zodAgeCountUp .3s ease">' + totalSec.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⚡ ثانية</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      } else {
+        ageCard.style.display = 'none';
+      }
+    } else {
+      ageCard.style.display = 'none';
+    }
+  }
+
+  var td = traitDefs[_zodSign] || traitDefs.pisces;
+  var tc = document.getElementById('zodiac-trait-cards');
+  tc.innerHTML = '';
+
+  // بطاقة الخصائص الأربع
+  td.traits.forEach(function(t, i) {
+    var card = document.createElement('div');
+    card.className = 'zod-trait-card';
+    card.style.cssText = 'background:linear-gradient(145deg,rgba(13,27,42,.95),rgba(5,14,30,.98));border:1.5px solid ' + td.color + '44;animation-delay:' + (i*0.12).toFixed(2) + 's';
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+        '<span style="font-size:1.5rem;line-height:1;filter:drop-shadow(0 0 6px ' + td.color + '88)">' + t[0] + '</span>' +
+        '<span style="font-size:.75rem;font-weight:900;color:' + td.color + '">' + t[1] + '</span>' +
+      '</div>' +
+      '<div style="font-size:.72rem;color:var(--txt2);line-height:1.65">' + t[2] + '</div>';
+    tc.appendChild(card);
+  });
+
+  // بطاقة الحجر الكريم + الرقم المحظوظ + يوم الحظ
+  var infoCard = document.createElement('div');
+  infoCard.className = 'zod-trait-card';
+  infoCard.style.cssText = 'grid-column:span 2;background:linear-gradient(145deg,rgba(13,27,42,.95),rgba(5,14,30,.98));border:1.5px solid ' + td.color + '66;animation-delay:.5s';
+  infoCard.innerHTML =
+    '<div style="display:flex;justify-content:space-around;text-align:center;gap:8px">' +
+      '<div><div style="font-size:.62rem;color:var(--txt3);margin-bottom:4px">💎 الحجر الكريم</div><div style="font-size:.75rem;font-weight:800;color:' + td.color + '">' + td.stone + '</div></div>' +
+      '<div style="width:1px;background:rgba(255,255,255,.08)"></div>' +
+      '<div><div style="font-size:.62rem;color:var(--txt3);margin-bottom:4px">🔢 الرقم المحظوظ</div><div style="font-size:1.1rem;font-weight:900;color:' + td.color2 + '">' + td.lucky + '</div></div>' +
+      '<div style="width:1px;background:rgba(255,255,255,.08)"></div>' +
+      '<div><div style="font-size:.62rem;color:var(--txt3);margin-bottom:4px">📅 يوم الحظ</div><div style="font-size:.75rem;font-weight:800;color:' + td.color + '">' + td.day + '</div></div>' +
+    '</div>';
+  tc.appendChild(infoCard);
+
+  // إظهار زر توقعات اليوم
+  var todayBtn = document.getElementById('zod-today-btn');
+  if (todayBtn) {
+    todayBtn.style.display = 'block';
+    todayBtn.style.animation = 'none';
+    setTimeout(function(){ todayBtn.style.animation = 'zodBtnPop .5s cubic-bezier(.34,1.56,.64,1) both'; }, 10);
+  }
+}
+
+function getZodiacSVG(sign, c, c2) {
+  var G = '#c9a84c';
+  var G2 = '#f0d060';
+  var GS = '#a07030';
+
+  function wrapSVG(inner, dur, dashArr, extraAnim) {
+    dur = dur || '20s'; dashArr = dashArr || '8 4'; extraAnim = extraAnim || '';
+    var uid = sign + Math.random().toString(36).slice(2,6);
+    return '<svg viewBox="0 0 160 160" width="150" height="150" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs>' +
+        '<radialGradient id="bg'+uid+'" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#1a1200"/><stop offset="100%" stop-color="#080600"/></radialGradient>' +
+        '<radialGradient id="glow'+uid+'" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="'+G+'" stop-opacity=".4"/><stop offset="100%" stop-color="'+G+'" stop-opacity="0"/></radialGradient>' +
+        '<filter id="blur'+uid+'"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+      '</defs>' +
+      '<circle cx="80" cy="80" r="78" fill="url(#bg'+uid+')"/>' +
+      '<circle cx="80" cy="80" r="72" fill="url(#glow'+uid+')" opacity=".5"><animate attributeName="opacity" values=".3;.7;.3" dur="3s" repeatCount="indefinite"/></circle>' +
+      '<circle cx="80" cy="80" r="74" fill="none" stroke="'+G+'" stroke-width="2" opacity=".9"/>' +
+      '<circle cx="80" cy="80" r="68" fill="none" stroke="'+G+'" stroke-width="0.8" stroke-dasharray="'+dashArr+'" opacity=".5">' +
+        '<animateTransform attributeName="transform" type="rotate" from="0 80 80" to="360 80 80" dur="'+dur+'" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '<circle cx="80" cy="80" r="60" fill="none" stroke="'+G2+'" stroke-width="0.6" stroke-dasharray="3 9" opacity=".3">' +
+        '<animateTransform attributeName="transform" type="rotate" from="360 80 80" to="0 80 80" dur="'+(parseFloat(dur)*1.4).toFixed(0)+'s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      inner +
+      getGoldStarsAnimated() +
+      extraAnim +
+      '</svg>';
+  }
+
+  function getGoldStarsAnimated() {
+    var pos = [[16,20],[140,26],[12,122],[144,118],[50,10],[114,146],[10,70],[150,76],[80,8],[80,152],[30,50],[130,50],[30,110],[130,110]];
+    return pos.map(function(p,i){
+      var d = (1.0 + i*0.22).toFixed(1);
+      var r = i%3===0?2.5:i%3===1?1.8:1.2;
+      return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+r+'" fill="'+G2+'">' +
+        '<animate attributeName="opacity" values=".9;0;.9" dur="'+d+'s" repeatCount="indefinite"/>' +
+        '<animate attributeName="r" values="'+r+';'+(r*0.5).toFixed(1)+';'+r+'" dur="'+d+'s" repeatCount="indefinite"/>' +
+      '</circle>';
+    }).join('');
+  }
+
+  function floatAnim(id, y1, y2, dur) {
+    return '<animateTransform xmlns="http://www.w3.org/2000/svg" attributeName="transform" type="translate" values="0 '+y1+';0 '+y2+';0 '+y1+'" dur="'+(dur||'2.5s')+'" repeatCount="indefinite" additive="sum"/>';
+  }
+
+  var svgs = {
+    aries: wrapSVG(
+      '<g filter="url(#bluraries2)">' +
+      // Glow behind ram
+      '<ellipse cx="80" cy="82" rx="35" ry="30" fill="#ef5350" opacity=".1"/>' +
+      '</g>' +
+      '<g fill="'+G+'">' +
+      // Body
+      '<ellipse cx="80" cy="94" rx="20" ry="22" fill="'+G+'"/>' +
+      // Head
+      '<circle cx="80" cy="66" r="17" fill="'+G+'"/>' +
+      // Left horn
+      '<path d="M63 60 C52 46 40 44 38 56 C36 68 48 74 62 70" fill="none" stroke="'+G+'" stroke-width="5.5" stroke-linecap="round"/>' +
+      '<circle cx="38" cy="56" r="9" fill="none" stroke="'+G+'" stroke-width="4"/>' +
+      // Right horn
+      '<path d="M97 60 C108 46 120 44 122 56 C124 68 112 74 98 70" fill="none" stroke="'+G+'" stroke-width="5.5" stroke-linecap="round"/>' +
+      '<circle cx="122" cy="56" r="9" fill="none" stroke="'+G+'" stroke-width="4"/>' +
+      // Face
+      '<circle cx="73" cy="63" r="3.5" fill="#0a0800"/>' +
+      '<circle cx="87" cy="63" r="3.5" fill="#0a0800"/>' +
+      '<circle cx="74" cy="62" r="1.5" fill="'+G2+'" opacity=".7"/>' +
+      '<ellipse cx="80" cy="72" rx="5.5" ry="3.5" fill="'+GS+'"/>' +
+      // Animated charge effect
+      '<path d="M55 95 L65 80 L62 88 L72 72" fill="none" stroke="'+G2+'" stroke-width="1.5" opacity=".5">' +
+        '<animate attributeName="opacity" values=".5;1;.2;.8;.5" dur="1.8s" repeatCount="indefinite"/>' +
+      '</path>' +
+      '</g>',
+      '18s', '10 4'
+    ),
+    taurus: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="88" rx="36" ry="30" fill="#66bb6a" opacity=".08"/>' +
+      '<ellipse cx="80" cy="95" rx="22" ry="18" fill="'+G+'"/>' +
+      '<circle cx="80" cy="70" r="19" fill="'+G+'"/>' +
+      // Wide curved horns
+      '<path d="M61 62 C48 40 34 38 32 52 C30 62 42 70 58 66" fill="none" stroke="'+G+'" stroke-width="6.5" stroke-linecap="round"/>' +
+      '<path d="M99 62 C112 40 126 38 128 52 C130 62 118 70 102 66" fill="none" stroke="'+G+'" stroke-width="6.5" stroke-linecap="round"/>' +
+      // Nose ring with gentle swing
+      '<g>' +
+        '<ellipse cx="80" cy="82" rx="7" ry="4.5" fill="none" stroke="'+G2+'" stroke-width="2.5"/>' +
+        '<circle cx="80" cy="78" r="3" fill="'+GS+'"/>' +
+        '<animateTransform attributeName="transform" type="rotate" values="-3 80 82;3 80 82;-3 80 82" dur="2s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Eyes
+      '<circle cx="72" cy="66" r="3.5" fill="#0a0800"/>' +
+      '<circle cx="88" cy="66" r="3.5" fill="#0a0800"/>' +
+      '<circle cx="73" cy="65" r="1.3" fill="'+G2+'" opacity=".7"/>' +
+      // Pulsing glow
+      '<circle cx="80" cy="76" r="28" fill="none" stroke="'+G+'" stroke-width="1" opacity=".2">' +
+        '<animate attributeName="r" values="28;34;28" dur="2.5s" repeatCount="indefinite"/>' +
+        '<animate attributeName="opacity" values=".2;0;.2" dur="2.5s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '25s', '6 6'
+    ),
+    gemini: wrapSVG(
+      '<g>' +
+      '<ellipse cx="60" cy="80" rx="20" ry="28" fill="#ffca28" opacity=".08"/>' +
+      '<ellipse cx="100" cy="80" rx="20" ry="28" fill="#ffca28" opacity=".08"/>' +
+      // Left twin
+      '<circle cx="60" cy="64" r="15" fill="'+G+'"/>' +
+      '<rect x="46" y="77" width="28" height="32" rx="8" fill="'+G+'"/>' +
+      // Right twin
+      '<circle cx="100" cy="64" r="15" fill="'+G+'"/>' +
+      '<rect x="86" y="77" width="28" height="32" rx="8" fill="'+G+'"/>' +
+      // Animated mirror connection
+      '<line x1="75" y1="64" x2="85" y2="64" stroke="'+G2+'" stroke-width="2.5">' +
+        '<animate attributeName="opacity" values="1;.2;1" dur="1.4s" repeatCount="indefinite"/>' +
+      '</line>' +
+      '<line x1="74" y1="90" x2="86" y2="90" stroke="'+G2+'" stroke-width="2.5">' +
+        '<animate attributeName="opacity" values=".2;1;.2" dur="1.4s" repeatCount="indefinite"/>' +
+      '</line>' +
+      // Left face
+      '<circle cx="55" cy="62" r="2.5" fill="#0a0800"/>' +
+      '<circle cx="65" cy="62" r="2.5" fill="#0a0800"/>' +
+      '<path d="M55 68 Q60 71 65 68" fill="none" stroke="#0a0800" stroke-width="1.5" stroke-linecap="round"/>' +
+      // Right face
+      '<circle cx="95" cy="62" r="2.5" fill="#0a0800"/>' +
+      '<circle cx="105" cy="62" r="2.5" fill="#0a0800"/>' +
+      '<path d="M95 68 Q100 71 105 68" fill="none" stroke="#0a0800" stroke-width="1.5" stroke-linecap="round"/>' +
+      // Orbiting energy particle
+      '<circle r="3" fill="'+G2+'" opacity=".8">' +
+        '<animateMotion dur="3s" repeatCount="indefinite" path="M80,50 a30,12 0 1,1 0.1,0 Z"/>' +
+        '<animate attributeName="opacity" values=".8;.3;.8" dur="1.5s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '18s', '10 3'
+    ),
+    cancer: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="85" rx="28" ry="20" fill="#26c6da" opacity=".08"/>' +
+      // Body
+      '<ellipse cx="78" cy="84" rx="24" ry="16" fill="'+G+'"/>' +
+      // Claws with pinch animation
+      '<g>' +
+        '<path d="M54 78 C40 64 34 56 38 48 C42 40 54 44 56 56" fill="none" stroke="'+G+'" stroke-width="5" stroke-linecap="round"/>' +
+        '<circle cx="38" cy="48" r="8" fill="none" stroke="'+G+'" stroke-width="4"/>' +
+        '<animateTransform attributeName="transform" type="rotate" values="-4 54 78;4 54 78;-4 54 78" dur="2.2s" repeatCount="indefinite"/>' +
+      '</g>' +
+      '<g>' +
+        '<path d="M102 78 C116 64 122 56 118 48 C114 40 102 44 100 56" fill="none" stroke="'+G+'" stroke-width="5" stroke-linecap="round"/>' +
+        '<circle cx="118" cy="48" r="8" fill="none" stroke="'+G+'" stroke-width="4"/>' +
+        '<animateTransform attributeName="transform" type="rotate" values="4 102 78;-4 102 78;4 102 78" dur="2.2s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Legs
+      '<line x1="60" y1="92" x2="48" y2="106" stroke="'+G+'" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<line x1="66" y1="97" x2="54" y2="111" stroke="'+G+'" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<line x1="96" y1="92" x2="108" y2="106" stroke="'+G+'" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<line x1="90" y1="97" x2="102" y2="111" stroke="'+G+'" stroke-width="3.5" stroke-linecap="round"/>' +
+      // Eye stalks
+      '<line x1="72" y1="70" x2="68" y2="60" stroke="'+G+'" stroke-width="2.5"/>' +
+      '<circle cx="68" cy="58" r="4.5" fill="'+G+'"/><circle cx="68" cy="58" r="2" fill="#0a0800"/>' +
+      '<line x1="86" y1="70" x2="90" y2="60" stroke="'+G+'" stroke-width="2.5"/>' +
+      '<circle cx="90" cy="58" r="4.5" fill="'+G+'"/><circle cx="90" cy="58" r="2" fill="#0a0800"/>' +
+      // Bubble rising
+      '<circle cx="80" cy="110" r="3" fill="none" stroke="'+G2+'" stroke-width="1.5">' +
+        '<animate attributeName="cy" values="110;60" dur="2.5s" repeatCount="indefinite"/>' +
+        '<animate attributeName="opacity" values=".8;0" dur="2.5s" repeatCount="indefinite"/>' +
+        '<animate attributeName="r" values="3;6" dur="2.5s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '30s', '5 8'
+    ),
+    leo: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="80" rx="30" ry="30" fill="#ffa726" opacity=".1"/>' +
+      // Animated mane rays
+      '<circle cx="80" cy="78" r="34" fill="none" stroke="'+G+'" stroke-width="7" stroke-dasharray="5 3" opacity=".65">' +
+        '<animateTransform attributeName="transform" type="rotate" from="0 80 78" to="360 80 78" dur="12s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '<circle cx="80" cy="78" r="28" fill="none" stroke="'+G2+'" stroke-width="4" stroke-dasharray="3 5" opacity=".4">' +
+        '<animateTransform attributeName="transform" type="rotate" from="360 80 78" to="0 80 78" dur="8s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      // Head
+      '<circle cx="80" cy="78" r="22" fill="'+G+'"/>' +
+      // Eyes
+      '<circle cx="72" cy="74" r="3.8" fill="#0a0800"/>' +
+      '<circle cx="88" cy="74" r="3.8" fill="#0a0800"/>' +
+      '<circle cx="73" cy="73" r="1.5" fill="'+G2+'" opacity=".8"/>' +
+      // Nose
+      '<ellipse cx="80" cy="82" rx="6" ry="4" fill="'+GS+'"/>' +
+      '<path d="M73 86 Q80 91 87 86" fill="none" stroke="'+GS+'" stroke-width="2.2" stroke-linecap="round"/>' +
+      // Whiskers
+      '<line x1="58" y1="80" x2="72" y2="82" stroke="'+G2+'" stroke-width="1.5" opacity=".8"/>' +
+      '<line x1="58" y1="85" x2="72" y2="84" stroke="'+G2+'" stroke-width="1.5" opacity=".7"/>' +
+      '<line x1="102" y1="80" x2="88" y2="82" stroke="'+G2+'" stroke-width="1.5" opacity=".8"/>' +
+      '<line x1="102" y1="85" x2="88" y2="84" stroke="'+G2+'" stroke-width="1.5" opacity=".7"/>' +
+      // Ears
+      '<polygon points="62,56 70,70 56,70" fill="'+G+'"/>' +
+      '<polygon points="98,56 104,70 90,70" fill="'+G+'"/>' +
+      // Crown glow
+      '<circle cx="80" cy="78" r="24" fill="none" stroke="'+G2+'" stroke-width="1.5" opacity=".3">' +
+        '<animate attributeName="opacity" values=".3;.8;.3" dur="2s" repeatCount="indefinite"/>' +
+        '<animate attributeName="r" values="24;27;24" dur="2s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '15s', '12 3'
+    ),
+    virgo: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="80" rx="28" ry="34" fill="#ab47bc" opacity=".08"/>' +
+      // Head
+      '<circle cx="80" cy="58" r="16" fill="'+G+'"/>' +
+      // Flowing hair
+      '<path d="M64 52 C58 38 68 30 80 34 C92 30 102 38 96 52" fill="'+G+'"/>' +
+      '<path d="M64 52 C56 62 54 75 59 84" fill="none" stroke="'+G+'" stroke-width="4.5" stroke-linecap="round"/>' +
+      '<path d="M96 52 C104 62 106 75 101 84" fill="none" stroke="'+G+'" stroke-width="3" stroke-linecap="round" opacity=".6"/>' +
+      // Robe
+      '<path d="M63 72 L58 114 L102 114 L97 72 Z" fill="'+G+'"/>' +
+      // Belt
+      '<rect x="61" y="82" width="38" height="6" rx="3" fill="'+GS+'"/>' +
+      // Wheat stalk with sway
+      '<g>' +
+        '<path d="M102 104 C110 90 115 76 110 62" fill="none" stroke="'+G+'" stroke-width="3.5" stroke-linecap="round"/>' +
+        '<ellipse cx="110" cy="60" rx="5.5" ry="9" fill="'+G+'" transform="rotate(-22 110 60)"/>' +
+        '<line x1="106" y1="72" x2="115" y2="68" stroke="'+G+'" stroke-width="2.5"/>' +
+        '<line x1="104" y1="79" x2="114" y2="75" stroke="'+G+'" stroke-width="2.5"/>' +
+        '<line x1="103" y1="86" x2="113" y2="84" stroke="'+G+'" stroke-width="2"/>' +
+        '<animateTransform attributeName="transform" type="rotate" values="-4 102 104;4 102 104;-4 102 104" dur="2.8s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Face
+      '<circle cx="74" cy="56" r="2.5" fill="#0a0800"/>' +
+      '<circle cx="86" cy="56" r="2.5" fill="#0a0800"/>' +
+      '<path d="M76 62 Q80 65 84 62" fill="none" stroke="'+GS+'" stroke-width="1.5" stroke-linecap="round"/>' +
+      '</g>',
+      '22s', '4 4'
+    ),
+    libra: wrapSVG(
+      '<g>' +
+      // Glow
+      '<ellipse cx="80" cy="80" rx="30" ry="28" fill="#ec407a" opacity=".07"/>' +
+      // Central pillar
+      '<rect x="78" y="54" width="4" height="38" rx="2" fill="'+G+'"/>' +
+      '<circle cx="80" cy="52" r="7" fill="'+G+'"/>' +
+      // Top beam
+      '<rect x="54" y="57" width="52" height="4" rx="2" fill="'+G+'"/>' +
+      // Left scale chain + pan with tilt animation
+      '<g>' +
+        '<line x1="60" y1="60" x2="50" y2="78" stroke="'+G+'" stroke-width="2.5"/>' +
+        '<line x1="76" y1="60" x2="68" y2="78" stroke="'+G+'" stroke-width="2.5"/>' +
+        '<path d="M46 78 Q59 84 72 78" fill="'+G+'" opacity=".8"/>' +
+        '<ellipse cx="59" cy="80" rx="13" ry="4" fill="'+GS+'" opacity=".6"/>' +
+        '<animateTransform attributeName="transform" type="rotate" values="-8 65 60;8 65 60;-8 65 60" dur="3s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Right scale chain + pan
+      '<g>' +
+        '<line x1="84" y1="60" x2="92" y2="74" stroke="'+G+'" stroke-width="2.5"/>' +
+        '<line x1="100" y1="60" x2="110" y2="74" stroke="'+G+'" stroke-width="2.5"/>' +
+        '<path d="M88 74 Q101 80 114 74" fill="'+G+'" opacity=".8"/>' +
+        '<ellipse cx="101" cy="76" rx="13" ry="4" fill="'+GS+'" opacity=".6"/>' +
+        '<animateTransform attributeName="transform" type="rotate" values="8 95 60;-8 95 60;8 95 60" dur="3s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Base
+      '<rect x="66" y="92" width="28" height="5" rx="2.5" fill="'+G+'"/>' +
+      '<ellipse cx="80" cy="100" rx="18" ry="5" fill="'+G+'" opacity=".5"/>' +
+      // Balance sparkle
+      '<circle cx="80" cy="54" r="2" fill="'+G2+'">' +
+        '<animate attributeName="opacity" values="1;.2;1" dur="1.2s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '24s', '7 5'
+    ),
+    scorpio: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="85" rx="28" ry="22" fill="#8d6e63" opacity=".09"/>' +
+      // Body
+      '<ellipse cx="74" cy="82" rx="20" ry="13" fill="'+G+'"/>' +
+      // Tail segments with glow
+      '<circle cx="96" cy="82" r="7" fill="'+G+'"/>' +
+      '<circle cx="109" cy="76" r="6" fill="'+G+'"/>' +
+      '<circle cx="118" cy="64" r="5" fill="'+G+'"/>' +
+      '<circle cx="121" cy="52" r="4" fill="'+G+'"/>' +
+      // Stinger with pulse
+      '<g>' +
+        '<path d="M121 52 C126 42 124 34 116 34" fill="none" stroke="'+G+'" stroke-width="3.5" stroke-linecap="round"/>' +
+        '<polygon points="116,32 120,40 112,40" fill="'+G2+'"/>' +
+        '<animate attributeName="opacity" values="1;.5;1" dur="1.5s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Claws
+      '<path d="M60 76 C48 64 40 58 36 65 C32 72 40 82 52 80" fill="none" stroke="'+G+'" stroke-width="4.5" stroke-linecap="round"/>' +
+      '<path d="M60 88 C48 100 40 104 36 97 C32 90 40 82 52 84" fill="none" stroke="'+G+'" stroke-width="4.5" stroke-linecap="round"/>' +
+      // Legs
+      '<line x1="70" y1="93" x2="60" y2="108" stroke="'+G+'" stroke-width="3" stroke-linecap="round"/>' +
+      '<line x1="78" y1="95" x2="74" y2="112" stroke="'+G+'" stroke-width="3" stroke-linecap="round"/>' +
+      // Eyes
+      '<circle cx="66" cy="78" r="3" fill="#0a0800"/>' +
+      '<circle cx="74" cy="76" r="3" fill="#0a0800"/>' +
+      // Venom drip from stinger
+      '<circle cx="116" cy="32" r="2" fill="'+G2+'" opacity=".8">' +
+        '<animate attributeName="cy" values="32;50;32" dur="1.8s" repeatCount="indefinite"/>' +
+        '<animate attributeName="opacity" values=".8;0;.8" dur="1.8s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '28s', '3 6'
+    ),
+    sagittarius: wrapSVG(
+      '<g>' +
+      '<ellipse cx="78" cy="95" rx="26" ry="18" fill="#42a5f5" opacity=".08"/>' +
+      // Horse body
+      '<ellipse cx="70" cy="100" rx="24" ry="14" fill="'+G+'"/>' +
+      // Legs with trot animation
+      '<g>' +
+        '<rect x="52" y="112" width="6" height="22" rx="3" fill="'+G+'"/>' +
+        '<rect x="64" y="114" width="6" height="20" rx="3" fill="'+G+'"/>' +
+        '<rect x="78" y="112" width="6" height="22" rx="3" fill="'+G+'"/>' +
+        '<rect x="90" y="114" width="6" height="20" rx="3" fill="'+G+'"/>' +
+        '<animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="0.8s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Human torso
+      '<ellipse cx="84" cy="80" rx="13" ry="17" fill="'+G+'"/>' +
+      '<circle cx="84" cy="62" r="13" fill="'+G+'"/>' +
+      // Bow
+      '<path d="M98 50 C112 58 114 76 106 82" fill="none" stroke="'+G+'" stroke-width="4.5" stroke-linecap="round"/>' +
+      '<line x1="98" y1="50" x2="106" y2="82" stroke="'+G2+'" stroke-width="1.5" stroke-dasharray="3 2"/>' +
+      // Arrow with flight animation
+      '<g>' +
+        '<line x1="70" y1="66" x2="106" y2="66" stroke="'+G+'" stroke-width="3"/>' +
+        '<polygon points="106,63 116,66 106,69" fill="'+G2+'"/>' +
+        '<animateTransform attributeName="transform" type="translate" values="0 0;8 0;0 0" dur="1.5s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Face
+      '<circle cx="78" cy="60" r="2.5" fill="#0a0800"/>' +
+      '<circle cx="88" cy="60" r="2.5" fill="#0a0800"/>' +
+      '</g>',
+      '16s', '9 4'
+    ),
+    capricorn: wrapSVG(
+      '<g>' +
+      '<ellipse cx="76" cy="85" rx="26" ry="28" fill="#78909c" opacity=".09"/>' +
+      // Goat head
+      '<circle cx="72" cy="62" r="17" fill="'+G+'"/>' +
+      // Animated horns
+      '<g>' +
+        '<path d="M62 50 C56 36 64 28 72 34" fill="none" stroke="'+G+'" stroke-width="5.5" stroke-linecap="round"/>' +
+        '<path d="M82 50 C88 36 94 32 92 42" fill="none" stroke="'+G+'" stroke-width="4.5" stroke-linecap="round"/>' +
+      '</g>' +
+      // Beard
+      '<path d="M64 76 C62 88 64 96 72 94 C80 96 82 88 80 76" fill="'+G+'" opacity=".8"/>' +
+      // Body
+      '<ellipse cx="80" cy="90" rx="18" ry="13" fill="'+G+'"/>' +
+      // Fish tail with wave
+      '<g>' +
+        '<path d="M78 102 C76 114 70 122 66 126" fill="none" stroke="'+G+'" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M82 102 C84 114 90 122 94 126" fill="none" stroke="'+G+'" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M62 124 C66 120 70 126 66 130 Z" fill="'+G+'"/>' +
+        '<path d="M90 124 C94 120 98 126 94 130 Z" fill="'+G+'"/>' +
+        '<path d="M74 110 Q80 116 86 110" fill="none" stroke="'+G2+'" stroke-width="2"/>' +
+        '<path d="M72 118 Q80 125 88 118" fill="none" stroke="'+G2+'" stroke-width="2"/>' +
+        '<animateTransform attributeName="transform" type="translate" values="0 0;2 3;-2 1;0 0" dur="2s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Eyes
+      '<circle cx="65" cy="60" r="3.2" fill="#0a0800"/>' +
+      '<circle cx="79" cy="60" r="3.2" fill="#0a0800"/>' +
+      '</g>',
+      '35s', '5 5'
+    ),
+    aquarius: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="72" rx="24" ry="28" fill="#5c6bc0" opacity=".09"/>' +
+      // Person body
+      '<circle cx="80" cy="52" r="14" fill="'+G+'"/>' +
+      '<ellipse cx="80" cy="74" rx="16" ry="18" fill="'+G+'"/>' +
+      // Arms
+      '<path d="M66 70 C50 66 44 74 46 82" fill="none" stroke="'+G+'" stroke-width="5.5" stroke-linecap="round"/>' +
+      '<path d="M94 70 C110 66 116 74 114 82" fill="none" stroke="'+G+'" stroke-width="5.5" stroke-linecap="round"/>' +
+      // Urns
+      '<path d="M40 82 C36 88 36 100 40 104 L52 104 C56 100 56 88 52 82 Z" fill="'+G+'"/>' +
+      '<ellipse cx="46" cy="82" rx="6" ry="3.5" fill="'+G2+'" opacity=".8"/>' +
+      '<path d="M106 82 C102 88 102 100 106 104 L118 104 C122 100 122 88 118 82 Z" fill="'+G+'"/>' +
+      '<ellipse cx="112" cy="82" rx="6" ry="3.5" fill="'+G2+'" opacity=".8"/>' +
+      // Animated water waves
+      '<g opacity=".9">' +
+        '<path d="M44 110 C48 106 54 114 58 110 C62 106 68 114 72 110 C76 106 80 114 80 110" fill="none" stroke="'+G2+'" stroke-width="2.5" stroke-linecap="round">' +
+          '<animate attributeName="d" values="M44 110 C48 106 54 114 58 110 C62 106 68 114 72 110 C76 106 80 114 80 110;M44 113 C48 109 54 117 58 113 C62 109 68 117 72 113 C76 109 80 117 80 113;M44 110 C48 106 54 114 58 110 C62 106 68 114 72 110 C76 106 80 114 80 110" dur="1.2s" repeatCount="indefinite"/>' +
+        '</path>' +
+        '<path d="M80 110 C84 106 90 114 94 110 C98 106 104 114 108 110 C112 106 118 114 116 110" fill="none" stroke="'+G2+'" stroke-width="2.5" stroke-linecap="round">' +
+          '<animate attributeName="d" values="M80 110 C84 106 90 114 94 110 C98 106 104 114 108 110;M80 113 C84 109 90 117 94 113 C98 109 104 117 108 113;M80 110 C84 106 90 114 94 110 C98 106 104 114 108 110" dur="1.2s" repeatCount="indefinite"/>' +
+        '</path>' +
+      '</g>' +
+      // Face
+      '<circle cx="74" cy="50" r="2.5" fill="#0a0800"/>' +
+      '<circle cx="86" cy="50" r="2.5" fill="#0a0800"/>' +
+      '<path d="M76 56 Q80 59 84 56" fill="none" stroke="'+GS+'" stroke-width="1.5" stroke-linecap="round"/>' +
+      '</g>',
+      '20s', '11 4'
+    ),
+    pisces: wrapSVG(
+      '<g>' +
+      '<ellipse cx="80" cy="80" rx="32" ry="32" fill="#26a69a" opacity=".08"/>' +
+      // Upper fish (swimming right) with animation
+      '<g>' +
+        '<ellipse cx="80" cy="62" rx="26" ry="11" fill="'+G+'"/>' +
+        '<polygon points="106,58 120,54 120,70" fill="'+G+'"/>' +
+        '<polygon points="54,56 42,50 44,68" fill="'+G+'"/>' +
+        '<circle cx="70" cy="60" r="3.5" fill="#0a0800"/>' +
+        '<path d="M70 68 C80 73 90 68 98 70" fill="none" stroke="'+GS+'" stroke-width="1.5"/>' +
+        '<animateTransform attributeName="transform" type="translate" values="0 0;5 -3;-3 2;0 0" dur="2.4s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Lower fish (swimming left) with animation
+      '<g>' +
+        '<ellipse cx="80" cy="98" rx="26" ry="11" fill="'+G+'"/>' +
+        '<polygon points="54,94 40,88 40,106" fill="'+G+'"/>' +
+        '<polygon points="106,92 118,86 116,100" fill="'+G+'"/>' +
+        '<circle cx="90" cy="96" r="3.5" fill="#0a0800"/>' +
+        '<path d="M90 104 C80 108 70 104 62 106" fill="none" stroke="'+GS+'" stroke-width="1.5"/>' +
+        '<animateTransform attributeName="transform" type="translate" values="0 0;-5 3;3 -2;0 0" dur="2.4s" repeatCount="indefinite"/>' +
+      '</g>' +
+      // Center ribbon
+      '<path d="M80 73 C72 78 88 84 80 89" fill="none" stroke="'+G2+'" stroke-width="3" stroke-linecap="round"/>' +
+      // Animated bubbles
+      '<circle cx="114" cy="70" r="2.5" fill="none" stroke="'+G2+'" stroke-width="1.5">' +
+        '<animate attributeName="cy" values="70;40" dur="2s" repeatCount="indefinite"/>' +
+        '<animate attributeName="opacity" values=".8;0" dur="2s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '<circle cx="46" cy="100" r="2" fill="none" stroke="'+G2+'" stroke-width="1.5">' +
+        '<animate attributeName="cy" values="100;70" dur="2.6s" repeatCount="indefinite"/>' +
+        '<animate attributeName="opacity" values=".7;0" dur="2.6s" repeatCount="indefinite"/>' +
+      '</circle>' +
+      '</g>',
+      '26s', '6 7'
+    )
+  };
+  return svgs[sign] || svgs.aries;
+}
+
+function getStars(c) {
+  var positions = [[20,25],[135,30],[15,120],[140,115],[50,14],[110,140],[12,70],[148,75]];
+  return positions.map(function(p,i){
+    var dur = (1.5 + i*0.3).toFixed(1);
+    return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="'+c+'" opacity=".7"><animate attributeName="opacity" values=".7;0;.7" dur="'+dur+'s" repeatCount="indefinite"/><animate attributeName="r" values="2.5;1;2.5" dur="'+dur+'s" repeatCount="indefinite"/></circle>';
+  }).join('');
+}
+
+function zodiacRead() {
+  var month = document.getElementById('zod-month').value;
+  var day = document.getElementById('zod-day').value;
+  if (!month || !day) { showToast('اختر الشهر واليوم أولاً 📅'); return; }
+  if (!_zodGender) { showToast('اختر النوع (ذكر / أنثى) أولاً'); return; }
+  if (!canUseTool('zodiac')) { showTrialExpiredModal('zodiac'); return; }
+  incToolUsage('zodiac');
+
+  zodiacDetect();
+  var sign = _zodSign || getZodiacSign(month, day);
+  var data = ZODIAC_DATA[sign];
+  var genderText = _zodGender === 'male' ? 'ذكر' : 'أنثى';
+  var todayStr = new Date().toLocaleDateString('ar-EG', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var resBox = document.getElementById('zodiac-result');
+
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:20px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">⭐ جاري تحليل شخصيتك...</span></div>';
+
+  var prompt = 'أنت منجّم وخبير في علم الأبراج الفلكية الغربية بخبرة عميقة.\n\nالشخص: ' + genderText + '، برجه: ' + data.ar + ' (' + data.en + ')، الفترة: ' + data.dates + '، العنصر: ' + data.element + '، الكوكب الحاكم: ' + data.planet + '.\n\nاكتب تقريراً شاملاً ومفصّلاً وفق هذا الهيكل بالضبط:\n\n**🌟 الشخصية والطباع**\nاشرح شخصية مولود برج ' + data.ar + ' بتفصيل حقيقي — تحدث عن طريقة تفكيره، نمط حياته، كيف يتعامل مع الناس، ما الذي يحرّكه من الداخل، وما يميّزه عن بقية الأبراج. اكتب فقرة كاملة من 5 إلى 6 جمل.\n\n**❤️ في الحب والعلاقات**\nاشرح بتفصيل كيف يكون ' + (genderText==='ذكر'?'مولود':'مولودة') + ' برج ' + data.ar + ' في الحب: كيف يُحب، ما الذي يبحث عنه في الشريك، كيف يتصرف في بداية العلاقة وفي استمرارها، ما أكثر ما يؤلمه عاطفياً، وما الذي يجعله يبقى في العلاقة أو يتركها. اكتب فقرة من 5 إلى 6 جمل.\n\n**💼 في العمل والطموح**\nاشرح بتفصيل نمط عمل مولود برج ' + data.ar + ': كيف يؤدي مهامه، هل هو قائد أم منفذ، أي البيئات تناسبه، أبرز المجالات التي يتألق فيها، وكيف يتعامل مع الضغط والمنافسة. اكتب فقرة من 4 إلى 5 جمل.\n\n**⚡ نقاط القوة والضعف**\nاذكر نقاط القوة (4 نقاط على الأقل مع شرح مختصر لكل منها) ونقاط الضعف (3 نقاط بصراحة مع شرح لماذا تمثّل تحدياً حقيقياً).\n\n**💡 النصيحة الذهبية لبرج ' + data.ar + '**\nاكتب نصيحة حقيقية ومعمّقة لمولود هذا البرج تساعده على استثمار طاقته بشكل صحيح — 3 إلى 4 جمل مباشرة وعملية.\n\nقواعد: عربي فصيح بسيط — جمل واضحة ومعبّرة — لا إجابات مختصرة جداً — اجعل القارئ يشعر أن الكلام يصفه بدقة.';
+
+  _callClaudeAPI(prompt, null).then(function(res) {
+    var c = data.color;
+    var c2 = data.color2;
+
+    // Parse sections from response
+    var sections = _parseZodiacSections(res);
+
+    var html = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '44;border-radius:22px;overflow:hidden;margin-bottom:14px">';
+
+    // Header with animated mini-SVG
+    html += '<div style="background:linear-gradient(135deg,' + c + '28,' + c + '10);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ' + c + '30">';
+    html += '<div style="flex-shrink:0">' + getZodiacSVG(sign, c, c2).replace('width="150" height="150"','width="62" height="62"') + '</div>';
+    html += '<div><div style="font-size:1.05rem;font-weight:900;color:' + c2 + '">' + data.ar + ' — ' + data.en + '</div>';
+    html += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + data.dates + ' • ' + data.element + ' • ' + data.planet + '</div></div>';
+    html += '</div>';
+
+    // Section cards
+    var sectionDefs = [
+      { key: 'personality', icon: '🌟', title: 'الشخصية والطباع', grad: 'rgba(201,168,76,.15),rgba(201,168,76,.05)', border: 'rgba(201,168,76,.4)', tc: '#f0d060' },
+      { key: 'love', icon: '❤️', title: 'الحب والعلاقات', grad: 'rgba(236,64,122,.15),rgba(236,64,122,.05)', border: 'rgba(236,64,122,.4)', tc: '#f48fb1' },
+      { key: 'career', icon: '💼', title: 'العمل والطموح', grad: 'rgba(33,150,243,.15),rgba(33,150,243,.05)', border: 'rgba(33,150,243,.4)', tc: '#90caf9' },
+      { key: 'strength', icon: '⚡', title: 'القوة والضعف', grad: 'rgba(102,187,106,.15),rgba(102,187,106,.05)', border: 'rgba(102,187,106,.4)', tc: '#a5d6a7' },
+      { key: 'advice', icon: '💡', title: 'النصيحة الذهبية', grad: 'rgba(255,193,7,.18),rgba(255,193,7,.06)', border: 'rgba(255,193,7,.5)', tc: '#ffe082' }
+    ];
+
+    html += '<div style="padding:14px;display:flex;flex-direction:column;gap:10px">';
+    sectionDefs.forEach(function(s, idx) {
+      var content = sections[s.key] || '';
+      if (!content) return;
+      html += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,' + s.grad + ');border:1.5px solid ' + s.border + ';animation-delay:' + (idx*0.1).toFixed(2) + 's">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      html += '<span style="font-size:1.2rem">' + s.icon + '</span>';
+      html += '<span style="font-size:.82rem;font-weight:900;color:' + s.tc + '">' + s.title + '</span>';
+      html += '</div>';
+      html += '<div style="font-size:.82rem;color:var(--txt);line-height:1.8;white-space:pre-line">' + content + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس — لا يُعد حقيقة علمية مثبتة.</div>';
+    html += '</div>';
+    resBox.innerHTML = html;
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل، حاول مرة أخرى.</div>';
+  });
+}
+
+// دالة تحليل الأقسام من النص
+function _parseZodiacSections(text) {
+  var result = { personality: '', love: '', career: '', strength: '', advice: '', fortune: '' };
+  var lines = text.split('\n');
+  var current = null;
+  var buf = [];
+
+  function flush() {
+    if (current) result[current] = buf.join('\n').trim();
+    buf = [];
+  }
+
+  lines.forEach(function(line) {
+    var l = line.trim();
+    if (/شخصية|طباع|الشخص/.test(l)) { flush(); current = 'personality'; }
+    else if (/الحب|علاقات/.test(l)) { flush(); current = 'love'; }
+    else if (/العمل|الطموح|المهن/.test(l)) { flush(); current = 'career'; }
+    else if (/قوة|ضعف|القوة/.test(l)) { flush(); current = 'strength'; }
+    else if (/نصيحة|ذهبية/.test(l)) { flush(); current = 'advice'; }
+    else if (/حظ|توقع|اليوم/.test(l)) { flush(); current = 'fortune'; }
+    else if (current && l && !/^\*\*/.test(l)) { buf.push(l.replace(/^\*+/, '').trim()); }
+  });
+  flush();
+
+  // fallback: split by bold headers if parsing failed
+  if (!result.personality && !result.love) {
+    var parts = text.split(/\*\*[^*]+\*\*/g).filter(function(p){ return p.trim(); });
+    var keys = ['personality','love','career','strength','advice','fortune'];
+    parts.forEach(function(p,i){ if(keys[i]) result[keys[i]] = p.trim(); });
+  }
+  // if still empty just show raw text in personality
+  if (!result.personality) result.personality = text;
+  return result;
+}
+
+// دالة توقعات اليوم المنفصلة
+function zodiacTodayFortune() {
+  if (!_zodSign) { showToast('اختر تاريخ ميلادك أولاً 📅'); return; }
+  var data = ZODIAC_DATA[_zodSign];
+  var todayStr = new Date().toLocaleDateString('ar-EG', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var fortuneBox = document.getElementById('zodiac-fortune-result');
+
+  fortuneBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:20px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🔮 جاري استشراف حظك اليوم...</span></div>';
+
+  // تمرير الصفحة للنتيجة
+  setTimeout(function(){
+    fortuneBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 200);
+
+  var prompt = 'أنت منجّم خبير في علم الأبراج.\n\nاليوم: ' + todayStr + '\nالبرج: ' + data.ar + ' (' + data.en + ')\n\nاكتب توقعات اليوم لبرج ' + data.ar + ' في خمسة أقسام بالضبط وكل قسم جملتان أو ثلاث:\n\n**💼 العمل والمال**\nما يخص العمل والمال اليوم لمولود برج ' + data.ar + '.\n\n**❤️ الحب والعاطفة**\nما يخص الحياة العاطفية والمشاعر والعلاقات الرومانسية اليوم بتفصيل.\n\n**💚 الصحة والطاقة**\nما يخص الصحة والطاقة ومستوى الحيوية اليوم.\n\n**🔭 المستقبل القريب**\nما ينتظر مولود برج ' + data.ar + ' في الأيام والأسابيع القادمة من فرص وتحديات.\n\nثم أضف:\n**⭐ نجمة اليوم لبرج ' + data.ar + '**\nجملة واحدة ملخّصة ومحفّزة لهذا اليوم.\n\nقواعد: كن محدداً لبرج ' + data.ar + ' وليس كلاماً عاماً — عربي بسيط مباشر.';
+
+  _callClaudeAPI(prompt, null).then(function(res) {
+    var c = data.color;
+    var c2 = data.color2;
+    var sections = _parseFortuneSections(res);
+
+    var html = '<div style="background:linear-gradient(145deg,rgba(10,20,38,.98),rgba(5,12,28,.99));border:2px solid ' + c + '66;border-radius:22px;overflow:hidden;margin-bottom:14px">';
+
+    // Header
+    html += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.3),rgba(201,168,76,.15));padding:14px 16px;border-bottom:1px solid ' + c + '40">';
+    html += '<div style="display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:1.8rem">🔮</span>';
+    html += '<div>';
+    html += '<div style="font-size:.95rem;font-weight:900;color:' + c2 + '">حظ برج ' + data.ar + ' اليوم</div>';
+    html += '<div style="font-size:.68rem;color:' + c + ';margin-top:2px">' + todayStr + '</div>';
+    html += '</div></div></div>';
+
+    // Fortune section cards
+    var fortuneSections = [
+      { key: 'work', icon: '💼', title: 'العمل والمال', grad: 'rgba(33,150,243,.15),rgba(33,150,243,.05)', border: 'rgba(33,150,243,.45)', tc: '#90caf9' },
+      { key: 'love', icon: '❤️', title: 'الحب والعاطفة', grad: 'rgba(233,30,99,.14),rgba(233,30,99,.05)', border: 'rgba(233,30,99,.45)', tc: '#f48fb1' },
+      { key: 'health', icon: '💚', title: 'الصحة والطاقة', grad: 'rgba(76,175,80,.14),rgba(76,175,80,.05)', border: 'rgba(76,175,80,.45)', tc: '#a5d6a7' },
+      { key: 'future', icon: '🔭', title: 'المستقبل القريب', grad: 'rgba(156,39,176,.14),rgba(156,39,176,.05)', border: 'rgba(156,39,176,.45)', tc: '#ce93d8' }
+    ];
+
+    html += '<div style="padding:14px;display:flex;flex-direction:column;gap:10px">';
+    fortuneSections.forEach(function(s, idx) {
+      var content = sections[s.key] || '';
+      if (!content) return;
+      html += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,' + s.grad + ');border:1.5px solid ' + s.border + ';animation-delay:' + (idx*0.15).toFixed(2) + 's">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      html += '<span style="font-size:1.4rem">' + s.icon + '</span>';
+      html += '<span style="font-size:.85rem;font-weight:900;color:' + s.tc + '">' + s.title + '</span>';
+      html += '</div>';
+      html += '<div style="font-size:.83rem;color:var(--txt);line-height:1.85">' + content + '</div>';
+      html += '</div>';
+    });
+
+    // Star of the day card
+    if (sections.star) {
+      html += '<div class="zod-fortune-card" style="background:linear-gradient(145deg,rgba(201,168,76,.2),rgba(201,168,76,.06));border:1.5px solid rgba(201,168,76,.6);text-align:center;animation-delay:.45s">';
+      html += '<div style="font-size:1.1rem;margin-bottom:6px">⭐</div>';
+      html += '<div style="font-size:.82rem;font-weight:800;color:#f0d060;line-height:1.7">' + sections.star + '</div>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+    html += '<div style="padding:8px 14px 12px;font-size:.65rem;color:var(--txt3);text-align:center">🔮 علم الأبراج للترفيه والاستئناس فقط.</div>';
+    html += '</div>';
+    fortuneBox.innerHTML = html;
+    setTimeout(function(){ fortuneBox.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
+  }).catch(function() {
+    fortuneBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر تحميل التوقعات، حاول مرة أخرى.</div>';
+  });
+}
+
+function _parseFortuneSections(text) {
+  var result = { work:'', love:'', health:'', future:'', star:'' };
+  var lines = text.split('\n');
+  var current = null;
+  var buf = [];
+
+  function flush() { if (current) result[current] = buf.join('\n').trim(); buf = []; }
+
+  lines.forEach(function(line) {
+    var l = line.trim();
+    if (/العمل|المال/.test(l)) { flush(); current = 'work'; }
+    else if (/الحب|علاقات|عاطف/.test(l)) { flush(); current = 'love'; }
+    else if (/الصحة|طاقة|حيوية/.test(l)) { flush(); current = 'health'; }
+    else if (/المستقبل|القريب|قادم/.test(l)) { flush(); current = 'future'; }
+    else if (/نجمة|نجم اليوم|ملخص|ملخّص/.test(l)) { flush(); current = 'star'; }
+    else if (current && l && !/^\*\*/.test(l)) { buf.push(l.replace(/^\*+/, '').trim()); }
+  });
+  flush();
+
+  if (!result.work && !result.love) {
+    var parts = text.split(/\*\*[^*]+\*\*/g).filter(function(p){ return p.trim(); });
+    ['work','love','health','future','star'].forEach(function(k,i){ if(parts[i]) result[k]=parts[i].trim(); });
+  }
+  if (!result.work) { result.work = text; }
+  return result;
+}
+
+function getZodiacEmoji(sign) {
+  var emojis = { aries:'♈', taurus:'♉', gemini:'♊', cancer:'♋', leo:'♌', virgo:'♍', libra:'♎', scorpio:'♏', sagittarius:'♐', capricorn:'♑', aquarius:'♒', pisces:'♓' };
+  return emojis[sign] || '⭐';
+}
+
+
+var _palmImageData = null;
+var _palmStream = null;
+var _palmMode = 'full';
+
+function palmSetMode(mode) {
+  _palmMode = mode;
+  var modes = ['full','love','career','health'];
+  var colors = { full: '#ff5722', love: '#e91e63', career: '#2196f3', health: '#4caf50' };
+  modes.forEach(function(m) {
+    var btn = document.getElementById('palm-mode-' + m);
+    if (!btn) return;
+    if (m === mode) {
+      var c = colors[m] || '#ff5722';
+      btn.style.borderColor = 'rgba(' + hexToRgb(c) + ',.6)';
+      btn.style.background = 'linear-gradient(135deg,rgba(' + hexToRgb(c) + ',.2),rgba(' + hexToRgb(c) + ',.08))';
+      btn.querySelector('i').style.color = c;
+      btn.querySelector('span').style.color = c;
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,.15)';
+      btn.style.background = 'rgba(255,255,255,.04)';
+    }
+  });
+}
+function hexToRgb(hex) {
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return r + ',' + g + ',' + b;
+}
+
+function palmLoadImage(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _palmImageData = e.target.result;
+    var preview = document.getElementById('palm-preview');
+    var img = document.getElementById('palm-img-preview');
+    if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
+    document.getElementById('palm-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="palmLoadImage(event)" style="display:none">';
+  };
+  reader.readAsDataURL(file);
+}
+
+function palmOpenCamera() {
+  var area = document.getElementById('palm-camera-area');
+  var video = document.getElementById('palm-video');
+  if (!area || !video) return;
+  if (_palmStream) { palmStopCamera(); return; }
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } })
+  .then(function(stream) {
+    _palmStream = stream;
+    video.srcObject = stream;
+    area.style.display = 'block';
+    document.getElementById('palm-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+  }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
+}
+
+function palmStopCamera() {
+  if (_palmStream) { _palmStream.getTracks().forEach(function(t) { t.stop(); }); _palmStream = null; }
+  var area = document.getElementById('palm-camera-area');
+  if (area) area.style.display = 'none';
+  var btn = document.getElementById('palm-camera-btn');
+  if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير كفك الآن</span>';
+}
+
+function palmCapture() {
+  var video = document.getElementById('palm-video');
+  if (!video || !_palmStream) { showToast('الكاميرا غير مفعلة'); return; }
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 960;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _palmImageData = canvas.toDataURL('image/jpeg', 0.95);
+  palmStopCamera();
+  var preview = document.getElementById('palm-preview');
+  var img = document.getElementById('palm-img-preview');
+  if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
+  showToast('✅ تم التقاط صورة الكف — اضغط اقرأ كفّي');
+}
+
+function palmAnalyze() {
+  if (!_palmImageData) { showToast('صوّر أو ارفع صورة كفك أولاً 🖐'); return; }
+  if (!canUseTool('palm')) { showTrialExpiredModal('palm'); return; }
+  incToolUsage('palm');
+  var resBox = document.getElementById('palm-result');
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🖐 جاري قراءة كفك...</span></div>';
+
+  var modePrompts = {
+    full: 'قدّم قراءة شاملة تشمل: الشخصية، العواطف، المسار المهني، الصحة، والتوقعات العامة.',
+    love: 'ركّز على الجانب العاطفي والعلاقات: خط القلب، الميل للحب، طبيعة العلاقات، الزواج.',
+    career: 'ركّز على المسار المهني والنجاح: خط القدر، الطموح، القدرات، الفرص المهنية.',
+    health: 'ركّز على جانب الصحة والطاقة: خط الحياة، الحيوية، نقاط القوة والضعف الجسدية.'
+  };
+
+  var prompt = 'أنت قارئ كف (palmist) خبير متخصص في علم قراءة الكف والخطوط والفلسفة الشرقية والغربية لهذا العلم.\n\nانظر إلى هذه الصورة لراحة اليد وحلّل ما تراه بدقة واحترافية.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nاتبع هذا الهيكل بالضبط في ردّك:\n\n**🖐 أولاً — شكل الكف والأصابع:**\nنوع الكف (ناري / ترابي / هوائي / مائي) وما يدل عليه من الشخصية.\n\n**📏 ثانياً — الخطوط الرئيسية:**\n• خط الحياة: وصف واضح ودلالته\n• خط القلب: وصف واضح ودلالته في العواطف\n• خط الرأس: وصف واضح ودلالته في التفكير\n• خط القدر (إن ظهر): وصف واضح ودلالته\n\n**✨ ثالثاً — ملاحظات خاصة:**\nأي علامات أو خطوط إضافية لافتة (خط الشمس، نجوم، مربعات، إلخ).\n\n**🔮 رابعاً — القراءة الشاملة:**\nفقرة واحدة واضحة تلخص شخصية صاحب الكف وأبرز ما يميزه.\n\nقواعد مهمة:\n- اكتب بالعربية الفصيحة البسيطة المفهومة تماماً\n- لا كلام غامض أو مبهم — كل جملة لها معنى واضح\n- كن محدداً وتفصيلياً بناءً على ما تراه في الصورة\n- في النهاية أضف: "هذه القراءة للترفيه والاستئناس فقط"';
+
+  _callClaudeAPIWithImage(prompt, _palmImageData).then(function(res) {
+    var modeLabels = { full: 'قراءة شاملة', love: 'الحياة العاطفية', career: 'المسار المهني', health: 'الصحة والحيوية' };
+    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">';
+    html += '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:1.6rem">🖐</span>';
+    html += '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف</div>';
+    html += '<div style="font-size:.68rem;color:#ffccbc;margin-top:2px">' + (modeLabels[_palmMode] || 'قراءة شاملة') + '</div></div>';
+    html += '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line">' + res + '</div>';
+    html += '<div style="padding:10px 14px 14px;background:rgba(255,87,34,.06);border-top:1px solid rgba(255,87,34,.15)">';
+    html += '<div style="font-size:.7rem;color:#ffab91;line-height:1.6">🔮 هذه القراءة للترفيه والاستئناس فقط ولا تُعدّ حقيقة علمية مثبتة.</div>';
+    html += '</div></div>';
+    resBox.innerHTML = html;
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر تحليل الكف، حاول تاني.</div>';
+  });
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
   updateTrialBadges();
   updatePremiumTabBadges();
+  loadSettingsToggles();
 });
 // تحديث فوري
 setTimeout(function(){ updateTrialBadges(); updatePremiumTabBadges(); }, 500);
@@ -10913,7 +12660,7 @@ function checkAdminTrialReset() {
         if (adminReset > localReset) {
           // Admin reset — clear all trial localStorage keys
           var trialKeys = ['scanner','food-scan','scan-food','scan-medicine','scan-report','scan-prescription',
-            'drug-interaction','drug-alt','xray','symptoms','barcode-boycott',
+            'drug-interaction','drug-alt','dream','fake-image','homework','palm','zodiac','symptoms','barcode-boycott',
             'protocols','recipes','challenges'];
           trialKeys.forEach(function(k) {
             localStorage.removeItem('tayyibat_trial_' + k);
@@ -10931,6 +12678,105 @@ function checkAdminTrialReset() {
 }
 // Check on load after Firebase is ready
 setTimeout(checkAdminTrialReset, 3000);
+
+/* ══════════════════════════════════════════════════════
+   📡 قناة التواصل مع لوحة التحكم (BroadcastChannel)
+══════════════════════════════════════════════════════ */
+(function() {
+  try {
+    var ch = new BroadcastChannel('tayyibat_admin_channel');
+
+    // استقبال أوامر لوحة التحكم
+    ch.addEventListener('message', function(e) {
+      var cmd = e.data;
+      if (!cmd || !cmd.type) return;
+
+      switch (cmd.type) {
+        // ── انتقل لصفحة معينة ──
+        case 'NAVIGATE':
+          if (cmd.page && typeof goPage === 'function') {
+            goPage(cmd.page);
+            showToast('📡 لوحة التحكم: فتح صفحة ' + cmd.page);
+          } else if (cmd.page && typeof goSmartTool === 'function') {
+            goSmartTool(cmd.page);
+          }
+          break;
+
+        // ── تفعيل / إلغاء تفعيل PRO ──
+        case 'SET_PRO':
+          if (window.currentUser) {
+            localStorage.setItem('tayyibat_pro_' + (window.currentUser.username || 'user'), JSON.stringify({
+              active: !!cmd.active,
+              expiresAt: cmd.expiresAt || 0,
+              lifetime: !!cmd.lifetime
+            }));
+            showToast(cmd.active ? '🎖️ تم تفعيل PRO بأمر الأدمن' : '⚠️ تم إيقاف PRO بأمر الأدمن');
+            if (typeof updatePremiumTabBadges === 'function') updatePremiumTabBadges();
+          }
+          break;
+
+        // ── إعادة تعيين التجارب ──
+        case 'RESET_TRIAL':
+          var trialKeys = ['scanner','food-scan','scan-food','scan-medicine','scan-report','scan-prescription',
+            'drug-interaction','drug-alt','dream','fake-image','homework','palm','zodiac','symptoms','barcode-boycott',
+            'protocols','recipes','challenges'];
+          trialKeys.forEach(function(k){ localStorage.removeItem('tayyibat_trial_' + k); });
+          localStorage.removeItem('tayyibat_trial_gemini_ai');
+          if (typeof updateTrialBadges === 'function') updateTrialBadges();
+          showToast('🔄 تم إعادة تعيين التجارب بأمر الأدمن');
+          break;
+
+        // ── رسالة إشعار ──
+        case 'NOTIFY':
+          if (cmd.message) showToast('📢 ' + cmd.message);
+          break;
+
+        // ── فتح صفحة البرج ──
+        case 'OPEN_ZODIAC':
+          if (typeof goSmartTool === 'function') goSmartTool('zodiac');
+          else if (typeof goPage === 'function') goPage('zodiac');
+          break;
+
+        // ── تحديث الشاشة ──
+        case 'RELOAD':
+          setTimeout(function(){ location.reload(); }, 500);
+          break;
+
+        // ── طلب معلومات المستخدم ──
+        case 'REQUEST_USER_INFO':
+          ch.postMessage({
+            type: 'USER_INFO',
+            user: window.currentUser || null,
+            isPro: !!(window.currentUser && window.currentUser.pro && window.currentUser.pro.active),
+            page: document.querySelector('.page.active')?.id || 'unknown',
+            ts: Date.now()
+          });
+          break;
+      }
+    });
+
+    // إرسال حالة المستخدم الحالية عند فتح الصفحة
+    setTimeout(function() {
+      ch.postMessage({
+        type: 'INDEX_READY',
+        user: window.currentUser || null,
+        ts: Date.now()
+      });
+    }, 2000);
+
+    // تحديث دوري كل 30 ثانية
+    setInterval(function() {
+      ch.postMessage({
+        type: 'INDEX_HEARTBEAT',
+        user: window.currentUser ? { username: window.currentUser.username, nameAr: window.currentUser.nameAr } : null,
+        page: document.querySelector('.page.active')?.id || 'unknown',
+        ts: Date.now()
+      });
+    }, 30000);
+
+    window._adminChannel = ch;
+  } catch(e) {}
+})();
 
 (function(){
   ['log','warn','error','info','debug','table','dir','trace'].forEach(function(k){
