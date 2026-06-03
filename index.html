@@ -1508,6 +1508,32 @@ body > div[style*="z-index:9"]:not(#daily-reward-panel):not(#pro-modal):not(.mod
 <body>
 <!-- ══ حاجب رسائل Puter المبكر — يعمل قبل أي شيء آخر ══ -->
 <script>
+/* ══════════════════════════════════════════════════
+   Early Wrappers — تُعرَّف قبل كل script blocks
+   تضمن عمل onclick قبل تحميل الـ blocks المتأخرة
+══════════════════════════════════════════════════ */
+function goSmartTool(toolKey) {
+  // Deferred: تنتظر تحميل الـ block الكامل إذا لزم
+  var fn = window._realGoSmartTool || (typeof arguments.callee._real === 'function' ? arguments.callee._real : null);
+  if (fn) { fn(toolKey); return; }
+  var tries = 0;
+  var iv = setInterval(function() {
+    tries++;
+    if (window._realGoSmartTool) { clearInterval(iv); window._realGoSmartTool(toolKey); }
+    else if (tries > 40) { clearInterval(iv); if (typeof goPage === 'function') goPage(toolKey); }
+  }, 80);
+}
+function goSmartToolScanner() {
+  if (window._realGoSmartToolScanner) { window._realGoSmartToolScanner(); return; }
+  var tries = 0;
+  var iv = setInterval(function() {
+    tries++;
+    if (window._realGoSmartToolScanner) { clearInterval(iv); window._realGoSmartToolScanner(); }
+    else if (tries > 40) { clearInterval(iv); if (typeof goPage === 'function') goPage('premium-scanner'); }
+  }, 80);
+}
+</script>
+<script>
 (function(){
   /* حذف فوري لأي عنصر يحتوي "Low Balance" */
   function _nukePuterModals(){
@@ -5053,7 +5079,7 @@ async function autoLogin() {
       currentUser = Object.assign({}, u, { username: s });
       if (currentUser.pro && currentUser.pro.active === true) {
         if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
-          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+          window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
         } else {
           currentUser.pro.active = false; window.isProUser = false;
         }
@@ -5177,7 +5203,7 @@ async function doLogin() {
     /* فحص Pro */
     if (currentUser.pro && currentUser.pro.active === true) {
       if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
-        window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+        window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
       } else {
         currentUser.pro.active = false; window.isProUser = false;
       }
@@ -5291,7 +5317,7 @@ function bootApp() {
       currentUser.pro = { active: false }; 
       window.isProUser = false; 
     } else {
-      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
     }
   }
   buildDisGrid('dis-grid-auth', []);
@@ -5391,7 +5417,7 @@ function updatePremiumTabBadges() {
 }
 
 function simulatePremiumUserActivationDirectly() {
-  window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+  window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
   if(currentUser) {
     currentUser.pro = { active: true, expiresAt: Date.now() + (1*3600000) };
     dbSaveUser(currentUser.username, currentUser);
@@ -5485,7 +5511,7 @@ function syncPremiumUIStates() {
 
   /* إذا كان أحد المصدرين نشطاً اعتبره برو */
   if (!window.isProUser && bestExp > now) {
-    window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+    window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
     if (currentUser) {
       currentUser.pro = currentUser.pro || {};
       currentUser.pro.active    = true;
@@ -9851,7 +9877,7 @@ window.addEventListener('DOMContentLoaded', function() {
       try { localStorage.setItem('tayyibat_pro_expiry_bonus', newExpiry.toString()); } catch(e) {}
 
       /* تفعيل PRO في الجلسة الحالية */
-      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
       if (window.currentUser) {
         window.currentUser.pro = window.currentUser.pro || {};
         window.currentUser.pro.active    = true;
@@ -10003,9 +10029,9 @@ async function handleGoogleUserData(googleUser) {
 
   if (currentUser.pro && currentUser.pro.active === true) {
     if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
     } else if (!currentUser.pro.expiresAt) {
-      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
     } else {
       currentUser.pro.active = false; window.isProUser = false;
     }
@@ -10438,6 +10464,8 @@ function updateTrialBadges() {
     if (wrap) wrap.style.display = window.isProUser ? 'none' : 'inline-flex';
   });
 }
+// ✅ تعريض الدوال على window scope لضمان الوصول من أي block
+window.updateTrialBadges = updateTrialBadges;
 /* دالة خاصة بزر ماسح المنتجات الخارجي */
 function goSmartToolScanner() {
   if (!canUseTool('scanner')) {
@@ -10574,6 +10602,10 @@ function checkToolAndRun(toolKey, fn) {
   incToolUsage(toolKey);
   fn();
 }
+// ✅ تعريض دوال التنقل على window scope
+window.goSmartTool = goSmartTool;
+window.goSmartToolScanner = goSmartToolScanner;
+window.checkToolAndRun = checkToolAndRun;
 
 /* ════════════════════════════════════════════════════════════
    🍕 تصوير وتحليل الطعام
@@ -13239,7 +13271,7 @@ document.addEventListener('DOMContentLoaded', function() {
   loadSettingsToggles();
 });
 // تحديث فوري
-setTimeout(function(){ updateTrialBadges(); updatePremiumTabBadges(); }, 500);
+setTimeout(function(){ if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges(); }, 500);
 
 // ── فحص إعادة ضبط التجربة من الأدمن ──
 function checkAdminTrialReset() {
