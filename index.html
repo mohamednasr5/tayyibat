@@ -4336,14 +4336,29 @@ var PREMIUM_CHALLENGES = [
 
 /* ══════════ Firebase ══════════ */
 async function dbGetUser(u) {
-  if (window.__firebaseReady) {
-    try {
-      var snap = await window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u));
-      if (snap.exists()) return snap.val();
-    } catch(e) {}
-  }
+  // أولاً: تحقق من localStorage (cache) للمستخدمين القدامى
   var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-  return local[u] || null;
+  var cached = local[u] || null;
+
+  if (window.__firebaseReady && window.__firebaseGet && window.__firebaseRef && window.__firebaseDB) {
+    try {
+      var snap = await Promise.race([
+        window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u)),
+        new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('DB_TIMEOUT')); }, 5000); })
+      ]);
+      if (snap && snap.exists()) {
+        var val = snap.val();
+        // تحديث cache المحلي
+        local[u] = val;
+        localStorage.setItem('tayyibat_users', JSON.stringify(local));
+        return val;
+      }
+    } catch(e) {
+      // Firebase فشل - استخدم الـ cache المحلي
+      if (cached) return cached;
+    }
+  }
+  return cached;
 }
 
 async function dbSaveUser(u, d) {
