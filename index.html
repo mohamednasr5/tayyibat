@@ -74,9 +74,9 @@
 <!-- ═══════════════════════════════════════════════════
      Icons & Manifest
 ════════════════════════════════════════════════════ -->
-<link rel="manifest" href="manifest.json">
+<!-- manifest disabled for local file compatibility -->
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-32.png">
 <link rel="shortcut icon" href="icons/favicon-32.png">
 
@@ -286,7 +286,10 @@
     window.__firebaseReady   = true;
 
     try {
-      const cfgSnap = await get(child(ref(db), 'config/ai'));
+      const cfgSnap = await Promise.race([
+        get(child(ref(db), 'config/ai')),
+        new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('FB_TIMEOUT')); }, 4000); })
+      ]);
       if (cfgSnap.exists()) {
         const cfg = cfgSnap.val();
         if (cfg.endpoint)              window.__aiEndpoint  = cfg.endpoint;
@@ -305,6 +308,7 @@
   }
 </script>
 <style>
+
 :root{--gold:#c8960c;--gold2:#f5c842;--gold3:#ffeaa0;--green:#1a7a2e;--green2:#2ec951;--red:#a01515;--red2:#e53935;--blue:#0d47a1;--blue2:#2196f3;--purple:#6c3fc9;--purple2:#9c5ffa;--bg:#050e1f;--bg2:#0a1628;--bg3:#0f1f3a;--card:#0d1e38;--card2:#112244;--border:#1e3560;--txt:#e8f0fc;--txt2:#8aa4c8;--txt3:#4a6285;--shadow3d:0 20px 60px rgba(0,0,0,.8),0 0 80px rgba(200,150,12,.1);--nav:68px;--glow-gold:0 0 30px rgba(200,150,12,.4);--ai-purple:#7c3aed;--ai-purple2:#a78bfa;--whatsapp:#25D366}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -375,64 +379,41 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .ads-free-only{display:none}
 #universe-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85}
 /* ══ GAME LOADER ══ */
-#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
-#loader-game-wrap{width:100%;max-width:420px;padding:0 16px;display:flex;flex-direction:column;align-items:center;gap:0}
-/* header */
-.lg-header{text-align:center;margin-bottom:12px}
-.lg-logo{font-size:2.4rem;display:block;filter:drop-shadow(0 0 16px rgba(200,150,12,.9));animation:lgFloat 3s ease-in-out infinite}
-@keyframes lgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.lg-title{font-family:'Amiri',serif;font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:2px}
-.lg-subtitle{font-size:.7rem;color:var(--txt3);margin-top:2px}
-/* score bar */
-.lg-scorebar{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:6px}
-.lg-score{font-size:.9rem;font-weight:800;color:var(--gold2)}
-.lg-lives{font-size:1rem;letter-spacing:2px}
-.lg-hint{font-size:.65rem;color:var(--txt3);text-align:center}
-/* game canvas area */
-#lg-canvas{width:100%;max-width:420px;height:260px;background:linear-gradient(180deg,#020b1a 0%,#051228 60%,#081830 100%);border-radius:18px;border:1.5px solid rgba(200,150,12,.25);position:relative;overflow:hidden;cursor:pointer;touch-action:none;box-shadow:0 0 30px rgba(200,150,12,.08),inset 0 0 40px rgba(0,0,0,.5)}
-/* ground line */
-#lg-canvas::after{content:'';position:absolute;bottom:40px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,150,12,.2),transparent)}
-/* player */
-#lg-player{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:2rem;transition:left .08s;filter:drop-shadow(0 0 8px rgba(200,150,12,.6))}
-/* falling items */
-.lg-item{position:absolute;top:-40px;font-size:1.8rem;line-height:1;transition:top linear;will-change:top;user-select:none;pointer-events:none}
-/* particles */
-.lg-particle{position:absolute;font-size:1rem;pointer-events:none;animation:lgPop .5s ease-out forwards}
-@keyframes lgPop{0%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(1.8) translateY(-24px)}}
-/* score popup */
-.lg-score-pop{position:absolute;font-size:.85rem;font-weight:800;pointer-events:none;animation:lgScorePop .7s ease-out forwards}
-@keyframes lgScorePop{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-32px) scale(1.2)}}
-/* progress bar */
-.lg-progress-wrap{width:100%;margin-top:10px}
-.lg-progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.lg-progress-text{font-size:.72rem;color:var(--txt2);font-weight:600}
-.lg-progress-pct{font-size:.72rem;color:var(--gold2);font-weight:800}
-.lg-bar-outer{width:100%;height:8px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;border:1px solid rgba(200,150,12,.15)}
-.lg-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--green2));border-radius:10px;transition:width .4s ease;box-shadow:0 0 10px rgba(200,150,12,.4)}
-/* mobile tilt hint */
-.lg-tilt-hint{font-size:.62rem;color:var(--txt3);text-align:center;margin-top:6px;opacity:.7}
-/* stars bg */
-.lg-star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:lgTwinkle var(--d,2s) ease-in-out infinite var(--dl,0s)}
-@keyframes lgTwinkle{0%,100%{opacity:.1}50%{opacity:.8}}
-/* ── Zodiac Enhanced Animations ── */
-@keyframes zodPlaceholderPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
-@keyframes zodNameIn{0%{opacity:0;transform:scale(.5) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes zodBtnPop{0%{opacity:0;transform:scale(.8) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes zodCardIn{0%{opacity:0;transform:translateY(24px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes zodSvgFloat{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-7px) rotate(1.5deg)}66%{transform:translateY(-3px) rotate(-1deg)}}
-@keyframes zodGlowPulse{0%,100%{filter:drop-shadow(0 0 10px rgba(201,168,76,.5))}50%{filter:drop-shadow(0 0 26px rgba(201,168,76,.9))}}
-@keyframes zodFortuneCardIn{0%{opacity:0;transform:translateX(30px)}100%{opacity:1;transform:translateX(0)}}
-@keyframes zodParticleFloat{0%{transform:translateY(0) translateX(0);opacity:.9}100%{transform:translateY(-50px) translateX(var(--px,8px));opacity:0}}
-@keyframes zodStarTwinkle{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.3)}}
-@keyframes zodOrbitSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes zodAgeCountUp{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
-@keyframes zodPulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(100,181,246,.3)}50%{box-shadow:0 0 0 8px rgba(100,181,246,.0)}}
-.zod-trait-card{border-radius:16px;padding:14px 12px;position:relative;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both}
-.zod-trait-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent);pointer-events:none}
-.zod-fortune-card{border-radius:18px;padding:16px 14px;position:relative;overflow:hidden;animation:zodFortuneCardIn .6s ease both}
-.zod-svg-container{animation:zodSvgFloat 4s ease-in-out infinite;cursor:pointer;transition:filter .4s}
-.zod-svg-container:hover{animation:zodGlowPulse .8s ease-in-out infinite alternate}
-.zod-age-counter{animation:zodAgeCountUp .5s ease both;animation-delay:.3s}
+
+/* ══ TASBIH LOADER ══ */
+#loader{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at center,#0a1628 0%,#050e1f 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .5s}
+#loader-wrap{width:100%;max-width:400px;padding:20px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:2}
+.ldr-stars{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ldr-star{position:absolute;border-radius:50%;background:#fff;animation:ldrTwinkle var(--d,2s) ease-in-out infinite var(--dl,0s)}
+@keyframes ldrTwinkle{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.85;transform:scale(1.5)}}
+.ldr-logo-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.ldr-logo-ring{animation:ldrRingSpin 8s linear infinite;transform-origin:center center}
+.ldr-logo-ring2{animation:ldrRingSpin 14s linear infinite reverse;transform-origin:center center}
+@keyframes ldrRingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.ldr-logo-icon{position:absolute;filter:drop-shadow(0 0 10px #c8960c88)}
+.ldr-title{font-size:1.2rem;font-weight:900;color:var(--gold2);text-align:center;letter-spacing:.5px;text-shadow:0 0 18px #c8960c88}
+.ldr-sub{font-size:.72rem;color:var(--txt3);text-align:center;margin-top:2px}
+.ldr-dhikr-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(200,150,12,.3);border-radius:16px;padding:12px 16px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .4s}
+.ldr-dhikr-arabic{font-size:1.3rem;font-weight:700;line-height:1.5;direction:rtl;transition:color .4s;animation:ldrTextIn .5s ease both}
+.ldr-dhikr-meaning{font-size:.68rem;color:var(--txt3)}
+.ldr-dhikr-hint{font-size:.6rem;color:rgba(200,150,12,.6);margin-top:2px}
+@keyframes ldrTextIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+/* زر المسبحة */
+.ldr-tasbih-btn{width:110px;height:110px;border-radius:50%;border:2.5px solid rgba(200,150,12,.5);background:radial-gradient(circle at 40% 35%,rgba(200,150,12,.2),rgba(0,0,0,.7));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .15s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 24px rgba(200,150,12,.3),0 6px 20px rgba(0,0,0,.5);position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.ldr-tasbih-btn:active{transform:scale(.93)}
+.ldr-bead-icon{font-size:2.2rem;pointer-events:none}
+.ldr-bead-count{font-size:1.3rem;font-weight:900;color:#fff;pointer-events:none;text-shadow:0 0 8px rgba(255,255,255,.5)}
+@keyframes ldrRipple{to{transform:scale(2.5);opacity:0}}
+/* بطاقات الأطوار */
+.ldr-phase-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:7px 4px;text-align:center;display:flex;flex-direction:column;gap:3px;transition:all .3s}
+.ldr-phase-num{font-size:.85rem;font-weight:900;color:var(--gold)}
+/* شريط التقدم */
+.ldr-bar-wrap{width:100%;display:flex;flex-direction:column;gap:5px}
+.ldr-bar-label{display:flex;justify-content:space-between;font-size:.65rem;color:var(--txt3)}
+.ldr-bar-outer{width:100%;height:5px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden}
+.ldr-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#c8960c,#f5c842,#ffe082);border-radius:10px;transition:width .7s ease;position:relative;overflow:hidden}
+.ldr-bar-glow{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:ldrShimmer 1.6s linear infinite}
+@keyframes ldrShimmer{from{transform:translateX(-100%)}to{transform:translateX(300%)}}
 .page{position:fixed;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:var(--nav);background:var(--bg);opacity:0;visibility:hidden;pointer-events:none}
 .page.active{opacity:1;visibility:visible;pointer-events:auto;animation:pageIn .4s ease}
 @keyframes pageIn{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
@@ -1476,35 +1457,98 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
 .cpb-btn-skip{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
 .cpb-progress-bar-wrap{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:20px;overflow:hidden}
 .cpb-progress-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .8s ease;width:0%}
+
+/* ══ Toast Notification ══ */
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gradient(135deg,rgba(8,20,45,.97),rgba(17,34,68,.97));border:1.5px solid rgba(200,150,12,.35);border-radius:24px;padding:14px 42px 14px 22px;font-size:.88rem;font-weight:800;color:var(--txt);z-index:4000;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);pointer-events:none;white-space:normal;backdrop-filter:blur(16px);max-width:min(92vw,420px);min-width:260px;text-align:center;box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.03) inset;line-height:1.9}
+#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+#toast-close{position:absolute;top:8px;left:10px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:var(--txt2);font-size:.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+#toast-close:hover{background:rgba(255,255,255,.2)}
+
 </style>
 </head>
 <body>
 <canvas id="universe-canvas"></canvas>
 <div id="loader">
-  <div id="loader-game-wrap">
-    <div class="lg-header">
-      <span class="lg-logo">🌿</span>
-      <div class="lg-title">نظام طيبات الصحي الذكي</div>
-      <div class="lg-subtitle">جاري تحضير النظام...</div>
+  <div class="ldr-stars" id="ldr-stars"></div>
+  <div id="loader-wrap">
+
+    <!-- SVG الشعار الدوار -->
+    <div class="ldr-logo-wrap">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <g class="ldr-logo-ring">
+          <circle cx="45" cy="45" r="40" fill="none" stroke="#c8960c" stroke-width="1" stroke-dasharray="7 5" opacity=".4"/>
+          <circle cx="45" cy="5" r="2.5" fill="#f5c842" opacity=".9"/>
+          <circle cx="85" cy="45" r="2" fill="#c8960c" opacity=".6"/>
+          <circle cx="5" cy="45" r="2" fill="#c8960c" opacity=".6"/>
+          <circle cx="45" cy="85" r="2" fill="#f5c842" opacity=".6"/>
+        </g>
+        <g class="ldr-logo-ring2">
+          <circle cx="45" cy="45" r="30" fill="none" stroke="#f5c842" stroke-width=".7" stroke-dasharray="4 8" opacity=".25"/>
+        </g>
+        <circle cx="45" cy="45" r="22" fill="rgba(200,150,12,.07)" stroke="rgba(200,150,12,.25)" stroke-width="1.2"/>
+      </svg>
+      <span class="ldr-logo-icon" style="font-size:1.7rem">🌿</span>
     </div>
-    <div class="lg-scorebar">
-      <div class="lg-score">⭐ النقاط: <span id="lg-score-val">0</span></div>
-      <div class="lg-lives" id="lg-lives">❤️❤️❤️</div>
+
+    <!-- العنوان -->
+    <div style="text-align:center">
+      <div class="ldr-title">نظام طيبات الصحي الذكي</div>
+      <div class="ldr-sub">بسم الله الرحمن الرحيم</div>
     </div>
-    <div class="lg-hint">اصطد الطعام الصحي 🥗 وتجنب الضار 🍟</div>
-    <div id="lg-canvas">
-      <div id="lg-player">🧑‍⚕️</div>
+
+    <!-- بطاقة الذكر الحالي -->
+    <div class="ldr-dhikr-card">
+      <div class="ldr-dhikr-arabic" id="ldr-dhikr-text">سُبْحَانَ اللَّهِ</div>
+      <div class="ldr-dhikr-meaning" id="ldr-dhikr-meaning">تنزيه الله وتقديسه</div>
+      <div class="ldr-dhikr-hint">اضغط المسبحة للتسبيح • ٣٣ مرة لكل ذكر</div>
     </div>
-    <div class="lg-tilt-hint">← اسحب يميناً ويساراً للتحرك →</div>
-    <div class="lg-progress-wrap">
-      <div class="lg-progress-label">
-        <span class="lg-progress-text">جاري فتح نظام طيبات...</span>
-        <span class="lg-progress-pct" id="lg-pct">0%</span>
+
+    <!-- زر المسبحة الكبير -->
+    <div style="position:relative;display:flex;align-items:center;justify-content:center">
+      <button id="ldr-tasbih-btn" class="ldr-tasbih-btn">
+        <span class="ldr-bead-icon">📿</span>
+        <span id="ldr-dhikr-count" class="ldr-bead-count">٠</span>
+      </button>
+    </div>
+
+    <!-- بطاقات الأطوار الأربعة -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%">
+      <div id="ldr-phase-0" class="ldr-phase-card" style="border-color:#4fc3f755">
+        <div style="font-size:.6rem;color:#4fc3f7">سبحان الله</div>
+        <div class="ldr-phase-num">٠</div>
       </div>
-      <div class="lg-bar-outer">
-        <div class="lg-bar-inner" id="lg-bar"></div>
+      <div id="ldr-phase-1" class="ldr-phase-card" style="border-color:#81c78455;opacity:.4">
+        <div style="font-size:.6rem;color:#81c784">الحمد لله</div>
+        <div class="ldr-phase-num">٠</div>
+      </div>
+      <div id="ldr-phase-2" class="ldr-phase-card" style="border-color:#ffb74d55;opacity:.4">
+        <div style="font-size:.6rem;color:#ffb74d">الله أكبر</div>
+        <div class="ldr-phase-num">٠</div>
+      </div>
+      <div id="ldr-phase-3" class="ldr-phase-card" style="border-color:#ce93d855;opacity:.4">
+        <div style="font-size:.58rem;color:#ce93d8">استغفر الله</div>
+        <div class="ldr-phase-num">٠</div>
       </div>
     </div>
+
+    <!-- إجمالي + شريط التقدم -->
+    <div style="width:100%;display:flex;flex-direction:column;gap:10px">
+      <div style="text-align:center;font-size:.72rem;color:var(--txt3)">
+        إجمالي التسبيح: <span id="ldr-counter" style="color:var(--gold);font-weight:900;font-size:.9rem">٠</span>
+      </div>
+      <div class="ldr-bar-wrap">
+        <div class="ldr-bar-label">
+          <span id="ldr-progress-text">جاري تهيئة النظام...</span>
+          <span id="ldr-pct">0%</span>
+        </div>
+        <div class="ldr-bar-outer">
+          <div class="ldr-bar-inner" id="ldr-bar">
+            <div class="ldr-bar-glow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 <button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="تبديل الصوت"><i class="fas fa-volume-up" id="sound-icon"></i></button>
@@ -4640,239 +4684,150 @@ function startApkDownloadAnim(e) {
   step();
 }
 
-/* ══════════ Loader Game ══════════ */
+/* ══════════ Loader Tasbih (مسبحة إلكترونية) ══════════ */
 (function(){
-  var HEALTHY  = ['🥗','🥦','🍎','🥕','🫐','🍊','🥝','🍇','🥑','🫑','🍓','🌽'];
-  var UNHEALTHY= ['🍟','🍕','🍔','🧁','🥤','🍩','🍫','🍪','🌭'];
-  var score=0, lives=3, gameActive=true;
-  var playerX=50; // percent
-  var items=[];
-  var animFrame;
-  var progress=0;
-  var progressInterval;
-  var lastTime=0;
-  var spawnInterval=1400;
-  var lastSpawn=0;
-  var speed=1.4; // px per ms factor
-  var canvas, player, scoreEl, livesEl, barEl, pctEl;
+  var TASBIH_SEQUENCE = [
+    { text: 'سُبْحَانَ اللَّهِ',     color: '#4fc3f7', glow: '#4fc3f788', meaning: 'تنزيه الله وتقديسه', count_label: 'سبحان الله' },
+    { text: 'الْحَمْدُ لِلَّهِ',      color: '#81c784', glow: '#81c78488', meaning: 'الشكر والثناء لله', count_label: 'الحمد لله' },
+    { text: 'اللَّهُ أَكْبَرُ',        color: '#ffb74d', glow: '#ffb74d88', meaning: 'الله أعظم من كل شيء', count_label: 'الله أكبر' },
+    { text: 'أَسْتَغْفِرُ اللَّهَ',    color: '#ce93d8', glow: '#ce93d888', meaning: 'أطلب المغفرة من الله', count_label: 'استغفر الله' }
+  ];
 
-  function init(){
-    canvas   = document.getElementById('lg-canvas');
-    player   = document.getElementById('lg-player');
-    scoreEl  = document.getElementById('lg-score-val');
-    livesEl  = document.getElementById('lg-lives');
-    barEl    = document.getElementById('lg-bar');
-    pctEl    = document.getElementById('lg-pct');
-    if(!canvas) return;
+  var LOAD_STEPS = [
+    { pct: 12, label: 'جاري تهيئة المحرك الذكي...' },
+    { pct: 28, label: 'جاري تحميل قاعدة البيانات...' },
+    { pct: 45, label: 'جاري الاتصال بالخادم...' },
+    { pct: 60, label: 'جاري تحميل نظام التغذية...' },
+    { pct: 75, label: 'جاري تفعيل الذكاء الاصطناعي...' },
+    { pct: 88, label: 'جاري التحقق من حسابك...' },
+    { pct: 100, label: 'اكتمل! جاري الدخول... ✨' }
+  ];
 
-    // Add stars background
-    for(var s=0;s<30;s++){
-      var st=document.createElement('div');
-      st.className='lg-star';
-      st.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*80+'%;--d:'+(1.5+Math.random()*2.5)+'s;--dl:'+(Math.random()*2)+'s';
-      canvas.appendChild(st);
+  var currentPhase = 0; // 0=سبحان, 1=حمد, 2=أكبر, 3=استغفار
+  var phaseCounts = [0, 0, 0, 0]; // عداد كل مرحلة
+  var totalCount = 0;
+  var stepIdx = 0;
+  var progressInterval, starsCreated = false;
+
+  function toAr(n) {
+    return n.toString().replace(/\d/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'[d]; });
+  }
+
+  function updateTasbihUI() {
+    var phase = TASBIH_SEQUENCE[currentPhase];
+    var el = document.getElementById('ldr-dhikr-text');
+    var me = document.getElementById('ldr-dhikr-meaning');
+    var ce = document.getElementById('ldr-dhikr-count');
+    var co = document.getElementById('ldr-counter');
+    var card = document.querySelector('.ldr-dhikr-card');
+    var btn = document.getElementById('ldr-tasbih-btn');
+    if (el) { el.textContent = phase.text; el.style.color = phase.color; }
+    if (me) me.textContent = phase.meaning;
+    if (ce) ce.textContent = toAr(phaseCounts[currentPhase]);
+    if (co) co.textContent = toAr(totalCount);
+    if (card) card.style.borderColor = phase.color + '55';
+    if (btn) {
+      btn.style.background = 'radial-gradient(circle at 40% 35%, ' + phase.color + '33, rgba(0,0,0,.6))';
+      btn.style.borderColor = phase.color + '88';
+      btn.style.boxShadow = '0 0 24px ' + phase.glow + ', 0 6px 20px rgba(0,0,0,.5)';
+    }
+    // تحديث بطاقات الأطوار
+    for (var i=0;i<4;i++) {
+      var pc = document.getElementById('ldr-phase-'+i);
+      if (pc) {
+        pc.style.opacity = (i===currentPhase) ? '1' : '0.4';
+        pc.style.transform = (i===currentPhase) ? 'scale(1.05)' : 'scale(1)';
+        var num = pc.querySelector('.ldr-phase-num');
+        if (num) num.textContent = toAr(phaseCounts[i]);
+      }
+    }
+  }
+
+  function onTasbihClick() {
+    phaseCounts[currentPhase]++;
+    totalCount++;
+    // انتقال للمرحلة التالية كل 33 نقرة
+    if (phaseCounts[currentPhase] >= 33) {
+      currentPhase = (currentPhase + 1) % 4;
+    }
+    // تأثير نبضة على الزر
+    var btn = document.getElementById('ldr-tasbih-btn');
+    if (btn) {
+      btn.style.transform = 'scale(0.93)';
+      setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 120);
+    }
+    updateTasbihUI();
+    // موجة دائرية
+    spawnRipple();
+  }
+
+  function spawnRipple() {
+    var btn = document.getElementById('ldr-tasbih-btn');
+    if (!btn) return;
+    var rpl = document.createElement('div');
+    var phase = TASBIH_SEQUENCE[currentPhase];
+    rpl.style.cssText = 'position:absolute;border-radius:50%;border:2px solid ' + phase.color + ';opacity:.7;animation:ldrRipple .6s ease-out forwards;pointer-events:none;inset:0;';
+    btn.appendChild(rpl);
+    setTimeout(function(){ if(rpl.parentNode) rpl.parentNode.removeChild(rpl); }, 700);
+  }
+
+  function initLoader() {
+    // توليد نجوم خلفية
+    var starsWrap = document.getElementById('ldr-stars');
+    if (starsWrap && !starsCreated) {
+      starsCreated = true;
+      for (var i=0; i<40; i++) {
+        var s = document.createElement('div');
+        s.className = 'ldr-star';
+        var sz = (Math.random()*2.5+1).toFixed(1);
+        s.style.cssText = 'left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;width:'+sz+'px;height:'+sz+'px;--d:'+(1.5+Math.random()*3).toFixed(1)+'s;--dl:'+(Math.random()*3).toFixed(1)+'s';
+        starsWrap.appendChild(s);
+      }
     }
 
-    // Touch drag
-    var dragStartX=null, dragStartPlayerX=null;
-    canvas.addEventListener('touchstart',function(e){
-      dragStartX=e.touches[0].clientX;
-      dragStartPlayerX=playerX;
-    },{passive:true});
-    canvas.addEventListener('touchmove',function(e){
-      if(dragStartX===null) return;
-      var dx=e.touches[0].clientX-dragStartX;
-      var w=canvas.offsetWidth||340;
-      playerX=Math.max(8,Math.min(92, dragStartPlayerX+(dx/w)*100));
-      player.style.left=playerX+'%';
-    },{passive:true});
-    canvas.addEventListener('touchend',function(){ dragStartX=null; },{passive:true});
-
-    // Mouse drag
-    var mouseDown=false, mStartX=0, mStartPX=0;
-    canvas.addEventListener('mousedown',function(e){ mouseDown=true; mStartX=e.clientX; mStartPX=playerX; });
-    window.addEventListener('mousemove',function(e){
-      if(!mouseDown) return;
-      var dx=e.clientX-mStartX;
-      var w=canvas.offsetWidth||340;
-      playerX=Math.max(8,Math.min(92, mStartPX+(dx/w)*100));
-      player.style.left=playerX+'%';
-    });
-    window.addEventListener('mouseup',function(){ mouseDown=false; });
-
-    // Device tilt
-    if(window.DeviceOrientationEvent){
-      window.addEventListener('deviceorientation',function(e){
-        if(!gameActive) return;
-        var gamma=e.gamma||0; // -90 to 90
-        playerX=Math.max(8,Math.min(92, 50+gamma*0.8));
-        player.style.left=playerX+'%';
-      });
+    // ربط زر المسبحة
+    var btn = document.getElementById('ldr-tasbih-btn');
+    if (btn) {
+      btn.addEventListener('click', onTasbihClick);
+      btn.addEventListener('touchend', function(e){ e.preventDefault(); onTasbihClick(); });
     }
 
-    // Progress bar simulation
-    var loadSteps=[
-      {pct:15,label:'جاري تهيئة المحرك الذكي...'},
-      {pct:35,label:'جاري تحميل قاعدة البيانات...'},
-      {pct:55,label:'جاري الاتصال بالخادم...'},
-      {pct:72,label:'جاري تحميل نظام التغذية...'},
-      {pct:88,label:'جاري تفعيل الذكاء الاصطناعي...'},
-      {pct:100,label:'اكتمل! جاري الدخول...'}
-    ];
-    var stepIdx=0;
-    var labelEl=document.querySelector('.lg-progress-text');
-    progressInterval=setInterval(function(){
-      if(stepIdx>=loadSteps.length){ clearInterval(progressInterval); return; }
-      var target=loadSteps[stepIdx];
-      progress=target.pct;
-      if(barEl) barEl.style.width=progress+'%';
-      if(pctEl) pctEl.textContent=progress+'%';
-      if(labelEl) labelEl.textContent=target.label;
+    updateTasbihUI();
+
+    // شريط التقدم
+    progressInterval = setInterval(function(){
+      if (stepIdx >= LOAD_STEPS.length) { clearInterval(progressInterval); return; }
+      var step = LOAD_STEPS[stepIdx];
+      var barEl = document.getElementById('ldr-bar');
+      var pctEl = document.getElementById('ldr-pct');
+      var labelEl = document.getElementById('ldr-progress-text');
+      if (barEl) barEl.style.width = step.pct + '%';
+      if (pctEl) pctEl.textContent = step.pct + '%';
+      if (labelEl) labelEl.textContent = step.label;
       stepIdx++;
-      if(progress>=100){
+      if (step.pct >= 100) {
         clearInterval(progressInterval);
-        gameActive=false;
-        setTimeout(function(){
-          if(canvas){
-            canvas.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px"><div style="font-size:3rem;animation:lgFloat 1s ease-in-out infinite">✅</div><div style="color:var(--gold2);font-size:1rem;font-weight:800">ممتاز! نقاطك: '+score+'</div><div style="color:var(--txt3);font-size:.75rem">جاري الدخول...</div></div>';
-          }
-        }, 200);
+        setTimeout(function(){ if(typeof hideLoader==='function') hideLoader(); }, 1200);
       }
-    }, 2200);
-
-    // Game loop
-    lastTime=performance.now();
-    requestAnimationFrame(gameLoop);
+    }, 800);
   }
 
-  function spawnItem(){
-    if(!gameActive) return;
-    var isHealthy=Math.random()>0.38;
-    var emoji=isHealthy
-      ? HEALTHY[Math.floor(Math.random()*HEALTHY.length)]
-      : UNHEALTHY[Math.floor(Math.random()*UNHEALTHY.length)];
-    var el=document.createElement('div');
-    el.className='lg-item';
-    var xPos=10+Math.random()*80;
-    el.style.left=xPos+'%';
-    el.textContent=emoji;
-    el.dataset.healthy=isHealthy?'1':'0';
-    el.dataset.y='-40';
-    canvas.appendChild(el);
-    items.push({el:el, x:xPos, y:-40, healthy:isHealthy, speed:speed*(0.85+Math.random()*0.45)});
-  }
-
-  function gameLoop(ts){
-    if(!gameActive){ return; }
-    var dt=ts-lastTime; lastTime=ts;
-    if(dt>100) dt=100;
-
-    // spawn
-    if(ts-lastSpawn>spawnInterval){
-      spawnItem();
-      lastSpawn=ts;
-      // speed up over time
-      if(spawnInterval>700) spawnInterval-=18;
-      speed=Math.min(speed+0.003, 3.2);
-    }
-
-    var canvasH=canvas.offsetHeight||260;
-    var canvasW=canvas.offsetWidth||340;
-    var playerW=42;
-    var catchZoneBottom=canvasH-44; // ground
-    var catchZoneTop=canvasH-90;
-
-    for(var i=items.length-1;i>=0;i--){
-      var item=items[i];
-      item.y+=item.speed*(dt/16);
-      item.el.style.top=item.y+'px';
-
-      // catch check
-      var itemX=(item.x/100)*canvasW;
-      var pxAbs=(playerX/100)*canvasW;
-      if(item.y>=catchZoneTop && item.y<=catchZoneBottom+30){
-        if(Math.abs(itemX-pxAbs)<34){
-          // caught!
-          if(item.healthy){
-            score+=10;
-            if(scoreEl) scoreEl.textContent=score;
-            showPopup(item.el, '+10', '#2ec951');
-            showParticle(item.el, '✨');
-          } else {
-            lives--;
-            updateLives();
-            showPopup(item.el, '-1❤️', '#e53935');
-            showParticle(item.el, '💢');
-            if(lives<=0){ endGame(); return; }
-          }
-          canvas.removeChild(item.el);
-          items.splice(i,1);
-          continue;
-        }
-      }
-
-      // missed — item fell off bottom
-      if(item.y>canvasH+10){
-        if(item.healthy){
-          // missed healthy = minor penalty
-          lives-=0; // no penalty for miss, just gone
-        }
-        canvas.removeChild(item.el);
-        items.splice(i,1);
-      }
-    }
-    animFrame=requestAnimationFrame(gameLoop);
-  }
-
-  function updateLives(){
-    if(!livesEl) return;
-    var h=''; for(var i=0;i<lives;i++) h+='❤️';
-    for(var j=0;j<3-lives;j++) h+='🖤';
-    livesEl.textContent=h;
-  }
-
-  function showPopup(refEl, text, color){
-    var pop=document.createElement('div');
-    pop.className='lg-score-pop';
-    pop.style.cssText='left:'+refEl.style.left+';top:'+(parseFloat(refEl.dataset.y||refEl.style.top||0)-10)+'px;color:'+color;
-    pop.textContent=text;
-    canvas.appendChild(pop);
-    setTimeout(function(){ if(pop.parentNode) pop.parentNode.removeChild(pop); }, 750);
-  }
-
-  function showParticle(refEl, emoji){
-    var p=document.createElement('div');
-    p.className='lg-particle';
-    p.style.cssText='left:'+refEl.style.left+';top:'+refEl.style.top;
-    p.textContent=emoji;
-    canvas.appendChild(p);
-    setTimeout(function(){ if(p.parentNode) p.parentNode.removeChild(p); }, 520);
-  }
-
-  function endGame(){
-    gameActive=false;
-    if(animFrame) cancelAnimationFrame(animFrame);
-    // Clear items
-    items.forEach(function(item){ if(item.el.parentNode) item.el.parentNode.removeChild(item.el); });
-    items=[];
-    if(canvas){
-      canvas.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px"><div style="font-size:2.5rem">💪</div><div style="color:var(--gold2);font-size:1rem;font-weight:800">نقاطك: '+score+'</div><div style="color:var(--txt3);font-size:.75rem">جاري فتح النظام...</div></div>';
-    }
-  }
-
-  // Start after DOM ready
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLoader);
   } else {
-    setTimeout(init, 0);
+    setTimeout(initLoader, 50);
   }
-})();
-
-/* ══════════ Loader ══════════ */
+})();/* ══════════ Loader ══════════ */
 function hideLoader() {
   var l = document.getElementById('loader');
+  if (!l || l.style.display === 'none') return;
+  l.style.transition = 'opacity .5s';
   l.style.opacity = '0';
-  setTimeout(function() { l.style.display = 'none'; }, 400);
+  setTimeout(function() {
+    l.style.display = 'none';
+    // وقف الـ intervals
+    if (window._ldrProgressInterval) clearInterval(window._ldrProgressInterval);
+  }, 520);
 }
 
 /* ══════════ Auto Login ══════════ */
@@ -4880,10 +4835,11 @@ async function autoLogin() {
   var s = getSession();
   if (!s) { hideLoader(); return; }
   try {
-    // تحقق هل المستخدم سجّل بجوجل
-    var snap = await window.__firebaseGet(
-      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
-    );
+    // تحقق هل المستخدم سجّل بجوجل - مع timeout 5s
+    var snap = await Promise.race([
+      window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)),
+      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('AUTO_TIMEOUT')); }, 5000); })
+    ]);
     if (snap.exists()) {
       var data = snap.val();
       if (data.loginMethod === 'google' && window.firebaseAuth) {
@@ -4918,7 +4874,7 @@ async function autoLogin() {
       } else { window.isProUser = false; }
       bootApp(); setTimeout(refreshGiftFab, 700); return;
     }
-  } catch(e) {}
+  } catch(e) { hideLoader(); return; }
   hideLoader();
 }
 
@@ -5896,16 +5852,34 @@ async function _scanAnalyzeAI(ingredients) {
 
   var result = null;
 
-  /* ١. Puter.js */
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
-      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (t) result = {text:t, source:"Puter.js"};
-    }
-  } catch(e) {}
+  /* ١. HuggingFace (الأساسي) */
+  if (!result && window.__HF_KEY) {
+    try {
+      var hfR = await _tryHuggingFace([{role:"user",content:prompt}], 0);
+      if (hfR) result = hfR;
+    } catch(e) {}
+  }
 
-  /* ٢. Mistral */
+  /* ٢. Pollinations (مجاني) */
+  if (!result) {
+    try {
+      var polR = await _tryPollinations([{role:"user",content:prompt}], 0);
+      if (polR) result = polR;
+    } catch(e) {}
+  }
+
+  /* ٣. Puter.js */
+  if (!result) {
+    try {
+      if (typeof puter !== "undefined" && puter.ai) {
+        var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
+        var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
+        if (t) result = {text:t, source:"Puter.js"};
+      }
+    } catch(e) {}
+  }
+
+  /* ٤. Mistral */
   if (!result && window.__MISTRAL_KEY) {
     try {
       var r = await fetch("https://api.mistral.ai/v1/chat/completions", {
@@ -5917,7 +5891,7 @@ async function _scanAnalyzeAI(ingredients) {
     } catch(e) {}
   }
 
-  /* ٣. Z.ai */
+  /* ٥. Z.ai */
   if (!result && window.__GEMINI_KEY) {
     try {
       var r2 = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
@@ -5929,7 +5903,7 @@ async function _scanAnalyzeAI(ingredients) {
     } catch(e) {}
   }
 
-  /* ٤. OpenRouter fallback */
+  /* ٦. OpenRouter fallback */
   if (!result && window.ORKEYFB) {
     try {
       var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext(), prompt);
@@ -6111,18 +6085,16 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
     (textInput ? "الدواء: " + textInput : "انظر للصورة واستخرج اسم الدواء والمعلومات منه");
 
   var result = null;
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      if (imgDataUrl) {
-        var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
-        if (vRes && vRes.source !== "fallback") result = {text: vRes.text, source: "AI Pharma"};
-      } else {
-        var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
-        var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-        if (t) result = {text:t, source:"AI Pharma"};
-      }
-    }
-  } catch(e) {}
+  if (imgDataUrl) {
+    try { var vRes = await _smartVisionAnalysis(imgDataUrl, prompt); if (vRes && vRes.source !== "fallback") result = {text:vRes.text, source:"AI Pharma"}; } catch(e) {}
+  } else {
+    /* ١. HuggingFace */
+    if (!result && window.__HF_KEY) { try { var hfR=await _tryHuggingFace([{role:"user",content:prompt}],0); if(hfR) result=hfR; } catch(e){} }
+    /* ٢. Pollinations */
+    if (!result) { try { var polR=await _tryPollinations([{role:"user",content:prompt}],0); if(polR) result={text:polR.text,source:"AI Pharma"}; } catch(e){} }
+    /* ٣. Puter */
+    if (!result) { try { if(typeof puter!=="undefined"&&puter.ai){ var res=await puter.ai.chat(prompt,{model:"gpt-5.4-nano",temperature:0.3}); var t=typeof res==="string"?res:res&&res.message&&res.message.content?res.message.content:res&&res.content?res.content:null; if(t) result={text:t,source:"AI Pharma"}; } } catch(e){} }
+  }
 
   if (!result && window.ORKEYFB) {
     try {
@@ -6325,18 +6297,16 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
     (textInput ? "نتائج التقرير:\n" + textInput : "انظر للصورة واقرأ التقرير الطبي المكتوب فيها بدقة");
 
   var result = null;
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      if (imgDataUrl) {
-        var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
-        if (vRes && vRes.source !== "fallback") result = {text: vRes.text, source: "AI Doctor"};
-      } else {
-        var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
-        var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-        if (t) result = {text:t, source:"AI Doctor"};
-      }
-    }
-  } catch(e) {}
+  if (imgDataUrl) {
+    try { var vRes = await _smartVisionAnalysis(imgDataUrl, prompt); if (vRes && vRes.source !== "fallback") result = {text:vRes.text, source:"AI Doctor"}; } catch(e) {}
+  } else {
+    /* ١. HuggingFace */
+    if (!result && window.__HF_KEY) { try { var hfR=await _tryHuggingFace([{role:"user",content:prompt}],0); if(hfR) result=hfR; } catch(e){} }
+    /* ٢. Pollinations */
+    if (!result) { try { var polR=await _tryPollinations([{role:"user",content:prompt}],0); if(polR) result={text:polR.text,source:"AI Doctor"}; } catch(e){} }
+    /* ٣. Puter */
+    if (!result) { try { if(typeof puter!=="undefined"&&puter.ai){ var res=await puter.ai.chat(prompt,{model:"gpt-5.4-nano",temperature:0.3}); var t=typeof res==="string"?res:res&&res.message&&res.message.content?res.message.content:res&&res.content?res.content:null; if(t) result={text:t,source:"AI Doctor"}; } } catch(e){} }
+  }
 
   if (!result && window.ORKEYFB) {
     try {
@@ -6660,12 +6630,17 @@ async function showDrugAI(btn) {
   el.style.display = 'block';
   el.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div></div>';
   try {
-    var res = await puter.ai.chat(
-      'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
-      '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...',
-      {model:'gpt-4o-mini', temperature:0.2}
-    );
-    var txt = typeof res==='string'?res:(res.message&&res.message.content||res.content||'');
+    var _drugPrompt = 'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
+      '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...';
+    var _drugMsgs = [{role:'user', content:_drugPrompt}];
+    var _drugResult = null;
+    // 1. HuggingFace
+    if (!_drugResult && window.__HF_KEY) { try { var hfD=await _tryHuggingFace(_drugMsgs,0); if(hfD) _drugResult=hfD.text; } catch(e){} }
+    // 2. Pollinations
+    if (!_drugResult) { try { var polD=await _tryPollinations(_drugMsgs,0); if(polD) _drugResult=polD.text; } catch(e){} }
+    // 3. Puter
+    if (!_drugResult) { try { if(typeof puter!=='undefined'&&puter.ai){ var res=await puter.ai.chat(_drugPrompt,{model:'gpt-4o-mini',temperature:0.2}); _drugResult=typeof res==='string'?res:(res.message&&res.message.content||res.content||''); } } catch(e){} }
+    var txt = _drugResult || '';
     var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
     txt.trim().split('\n').forEach(function(line){
       var m=line.match(/^\*\*([^*]+)\*\*[:\s]*(.*)/);
@@ -6834,21 +6809,15 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
 
   var result = null;
 
-  // 1. Puter.js (vision للصورة) - مع تنقل تلقائي بين الموديلات
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      if (imgDataUrl) {
-        var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
-        if (vRes && vRes.source !== 'fallback') result = vRes.text;
-      } else {
-        var res = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.2 });
-        var t = typeof res === 'string' ? res
-          : res && res.message && res.message.content ? res.message.content
-          : res && res.content ? res.content : null;
-        if (t) result = t;
-      }
-    }
-  } catch(e) {}
+  if (imgDataUrl) {
+    // vision: HF → Pollinations → Puter
+    try { var vRes=await _smartVisionAnalysis(imgDataUrl,prompt); if(vRes&&vRes.source!=='fallback') result=vRes.text; } catch(e) {}
+  } else {
+    // text: HF → Pollinations → Puter
+    if (!result && window.__HF_KEY) { try { var hfP=await _tryHuggingFace([{role:'user',content:prompt}],0); if(hfP) result=hfP.text; } catch(e){} }
+    if (!result) { try { var polP=await _tryPollinations([{role:'user',content:prompt}],0); if(polP) result=polP.text; } catch(e){} }
+    if (!result) { try { if(typeof puter!=='undefined'&&puter.ai){ var res=await puter.ai.chat(prompt,{model:'gpt-4o-mini',temperature:0.2}); var t=typeof res==='string'?res:res&&res.message&&res.message.content?res.message.content:res&&res.content?res.content:null; if(t) result=t; } } catch(e){} }
+  }
 
   // 2. OpenRouter fallback
   if (!result && window.ORKEYFB) {
@@ -7065,9 +7034,10 @@ async function _rxLookupAndShow(name, db, container) {
           'دواعي_الاستخدام: (متى يوصف هذا الدواء — جملة أو جملتان)\n' +
           'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
         var res2 = null;
-        if (typeof puter !== 'undefined' && puter.ai) {
-          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
-        }
+        var _dc1Msgs=[{role:'user',content:aiPrompt2}];
+        if (!res2&&window.__HF_KEY){try{var hfDc1=await _tryHuggingFace(_dc1Msgs,0);if(hfDc1)res2=hfDc1.text;}catch(e){}}
+        if (!res2){try{var polDc1=await _tryPollinations(_dc1Msgs,0);if(polDc1)res2=polDc1.text;}catch(e){}}
+        if (!res2&&typeof puter!=='undefined'&&puter.ai){try{var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2});res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null));}catch(e){}}
         if (!res2 && window.__OR_KEY_FB) { try { var orR2=await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt2); if(orR2) res2=orR2.text; } catch(e) {} }
         if (!res2) throw new Error('no result');
         var uM=res2.match(/الاستخدامات\s*:\s*([^\n]+)/i);
@@ -7133,12 +7103,10 @@ async function _rxLookupAndShow(name, db, container) {
         'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
 
       var res = null;
-      if (typeof puter !== 'undefined' && puter.ai) {
-        try {
-          var pr = await puter.ai.chat(aiPrompt, {model:'gpt-4o-mini', temperature:0.2});
-          res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?pr.message.content:(pr&&pr.content?pr.content:null));
-        } catch(e) {}
-      }
+      var _dc2Msgs=[{role:'user',content:aiPrompt}];
+      if (!res&&window.__HF_KEY){try{var hfDc2=await _tryHuggingFace(_dc2Msgs,0);if(hfDc2)res=hfDc2.text;}catch(e){}}
+      if (!res){try{var polDc2=await _tryPollinations(_dc2Msgs,0);if(polDc2)res=polDc2.text;}catch(e){}}
+      if (!res&&typeof puter!=='undefined'&&puter.ai){try{var pr=await puter.ai.chat(aiPrompt,{model:'gpt-4o-mini',temperature:0.2});res=typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?pr.message.content:(pr&&pr.content?pr.content:null));}catch(e){}}
       if (!res && window.__OR_KEY_FB) {
         try { var orR = await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt); if(orR) res=orR.text; } catch(e) {}
       }
@@ -8798,8 +8766,8 @@ window.addEventListener('appinstalled', function() {
 window.addEventListener('DOMContentLoaded', function() {
   adaptBannerForPlatform();
   startQuotesAnimation();
-  var safetyTimeout = setTimeout(function() { hideLoader(); }, 4000);
-  autoLogin().then(function() { clearTimeout(safetyTimeout); });
+  var safetyTimeout = setTimeout(function() { hideLoader(); }, 8000);
+  autoLogin().then(function() { clearTimeout(safetyTimeout); }).catch(function() { clearTimeout(safetyTimeout); hideLoader(); });
 });
 </script>
   <script src="https://js.puter.com/v2/" async></script>
@@ -11785,7 +11753,30 @@ function _emGetNewEmergencyAnim(type, stepIdx, step, color) {
    🤖 وظائف استدعاء Claude API
 ════════════════════════════════════════════════════════════ */
 async function _callClaudeAPI(prompt, systemPrompt) {
-  // محاولة 1: Anthropic API مباشرة
+  // ١. HuggingFace (الأساسي)
+  if (window.__HF_KEY) {
+    try {
+      var hfZod = await _tryHuggingFace([{role:'user', content: (systemPrompt ? systemPrompt + '\n' : '') + prompt}], 0);
+      if (hfZod && hfZod.text) return hfZod.text;
+    } catch(e) {}
+  }
+
+  // ٢. Pollinations (مجاني)
+  try {
+    var polZod = await _tryPollinations([{role:'user', content: (systemPrompt ? systemPrompt + '\n' : '') + prompt}], 0);
+    if (polZod && polZod.text) return polZod.text;
+  } catch(e) {}
+
+  // ٣. Puter.js
+  try {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var puRes = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.3 });
+      var t = typeof puRes === 'string' ? puRes : puRes && puRes.message ? puRes.message.content : null;
+      if (t) return t;
+    }
+  } catch(e) {}
+
+  // ٤. Anthropic (احتياطي)
   try {
     var messages = [{ role: 'user', content: prompt }];
     var body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: messages };
@@ -11798,30 +11789,6 @@ async function _callClaudeAPI(prompt, systemPrompt) {
     if (res.ok) {
       var data = await res.json();
       if (data.content && data.content[0] && data.content[0].text) return data.content[0].text;
-    }
-  } catch(e) {}
-  
-  // محاولة 2: استخدام الـ AI المدمج في التطبيق (Pollinations)
-  try {
-    var poRes = await fetch(window.__POLLINATIONS_ENDPOINT || 'https://text.pollinations.ai/openai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'openai', messages: [{ role: 'user', content: prompt }], max_tokens: 1000
-      })
-    });
-    if (poRes.ok) {
-      var poData = await poRes.json();
-      if (poData.choices && poData.choices[0]) return poData.choices[0].message.content;
-    }
-  } catch(e) {}
-
-  // محاولة 3: Puter.js
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var puRes = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.3 });
-      var t = typeof puRes === 'string' ? puRes : puRes && puRes.message ? puRes.message.content : null;
-      if (t) return t;
     }
   } catch(e) {}
 
@@ -11918,6 +11885,13 @@ function zodiacSetGender(g) {
   }
 }
 
+function _zodAgeBox(id, val, label, color) {
+  return '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 6px;text-align:center">' +
+    '<div id="' + id + '" style="font-size:1rem;font-weight:900;color:' + color + '">' + (val||0).toLocaleString('ar-EG') + '</div>' +
+    '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">' + label + '</div>' +
+  '</div>';
+}
+
 function zodiacDetect() {
   var month = document.getElementById('zod-month').value;
   var day = document.getElementById('zod-day').value;
@@ -11985,107 +11959,95 @@ function zodiacDetect() {
   var monthVal = parseInt(document.getElementById('zod-month')?.value);
   var dayVal = parseInt(document.getElementById('zod-day')?.value);
   if (ageCard) {
-    if (yearVal && yearVal >= 1920 && yearVal <= 2025 && monthVal && dayVal) {
-      var birthDate = new Date(yearVal, monthVal - 1, dayVal);
+    if (yearVal && yearVal >= 1920 && yearVal <= 2025) {
+      // نستخدم 1 يناير إذا لم يُدخل الشهر واليوم
+      var safeMonth = (monthVal && monthVal >= 1 && monthVal <= 12) ? monthVal : 1;
+      var safeDay   = (dayVal   && dayVal   >= 1 && dayVal   <= 31) ? dayVal   : 1;
+      var birthDate = new Date(yearVal, safeMonth - 1, safeDay);
       var now = new Date();
       var diffMs = now - birthDate;
       if (diffMs > 0) {
-        var totalSec = Math.floor(diffMs / 1000);
-        var totalMin = Math.floor(totalSec / 60);
-        var totalHrs = Math.floor(totalMin / 60);
-        var totalDays = Math.floor(totalHrs / 24);
+        var totalSec   = Math.floor(diffMs / 1000);
+        var totalMin   = Math.floor(totalSec / 60);
+        var totalHrs   = Math.floor(totalMin / 60);
+        var totalDays  = Math.floor(totalHrs / 24);
         var totalWeeks = Math.floor(totalDays / 7);
-        // حساب السنوات والأشهر الدقيقة
-        var ageYears = now.getFullYear() - birthDate.getFullYear();
-        var ageMonths = now.getMonth() - birthDate.getMonth();
+        var ageYears   = now.getFullYear() - birthDate.getFullYear();
+        var ageMonths  = now.getMonth() - birthDate.getMonth();
         if (now.getDate() < birthDate.getDate()) ageMonths--;
         if (ageMonths < 0) { ageYears--; ageMonths += 12; }
         var ageDaysRem = Math.floor((now - new Date(now.getFullYear(), now.getMonth(), birthDate.getDate())) / 86400000);
         if (isNaN(ageDaysRem) || ageDaysRem < 0) ageDaysRem = 0;
+        var totalMonths = ageYears * 12 + ageMonths;
 
-        // عداد تشغيل حي
         if (window._zodAgeInterval) clearInterval(window._zodAgeInterval);
+
         function updateAgeCounters() {
-          var n = new Date();
+          var n  = new Date();
           var df = n - birthDate;
-          var ts = Math.floor(df/1000);
-          var tm = Math.floor(ts/60);
-          var th = Math.floor(tm/60);
-          var td2 = Math.floor(th/24);
-          var tw = Math.floor(td2/7);
-          // حساب الأشهر الكاملة
-          var ay = n.getFullYear() - birthDate.getFullYear();
-          var am = n.getMonth() - birthDate.getMonth();
+          var ts = Math.floor(df / 1000);
+          var tm = Math.floor(ts / 60);
+          var th = Math.floor(tm / 60);
+          var td2 = Math.floor(th / 24);
+          var tw  = Math.floor(td2 / 7);
+          var ay  = n.getFullYear() - birthDate.getFullYear();
+          var am  = n.getMonth()    - birthDate.getMonth();
           if (n.getDate() < birthDate.getDate()) am--;
           if (am < 0) { ay--; am += 12; }
-          var totMonths = ay * 12 + am;
-          var tdEl = document.getElementById('zod-total-days');
-          var twEl = document.getElementById('zod-total-weeks');
-          var tminEl = document.getElementById('zod-total-min');
-          var tsecEl = document.getElementById('zod-total-sec');
-          var thEl = document.getElementById('zod-total-hrs');
-          var tmEl = document.getElementById('zod-total-months');
-          var tyEl = document.getElementById('zod-total-years-num');
-          if (tdEl) tdEl.textContent = td2.toLocaleString('ar-EG');
-          if (twEl) twEl.textContent = tw.toLocaleString('ar-EG');
-          if (tminEl) tminEl.textContent = tm.toLocaleString('ar-EG');
-          if (tsecEl) tsecEl.textContent = ts.toLocaleString('ar-EG');
-          if (thEl) thEl.textContent = th.toLocaleString('ar-EG');
-          if (tmEl) tmEl.textContent = totMonths.toLocaleString('ar-EG');
-          if (tyEl) tyEl.textContent = ay.toLocaleString('ar-EG');
+          var totM = ay * 12 + am;
+          var el = function(id){ return document.getElementById(id); };
+          if (el('zod-age-years'))   el('zod-age-years').textContent   = ay.toLocaleString('ar-EG');
+          if (el('zod-age-months'))  el('zod-age-months').textContent  = am.toLocaleString('ar-EG');
+          if (el('zod-total-months'))el('zod-total-months').textContent= totM.toLocaleString('ar-EG');
+          if (el('zod-total-weeks')) el('zod-total-weeks').textContent = tw.toLocaleString('ar-EG');
+          if (el('zod-total-days'))  el('zod-total-days').textContent  = td2.toLocaleString('ar-EG');
+          if (el('zod-total-hrs'))   el('zod-total-hrs').textContent   = th.toLocaleString('ar-EG');
+          if (el('zod-total-min'))   el('zod-total-min').textContent   = tm.toLocaleString('ar-EG');
+          if (el('zod-total-sec'))   el('zod-total-sec').textContent   = ts.toLocaleString('ar-EG');
+          if (el('zod-total-years-num')) el('zod-total-years-num').textContent = ay.toLocaleString('ar-EG');
         }
         window._zodAgeInterval = setInterval(updateAgeCounters, 1000);
 
-        var totalMonths = ageYears * 12 + ageMonths;
+        var td = traitDefs[_zodSign] || traitDefs.pisces;
+        var clr  = (td && td.color)  || '#64b5f6';
+        var clr2 = (td && td.color2) || '#bbdefb';
+
         ageCard.style.display = 'block';
         ageCard.innerHTML =
-          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + td.color + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both;width:100%">' +
-            '<div style="background:linear-gradient(135deg,' + td.color + '30,' + td.color + '12);padding:12px 16px;border-bottom:1px solid ' + td.color + '30;display:flex;align-items:center;gap:10px">' +
+          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + clr + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both;width:100%">' +
+            '<div style="background:linear-gradient(135deg,' + clr + '30,' + clr + '12);padding:12px 16px;border-bottom:1px solid ' + clr + '30;display:flex;align-items:center;gap:10px">' +
               '<span style="font-size:1.6rem">⏳</span>' +
               '<div>' +
-                '<div style="font-size:.88rem;font-weight:900;color:' + td.color + '">⏳ بطاقة العمر المفصّلة</div>' +
+                '<div style="font-size:.88rem;font-weight:900;color:' + clr + '">⏳ بطاقة العمر المفصّلة</div>' +
                 '<div style="font-size:.68rem;color:var(--txt3);margin-top:2px">عداد حي يتحدث كل ثانية ⚡</div>' +
               '</div>' +
             '</div>' +
             '<div style="padding:14px 16px">' +
-              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + td.color + '15;border-radius:14px;border:1.5px solid ' + td.color + '33">' +
-                '<div style="font-size:2.4rem;font-weight:900;color:' + td.color + ';line-height:1">' + ageYears + '</div>' +
-                '<div style="font-size:.78rem;color:var(--txt2);margin-top:4px;font-weight:700">سنة' + (ageMonths ? ' و ' + ageMonths + ' شهر' : '') + (ageDaysRem ? ' و ' + ageDaysRem + ' يوم' : '') + '</div>' +
-              '</div>' +
-              '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-years-num" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + ageYears.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🔢 سنة</div>' +
-                '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-months" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalMonths.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">📆 شهر</div>' +
-                '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-weeks" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalWeeks.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🗓️ أسبوع</div>' +
+              // العمر الرئيسي بالسنوات
+              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + clr + '15;border-radius:14px;border:1.5px solid ' + clr + '33">' +
+                '<div id="zod-age-years" style="font-size:2.8rem;font-weight:900;color:' + clr + ';line-height:1">' + ageYears + '</div>' +
+                '<div style="font-size:.82rem;color:var(--txt2);margin-top:6px;font-weight:700">سنة' +
+                  ' <span style="color:' + clr2 + '">و <span id="zod-age-months">' + ageMonths + '</span> شهر</span>' +
+                  ' <span style="color:#aaa">و ' + ageDaysRem + ' يوم</span>' +
                 '</div>' +
               '</div>' +
-              '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-days" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalDays.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">📅 يوم</div>' +
-                '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-hrs" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalHrs.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">🕐 ساعة</div>' +
-                '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-min" style="font-size:.95rem;font-weight:900;color:' + td.color2 + '">' + totalMin.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⏱️ دقيقة</div>' +
-                '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
-                  '<div id="zod-total-sec" style="font-size:.95rem;font-weight:900;color:' + td.color + ';animation:zodAgeCountUp .3s ease">' + totalSec.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⚡ ثانية</div>' +
-                '</div>' +
+              // شبكة التفاصيل
+              '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">' +
+                _zodAgeBox('zod-total-years-num', ageYears, '🔢 سنة', clr) +
+                _zodAgeBox('zod-total-months', totalMonths, '📆 شهر إجمالي', clr2) +
+                _zodAgeBox('zod-total-weeks', totalWeeks, '🗓️ أسبوع', clr2) +
+              '</div>' +
+              '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px">' +
+                _zodAgeBox('zod-total-days', totalDays, '📅 يوم', clr2) +
+                _zodAgeBox('zod-total-hrs',  totalHrs,  '🕐 ساعة', clr2) +
+              '</div>' +
+              '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">' +
+                _zodAgeBox('zod-total-min', totalMin, '⏱️ دقيقة', clr) +
+                _zodAgeBox('zod-total-sec', totalSec, '⚡ ثانية', clr) +
               '</div>' +
             '</div>' +
           '</div>';
+        updateAgeCounters();
       } else {
         ageCard.style.display = 'none';
       }
@@ -12893,12 +12855,15 @@ function palmAnalyze() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  updateTrialBadges();
-  updatePremiumTabBadges();
-  loadSettingsToggles();
+  if (typeof updateTrialBadges === 'function') updateTrialBadges();
+  if (typeof updatePremiumTabBadges === 'function') updatePremiumTabBadges();
+  if (typeof loadSettingsToggles === 'function') loadSettingsToggles();
 });
-// تحديث فوري
-setTimeout(function(){ updateTrialBadges(); updatePremiumTabBadges(); }, 500);
+// تحديث فوري بعد تحميل كل الـ scripts
+setTimeout(function(){
+  if (typeof updateTrialBadges === 'function') updateTrialBadges();
+  if (typeof updatePremiumTabBadges === 'function') updatePremiumTabBadges();
+}, 800);
 
 // ── فحص إعادة ضبط التجربة من الأدمن ──
 function checkAdminTrialReset() {
