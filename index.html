@@ -301,27 +301,25 @@
 </script>
 
 <!-- ═══════════════════════════════════════════════════
-     📡 OpenRouter AI — بديل Puter.js
-     يجلب API Key من Firebase: config/ai/openrouter_key
-════════════════════════════════════════════════════ -->
-<script>
+  <script>
 (function () {
   'use strict';
 
   var OR_ENDPOINT    = 'https://openrouter.ai/api/v1/chat/completions';
   var OR_MODEL_TEXT  = 'z-ai/glm-4.5-air:free';
   var OR_MODEL_VISION= 'z-ai/glm-4.5-air:free';
-  var OR_SITE_URL    = 'https://tayyibat.online';
+  var OR_SITE_URL    = window.location.href;
   var OR_SITE_NAME   = 'طيبات الصحي';
 
   var _cachedKey     = null;
   var _keyFetching   = false;
   var _keyCallbacks  = [];
 
-  /* ── جلب API Key من Firebase ── */
+  /* ── جلب API Key من Firebase بشكل آمن فقط ── */
   function _fetchApiKey(callback) {
     if (_cachedKey) { callback(_cachedKey); return; }
     if (_keyFetching) { _keyCallbacks.push(callback); return; }
+    
     _keyFetching = true;
     _keyCallbacks.push(callback);
 
@@ -335,26 +333,40 @@
     var _tries = 0;
     function _tryFetch() {
       _tries++;
+      // التوقف بعد 40 محاولة (حوالي 20 ثانية) لتجنب التعليق اللانهائي
       if (_tries > 40) { _done(null); return; }
+      
       if (!window.__firebaseReady || !window.__firebaseGet || !window.__firebaseRef || !window.__firebaseDB) {
         setTimeout(_tryFetch, 500); return;
       }
+      
       window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'config/ai/openrouter_key'))
         .then(function(snap) {
           var key = snap && snap.exists() ? snap.val() : null;
-          if (key) { console.log('[OpenRouter] ✅ API Key loaded'); _done(key); }
-          else     { console.warn('[OpenRouter] ⚠️ Key not found at config/ai/openrouter_key'); _done(null); }
-        }).catch(function(e){ console.error('[OpenRouter] Firebase error:', e); _done(null); });
+          if (key) { 
+            console.log('[OpenRouter] ✅ API Key loaded securely from Firebase DB'); 
+            _done(key); 
+          } else { 
+            console.warn('[OpenRouter] ⚠️ Key not found at config/ai/openrouter_key'); 
+            _done(null); 
+          }
+        }).catch(function(e){ 
+          console.error('[OpenRouter] Firebase DB error:', e); 
+          _done(null); 
+        });
     }
     _tryFetch();
   }
 
-  /* ── استدعاء OpenRouter (نص) ── */
+  /* ── استدعاء OpenRouter (نص) مع معالجة الأخطاء لمنع التجمد ── */
   async function _orChat(messages, opts) {
     opts = opts || {};
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
       _fetchApiKey(async function(apiKey) {
-        if (!apiKey) { reject(new Error('OpenRouter: No API Key in Firebase')); return; }
+        if (!apiKey) { 
+          resolve('⚠️ عذراً، لم يتمكن النظام من الاتصال بقاعدة البيانات لجلب مفتاح الذكاء الاصطناعي. يرجى المحاولة لاحقاً.'); 
+          return; 
+        }
         try {
           var res = await fetch(OR_ENDPOINT, {
             method: 'POST',
@@ -372,13 +384,14 @@
             })
           });
           if (!res.ok) {
-            var errTxt = await res.text();
-            throw new Error('OR HTTP ' + res.status + ': ' + errTxt);
+            resolve('⚠️ حدث خطأ في خادم الذكاء الاصطناعي. يرجى المحاولة لاحقاً.'); return;
           }
           var data = await res.json();
-          if (!data.choices || !data.choices[0]) throw new Error('Empty OR response');
+          if (!data.choices || !data.choices[0]) { resolve('⚠️ استجابة فارغة من مزود الخدمة.'); return; }
           resolve(data.choices[0].message.content);
-        } catch(e) { reject(e); }
+        } catch(e) { 
+          resolve('⚠️ فشل الاتصال بالإنترنت أثناء معالجة طلب الذكاء الاصطناعي.'); 
+        }
       });
     });
   }
@@ -397,26 +410,31 @@
   window.callAI           = async function(messages, opts)                    { return _orChat(messages, opts); };
   window.callAIText       = async function(prompt, system, opts)              { var m=[]; if(system) m.push({role:'system',content:system}); m.push({role:'user',content:prompt}); return _orChat(m, opts); };
   window.callAIWithImage  = async function(prompt, imgUrl, system)            { return _orChatWithImage(prompt, imgUrl, system); };
-  window.setOpenRouterModel = function(model)                                 { OR_MODEL_TEXT = OR_MODEL_VISION = model; console.log('[OpenRouter] Model:', model); };
-  window.preloadApiKey    = function()                                        { _fetchApiKey(function(k){ console.log('[OpenRouter] Preloaded:', k?'✅':'❌'); }); };
+  window.setOpenRouterModel = function(model)                                 { OR_MODEL_TEXT = OR_MODEL_VISION = model; };
+  window.preloadApiKey    = function()                                        { _fetchApiKey(function(k){}); };
 
-  /* ── Streaming ── */
+  /* ── Streaming لمعالجة البث المباشر بدون تجمد ── */
   window.callAIStream = async function(messages, onChunk, onDone, opts) {
     opts = opts || {};
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
       _fetchApiKey(async function(apiKey) {
-        if (!apiKey) { reject(new Error('No API Key')); return; }
+        if (!apiKey) {
+          var err = '⚠️ خطأ: تعذر جلب مفتاح التشغيل من قاعدة البيانات.';
+          if (onChunk) onChunk(err, err); if (onDone) onDone(err); resolve(err); return;
+        }
         try {
           var res = await fetch(OR_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey, 'HTTP-Referer':OR_SITE_URL, 'X-Title':OR_SITE_NAME },
             body: JSON.stringify({ model: opts.model||OR_MODEL_TEXT, messages: messages, temperature: opts.temperature||0.7, max_tokens: opts.max_tokens||1200, stream: true })
           });
-          if (!res.ok) throw new Error('Stream HTTP ' + res.status);
+          if (!res.ok) {
+            var err = '⚠️ الخدمة غير متوفرة حالياً بسبب ضغط على المزود.';
+            if (onChunk) onChunk(err, err); if (onDone) onDone(err); resolve(err); return;
+          }
           var reader = res.body.getReader(), decoder = new TextDecoder(), full = '';
           while (true) {
-            var _r = await reader.read();
-            if (_r.done) break;
+            var _r = await reader.read(); if (_r.done) break;
             var lines = decoder.decode(_r.value, {stream:true}).split('\n');
             for (var i=0; i<lines.length; i++) {
               var line = lines[i].trim();
@@ -430,17 +448,16 @@
               }
             }
           }
-          if (onDone) onDone(full);
-          resolve(full);
-        } catch(e) { reject(e); }
+          if (onDone) onDone(full); resolve(full);
+        } catch(e) {
+          var err = '⚠️ انقطع الاتصال أثناء استلام البيانات.';
+          if (onChunk) onChunk(err, err); if (onDone) onDone(err); resolve(err);
+        }
       });
     });
   };
 
-  /* ════════════════════════════════════════
-     استبدال دوال Puter للتوافق مع الكود القديم
-  ════════════════════════════════════════ */
-
+  /* ── توافقية مع دوال Puter القديمة ── */
   window._puterExtractText = function(res) {
     if (!res) return null;
     if (typeof res === 'string') return res;
@@ -449,29 +466,19 @@
       if (Array.isArray(c) && c[0] && c[0].text) return c[0].text;
       if (typeof c === 'string') return c;
     }
-    if (res.content) {
-      if (Array.isArray(res.content) && res.content[0] && res.content[0].text) return res.content[0].text;
-      if (typeof res.content === 'string') return res.content;
-    }
     return null;
   };
 
   window._puterChat = async function(messages, opts) {
     opts = opts || {};
     var text = await _orChat(messages, { temperature: opts.temperature||0.7, max_tokens: opts.max_tokens||1200 });
-    /* نُعيد كائناً بنفس شكل Puter للتوافق مع كل الكود القديم */
     return { message: { content: text } };
   };
 
-  window._callClaudeAPI = async function(prompt, systemPrompt) {
-    return _orChatWithImage(prompt, null, systemPrompt);
-  };
+  window._callClaudeAPI = async function(prompt, systemPrompt) { return _orChatWithImage(prompt, null, systemPrompt); };
+  window._callClaudeAPIWithImage = async function(prompt, imgDataUrl) { return _orChatWithImage(prompt, imgDataUrl, null); };
 
-  window._callClaudeAPIWithImage = async function(prompt, imgDataUrl) {
-    return _orChatWithImage(prompt, imgDataUrl, null);
-  };
-
-  console.log('[OpenRouter] ✅ Module ready — tayyibat.online');
+  console.log('[OpenRouter] ✅ Secure Module Ready');
 })();
 </script>
 <style>
