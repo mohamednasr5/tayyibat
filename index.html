@@ -4366,49 +4366,58 @@ var PREMIUM_CHALLENGES = [
 
 /* ══════════ Firebase ══════════ */
 async function dbGetUser(u) {
-  /* ── محاولة 1: قراءة مباشرة من Firebase (تعمل مع Google Auth) ── */
-  if (window.__firebaseReady) {
+  /* ── خطوة 0: تأكد من Anonymous Auth قبل أي قراءة من Firebase ── */
+  if (window.__firebaseReady && window.firebaseAuth) {
     try {
-      var snap = await window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u));
-      if (snap.exists()) return snap.val();
-    } catch(e) {
-      /* قد يكون Permission Denied لأن المستخدم غير مُصادَق — جرّب Anonymous Auth */
-      try {
-        if (window.firebaseAuth && window.__firebaseSignInAnon) {
-          await window.__firebaseSignInAnon(window.firebaseAuth);
-        } else if (window.firebaseAuth) {
-          /* استخدام signInAnonymously من Firebase SDK */
-          var fbAuth = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js');
-          if (fbAuth && fbAuth.signInAnonymously) {
-            await fbAuth.signInAnonymously(window.firebaseAuth);
-          }
-        }
-        /* أعد المحاولة بعد Anonymous Auth */
-        var snap2 = await window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u));
-        if (snap2.exists()) return snap2.val();
-      } catch(e2) {}
+      if (!window.firebaseAuth.currentUser && window.__firebaseSignInAnon) {
+        await Promise.race([
+          window.__firebaseSignInAnon(window.firebaseAuth),
+          new Promise(function(_, rej) { setTimeout(function() { rej(new Error('anon-timeout')); }, 3000); })
+        ]);
+      }
+    } catch(authErr) {
+      console.warn('dbGetUser: Anonymous auth skipped:', authErr.message);
     }
   }
+
+  /* ── محاولة 1: قراءة من Firebase ── */
+  if (window.__firebaseReady) {
+    try {
+      var snap = await window.__firebaseGet(
+        window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u)
+      );
+      if (snap.exists()) return snap.val();
+    } catch(e) {
+      console.warn('dbGetUser Firebase read failed:', e.code || e.message);
+    }
+  }
+
   /* ── محاولة 2: localStorage كـ fallback ── */
   try {
     var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
     if (local[u]) return local[u];
-  } catch(e3) {}
+  } catch(e2) {}
+
   return null;
 }
 
 async function dbSaveUser(u, d) {
+  var saved = false;
   if (window.__firebaseReady) {
     try {
       await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + u), d);
+      saved = true;
     } catch(e) {
-      /* Permission Denied — احفظ محلياً فقط */
+      console.warn('dbSaveUser Firebase failed:', e.code || e.message);
     }
   }
+  /* دائماً احفظ في localStorage كـ backup */
   try {
     var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-    local[u] = d; localStorage.setItem('tayyibat_users', JSON.stringify(local));
+    local[u] = d;
+    localStorage.setItem('tayyibat_users', JSON.stringify(local));
   } catch(e2) {}
+  return saved;
 }
 
 /* ══════════ تسجيل نشاط المستخدم في Firebase ══════════ */
@@ -4981,37 +4990,69 @@ async function autoLogin() {
   var s = getSession();
   if (!s) { hideLoader(); return; }
   try {
-    // تحقق هل المستخدم سجّل بجوجل
-    var snap = await window.__firebaseGet(
-      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
-    );
-    if (snap.exists()) {
-      var data = snap.val();
-      if (data.loginMethod === 'google' && window.firebaseAuth) {
-        var done = await Promise.race([
-          new Promise(function(resolve) {
-            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
-              unsub();
-              if (user && user.uid === s) {
-                try { await handleGoogleUserData(user); resolve(true); }
-                catch(e) { resolve(false); }
-              } else { resolve(false); }
-            });
-          }),
-          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
-        ]);
-        if (done) return;
-        hideLoader(); return;
+    /* ── انتظر Firebase إذا لم يكن جاهزاً ── */
+    if (!window.__firebaseReady) {
+      await new Promise(function(resolve) { setTimeout(resolve, 1500); });
+    }
+
+    /* ── Anonymous Auth قبل القراءة ── */
+    if (window.__firebaseReady && window.firebaseAuth && !window.firebaseAuth.currentUser) {
+      try {
+        if (window.__firebaseSignInAnon) {
+          await Promise.race([
+            window.__firebaseSignInAnon(window.firebaseAuth),
+            new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
+          ]);
+        }
+      } catch(authErr) {
+        console.warn('autoLogin: Anonymous auth skipped:', authErr.message);
       }
     }
-    // دخول عادي username/password
+
+    /* ── تحقق هل المستخدم سجّل بجوجل ── */
+    if (window.__firebaseReady) {
+      try {
+        var snap = await window.__firebaseGet(
+          window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
+        );
+        if (snap.exists()) {
+          var data = snap.val();
+          if (data.loginMethod === 'google' && window.firebaseAuth) {
+            var done = await Promise.race([
+              new Promise(function(resolve) {
+                var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
+                  unsub();
+                  if (user && user.uid === s) {
+                    try { await handleGoogleUserData(user); resolve(true); }
+                    catch(e) { resolve(false); }
+                  } else { resolve(false); }
+                });
+              }),
+              new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2500); })
+            ]);
+            if (done) return;
+            hideLoader(); return;
+          }
+        }
+      } catch(fbErr) {
+        console.warn('autoLogin: Firebase read failed, falling back to localStorage:', fbErr.message);
+      }
+    }
+
+    /* ── دخول عادي username/password ── */
     var u = await dbGetUser(s);
+    if (!u) {
+      /* ── Fallback: localStorage مباشرة ── */
+      try {
+        var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+        if (local[s]) u = local[s];
+      } catch(le) {}
+    }
+
     if (u) {
       currentUser = Object.assign({}, u, { username: s });
       if (currentUser.pro && currentUser.pro.active === true) {
-        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
-        } else if (!currentUser.pro.expiresAt) {
+        if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
           window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
         } else {
           currentUser.pro.active = false; window.isProUser = false;
@@ -5019,7 +5060,9 @@ async function autoLogin() {
       } else { window.isProUser = false; }
       bootApp(); setTimeout(refreshGiftFab, 700); return;
     }
-  } catch(e) {}
+  } catch(e) {
+    console.error('autoLogin error:', e);
+  }
   hideLoader();
 }
 
@@ -5102,32 +5145,58 @@ async function doLogin() {
   var b = document.getElementById('btn-login');
   b.disabled = true; b.innerHTML = '<span class="btn-spinner"></span> جاري التحقق...';
   try {
+    /* ── خطوة 1: Anonymous Auth قبل أي قراءة ── */
+    if (window.__firebaseReady && window.firebaseAuth && !window.firebaseAuth.currentUser) {
+      try {
+        if (window.__firebaseSignInAnon) {
+          await Promise.race([
+            window.__firebaseSignInAnon(window.firebaseAuth),
+            new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
+          ]);
+        }
+      } catch(authErr) {
+        console.warn('doLogin: Anonymous auth failed, trying localStorage:', authErr.message);
+      }
+    }
+
+    /* ── خطوة 2: جلب بيانات المستخدم ── */
     var user = await dbGetUser(u);
     if (!user) { showAuthError('login', '❌ اسم المستخدم غير موجود'); return; }
+
+    /* ── خطوة 3: التحقق من كلمة المرور (3 طرق للتوافق مع القديم) ── */
     var match = false;
     try { match = decodePass(user.password) === p; } catch(ex) {}
     if (!match) match = (user.password === p);
+    if (!match) { try { match = (atob(user.password) === p); } catch(ex) {} }
     if (!match) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); return; }
+
+    /* ── خطوة 4: تسجيل الدخول بنجاح ── */
     currentUser = Object.assign({}, user, { username: u });
     saveSession(u);
-    
-    // فحص وتأمين تفعيل الحساب المطور الفاخر
+
+    /* فحص Pro */
     if (currentUser.pro && currentUser.pro.active === true) {
       if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
         window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
       } else {
-        currentUser.pro.active = false;
-        window.isProUser = false;
+        currentUser.pro.active = false; window.isProUser = false;
       }
-    } else {
-      window.isProUser = false;
-    }
-    
-    try { await dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
+    } else { window.isProUser = false; }
+
+    /* تحديث lastLogin في الخلفية بدون إيقاف الدخول */
+    dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })).catch(function() {});
+
     logActivity('login', 'سجّل دخولاً للتطبيق', 'من صفحة تسجيل الدخول');
-    playSound('success'); showToast('✅ أهلاً ' + user.name); bootApp(); setTimeout(refreshGiftFab, 700);
-  } catch(e) { showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً'); }
-  finally { b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'; }
+    playSound('success');
+    showToast('✅ أهلاً ' + (currentUser.nameAr || currentUser.name || u));
+    bootApp();
+    setTimeout(refreshGiftFab, 700);
+  } catch(e) {
+    console.error('doLogin error:', e);
+    showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً');
+  } finally {
+    b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+  }
 }
 
 async function doRegister() {
@@ -5141,26 +5210,63 @@ async function doRegister() {
   var w = parseFloat(document.getElementById('r-weight').value) || 0;
   var h = parseFloat(document.getElementById('r-height').value) || 0;
   var phone = document.getElementById('r-phone').value.trim();
+
   if (!n) { showAuthError('reg', '❌ أدخل الاسم الكامل'); return; }
   if (!u || u.length < 3) { showAuthError('reg', '❌ اسم المستخدم 3 أحرف على الأقل'); return; }
   if (!p || p.length < 6) { showAuthError('reg', '❌ كلمة المرور 6 أحرف على الأقل'); return; }
   if (!d) { showAuthError('reg', '❌ أدخل تاريخ الميلاد'); return; }
   if (!g) { showAuthError('reg', '❌ اختر الجنس'); return; }
+
   var b = document.getElementById('btn-register');
   b.disabled = true; b.innerHTML = '<span class="btn-spinner"></span> جاري الإنشاء...';
   try {
+    /* ── Anonymous Auth أولاً ── */
+    if (window.__firebaseReady && window.firebaseAuth && !window.firebaseAuth.currentUser) {
+      try {
+        if (window.__firebaseSignInAnon) {
+          await Promise.race([
+            window.__firebaseSignInAnon(window.firebaseAuth),
+            new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
+          ]);
+        }
+      } catch(authErr) {
+        console.warn('doRegister: Anonymous auth failed:', authErr.message);
+      }
+    }
+
+    /* ── تحقق من عدم وجود اسم المستخدم مسبقاً ── */
     var ex = await dbGetUser(u);
     if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز، اختر آخر'); return; }
+
     var bmi = (w && h) ? +(w / ((h / 100) * (h / 100))).toFixed(1) : 0;
-    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), phone: phone || '', created: Date.now(), pro: { active: false } };
+    var ud = {
+      name: n, nameAr: n, username: u,
+      password: encodePass(p),
+      dob: d, gender: g, smoking: sm,
+      weight: w, height: h, bmi: bmi,
+      diseases: selectedDiseases.slice(),
+      phone: phone || '',
+      created: Date.now(),
+      lastLogin: Date.now(),
+      loginMethod: 'username',
+      pro: { active: false }
+    };
+
     await dbSaveUser(u, ud);
     currentUser = Object.assign({}, ud);
     saveSession(u);
     window.isProUser = false;
     selectedDiseases = [];
-    playSound('success'); showToast('✅ تم إنشاء الحساب بنجاح'); bootApp(); setTimeout(refreshGiftFab, 700);
-  } catch(e) { showAuthError('reg', '❌ خطأ في الإنشاء، حاول مجدداً'); }
-  finally { b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب'; }
+    playSound('success');
+    showToast('✅ تم إنشاء الحساب بنجاح');
+    bootApp();
+    setTimeout(refreshGiftFab, 700);
+  } catch(e) {
+    console.error('doRegister error:', e);
+    showAuthError('reg', '❌ خطأ في الإنشاء، حاول مجدداً');
+  } finally {
+    b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب';
+  }
 }
 
 function doLogout() {
@@ -10138,46 +10244,7 @@ function doLogout() {
   showToast('👋 تم تسجيل الخروج');
 }
 
-/* ─── autoLogin with Google support ───────────────── */
-async function autoLogin() {
-  var s = getSession();
-  if (!s) { hideLoader(); return; }
-  try {
-    var snap = await window.__firebaseGet(
-      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
-    );
-    if (snap.exists()) {
-      var data = snap.val();
-      if (data.loginMethod === 'google' && window.firebaseAuth) {
-        var done = await Promise.race([
-          new Promise(function(resolve) {
-            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
-              unsub();
-              if (user && user.uid === s) {
-                try { await handleGoogleUserData(user); resolve(true); }
-                catch(e) { resolve(false); }
-              } else { resolve(false); }
-            });
-          }),
-          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
-        ]);
-        if (done) return;
-        hideLoader(); return;
-      }
-    }
-    var u = await dbGetUser(s);
-    if (u) {
-      currentUser = Object.assign({}, u, { username: s });
-      if (currentUser.pro && currentUser.pro.active === true) {
-        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
-        else if (!currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
-        else { currentUser.pro.active = false; window.isProUser = false; }
-      } else { window.isProUser = false; }
-      bootApp(); setTimeout(refreshGiftFab, 700); return;
-    }
-  } catch(e) {}
-  hideLoader();
-}
+/* ─── autoLogin: تم دمجها في التعريف الموحد أعلاه ─── */
 </script>
 
 <script>
