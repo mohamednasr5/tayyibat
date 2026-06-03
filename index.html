@@ -5936,65 +5936,16 @@ async function _scanAnalyzeAI(ingredients) {
   }
 
   var result = null;
+  var _msgs = [{role:"user",content:prompt}];
 
-  /* ١. HuggingFace (الأساسي) */
-  if (!result && window.__HF_KEY) {
-    try {
-      var hfR = await _tryHuggingFace([{role:"user",content:prompt}], 0);
-      if (hfR) result = hfR;
-    } catch(e) {}
-  }
+  /* ١. LLM7 (GPT-4o, DeepSeek, Mistral — مجاني 30 RPM) */
+  if (!result) { try { var r=await _tryLLM7(_msgs,0); if(r&&r.text) result=r; } catch(e) {} }
 
-  /* ٢. Pollinations (مجاني) */
-  if (!result) {
-    try {
-      var polR = await _tryPollinations([{role:"user",content:prompt}], 0);
-      if (polR) result = polR;
-    } catch(e) {}
-  }
+  /* ٢. Pollinations */
+  if (!result) { try { var r=await _tryPollinations(_msgs,0); if(r&&r.text) result=r; } catch(e) {} }
 
-  /* ٣. Puter.js */
-  if (!result) {
-    try {
-      if (typeof puter !== "undefined" && puter.ai) {
-        var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
-        var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-        if (t) result = {text:t, source:"Puter.js"};
-      }
-    } catch(e) {}
-  }
-
-  /* ٤. Mistral */
-  if (!result && window.__MISTRAL_KEY) {
-    try {
-      var r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer "+window.__MISTRAL_KEY},
-        body:JSON.stringify({model:"mistral-small-latest",messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
-      });
-      if (r.ok) { var d=await r.json(); var t2=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:null; if(t2) result={text:t2,source:"Mistral"}; }
-    } catch(e) {}
-  }
-
-  /* ٥. Z.ai */
-  if (!result && window.__GEMINI_KEY) {
-    try {
-      var r2 = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer "+window.__GEMINI_KEY},
-        body:JSON.stringify({model:"glm-4-flash",messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
-      });
-      if (r2.ok) { var d2=await r2.json(); var t3=d2&&d2.choices&&d2.choices[0]&&d2.choices[0].message?d2.choices[0].message.content:null; if(t3) result={text:t3,source:"Z.ai"}; }
-    } catch(e) {}
-  }
-
-  /* ٦. OpenRouter fallback */
-  if (!result && window.ORKEYFB) {
-    try {
-      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext(), prompt);
-      if (oRes) result = {text:oRes.text, source:"OpenRouter"};
-    } catch(e) {}
-  }
+  /* ٣. OpenRouter Free */
+  if (!result) { try { var r=await _tryOpenRouterFree(_msgs,0); if(r&&r.text) result=r; } catch(e) {} }
 
   if (!result) result = {
     text: "تعذر التحليل الان.\n\nتذكر:\nممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات.\nمسموح: لحم خروف، سمك، ارز، بطاطس، عسل، تمر.",
@@ -6130,42 +6081,20 @@ async function _liveVisionAnalyze(videoEl, prompt, onResult, onError) {
   var canvas = document.createElement('canvas');
   canvas.width = videoEl.videoWidth; canvas.height = videoEl.videoHeight;
   canvas.getContext('2d').drawImage(videoEl, 0, 0);
-  var imgData = canvas.toDataURL('image/jpeg', 0.82);
+  var imgData = canvas.toDataURL('image/jpeg', 0.85);
   var result = null;
 
-  // HF أولاً
-  if (!result && window.__HF_KEY) {
-    try {
-      var r = await _smartVisionAnalysis(imgData, prompt);
-      if (r && r.source !== 'fallback' && r.text) result = r.text;
-    } catch(e) {}
-  }
-  // Pollinations ثانياً
+  // LLM7 Vision أولاً (GPT-4o, Claude, Gemini)
   if (!result) {
-    try {
-      var r2 = await _tryPollinations([
-        {role:'user', content:[
-          {type:'text', text: prompt},
-          {type:'image_url', image_url:{url: imgData}}
-        ]}
-      ], 0);
-      if (r2 && r2.text) result = r2.text;
-    } catch(e) {}
+    try { var r = await _tryLLM7Vision(imgData, prompt, 0); if (r && r.text) result = r.text; } catch(e) {}
   }
-  // Puter أخيراً
+  // Pollinations Vision ثانياً
   if (!result) {
-    try {
-      if (typeof puter !== 'undefined' && puter.ai) {
-        var r3 = await puter.ai.chat([
-          {role:'user', content:[
-            {type:'text', text: prompt},
-            {type:'image_url', image_url:{url: imgData}}
-          ]}
-        ], {model:'gpt-4o-mini'});
-        var t = typeof r3==='string'?r3:r3&&r3.message?r3.message.content:null;
-        if (t) result = t;
-      }
-    } catch(e) {}
+    try { var r2 = await _tryPollinationsVision(imgData, prompt, 0); if (r2 && r2.text) result = r2.text; } catch(e) {}
+  }
+  // _smartVisionAnalysis كاحتياطي
+  if (!result) {
+    try { var r3 = await _smartVisionAnalysis(imgData, prompt); if (r3 && r3.source !== 'fallback') result = r3.text; } catch(e) {}
   }
 
   if (result) { if(onResult) onResult(result, imgData); return result; }
@@ -6176,21 +6105,12 @@ async function _liveVisionAnalyze(videoEl, prompt, onResult, onError) {
 async function _aiAsk(prompt, onResult, onError) {
   var result = null;
   var msgs = [{role:'user', content: prompt}];
-  if (!result && window.__HF_KEY) {
-    try { var r=await _tryHuggingFace(msgs,0); if(r&&r.text) result=r.text; } catch(e) {}
-  }
-  if (!result) {
-    try { var r=await _tryPollinations(msgs,0); if(r&&r.text) result=r.text; } catch(e) {}
-  }
-  if (!result) {
-    try {
-      if (typeof puter!=='undefined'&&puter.ai) {
-        var r=await puter.ai.chat(prompt,{model:'gpt-4o-mini',temperature:0.4});
-        var t=typeof r==='string'?r:r&&r.message?r.message.content:null;
-        if(t) result=t;
-      }
-    } catch(e) {}
-  }
+  // LLM7 أولاً
+  if (!result) { try { var r=await _tryLLM7(msgs,0); if(r&&r.text) result=r.text; } catch(e) {} }
+  // Pollinations ثانياً
+  if (!result) { try { var r=await _tryPollinations(msgs,0); if(r&&r.text) result=r.text; } catch(e) {} }
+  // OpenRouter ثالثاً
+  if (!result) { try { var r=await _tryOpenRouterFree(msgs,0); if(r&&r.text) result=r.text; } catch(e) {} }
   if (result) { if(onResult) onResult(result); return result; }
   else { if(onError) onError('تعذّر الحصول على إجابة'); return null; }
 }
@@ -6244,21 +6164,17 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
 
   var result = null;
   if (imgDataUrl) {
-    try { var vRes = await _smartVisionAnalysis(imgDataUrl, prompt); if (vRes && vRes.source !== "fallback") result = {text:vRes.text, source:"AI Pharma"}; } catch(e) {}
+    // LLM7 Vision أولاً
+    try { var r1=await _tryLLM7Vision(imgDataUrl, prompt, 0); if(r1&&r1.text) result={text:r1.text,source:"AI Pharma/"+r1.source}; } catch(e) {}
+    // Pollinations Vision ثانياً
+    if (!result) { try { var r2=await _tryPollinationsVision(imgDataUrl, prompt, 0); if(r2&&r2.text) result={text:r2.text,source:"AI Pharma"}; } catch(e) {} }
+    // _smartVisionAnalysis كاحتياطي
+    if (!result) { try { var vRes=await _smartVisionAnalysis(imgDataUrl, prompt); if(vRes&&vRes.source!=="fallback") result={text:vRes.text,source:"AI Pharma"}; } catch(e) {} }
   } else {
-    /* ١. HuggingFace */
-    if (!result && window.__HF_KEY) { try { var hfR=await _tryHuggingFace([{role:"user",content:prompt}],0); if(hfR) result=hfR; } catch(e){} }
-    /* ٢. Pollinations */
-    if (!result) { try { var polR=await _tryPollinations([{role:"user",content:prompt}],0); if(polR) result={text:polR.text,source:"AI Pharma"}; } catch(e){} }
-    /* ٣. Puter */
-    if (!result) { try { if(typeof puter!=="undefined"&&puter.ai){ var res=await puter.ai.chat(prompt,{model:"gpt-5.4-nano",temperature:0.3}); var t=typeof res==="string"?res:res&&res.message&&res.message.content?res.message.content:res&&res.content?res.content:null; if(t) result={text:t,source:"AI Pharma"}; } } catch(e){} }
-  }
-
-  if (!result && window.ORKEYFB) {
-    try {
-      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext ? buildUserContext() : "", prompt);
-      if (oRes) result = {text:oRes.text, source:"AI Pharma"};
-    } catch(e) {}
+    var msgs=[{role:"user",content:prompt}];
+    try { var r=await _tryLLM7(msgs,0); if(r&&r.text) result={text:r.text,source:"AI Pharma"}; } catch(e) {}
+    if (!result) { try { var r=await _tryPollinations(msgs,0); if(r&&r.text) result={text:r.text,source:"AI Pharma"}; } catch(e) {} }
+    if (!result) { try { var r=await _tryOpenRouterFree(msgs,0); if(r&&r.text) result={text:r.text,source:"AI Pharma"}; } catch(e) {} }
   }
   if (!result) result = {text:"تعذر تحليل الدواء. أدخل اسم الدواء يدوياً أو حاول مرة أخرى.", source:"محلي"};
   _renderMedicineResult(result.text, result.source);
@@ -6459,11 +6375,11 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
     try { var vRes = await _smartVisionAnalysis(imgDataUrl, prompt); if (vRes && vRes.source !== "fallback") result = {text:vRes.text, source:"AI Doctor"}; } catch(e) {}
   } else {
     /* ١. HuggingFace */
-    if (!result && window.__HF_KEY) { try { var hfR=await _tryHuggingFace([{role:"user",content:prompt}],0); if(hfR) result=hfR; } catch(e){} }
+    if (!result) { try { var rHF=await _tryLLM7([{role:"user",content:prompt}],0); if(rHF&&rHF.text) result={text:rHF.text,source:"AI Doctor"}; } catch(e){} }
     /* ٢. Pollinations */
     if (!result) { try { var polR=await _tryPollinations([{role:"user",content:prompt}],0); if(polR) result={text:polR.text,source:"AI Doctor"}; } catch(e){} }
     /* ٣. Puter */
-    if (!result) { try { if(typeof puter!=="undefined"&&puter.ai){ var res=await puter.ai.chat(prompt,{model:"gpt-5.4-nano",temperature:0.3}); var t=typeof res==="string"?res:res&&res.message&&res.message.content?res.message.content:res&&res.content?res.content:null; if(t) result={text:t,source:"AI Doctor"}; } } catch(e){} }
+    if (!result) { try { var rOR=await _tryOpenRouterFree([{role:"user",content:prompt}],0); if(rOR&&rOR.text) result={text:rOR.text,source:"AI Doctor"}; } catch(e){} }
   }
 
   if (!result && window.ORKEYFB) {
@@ -6793,11 +6709,11 @@ async function showDrugAI(btn) {
     var _drugMsgs = [{role:'user', content:_drugPrompt}];
     var _drugResult = null;
     // 1. HuggingFace
-    if (!_drugResult && window.__HF_KEY) { try { var hfD=await _tryHuggingFace(_drugMsgs,0); if(hfD) _drugResult=hfD.text; } catch(e){} }
+    if (!_drugResult) { try { var rd=await _tryLLM7(_drugMsgs,0); if(rd&&rd.text) _drugResult=rd.text; } catch(e){} }
     // 2. Pollinations
     if (!_drugResult) { try { var polD=await _tryPollinations(_drugMsgs,0); if(polD) _drugResult=polD.text; } catch(e){} }
     // 3. Puter
-    if (!_drugResult) { try { if(typeof puter!=='undefined'&&puter.ai){ var res=await puter.ai.chat(_drugPrompt,{model:'gpt-4o-mini',temperature:0.2}); _drugResult=typeof res==='string'?res:(res.message&&res.message.content||res.content||''); } } catch(e){} }
+    if (!_drugResult) { try { var rd2=await _tryOpenRouterFree(_drugMsgs,0); if(rd2&&rd2.text) _drugResult=rd2.text; } catch(e){} }
     var txt = _drugResult || '';
     var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
     txt.trim().split('\n').forEach(function(line){
@@ -6971,9 +6887,9 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
     try { var vRes=await _smartVisionAnalysis(imgDataUrl,prompt); if(vRes&&vRes.source!=='fallback') result=vRes.text; } catch(e) {}
   } else {
     // text: HF → Pollinations → Puter
-    if (!result && window.__HF_KEY) { try { var hfP=await _tryHuggingFace([{role:'user',content:prompt}],0); if(hfP) result=hfP.text; } catch(e){} }
+    if (!result) { try { var rp=await _tryLLM7([{role:'user',content:prompt}],0); if(rp&&rp.text) result=rp.text; } catch(e){} }
     if (!result) { try { var polP=await _tryPollinations([{role:'user',content:prompt}],0); if(polP) result=polP.text; } catch(e){} }
-    if (!result) { try { if(typeof puter!=='undefined'&&puter.ai){ var res=await puter.ai.chat(prompt,{model:'gpt-4o-mini',temperature:0.2}); var t=typeof res==='string'?res:res&&res.message&&res.message.content?res.message.content:res&&res.content?res.content:null; if(t) result=t; } } catch(e){} }
+    if (!result) { try { var rp2=await _tryOpenRouterFree([{role:'user',content:prompt}],0); if(rp2&&rp2.text) result=rp2.text; } catch(e){} }
   }
 
   // 2. OpenRouter fallback
@@ -7194,7 +7110,7 @@ async function _rxLookupAndShow(name, db, container) {
         var _dc1Msgs=[{role:'user',content:aiPrompt2}];
         if (!res2&&window.__HF_KEY){try{var hfDc1=await _tryHuggingFace(_dc1Msgs,0);if(hfDc1)res2=hfDc1.text;}catch(e){}}
         if (!res2){try{var polDc1=await _tryPollinations(_dc1Msgs,0);if(polDc1)res2=polDc1.text;}catch(e){}}
-        if (!res2&&typeof puter!=='undefined'&&puter.ai){try{var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2});res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null));}catch(e){}}
+        if (!res2){try{var pr2=await _tryLLM7(_dc1Msgs,0);if(pr2&&pr2.text)res2=pr2.text;}catch(e){}}
         if (!res2 && window.__OR_KEY_FB) { try { var orR2=await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt2); if(orR2) res2=orR2.text; } catch(e) {} }
         if (!res2) throw new Error('no result');
         var uM=res2.match(/الاستخدامات\s*:\s*([^\n]+)/i);
@@ -7263,7 +7179,7 @@ async function _rxLookupAndShow(name, db, container) {
       var _dc2Msgs=[{role:'user',content:aiPrompt}];
       if (!res&&window.__HF_KEY){try{var hfDc2=await _tryHuggingFace(_dc2Msgs,0);if(hfDc2)res=hfDc2.text;}catch(e){}}
       if (!res){try{var polDc2=await _tryPollinations(_dc2Msgs,0);if(polDc2)res=polDc2.text;}catch(e){}}
-      if (!res&&typeof puter!=='undefined'&&puter.ai){try{var pr=await puter.ai.chat(aiPrompt,{model:'gpt-4o-mini',temperature:0.2});res=typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?pr.message.content:(pr&&pr.content?pr.content:null));}catch(e){}}
+      if (!res){try{var pr=await _tryLLM7(_dc2Msgs,0);if(pr&&pr.text)res=pr.text;}catch(e){}}
       if (!res && window.__OR_KEY_FB) {
         try { var orR = await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt); if(orR) res=orR.text; } catch(e) {}
       }
