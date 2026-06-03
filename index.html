@@ -4103,7 +4103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* ══════════ GLOBALS ══════════ */
 
 // نماذج Puter المعتمدة — يجب تعريفها مبكراً قبل أي استخدام
-var PUTER_AI_MODELS = ["gpt-4o-mini"];
+var PUTER_AI_MODELS = ["gpt-5.4"];
 
 var currentUser = null;
 var selectedDiseases = [];
@@ -4132,7 +4132,7 @@ var DISEASES_LIST = [
 
 var OR_MODELS = [
   { id: 'deepseek/deepseek-chat', name: 'DeepSeek Chat', icon: '🔮' },
-  { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini', icon: '🧠' },
+  { id: 'openai/gpt-5.4', name: 'GPT-4o Mini', icon: '🧠' },
   { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B', icon: '🦙' },
   { id: 'mistralai/mistral-large', name: 'Mistral Large', icon: '🌪️' },
   { id: 'qwen/qwen-2.5-72b-instruct', name: 'Qwen 2.5 72B', icon: '🐲' },
@@ -4145,7 +4145,7 @@ var OR_MODELS = [
 
 var AI_MODELS = [
   { id: 'deepseek-v3', name: 'DeepSeek V3', icon: '🔮' },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', icon: '🧠' },
+  { id: 'gpt-5.4', name: 'GPT-4o Mini', icon: '🧠' },
   { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', icon: '🦙' },
   { id: 'mistral-large', name: 'Mistral Large', icon: '🌪️' },
   { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', icon: '🐲' },
@@ -5391,7 +5391,7 @@ async function runPremiumHealthAnalyzer() {
   var sysPrompt = buildUserContext();
   var response = null;
   try {
-    var _hr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:promptText}], {model:'gpt-4o-mini', temperature:0.7});
+    var _hr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:promptText}], {model:'gpt-5.4', temperature:0.7});
     var _ht = typeof _hr==='string'?_hr:(_hr&&_hr.message&&_hr.message.content?(Array.isArray(_hr.message.content)?_hr.message.content[0].text:_hr.message.content):(_hr&&_hr.content?_hr.content:null));
     if (_ht) response = _ht;
   } catch(e) {}
@@ -5432,7 +5432,7 @@ async function sendPremiumCoachMsg() {
   
   var response = null;
   try {
-    var _cr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:query}], {model:'gpt-4o-mini', temperature:0.7});
+    var _cr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:query}], {model:'gpt-5.4', temperature:0.7});
     var _ct = typeof _cr==='string'?_cr:(_cr&&_cr.message&&_cr.message.content?(Array.isArray(_cr.message.content)?_cr.message.content[0].text:_cr.message.content):(_cr&&_cr.content?_cr.content:null));
     if (_ct) response = _ct;
   } catch(e) {}
@@ -5596,7 +5596,7 @@ async function captureAndScanProductBlob() {
           {type:"text", text: vPrompt},
           {type:"image_url", image_url:{url: imgData}}
         ]}
-      ], {model:'gpt-4o-mini', temperature:0.3});
+      ], {model:'gpt-5.4', temperature:0.3});
       var text = typeof res==="string" ? res
         : res&&res.message&&res.message.content ? res.message.content
         : res&&res.content ? res.content : null;
@@ -5674,9 +5674,9 @@ async function _scanAnalyzeAI(ingredients) {
 
   try {
     if (typeof puter !== "undefined" && puter.ai) {
-      var _sr = await puter.ai.chat(prompt, {model:'gpt-4o-mini', temperature:0.3});
+      var _sr = await puter.ai.chat(prompt, {model:'gpt-5.4', temperature:0.3});
       var _st = typeof _sr==="string"?_sr:(_sr&&_sr.message&&_sr.message.content?(Array.isArray(_sr.message.content)?_sr.message.content[0].text:_sr.message.content):(_sr&&_sr.content?_sr.content:null));
-      if (_st) result = {text:_st, source:"Puter / gpt-4o-mini"};
+      if (_st) result = {text:_st, source:"Puter / gpt-5.4"};
     }
   } catch(e) {}
 
@@ -5854,7 +5854,7 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
     (textInput ? "الدواء: " + textInput : "انظر للصورة واستخرج اسم الدواء والمعلومات منه");
 
   var result = null;
-  /* Puter gpt-4o-mini */
+  /* Puter gpt-5.4 */
     try {
       if (typeof puter !== "undefined" && puter.ai) {
         var content = imgDataUrl
@@ -5862,10 +5862,10 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
           : prompt;
         var _mr = await puter.ai.chat(
           imgDataUrl ? [{role:"user",content:content}] : prompt,
-          {model: 'gpt-4o-mini', temperature:0.3}
+          {model: 'gpt-5.4', temperature:0.3}
         );
         var _mt = typeof _mr==="string"?_mr:(_mr&&_mr.message&&_mr.message.content?(Array.isArray(_mr.message.content)?_mr.message.content[0].text:_mr.message.content):(_mr&&_mr.content?_mr.content:null));
-        if (_mt) result = {text:_mt, source:'Puter / gpt-4o-mini'};
+        if (_mt) result = {text:_mt, source:'Puter / gpt-5.4'};
       }
     } catch(e) {}
   if (!result) result = {text:"تعذر تحليل الدواء. أدخل اسم الدواء يدوياً أو حاول مرة أخرى.", source:"محلي"};
@@ -6063,7 +6063,7 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
     (textInput ? "نتائج التقرير:\n" + textInput : "انظر للصورة واقرأ التقرير الطبي المكتوب فيها بدقة");
 
   var result = null;
-  /* Puter gpt-4o-mini */
+  /* Puter gpt-5.4 */
     try {
       if (typeof puter !== "undefined" && puter.ai) {
         var content = imgDataUrl
@@ -6071,10 +6071,10 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
           : prompt;
         var _rr = await puter.ai.chat(
           imgDataUrl ? [{role:"user",content:content}] : prompt,
-          {model: 'gpt-4o-mini', temperature:0.3}
+          {model: 'gpt-5.4', temperature:0.3}
         );
         var _rt = typeof _rr==="string"?_rr:(_rr&&_rr.message&&_rr.message.content?(Array.isArray(_rr.message.content)?_rr.message.content[0].text:_rr.message.content):(_rr&&_rr.content?_rr.content:null));
-        if (_rt) result = {text:_rt, source:'Puter / gpt-4o-mini'};
+        if (_rt) result = {text:_rt, source:'Puter / gpt-5.4'};
       }
     } catch(e) {}
   if (!result) result = {text:"تعذر تحليل التقرير. أدخل النتائج يدوياً أو حاول مرة أخرى.", source:"محلي"};
@@ -6396,7 +6396,7 @@ async function showDrugAI(btn) {
     var res = await puter.ai.chat(
       'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
       '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...',
-      {model:'gpt-4o-mini', temperature:0.2}
+      {model:'gpt-5.4', temperature:0.2}
     );
     var txt = typeof res==='string'?res:(res.message&&res.message.content||res.content||'');
     var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
@@ -6446,7 +6446,7 @@ async function drugSearchByCamera() {
         {type:'text', text:'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.'},
         {type:'image_url', image_url:{url: imgData}}
       ]
-    }], {model:'gpt-4o-mini', temperature:0});
+    }], {model:'gpt-5.4', temperature:0});
     var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message && aiRes.message.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
     if (drugName && drugName.length > 1) {
       var inp2 = document.getElementById('drug-name-search-input');
@@ -6573,7 +6573,7 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
   var result = null;
 
   // Puter.js مع fallback على النماذج
-  /* Puter gpt-4o-mini */
+  /* Puter gpt-5.4 */
     try {
       if (typeof puter !== 'undefined' && puter.ai) {
         var content = imgDataUrl
@@ -6581,7 +6581,7 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
           : prompt;
         var _pxr = await puter.ai.chat(
           imgDataUrl ? [{ role: 'user', content: content }] : prompt,
-          { model: 'gpt-4o-mini', temperature: 0.2 }
+          { model: 'gpt-5.4', temperature: 0.2 }
         );
         var _pxt = typeof _pxr==='string'?_pxr:(_pxr&&_pxr.message&&_pxr.message.content?(Array.isArray(_pxr.message.content)?_pxr.message.content[0].text:_pxr.message.content):(_pxr&&_pxr.content?_pxr.content:null));
         if (_pxt) result = _pxt;
@@ -6796,7 +6796,7 @@ async function _rxLookupAndShow(name, db, container) {
           'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
         var res2 = null;
         if (typeof puter !== 'undefined' && puter.ai) {
-          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?(Array.isArray(pr2.message.content)?pr2.message.content[0].text:pr2.message.content):(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
+          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-5.4',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?(Array.isArray(pr2.message.content)?pr2.message.content[0].text:pr2.message.content):(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
         }
         if (!res2) throw new Error('no result');
         var uM=res2.match(/الاستخدامات\s*:\s*([^\n]+)/i);
@@ -6864,7 +6864,7 @@ async function _rxLookupAndShow(name, db, container) {
       var res = null;
       if (typeof puter !== 'undefined' && puter.ai) {
         try {
-          var pr = await puter.ai.chat(aiPrompt, {model:'gpt-4o-mini', temperature:0.2});
+          var pr = await puter.ai.chat(aiPrompt, {model:'gpt-5.4', temperature:0.2});
           res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?(Array.isArray(pr.message.content)?pr.message.content[0].text:pr.message.content):(pr&&pr.content?pr.content:null));
         } catch(e) {}
       }
@@ -8047,13 +8047,13 @@ async function sendAiMessage() {
   try {
     var _pr = await puter.ai.chat(
       [{role:'system',content:sysPrompt},{role:'user',content:txt}],
-      {model: 'gpt-4o-mini', temperature: 0.7}
+      {model: 'gpt-5.4', temperature: 0.7}
     );
     var _pt = typeof _pr === 'string' ? _pr
       : (_pr && _pr.message && _pr.message.content
           ? (Array.isArray(_pr.message.content) ? _pr.message.content[0].text : _pr.message.content)
           : (_pr && _pr.content ? _pr.content : null));
-    if (_pt) { reply = _pt; usedModelName = 'gpt-4o-mini'; }
+    if (_pt) { reply = _pt; usedModelName = 'gpt-5.4'; }
   } catch(e) {}
   removeThink();
   var finalReply = reply || generateLocalResponse(txt);
@@ -8558,10 +8558,10 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   async function _tryPuter(msg) {
-    var res = await puter.ai.chat(_buildMessages(msg), {model:'gpt-4o-mini', temperature:0.7});
+    var res = await puter.ai.chat(_buildMessages(msg), {model:'gpt-5.4', temperature:0.7});
     var text = typeof res==="string" ? res : res&&res.message&&res.message.content ? (Array.isArray(res.message.content)?res.message.content[0].text:res.message.content) : res&&res.content ? res.content : null;
     if (!text) throw new Error("EMPTY");
-    return {text:text, source:"Puter / gpt-4o-mini"};
+    return {text:text, source:"Puter / gpt-5.4"};
   }
 
   // Mistral and Z.ai removed — Puter only
@@ -10699,14 +10699,14 @@ function dreamInterpret() {
     var fullText = '';
     if (typeof puter !== 'undefined' && puter.ai) {
       try {
-        var sr = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: true });
+        var sr = await puter.ai.chat(prompt, { model: 'gpt-5.4', stream: true });
         for await (var part of sr) {
           var chunk = part && part.text ? part.text : '';
           if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
         }
       } catch(e1) {
         try {
-          var r2 = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: false });
+          var r2 = await puter.ai.chat(prompt, { model: 'gpt-5.4', stream: false });
           fullText = _puterExtractText(r2) || '';
           if (streamEl) streamEl.textContent = fullText || 'تعذر التفسير، حاول مرة أخرى.';
         } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر التفسير، حاول مرة أخرى.'; }
@@ -11574,7 +11574,7 @@ async function _puterChat(messages, opts) {
   opts = opts || {};
   var isStream = !!opts.stream;
   try {
-    var _opt = Object.assign({}, opts, { model: 'gpt-4o-mini' });
+    var _opt = Object.assign({}, opts, { model: 'gpt-5.4' });
     var _r = await puter.ai.chat(messages, _opt);
     if (isStream) return _r;
     var _t = _puterExtractText(_r);
@@ -12374,14 +12374,14 @@ function zodiacRead() {
     var fullText = '';
     if (typeof puter !== 'undefined' && puter.ai) {
       try {
-        var sr = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: true });
+        var sr = await puter.ai.chat(prompt, { model: 'gpt-5.4', stream: true });
         for await (var part of sr) {
           var chunk = part && part.text ? part.text : '';
           if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
         }
       } catch(e1) {
         try {
-          var r2 = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: false });
+          var r2 = await puter.ai.chat(prompt, { model: 'gpt-5.4', stream: false });
           fullText = _puterExtractText(r2) || '';
           if (streamEl) streamEl.textContent = fullText || 'تعذر التحليل، حاول مرة أخرى.';
         } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر التحليل، حاول مرة أخرى.'; }
@@ -12486,14 +12486,14 @@ function zodiacTodayFortune() {
     var fullText = '';
     if (typeof puter !== 'undefined' && puter.ai) {
       try {
-        var sr = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: true });
+        var sr = await puter.ai.chat(prompt, { model: 'gpt-5.4', stream: true });
         for await (var part of sr) {
           var chunk = part && part.text ? part.text : '';
           if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
         }
       } catch(e1) {
         try {
-          var r2 = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: false });
+          var r2 = await puter.ai.chat(prompt, { model: 'gpt-5.4', stream: false });
           fullText = _puterExtractText(r2) || '';
           if (streamEl) streamEl.textContent = fullText || 'تعذر تحميل التوقعات.';
         } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر تحميل التوقعات.'; }
@@ -12700,7 +12700,7 @@ async function _palmAnalyzeLiveFrame() {
       try {
         var streamRes = await puter.ai.chat(
           [{ role: 'user', content: visionContent }],
-          { model: 'gpt-4o-mini', stream: true }
+          { model: 'gpt-5.4', stream: true }
         );
         for await (var part of streamRes) {
           var chunk = part && part.text ? part.text : '';
@@ -12711,7 +12711,7 @@ async function _palmAnalyzeLiveFrame() {
         try {
           var r2 = await puter.ai.chat(
             [{ role: 'user', content: visionContent }],
-            { model: 'gpt-4o-mini', stream: false }
+            { model: 'gpt-5.4', stream: false }
           );
           fullText = _puterExtractText(r2) || '';
           if (fullText) { gotContent = true; if (streamEl) streamEl.textContent = fullText; }
@@ -12801,7 +12801,7 @@ async function palmAnalyze() {
     try {
       var streamRes = await puter.ai.chat(
         [{ role: 'user', content: visionContent }],
-        { model: 'gpt-4o-mini', stream: true }
+        { model: 'gpt-5.4', stream: true }
       );
       for await (var part of streamRes) {
         var chunk = part && part.text ? part.text : '';
@@ -12810,7 +12810,7 @@ async function palmAnalyze() {
     } catch(e1) {
       // بدون streaming
       try {
-        var r2 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'gpt-4o-mini', stream: false });
+        var r2 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'gpt-5.4', stream: false });
         fullText = _puterExtractText(r2) || '';
         if (streamEl && fullText) streamEl.textContent = fullText;
       } catch(e2) {
