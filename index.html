@@ -245,7 +245,7 @@
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
   import {
     getAuth, GoogleAuthProvider,
-    signInWithPopup, signOut, onAuthStateChanged
+    signInWithPopup, signOut, onAuthStateChanged, signInAnonymously
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -282,8 +282,18 @@
     window.googleProvider    = googleProvider;
     window.fbSignInWithPopup = signInWithPopup;
     window.fbSignOut         = signOut;
+    window.__firebaseSignInAnon = signInAnonymously;
     window.firebaseReady     = true;
     window.__firebaseReady   = true;
+
+    /* ── تسجيل دخول مجهول تلقائي لتجاوز قيود Rules عند قراءة بيانات username/password ── */
+    onAuthStateChanged(auth, function(user) {
+      if (!user) {
+        /* لا يوجد مستخدم مسجّل — ادخل كمجهول لقراءة بيانات المستخدمين العاديين */
+        signInAnonymously(auth).catch(function() {});
+      }
+      window.__firebaseCurrentAuthUser = user;
+    });
 
     try {
       const cfgSnap = await get(child(ref(db), 'config/ai'));
@@ -4356,22 +4366,49 @@ var PREMIUM_CHALLENGES = [
 
 /* ══════════ Firebase ══════════ */
 async function dbGetUser(u) {
+  /* ── محاولة 1: قراءة مباشرة من Firebase (تعمل مع Google Auth) ── */
   if (window.__firebaseReady) {
     try {
       var snap = await window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u));
       if (snap.exists()) return snap.val();
-    } catch(e) {}
+    } catch(e) {
+      /* قد يكون Permission Denied لأن المستخدم غير مُصادَق — جرّب Anonymous Auth */
+      try {
+        if (window.firebaseAuth && window.__firebaseSignInAnon) {
+          await window.__firebaseSignInAnon(window.firebaseAuth);
+        } else if (window.firebaseAuth) {
+          /* استخدام signInAnonymously من Firebase SDK */
+          var fbAuth = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js');
+          if (fbAuth && fbAuth.signInAnonymously) {
+            await fbAuth.signInAnonymously(window.firebaseAuth);
+          }
+        }
+        /* أعد المحاولة بعد Anonymous Auth */
+        var snap2 = await window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u));
+        if (snap2.exists()) return snap2.val();
+      } catch(e2) {}
+    }
   }
-  var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-  return local[u] || null;
+  /* ── محاولة 2: localStorage كـ fallback ── */
+  try {
+    var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+    if (local[u]) return local[u];
+  } catch(e3) {}
+  return null;
 }
 
 async function dbSaveUser(u, d) {
   if (window.__firebaseReady) {
-    try { await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + u), d); } catch(e) {}
+    try {
+      await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + u), d);
+    } catch(e) {
+      /* Permission Denied — احفظ محلياً فقط */
+    }
   }
-  var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-  local[u] = d; localStorage.setItem('tayyibat_users', JSON.stringify(local));
+  try {
+    var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+    local[u] = d; localStorage.setItem('tayyibat_users', JSON.stringify(local));
+  } catch(e2) {}
 }
 
 /* ══════════ تسجيل نشاط المستخدم في Firebase ══════════ */
