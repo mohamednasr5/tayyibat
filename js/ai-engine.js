@@ -17,6 +17,9 @@
   'use strict';
 
   var CFG = {
+    // Cloudflare Worker — أولوية قصوى لتحليل الصور
+    cloudflareEndpoint: 'https://taybat-ai.studegy8.workers.dev',
+
     // OVH Kepler — مجاني 2 req/دقيقة لكل IP
     keplerEndpoint: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions',
     keplerModels: [
@@ -268,7 +271,35 @@
   }
 
   /* ─────────────────────────────────────────
-     5. المحرك الرئيسي
+     5. Cloudflare Worker Vision (أولوية أولى)
+  ───────────────────────────────────────── */
+  async function _tryCloudflareVision(imgDataUrl, prompt) {
+    try {
+      var resp = await race(fetch(CFG.cloudflareEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: imgDataUrl } }
+            ]
+          }],
+          max_tokens: 1200,
+          temperature: 0.3
+        })
+      }));
+      if (!resp.ok) return null;
+      var data = await resp.json();
+      var text = extractText(data);
+      if (text && text.trim().length > 5) return { text: text.trim(), source: 'Cloudflare-Worker' };
+      return null;
+    } catch(e) { return null; }
+  }
+
+  /* ─────────────────────────────────────────
+     6. المحرك الرئيسي
   ───────────────────────────────────────── */
   async function _universalChat(messages) {
     // LLM7 أولاً (30 RPM مجاني، نماذج قوية)
@@ -283,9 +314,11 @@
   }
 
   async function _universalVision(imgDataUrl, prompt) {
-    // LLM7 Vision أولاً (يدعم GPT-4o وClaude وGemini)
+    // Cloudflare Worker أولاً (الأكثر موثوقية)
+    try { var r = await _tryCloudflareVision(imgDataUrl, prompt); if (r) return r; } catch(e) {}
+    // LLM7 Vision ثانياً (يدعم GPT-4o وClaude وGemini)
     try { var r = await _tryLLM7Vision(imgDataUrl, prompt, 0); if (r) return r; } catch(e) {}
-    // Pollinations Vision ثانياً
+    // Pollinations Vision ثالثاً
     try { var r = await _tryPollinationsVision(imgDataUrl, prompt, 0); if (r) return r; } catch(e) {}
     return null;
   }
