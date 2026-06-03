@@ -4103,11 +4103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* ══════════ GLOBALS ══════════ */
 
 // نماذج Puter المعتمدة — يجب تعريفها مبكراً قبل أي استخدام
-var PUTER_AI_MODELS = [
-  "claude-haiku-4-5",
-  "gpt-4o-mini",
-  "gpt-4.1-mini"
-];
+var PUTER_AI_MODELS = ["gpt-4o-mini"];
 
 var currentUser = null;
 var selectedDiseases = [];
@@ -4149,7 +4145,7 @@ var OR_MODELS = [
 
 var AI_MODELS = [
   { id: 'deepseek-v3', name: 'DeepSeek V3', icon: '🔮' },
-  { id: PUTER_AI_MODELS[1], name: 'GPT-4o Mini', icon: '🧠' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', icon: '🧠' },
   { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', icon: '🦙' },
   { id: 'mistral-large', name: 'Mistral Large', icon: '🌪️' },
   { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', icon: '🐲' },
@@ -5394,13 +5390,11 @@ async function runPremiumHealthAnalyzer() {
   
   var sysPrompt = buildUserContext();
   var response = null;
-  for (var _hi = 0; _hi < PUTER_AI_MODELS.length; _hi++) {
-    try {
-      var _hr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:promptText}], {model:PUTER_AI_MODELS[_hi], temperature:0.7});
-      var _ht = typeof _hr==='string'?_hr:(_hr&&_hr.message&&_hr.message.content?(Array.isArray(_hr.message.content)?_hr.message.content[0].text:_hr.message.content):(_hr&&_hr.content?_hr.content:null));
-      if (_ht) { response = _ht; break; }
-    } catch(e) {}
-  }
+  try {
+    var _hr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:promptText}], {model:'gpt-4o-mini', temperature:0.7});
+    var _ht = typeof _hr==='string'?_hr:(_hr&&_hr.message&&_hr.message.content?(Array.isArray(_hr.message.content)?_hr.message.content[0].text:_hr.message.content):(_hr&&_hr.content?_hr.content:null));
+    if (_ht) response = _ht;
+  } catch(e) {}
   
   if(response) {
     resultBox.innerHTML = '<div class="prof-card" style="border-right:4px solid var(--green2); padding:16px;"><div style="font-size:0.95rem; font-weight:800; color:var(--gold2); margin-bottom:10px;"><i class="fas fa-poll-h"></i> نتائج التقرير والتحليل الذكي الشامل:</div><div style="font-size:0.85rem; line-height:1.8; white-space:pre-wrap; color:var(--txt);">' + response + '</div></div>';
@@ -5437,13 +5431,11 @@ async function sendPremiumCoachMsg() {
   var response = null;
   
   var response = null;
-  for (var _ci = 0; _ci < PUTER_AI_MODELS.length; _ci++) {
-    try {
-      var _cr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:query}], {model:PUTER_AI_MODELS[_ci], temperature:0.7});
-      var _ct = typeof _cr==='string'?_cr:(_cr&&_cr.message&&_cr.message.content?(Array.isArray(_cr.message.content)?_cr.message.content[0].text:_cr.message.content):(_cr&&_cr.content?_cr.content:null));
-      if (_ct) { response = _ct; break; }
-    } catch(e) {}
-  }
+  try {
+    var _cr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:query}], {model:'gpt-4o-mini', temperature:0.7});
+    var _ct = typeof _cr==='string'?_cr:(_cr&&_cr.message&&_cr.message.content?(Array.isArray(_cr.message.content)?_cr.message.content[0].text:_cr.message.content):(_cr&&_cr.content?_cr.content:null));
+    if (_ct) response = _ct;
+  } catch(e) {}
   
   if(response) {
     tBubble.innerHTML = '<div style="font-weight:800; color:var(--gold2); font-size:0.75rem; margin-bottom:4px;"><i class="fas fa-user-shield"></i> كابتن طيبات الذكي:</div>' + response;
@@ -5604,7 +5596,7 @@ async function captureAndScanProductBlob() {
           {type:"text", text: vPrompt},
           {type:"image_url", image_url:{url: imgData}}
         ]}
-      ], {model:PUTER_AI_MODELS[0], temperature:0.3});
+      ], {model:'gpt-4o-mini', temperature:0.3});
       var text = typeof res==="string" ? res
         : res&&res.message&&res.message.content ? res.message.content
         : res&&res.content ? res.content : null;
@@ -5680,16 +5672,13 @@ async function _scanAnalyzeAI(ingredients) {
 
   var result = null;
 
-  /* Puter.js — مع fallback على النماذج الثلاثة */
-  for (var _si = 0; _si < PUTER_AI_MODELS.length; _si++) {
-    try {
-      if (typeof puter !== "undefined" && puter.ai) {
-        var _sr = await puter.ai.chat(prompt, {model:PUTER_AI_MODELS[_si], temperature:0.3});
-        var _st = typeof _sr==="string"?_sr:(_sr&&_sr.message&&_sr.message.content?(Array.isArray(_sr.message.content)?_sr.message.content[0].text:_sr.message.content):(_sr&&_sr.content?_sr.content:null));
-        if (_st) { result = {text:_st, source:"Puter / "+PUTER_AI_MODELS[_si]}; break; }
-      }
-    } catch(e) {}
-  }
+  try {
+    if (typeof puter !== "undefined" && puter.ai) {
+      var _sr = await puter.ai.chat(prompt, {model:'gpt-4o-mini', temperature:0.3});
+      var _st = typeof _sr==="string"?_sr:(_sr&&_sr.message&&_sr.message.content?(Array.isArray(_sr.message.content)?_sr.message.content[0].text:_sr.message.content):(_sr&&_sr.content?_sr.content:null));
+      if (_st) result = {text:_st, source:"Puter / gpt-4o-mini"};
+    }
+  } catch(e) {}
 
   if (!result) result = {
     text: "تعذر التحليل الان.\n\nتذكر:\nممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات.\nمسموح: لحم خروف، سمك، ارز، بطاطس، عسل، تمر.",
@@ -5865,7 +5854,7 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
     (textInput ? "الدواء: " + textInput : "انظر للصورة واستخرج اسم الدواء والمعلومات منه");
 
   var result = null;
-  for (var _mi2 = 0; _mi2 < PUTER_AI_MODELS.length; _mi2++) {
+  /* Puter gpt-4o-mini */
     try {
       if (typeof puter !== "undefined" && puter.ai) {
         var content = imgDataUrl
@@ -5873,13 +5862,12 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
           : prompt;
         var _mr = await puter.ai.chat(
           imgDataUrl ? [{role:"user",content:content}] : prompt,
-          {model: PUTER_AI_MODELS[_mi2], temperature:0.3}
+          {model: 'gpt-4o-mini', temperature:0.3}
         );
         var _mt = typeof _mr==="string"?_mr:(_mr&&_mr.message&&_mr.message.content?(Array.isArray(_mr.message.content)?_mr.message.content[0].text:_mr.message.content):(_mr&&_mr.content?_mr.content:null));
-        if (_mt) { result = {text:_mt, source:"Puter / "+PUTER_AI_MODELS[_mi2]}; break; }
+        if (_mt) result = {text:_mt, source:'Puter / gpt-4o-mini'};
       }
     } catch(e) {}
-  }
   if (!result) result = {text:"تعذر تحليل الدواء. أدخل اسم الدواء يدوياً أو حاول مرة أخرى.", source:"محلي"};
   _renderMedicineResult(result.text, result.source);
 }
@@ -6075,7 +6063,7 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
     (textInput ? "نتائج التقرير:\n" + textInput : "انظر للصورة واقرأ التقرير الطبي المكتوب فيها بدقة");
 
   var result = null;
-  for (var _ri = 0; _ri < PUTER_AI_MODELS.length; _ri++) {
+  /* Puter gpt-4o-mini */
     try {
       if (typeof puter !== "undefined" && puter.ai) {
         var content = imgDataUrl
@@ -6083,13 +6071,12 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
           : prompt;
         var _rr = await puter.ai.chat(
           imgDataUrl ? [{role:"user",content:content}] : prompt,
-          {model: PUTER_AI_MODELS[_ri], temperature:0.3}
+          {model: 'gpt-4o-mini', temperature:0.3}
         );
         var _rt = typeof _rr==="string"?_rr:(_rr&&_rr.message&&_rr.message.content?(Array.isArray(_rr.message.content)?_rr.message.content[0].text:_rr.message.content):(_rr&&_rr.content?_rr.content:null));
-        if (_rt) { result = {text:_rt, source:"Puter / "+PUTER_AI_MODELS[_ri]}; break; }
+        if (_rt) result = {text:_rt, source:'Puter / gpt-4o-mini'};
       }
     } catch(e) {}
-  }
   if (!result) result = {text:"تعذر تحليل التقرير. أدخل النتائج يدوياً أو حاول مرة أخرى.", source:"محلي"};
   _renderReportResult(result.text, result.source);
 }
@@ -6409,7 +6396,7 @@ async function showDrugAI(btn) {
     var res = await puter.ai.chat(
       'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
       '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...',
-      {model:PUTER_AI_MODELS[1], temperature:0.2}
+      {model:'gpt-4o-mini', temperature:0.2}
     );
     var txt = typeof res==='string'?res:(res.message&&res.message.content||res.content||'');
     var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
@@ -6459,7 +6446,7 @@ async function drugSearchByCamera() {
         {type:'text', text:'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.'},
         {type:'image_url', image_url:{url: imgData}}
       ]
-    }], {model:PUTER_AI_MODELS[1], temperature:0});
+    }], {model:'gpt-4o-mini', temperature:0});
     var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message && aiRes.message.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
     if (drugName && drugName.length > 1) {
       var inp2 = document.getElementById('drug-name-search-input');
@@ -6586,7 +6573,7 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
   var result = null;
 
   // Puter.js مع fallback على النماذج
-  for (var _pxi = 0; _pxi < PUTER_AI_MODELS.length; _pxi++) {
+  /* Puter gpt-4o-mini */
     try {
       if (typeof puter !== 'undefined' && puter.ai) {
         var content = imgDataUrl
@@ -6594,13 +6581,12 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
           : prompt;
         var _pxr = await puter.ai.chat(
           imgDataUrl ? [{ role: 'user', content: content }] : prompt,
-          { model: PUTER_AI_MODELS[_pxi], temperature: 0.2 }
+          { model: 'gpt-4o-mini', temperature: 0.2 }
         );
         var _pxt = typeof _pxr==='string'?_pxr:(_pxr&&_pxr.message&&_pxr.message.content?(Array.isArray(_pxr.message.content)?_pxr.message.content[0].text:_pxr.message.content):(_pxr&&_pxr.content?_pxr.content:null));
-        if (_pxt) { result = _pxt; break; }
+        if (_pxt) result = _pxt;
       }
     } catch(e) {}
-  }
 
   if (!result) {
     result = 'تعذر قراءة الروشتة. حاول تصوير الروشتة بإضاءة أفضل أو أدخل النص يدوياً.';
@@ -6809,10 +6795,8 @@ async function _rxLookupAndShow(name, db, container) {
           'دواعي_الاستخدام: (متى يوصف هذا الدواء — جملة أو جملتان)\n' +
           'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
         var res2 = null;
-        for (var _dfi = 0; _dfi < PUTER_AI_MODELS.length; _dfi++) {
-          if (typeof puter !== 'undefined' && puter.ai) {
-            try { var pr2=await puter.ai.chat(aiPrompt2,{model:PUTER_AI_MODELS[_dfi],temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?(Array.isArray(pr2.message.content)?pr2.message.content[0].text:pr2.message.content):(pr2&&pr2.content?pr2.content:null)); if(res2) break; } catch(e) {}
-          }
+        if (typeof puter !== 'undefined' && puter.ai) {
+          try { var pr2=await puter.ai.chat(aiPrompt2,{model:'gpt-4o-mini',temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?(Array.isArray(pr2.message.content)?pr2.message.content[0].text:pr2.message.content):(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
         }
         if (!res2) throw new Error('no result');
         var uM=res2.match(/الاستخدامات\s*:\s*([^\n]+)/i);
@@ -6878,14 +6862,11 @@ async function _rxLookupAndShow(name, db, container) {
         'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
 
       var res = null;
-      for (var _dfi2 = 0; _dfi2 < PUTER_AI_MODELS.length; _dfi2++) {
-        if (typeof puter !== 'undefined' && puter.ai) {
-          try {
-            var pr = await puter.ai.chat(aiPrompt, {model:PUTER_AI_MODELS[_dfi2], temperature:0.2});
-            res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?(Array.isArray(pr.message.content)?pr.message.content[0].text:pr.message.content):(pr&&pr.content?pr.content:null));
-            if (res) break;
-          } catch(e) {}
-        }
+      if (typeof puter !== 'undefined' && puter.ai) {
+        try {
+          var pr = await puter.ai.chat(aiPrompt, {model:'gpt-4o-mini', temperature:0.2});
+          res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?(Array.isArray(pr.message.content)?pr.message.content[0].text:pr.message.content):(pr&&pr.content?pr.content:null));
+        } catch(e) {}
       }
       if (!res) throw new Error('no result');
 
@@ -8063,19 +8044,17 @@ async function sendAiMessage() {
   }
   var sysPrompt = buildUserContext(), reply = null, usedModelName = null;
   updateThinkText('🤖 Puter AI — جاري التفكير...');
-  for (var _pi = 0; _pi < PUTER_AI_MODELS.length; _pi++) {
-    try {
-      var _pr = await puter.ai.chat(
-        [{role:'system',content:sysPrompt},{role:'user',content:txt}],
-        {model: PUTER_AI_MODELS[_pi], temperature: 0.7}
-      );
-      var _pt = typeof _pr === 'string' ? _pr
-        : (_pr && _pr.message && _pr.message.content
-            ? (Array.isArray(_pr.message.content) ? _pr.message.content[0].text : _pr.message.content)
-            : (_pr && _pr.content ? _pr.content : null));
-      if (_pt) { reply = _pt; usedModelName = PUTER_AI_MODELS[_pi]; break; }
-    } catch(e) {}
-  }
+  try {
+    var _pr = await puter.ai.chat(
+      [{role:'system',content:sysPrompt},{role:'user',content:txt}],
+      {model: 'gpt-4o-mini', temperature: 0.7}
+    );
+    var _pt = typeof _pr === 'string' ? _pr
+      : (_pr && _pr.message && _pr.message.content
+          ? (Array.isArray(_pr.message.content) ? _pr.message.content[0].text : _pr.message.content)
+          : (_pr && _pr.content ? _pr.content : null));
+    if (_pt) { reply = _pt; usedModelName = 'gpt-4o-mini'; }
+  } catch(e) {}
   removeThink();
   var finalReply = reply || generateLocalResponse(txt);
   var replySource = reply ? ('Puter / ' + usedModelName) : 'رد محلي';
@@ -8578,15 +8557,11 @@ window.addEventListener('DOMContentLoaded', function() {
     return msgs;
   }
 
-  async function _tryPuter(msg, idx) {
-    idx = idx || 0;
-    if (idx >= PUTER_MODELS.length) throw new Error("ALL_PUTER_FAILED");
-    try {
-      var res = await puter.ai.chat(_buildMessages(msg), {model:PUTER_MODELS[idx], temperature:0.7});
-      var text = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (!text) throw new Error("EMPTY");
-      return {text:text, source:"Puter / "+PUTER_MODELS[idx]};
-    } catch(e) { return await _tryPuter(msg, idx+1); }
+  async function _tryPuter(msg) {
+    var res = await puter.ai.chat(_buildMessages(msg), {model:'gpt-4o-mini', temperature:0.7});
+    var text = typeof res==="string" ? res : res&&res.message&&res.message.content ? (Array.isArray(res.message.content)?res.message.content[0].text:res.message.content) : res&&res.content ? res.content : null;
+    if (!text) throw new Error("EMPTY");
+    return {text:text, source:"Puter / gpt-4o-mini"};
   }
 
   // Mistral and Z.ai removed — Puter only
@@ -10724,14 +10699,14 @@ function dreamInterpret() {
     var fullText = '';
     if (typeof puter !== 'undefined' && puter.ai) {
       try {
-        var sr = await puter.ai.chat(prompt, { model: PUTER_AI_MODELS[0], stream: true });
+        var sr = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: true });
         for await (var part of sr) {
           var chunk = part && part.text ? part.text : '';
           if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
         }
       } catch(e1) {
         try {
-          var r2 = await puter.ai.chat(prompt, { model: PUTER_AI_MODELS[0], stream: false });
+          var r2 = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: false });
           fullText = _puterExtractText(r2) || '';
           if (streamEl) streamEl.textContent = fullText || 'تعذر التفسير، حاول مرة أخرى.';
         } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر التفسير، حاول مرة أخرى.'; }
@@ -11598,16 +11573,14 @@ function _puterExtractText(res) {
 async function _puterChat(messages, opts) {
   opts = opts || {};
   var isStream = !!opts.stream;
-  for (var _mi = 0; _mi < PUTER_AI_MODELS.length; _mi++) {
-    try {
-      var _opt = Object.assign({}, opts, { model: PUTER_AI_MODELS[_mi] });
-      var _r = await puter.ai.chat(messages, _opt);
-      if (isStream) return _r; // إرجاع stream مباشرة
-      var _t = _puterExtractText(_r);
-      if (_t) return _r;
-    } catch(e) {}
-  }
-  throw new Error('All Puter models failed');
+  try {
+    var _opt = Object.assign({}, opts, { model: 'gpt-4o-mini' });
+    var _r = await puter.ai.chat(messages, _opt);
+    if (isStream) return _r;
+    var _t = _puterExtractText(_r);
+    if (_t) return _r;
+  } catch(e) {}
+  throw new Error('Puter model failed');
 }
 
 async function _callClaudeAPI(prompt, systemPrompt) {
@@ -12401,14 +12374,14 @@ function zodiacRead() {
     var fullText = '';
     if (typeof puter !== 'undefined' && puter.ai) {
       try {
-        var sr = await puter.ai.chat(prompt, { model: PUTER_AI_MODELS[0], stream: true });
+        var sr = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: true });
         for await (var part of sr) {
           var chunk = part && part.text ? part.text : '';
           if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
         }
       } catch(e1) {
         try {
-          var r2 = await puter.ai.chat(prompt, { model: PUTER_AI_MODELS[0], stream: false });
+          var r2 = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: false });
           fullText = _puterExtractText(r2) || '';
           if (streamEl) streamEl.textContent = fullText || 'تعذر التحليل، حاول مرة أخرى.';
         } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر التحليل، حاول مرة أخرى.'; }
@@ -12513,14 +12486,14 @@ function zodiacTodayFortune() {
     var fullText = '';
     if (typeof puter !== 'undefined' && puter.ai) {
       try {
-        var sr = await puter.ai.chat(prompt, { model: PUTER_AI_MODELS[0], stream: true });
+        var sr = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: true });
         for await (var part of sr) {
           var chunk = part && part.text ? part.text : '';
           if (chunk) { fullText += chunk; if (streamEl) streamEl.textContent = fullText; }
         }
       } catch(e1) {
         try {
-          var r2 = await puter.ai.chat(prompt, { model: PUTER_AI_MODELS[0], stream: false });
+          var r2 = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', stream: false });
           fullText = _puterExtractText(r2) || '';
           if (streamEl) streamEl.textContent = fullText || 'تعذر تحميل التوقعات.';
         } catch(e2) { if (streamEl) streamEl.textContent = 'تعذر تحميل التوقعات.'; }
@@ -12727,7 +12700,7 @@ async function _palmAnalyzeLiveFrame() {
       try {
         var streamRes = await puter.ai.chat(
           [{ role: 'user', content: visionContent }],
-          { model: PUTER_AI_MODELS[0], stream: true }
+          { model: 'gpt-4o-mini', stream: true }
         );
         for await (var part of streamRes) {
           var chunk = part && part.text ? part.text : '';
@@ -12738,7 +12711,7 @@ async function _palmAnalyzeLiveFrame() {
         try {
           var r2 = await puter.ai.chat(
             [{ role: 'user', content: visionContent }],
-            { model: PUTER_AI_MODELS[0], stream: false }
+            { model: 'gpt-4o-mini', stream: false }
           );
           fullText = _puterExtractText(r2) || '';
           if (fullText) { gotContent = true; if (streamEl) streamEl.textContent = fullText; }
@@ -12828,7 +12801,7 @@ async function palmAnalyze() {
     try {
       var streamRes = await puter.ai.chat(
         [{ role: 'user', content: visionContent }],
-        { model: PUTER_AI_MODELS[0], stream: true }
+        { model: 'gpt-4o-mini', stream: true }
       );
       for await (var part of streamRes) {
         var chunk = part && part.text ? part.text : '';
@@ -12837,7 +12810,7 @@ async function palmAnalyze() {
     } catch(e1) {
       // بدون streaming
       try {
-        var r2 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: PUTER_AI_MODELS[0], stream: false });
+        var r2 = await puter.ai.chat([{ role: 'user', content: visionContent }], { model: 'gpt-4o-mini', stream: false });
         fullText = _puterExtractText(r2) || '';
         if (streamEl && fullText) streamEl.textContent = fullText;
       } catch(e2) {
@@ -12851,12 +12824,15 @@ async function palmAnalyze() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  updateTrialBadges();
-  updatePremiumTabBadges();
-  loadSettingsToggles();
+  if (typeof updateTrialBadges === 'function') updateTrialBadges();
+  if (typeof updatePremiumTabBadges === 'function') updatePremiumTabBadges();
+  if (typeof loadSettingsToggles === 'function') loadSettingsToggles();
 });
 // تحديث فوري
-setTimeout(function(){ updateTrialBadges(); updatePremiumTabBadges(); }, 500);
+setTimeout(function(){
+  if (typeof updateTrialBadges === 'function') updateTrialBadges();
+  if (typeof updatePremiumTabBadges === 'function') updatePremiumTabBadges();
+}, 500);
 
 // ── فحص إعادة ضبط التجربة من الأدمن ──
 function checkAdminTrialReset() {
