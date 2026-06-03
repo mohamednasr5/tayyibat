@@ -5778,12 +5778,52 @@ async function _tryOpenRouterFree(messages, modelIndex) {
   } catch(e) { return await _tryOpenRouterFree(messages, modelIndex+1); }
 }
 
+/* ═══════════════════════════════════════════════════════
+   Cloudflare Worker Vision — أولوية قصوى لتحليل الصور
+   Endpoint: https://taybat-ai.studegy8.workers.dev
+════════════════════════════════════════════════════════ */
+var CLOUDFLARE_WORKER_ENDPOINT = 'https://taybat-ai.studegy8.workers.dev';
+
+async function _tryCloudflareWorkerVision(imgDataUrl, promptText) {
+  try {
+    var resp = await Promise.race([
+      fetch(CLOUDFLARE_WORKER_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: promptText },
+              { type: 'image_url', image_url: { url: imgDataUrl } }
+            ]
+          }],
+          max_tokens: 1200,
+          temperature: 0.3
+        })
+      }),
+      new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('CF_TIMEOUT')); }, 15000); })
+    ]);
+    if (!resp.ok) return null;
+    var data = await resp.json();
+    var text = null;
+    if (data.choices && data.choices[0] && data.choices[0].message)
+      text = data.choices[0].message.content;
+    else if (typeof data === 'string') text = data;
+    else if (data.content) text = data.content;
+    if (text && text.trim().length > 5) return { text: text.trim(), source: 'Cloudflare-Worker' };
+    return null;
+  } catch(e) { return null; }
+}
+
 /* Universal AI Router — LLM7 → Pollinations → OpenRouter → Kepler */
 async function _universalAICall(messages, opts) {
   opts = opts || {};
   var isVision = !!(opts.imageDataUrl);
 
   if (isVision) {
+    // Cloudflare Worker أولاً (الأكثر موثوقية وجودة)
+    try { var cfR = await _tryCloudflareWorkerVision(opts.imageDataUrl, opts.promptText||""); if (cfR) return cfR; } catch(e) {}
     try { var r = await _tryLLM7Vision(opts.imageDataUrl, opts.promptText||"", 0); if (r) return r; } catch(e) {}
     try { var r = await _tryPollinationsVision(opts.imageDataUrl, opts.promptText||"", 0); if (r) return r; } catch(e) {}
     var textMsgs = [{role:"user", content:(opts.promptText||"")+"\n(تعذر تحميل الصورة، أعطِ تحليلاً نصياً عاماً)"}];
@@ -6084,11 +6124,15 @@ async function _liveVisionAnalyze(videoEl, prompt, onResult, onError) {
   var imgData = canvas.toDataURL('image/jpeg', 0.85);
   var result = null;
 
-  // LLM7 Vision أولاً (GPT-4o, Claude, Gemini)
+  // Cloudflare Worker أولاً (الأكثر موثوقية)
+  if (!result) {
+    try { var cfR = await _tryCloudflareWorkerVision(imgData, prompt); if (cfR && cfR.text) result = cfR.text; } catch(e) {}
+  }
+  // LLM7 Vision ثانياً (GPT-4o, Claude, Gemini)
   if (!result) {
     try { var r = await _tryLLM7Vision(imgData, prompt, 0); if (r && r.text) result = r.text; } catch(e) {}
   }
-  // Pollinations Vision ثانياً
+  // Pollinations Vision ثالثاً
   if (!result) {
     try { var r2 = await _tryPollinationsVision(imgData, prompt, 0); if (r2 && r2.text) result = r2.text; } catch(e) {}
   }
@@ -6164,9 +6208,11 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
 
   var result = null;
   if (imgDataUrl) {
-    // LLM7 Vision أولاً
-    try { var r1=await _tryLLM7Vision(imgDataUrl, prompt, 0); if(r1&&r1.text) result={text:r1.text,source:"AI Pharma/"+r1.source}; } catch(e) {}
-    // Pollinations Vision ثانياً
+    // Cloudflare Worker أولاً
+    try { var cfR=await _tryCloudflareWorkerVision(imgDataUrl, prompt); if(cfR&&cfR.text) result={text:cfR.text,source:"Cloudflare-Worker"}; } catch(e) {}
+    // LLM7 Vision ثانياً
+    if (!result) { try { var r1=await _tryLLM7Vision(imgDataUrl, prompt, 0); if(r1&&r1.text) result={text:r1.text,source:"AI Pharma/"+r1.source}; } catch(e) {} }
+    // Pollinations Vision ثالثاً
     if (!result) { try { var r2=await _tryPollinationsVision(imgDataUrl, prompt, 0); if(r2&&r2.text) result={text:r2.text,source:"AI Pharma"}; } catch(e) {} }
     // _smartVisionAnalysis كاحتياطي
     if (!result) { try { var vRes=await _smartVisionAnalysis(imgDataUrl, prompt); if(vRes&&vRes.source!=="fallback") result={text:vRes.text,source:"AI Pharma"}; } catch(e) {} }
@@ -13573,9 +13619,16 @@ setTimeout(checkAdminTrialReset, 3000);
     });
   }
 
-  /* ── Vision AI — يستخدم محرك TayyibatAI المجاني ── */
+  /* ── Vision AI — يستخدم Cloudflare Worker ثم TayyibatAI ── */
   async function _smartVisionAnalysisVitals(imgDataUrl, prompt) {
-    // استخدام TayyibatAI.vision إذا كان متاحاً
+    // Cloudflare Worker أولاً
+    if (imgDataUrl) {
+      try {
+        var cfR = await _tryCloudflareWorkerVision(imgDataUrl, prompt);
+        if (cfR && cfR.text) return cfR.text;
+      } catch(e) {}
+    }
+    // استخدام TayyibatAI.vision ثانياً
     if (window.TayyibatAI) {
       try {
         var r = await window.TayyibatAI.vision(imgDataUrl, prompt);
