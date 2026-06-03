@@ -245,7 +245,7 @@
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
   import {
     getAuth, GoogleAuthProvider,
-    signInWithPopup, signOut, onAuthStateChanged, signInAnonymously
+    signInWithPopup, signOut, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -282,18 +282,8 @@
     window.googleProvider    = googleProvider;
     window.fbSignInWithPopup = signInWithPopup;
     window.fbSignOut         = signOut;
-    window.__firebaseSignInAnon = signInAnonymously;
     window.firebaseReady     = true;
     window.__firebaseReady   = true;
-
-    /* ── تسجيل دخول مجهول تلقائي لتجاوز قيود Rules عند قراءة بيانات username/password ── */
-    onAuthStateChanged(auth, function(user) {
-      if (!user) {
-        /* لا يوجد مستخدم مسجّل — ادخل كمجهول لقراءة بيانات المستخدمين العاديين */
-        signInAnonymously(auth).catch(function() {});
-      }
-      window.__firebaseCurrentAuthUser = user;
-    });
 
     try {
       const cfgSnap = await get(child(ref(db), 'config/ai'));
@@ -757,18 +747,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .wvm-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
 .wvm-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s;cursor:pointer}
 .wvm-dot.active{background:var(--gold);width:22px;border-radius:4px}
-/* ══ Palm Countdown Animation ══ */
-@keyframes palmCountPulse {
-  0%   { transform: scale(1);    opacity: 1; }
-  50%  { transform: scale(1.15); opacity: .7; }
-  100% { transform: scale(1);    opacity: 1; }
-}
-@keyframes palmFlash {
-  0%   { opacity: 1; }
-  30%  { opacity: 0; }
-  100% { opacity: 1; }
-}
-
+/* ══ Settings Toggle Switch ══ */
 .settings-toggle {
   position: relative;
   display: inline-block;
@@ -1496,78 +1475,9 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
 .cpb-btn-skip{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
 .cpb-progress-bar-wrap{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:20px;overflow:hidden}
 .cpb-progress-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .8s ease;width:0%}
-/* ══ حاجب CSS لرسائل Puter المزعجة ══ */
-[class*="puter"],[id*="puter"]{--puter-ui-hidden:none}
-/* إخفاء أي overlay/modal يظهر فوق التطبيق بـ z-index عالي جداً من Puter */
-body > div[style*="z-index: 9"]:not(#daily-reward-panel):not(#pro-modal):not(.modal),
-body > div[style*="z-index:9"]:not(#daily-reward-panel):not(#pro-modal):not(.modal){
-  /* لا نخفي كل شيء — نتركه للـ JS observer */
-}
 </style>
 </head>
 <body>
-<!-- ══ حاجب رسائل Puter المبكر — يعمل قبل أي شيء آخر ══ -->
-<script>
-/* ══════════════════════════════════════════════════
-   Early Wrappers — تُعرَّف قبل كل script blocks
-   تضمن عمل onclick قبل تحميل الـ blocks المتأخرة
-══════════════════════════════════════════════════ */
-function goSmartTool(toolKey) {
-  // Deferred: تنتظر تحميل الـ block الكامل إذا لزم
-  var fn = window._realGoSmartTool || (typeof arguments.callee._real === 'function' ? arguments.callee._real : null);
-  if (fn) { fn(toolKey); return; }
-  var tries = 0;
-  var iv = setInterval(function() {
-    tries++;
-    if (window._realGoSmartTool) { clearInterval(iv); window._realGoSmartTool(toolKey); }
-    else if (tries > 40) { clearInterval(iv); if (typeof goPage === 'function') goPage(toolKey); }
-  }, 80);
-}
-function goSmartToolScanner() {
-  if (window._realGoSmartToolScanner) { window._realGoSmartToolScanner(); return; }
-  var tries = 0;
-  var iv = setInterval(function() {
-    tries++;
-    if (window._realGoSmartToolScanner) { clearInterval(iv); window._realGoSmartToolScanner(); }
-    else if (tries > 40) { clearInterval(iv); if (typeof goPage === 'function') goPage('premium-scanner'); }
-  }, 80);
-}
-</script>
-<script>
-(function(){
-  /* حذف فوري لأي عنصر يحتوي "Low Balance" */
-  function _nukePuterModals(){
-    var all = document.querySelectorAll('body > *');
-    for(var i=0;i<all.length;i++){
-      var el=all[i];
-      if(!el||!el.textContent)continue;
-      var t=el.textContent.toLowerCase();
-      if(t.includes('low balance')||t.includes('not enough funding')||t.includes('upgrade to continue')){
-        el.style.cssText='display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important';
-        try{el.remove();}catch(e){}
-      }
-    }
-  }
-  /* MutationObserver مبكر جداً */
-  var obs=new MutationObserver(function(muts){
-    muts.forEach(function(m){
-      m.addedNodes.forEach(function(n){
-        if(!n||n.nodeType!==1)return;
-        var t=(n.textContent||'').toLowerCase();
-        if(t.includes('low balance')||t.includes('not enough funding')||t.includes('upgrade to continue')){
-          n.style.cssText='display:none!important;visibility:hidden!important;opacity:0!important';
-          try{n.remove();}catch(e){}
-        }
-      });
-    });
-  });
-  obs.observe(document.documentElement,{childList:true,subtree:true});
-  /* polling سريع */
-  var _t=setInterval(_nukePuterModals,100);
-  setTimeout(function(){clearInterval(_t);setInterval(_nukePuterModals,500);},10000);
-  window._nukePuterModals=_nukePuterModals;
-})();
-</script>
 <canvas id="universe-canvas"></canvas>
 <div id="loader">
   <div id="loader-game-wrap">
@@ -2776,22 +2686,11 @@ function goSmartToolScanner() {
         <div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-top:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:4px 0 0 0"></div>
         <div style="position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-right:2px solid #ff5722;border-radius:0 0 4px 0"></div>
         <div style="position:absolute;bottom:10px;left:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:0 0 0 4px"></div>
-        <!-- عداد تنازلي تلقائي -->
-        <div id="palm-countdown-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-          <div id="palm-countdown-num" style="font-size:5rem;font-weight:900;color:#ff8a65;line-height:1;text-shadow:0 0 30px rgba(255,87,34,.8);animation:palmCountPulse .9s ease-in-out infinite"></div>
-          <div style="font-size:.85rem;color:#ffccbc;font-weight:700">ثبّت كفك داخل الإطار</div>
-        </div>
-        <!-- مؤشر التحليل التلقائي -->
-        <div id="palm-analyzing-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.7);flex-direction:column;align-items:center;justify-content:center;gap:12px">
-          <div style="font-size:2.5rem">🖐</div>
-          <div style="font-size:.9rem;color:#ff8a65;font-weight:800">جاري تحليل الكف...</div>
-          <div class="ai-dots"><span></span><span></span><span></span></div>
-        </div>
       </div>
-      <div id="palm-camera-hint" style="text-align:center;font-size:.75rem;color:#ff8a65;margin-top:8px;font-weight:700">🖐 ضع كفك داخل الإطار — التحليل يبدأ تلقائياً خلال <span id="palm-hint-secs">3</span> ثوانٍ</div>
+      <div style="text-align:center;font-size:.7rem;color:#ff8a65;margin-top:6px">🖐 ضع كفك داخل الإطار — افتح يدك بشكل طبيعي</div>
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="palmCaptureNow()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,87,34,.35),rgba(255,138,101,.2));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:10px;font-size:.85rem;font-weight:800">
-          <i class="fas fa-bolt" style="margin-left:5px"></i> تحليل الآن
+        <button onclick="palmCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,87,34,.35),rgba(255,138,101,.2));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:12px;font-size:.88rem;font-weight:800">
+          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط الصورة
         </button>
         <button onclick="palmStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
           <i class="fas fa-stop"></i>
@@ -4392,58 +4291,22 @@ var PREMIUM_CHALLENGES = [
 
 /* ══════════ Firebase ══════════ */
 async function dbGetUser(u) {
-  /* ── خطوة 0: تأكد من Anonymous Auth قبل أي قراءة من Firebase ── */
-  if (window.__firebaseReady && window.firebaseAuth) {
-    try {
-      if (!window.firebaseAuth.currentUser && window.__firebaseSignInAnon) {
-        await Promise.race([
-          window.__firebaseSignInAnon(window.firebaseAuth),
-          new Promise(function(_, rej) { setTimeout(function() { rej(new Error('anon-timeout')); }, 3000); })
-        ]);
-      }
-    } catch(authErr) {
-      console.warn('dbGetUser: Anonymous auth skipped:', authErr.message);
-    }
-  }
-
-  /* ── محاولة 1: قراءة من Firebase ── */
   if (window.__firebaseReady) {
     try {
-      var snap = await window.__firebaseGet(
-        window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u)
-      );
+      var snap = await window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + u));
       if (snap.exists()) return snap.val();
-    } catch(e) {
-      console.warn('dbGetUser Firebase read failed:', e.code || e.message);
-    }
+    } catch(e) {}
   }
-
-  /* ── محاولة 2: localStorage كـ fallback ── */
-  try {
-    var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-    if (local[u]) return local[u];
-  } catch(e2) {}
-
-  return null;
+  var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+  return local[u] || null;
 }
 
 async function dbSaveUser(u, d) {
-  var saved = false;
   if (window.__firebaseReady) {
-    try {
-      await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + u), d);
-      saved = true;
-    } catch(e) {
-      console.warn('dbSaveUser Firebase failed:', e.code || e.message);
-    }
+    try { await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + u), d); } catch(e) {}
   }
-  /* دائماً احفظ في localStorage كـ backup */
-  try {
-    var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-    local[u] = d;
-    localStorage.setItem('tayyibat_users', JSON.stringify(local));
-  } catch(e2) {}
-  return saved;
+  var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
+  local[u] = d; localStorage.setItem('tayyibat_users', JSON.stringify(local));
 }
 
 /* ══════════ تسجيل نشاط المستخدم في Firebase ══════════ */
@@ -5016,79 +4879,45 @@ async function autoLogin() {
   var s = getSession();
   if (!s) { hideLoader(); return; }
   try {
-    /* ── انتظر Firebase إذا لم يكن جاهزاً ── */
-    if (!window.__firebaseReady) {
-      await new Promise(function(resolve) { setTimeout(resolve, 1500); });
-    }
-
-    /* ── Anonymous Auth قبل القراءة ── */
-    if (window.__firebaseReady && window.firebaseAuth && !window.firebaseAuth.currentUser) {
-      try {
-        if (window.__firebaseSignInAnon) {
-          await Promise.race([
-            window.__firebaseSignInAnon(window.firebaseAuth),
-            new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
-          ]);
-        }
-      } catch(authErr) {
-        console.warn('autoLogin: Anonymous auth skipped:', authErr.message);
+    // تحقق هل المستخدم سجّل بجوجل
+    var snap = await window.__firebaseGet(
+      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
+    );
+    if (snap.exists()) {
+      var data = snap.val();
+      if (data.loginMethod === 'google' && window.firebaseAuth) {
+        var done = await Promise.race([
+          new Promise(function(resolve) {
+            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
+              unsub();
+              if (user && user.uid === s) {
+                try { await handleGoogleUserData(user); resolve(true); }
+                catch(e) { resolve(false); }
+              } else { resolve(false); }
+            });
+          }),
+          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
+        ]);
+        if (done) return;
+        hideLoader(); return;
       }
     }
-
-    /* ── تحقق هل المستخدم سجّل بجوجل ── */
-    if (window.__firebaseReady) {
-      try {
-        var snap = await window.__firebaseGet(
-          window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
-        );
-        if (snap.exists()) {
-          var data = snap.val();
-          if (data.loginMethod === 'google' && window.firebaseAuth) {
-            var done = await Promise.race([
-              new Promise(function(resolve) {
-                var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
-                  unsub();
-                  if (user && user.uid === s) {
-                    try { await handleGoogleUserData(user); resolve(true); }
-                    catch(e) { resolve(false); }
-                  } else { resolve(false); }
-                });
-              }),
-              new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2500); })
-            ]);
-            if (done) return;
-            hideLoader(); return;
-          }
-        }
-      } catch(fbErr) {
-        console.warn('autoLogin: Firebase read failed, falling back to localStorage:', fbErr.message);
-      }
-    }
-
-    /* ── دخول عادي username/password ── */
+    // دخول عادي username/password
     var u = await dbGetUser(s);
-    if (!u) {
-      /* ── Fallback: localStorage مباشرة ── */
-      try {
-        var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
-        if (local[s]) u = local[s];
-      } catch(le) {}
-    }
-
     if (u) {
       currentUser = Object.assign({}, u, { username: s });
       if (currentUser.pro && currentUser.pro.active === true) {
-        if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
-          window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
+          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
+        } else if (!currentUser.pro.expiresAt) {
+          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
         } else {
           currentUser.pro.active = false; window.isProUser = false;
         }
       } else { window.isProUser = false; }
       bootApp(); setTimeout(refreshGiftFab, 700); return;
     }
-  } catch(e) {
-    console.error('autoLogin error:', e);
-  }
+  } catch(e) {}
   hideLoader();
 }
 
@@ -5171,58 +5000,32 @@ async function doLogin() {
   var b = document.getElementById('btn-login');
   b.disabled = true; b.innerHTML = '<span class="btn-spinner"></span> جاري التحقق...';
   try {
-    /* ── خطوة 1: Anonymous Auth قبل أي قراءة ── */
-    if (window.__firebaseReady && window.firebaseAuth && !window.firebaseAuth.currentUser) {
-      try {
-        if (window.__firebaseSignInAnon) {
-          await Promise.race([
-            window.__firebaseSignInAnon(window.firebaseAuth),
-            new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
-          ]);
-        }
-      } catch(authErr) {
-        console.warn('doLogin: Anonymous auth failed, trying localStorage:', authErr.message);
-      }
-    }
-
-    /* ── خطوة 2: جلب بيانات المستخدم ── */
     var user = await dbGetUser(u);
     if (!user) { showAuthError('login', '❌ اسم المستخدم غير موجود'); return; }
-
-    /* ── خطوة 3: التحقق من كلمة المرور (3 طرق للتوافق مع القديم) ── */
     var match = false;
     try { match = decodePass(user.password) === p; } catch(ex) {}
     if (!match) match = (user.password === p);
-    if (!match) { try { match = (atob(user.password) === p); } catch(ex) {} }
     if (!match) { showAuthError('login', '❌ كلمة المرور غير صحيحة'); return; }
-
-    /* ── خطوة 4: تسجيل الدخول بنجاح ── */
     currentUser = Object.assign({}, user, { username: u });
     saveSession(u);
-
-    /* فحص Pro */
+    
+    // فحص وتأمين تفعيل الحساب المطور الفاخر
     if (currentUser.pro && currentUser.pro.active === true) {
       if (!currentUser.pro.expiresAt || Date.now() < currentUser.pro.expiresAt) {
-        window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+        window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
       } else {
-        currentUser.pro.active = false; window.isProUser = false;
+        currentUser.pro.active = false;
+        window.isProUser = false;
       }
-    } else { window.isProUser = false; }
-
-    /* تحديث lastLogin في الخلفية بدون إيقاف الدخول */
-    dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })).catch(function() {});
-
+    } else {
+      window.isProUser = false;
+    }
+    
+    try { await dbSaveUser(u, Object.assign({}, currentUser, { lastLogin: Date.now() })); } catch(e) {}
     logActivity('login', 'سجّل دخولاً للتطبيق', 'من صفحة تسجيل الدخول');
-    playSound('success');
-    showToast('✅ أهلاً ' + (currentUser.nameAr || currentUser.name || u));
-    bootApp();
-    setTimeout(refreshGiftFab, 700);
-  } catch(e) {
-    console.error('doLogin error:', e);
-    showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً');
-  } finally {
-    b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
-  }
+    playSound('success'); showToast('✅ أهلاً ' + user.name); bootApp(); setTimeout(refreshGiftFab, 700);
+  } catch(e) { showAuthError('login', '❌ خطأ في الاتصال، حاول مجدداً'); }
+  finally { b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'; }
 }
 
 async function doRegister() {
@@ -5236,63 +5039,26 @@ async function doRegister() {
   var w = parseFloat(document.getElementById('r-weight').value) || 0;
   var h = parseFloat(document.getElementById('r-height').value) || 0;
   var phone = document.getElementById('r-phone').value.trim();
-
   if (!n) { showAuthError('reg', '❌ أدخل الاسم الكامل'); return; }
   if (!u || u.length < 3) { showAuthError('reg', '❌ اسم المستخدم 3 أحرف على الأقل'); return; }
   if (!p || p.length < 6) { showAuthError('reg', '❌ كلمة المرور 6 أحرف على الأقل'); return; }
   if (!d) { showAuthError('reg', '❌ أدخل تاريخ الميلاد'); return; }
   if (!g) { showAuthError('reg', '❌ اختر الجنس'); return; }
-
   var b = document.getElementById('btn-register');
   b.disabled = true; b.innerHTML = '<span class="btn-spinner"></span> جاري الإنشاء...';
   try {
-    /* ── Anonymous Auth أولاً ── */
-    if (window.__firebaseReady && window.firebaseAuth && !window.firebaseAuth.currentUser) {
-      try {
-        if (window.__firebaseSignInAnon) {
-          await Promise.race([
-            window.__firebaseSignInAnon(window.firebaseAuth),
-            new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
-          ]);
-        }
-      } catch(authErr) {
-        console.warn('doRegister: Anonymous auth failed:', authErr.message);
-      }
-    }
-
-    /* ── تحقق من عدم وجود اسم المستخدم مسبقاً ── */
     var ex = await dbGetUser(u);
     if (ex) { showAuthError('reg', '❌ اسم المستخدم محجوز، اختر آخر'); return; }
-
     var bmi = (w && h) ? +(w / ((h / 100) * (h / 100))).toFixed(1) : 0;
-    var ud = {
-      name: n, nameAr: n, username: u,
-      password: encodePass(p),
-      dob: d, gender: g, smoking: sm,
-      weight: w, height: h, bmi: bmi,
-      diseases: selectedDiseases.slice(),
-      phone: phone || '',
-      created: Date.now(),
-      lastLogin: Date.now(),
-      loginMethod: 'username',
-      pro: { active: false }
-    };
-
+    var ud = { name: n, username: u, password: encodePass(p), dob: d, gender: g, smoking: sm, weight: w, height: h, bmi: bmi, diseases: selectedDiseases.slice(), phone: phone || '', created: Date.now(), pro: { active: false } };
     await dbSaveUser(u, ud);
     currentUser = Object.assign({}, ud);
     saveSession(u);
     window.isProUser = false;
     selectedDiseases = [];
-    playSound('success');
-    showToast('✅ تم إنشاء الحساب بنجاح');
-    bootApp();
-    setTimeout(refreshGiftFab, 700);
-  } catch(e) {
-    console.error('doRegister error:', e);
-    showAuthError('reg', '❌ خطأ في الإنشاء، حاول مجدداً');
-  } finally {
-    b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب';
-  }
+    playSound('success'); showToast('✅ تم إنشاء الحساب بنجاح'); bootApp(); setTimeout(refreshGiftFab, 700);
+  } catch(e) { showAuthError('reg', '❌ خطأ في الإنشاء، حاول مجدداً'); }
+  finally { b.disabled = false; b.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب'; }
 }
 
 function doLogout() {
@@ -5317,7 +5083,7 @@ function bootApp() {
       currentUser.pro = { active: false }; 
       window.isProUser = false; 
     } else {
-      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     }
   }
   buildDisGrid('dis-grid-auth', []);
@@ -5417,7 +5183,7 @@ function updatePremiumTabBadges() {
 }
 
 function simulatePremiumUserActivationDirectly() {
-  window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+  window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
   if(currentUser) {
     currentUser.pro = { active: true, expiresAt: Date.now() + (1*3600000) };
     dbSaveUser(currentUser.username, currentUser);
@@ -5511,7 +5277,7 @@ function syncPremiumUIStates() {
 
   /* إذا كان أحد المصدرين نشطاً اعتبره برو */
   if (!window.isProUser && bestExp > now) {
-    window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+    window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     if (currentUser) {
       currentUser.pro = currentUser.pro || {};
       currentUser.pro.active    = true;
@@ -5816,42 +5582,32 @@ async function captureAndScanProductBlob() {
     } catch(e) {}
   }
 
-  /* Puter Vision - AI food/product recognition */
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      var imgData = canvas.toDataURL("image/jpeg", 0.85);
-      var vPrompt;
-      if (isFoodMode) {
-        vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
-          + "انظر للصورة وتعرف على الطعام او الشيء الذي امامك (فاكهة، خبز، وجبة، مشروب، اي طعام).\n"
-          + "لا يلزم ان تكون هناك علبة او مكونات مكتوبة - فقط تعرف على ما تراه.\n"
-          + "ثم احكم: هل هو مسموح او ممنوع في نظام الطيبات؟\n"
-          + "نظام الطيبات:\n"
-          + "مسموح: لحم خروف، سمك، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
-          + "ممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات، سكر مكرر، زيوت مهدرجة، خضار نيئة بعض انواعها.\n"
-          + "الرد مختصر 100 كلمة: اذكر ما تراه، ثم الحكم والسبب. بدون **";
-      } else {
-        vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
-          + "انظر الى الصورة وافعل:\n"
-          + "1. اقرا قائمة المكونات المكتوبة على علبة المنتج.\n"
-          + "2. احكم: مسموح ام ممنوع في الطيبات؟\n"
-          + "3. اذكر المكونات الممنوعة (دجاج/بيض/دقيق ابيض/البان/بقوليات/سكر مكرر/زيوت مهدرجة).\n"
-          + "4. اقترح بديلا ان وجد.\n"
-          + "اذا لم تتضح الصورة اطلب ادخال المكونات يدويا. الرد مختصر 120 كلمة بدون **";
-      }
-      var res = await puter.ai.chat([
-        {role:"user", content:[
-          {type:"text", text: vPrompt},
-          {type:"image_url", image_url:{url: imgData}}
-        ]}
-      ], {model:"gpt-5.4", temperature:0.3});
-      var text = typeof res==="string" ? res
-        : res&&res.message&&res.message.content ? res.message.content
-        : res&&res.content ? res.content : null;
-      if (text) { _renderScanResult(text, "Puter Vision"); return; }
-    }
-  } catch(e) {}
-
+  /* Vision Analysis - تحليل مباشر مع تنقل تلقائي بين الموديلات */
+  var vPrompt;
+  if (isFoodMode) {
+    vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
+      + "انظر للصورة وتعرف على الطعام او الشيء الذي امامك (فاكهة، خبز، وجبة، مشروب، اي طعام).\n"
+      + "لا يلزم ان تكون هناك علبة او مكونات مكتوبة - فقط تعرف على ما تراه.\n"
+      + "ثم احكم: هل هو مسموح او ممنوع في نظام الطيبات؟\n"
+      + "نظام الطيبات:\n"
+      + "مسموح: لحم خروف، سمك، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، معظم الفواكه الطازجة.\n"
+      + "ممنوع: دجاج، بيض، دقيق ابيض، البان، بقوليات، سكر مكرر، زيوت مهدرجة، خضار نيئة بعض انواعها.\n"
+      + "الرد مختصر 100 كلمة: اذكر ما تراه، ثم الحكم والسبب. بدون **";
+  } else {
+    vPrompt = "انت خبير تغذية في نظام الطيبات للدكتور ضياء العوضي.\n"
+      + "انظر الى الصورة وافعل:\n"
+      + "1. اقرا قائمة المكونات المكتوبة على علبة المنتج.\n"
+      + "2. احكم: مسموح ام ممنوع في الطيبات؟\n"
+      + "3. اذكر المكونات الممنوعة (دجاج/بيض/دقيق ابيض/البان/بقوليات/سكر مكرر/زيوت مهدرجة).\n"
+      + "4. اقترح بديلا ان وجد.\n"
+      + "اذا لم تتضح الصورة اطلب ادخال المكونات يدويا. الرد مختصر 120 كلمة بدون **";
+  }
+  var imgData = canvas.toDataURL("image/jpeg", 0.85);
+  var vResult = await _smartVisionAnalysis(imgData, vPrompt);
+  if (vResult && vResult.source !== "fallback") {
+    _renderScanResult(vResult.text, vResult.source);
+    return;
+  }
   resBox.innerHTML = '<p style="color:#ff9800;padding:12px;font-size:.82rem">تعذر قراءة الصورة تلقائيا.<br>الرجاء ادخال اسم الطعام او المكونات في الحقل ادناه.</p>';
 }
 
@@ -6137,15 +5893,14 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
   var result = null;
   try {
     if (typeof puter !== "undefined" && puter.ai) {
-      var content = imgDataUrl
-        ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
-        : prompt;
-      var res = await puter.ai.chat(
-        imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
-      );
-      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (t) result = {text:t, source:"AI Pharma"};
+      if (imgDataUrl) {
+        var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
+        if (vRes && vRes.source !== "fallback") result = {text: vRes.text, source: "AI Pharma"};
+      } else {
+        var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
+        var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
+        if (t) result = {text:t, source:"AI Pharma"};
+      }
     }
   } catch(e) {}
 
@@ -6352,15 +6107,14 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
   var result = null;
   try {
     if (typeof puter !== "undefined" && puter.ai) {
-      var content = imgDataUrl
-        ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
-        : prompt;
-      var res = await puter.ai.chat(
-        imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? "gpt-5.4" : "gpt-5.4-nano", temperature:0.3}
-      );
-      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (t) result = {text:t, source:"AI Doctor"};
+      if (imgDataUrl) {
+        var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
+        if (vRes && vRes.source !== "fallback") result = {text: vRes.text, source: "AI Doctor"};
+      } else {
+        var res = await puter.ai.chat(prompt, {model:"gpt-5.4-nano", temperature:0.3});
+        var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
+        if (t) result = {text:t, source:"AI Doctor"};
+      }
     }
   } catch(e) {}
 
@@ -6733,14 +6487,9 @@ async function drugSearchByCamera() {
   }
   try {
     var imgData = canvas.toDataURL('image/jpeg', 0.85);
-    var aiRes = await puter.ai.chat([{
-      role:'user',
-      content:[
-        {type:'text', text:'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.'},
-        {type:'image_url', image_url:{url: imgData}}
-      ]
-    }], {model:'gpt-4o-mini', temperature:0});
-    var drugName = (typeof aiRes === 'string' ? aiRes : (aiRes.message && aiRes.message.content || aiRes.content || '')).trim().split('\n')[0].replace(/[*_#"']/g,'');
+    var vDrug = await _smartVisionAnalysis(imgData, 'ما اسم الدواء في هذه الصورة؟ أجب بالاسم التجاري فقط (عربي أو إنجليزي) دون أي شرح.');
+    var aiRes = (vDrug && vDrug.text) ? vDrug.text : '';
+    var drugName = (typeof aiRes === 'string' ? aiRes : '').trim().split('\n')[0].replace(/[*_#"']/g,'');
     if (drugName && drugName.length > 1) {
       var inp2 = document.getElementById('drug-name-search-input');
       if (inp2) inp2.value = drugName;
@@ -6865,20 +6614,19 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
 
   var result = null;
 
-  // 1. Puter.js (vision للصورة)
+  // 1. Puter.js (vision للصورة) - مع تنقل تلقائي بين الموديلات
   try {
     if (typeof puter !== 'undefined' && puter.ai) {
-      var content = imgDataUrl
-        ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imgDataUrl } }]
-        : prompt;
-      var res = await puter.ai.chat(
-        imgDataUrl ? [{ role: 'user', content: content }] : prompt,
-        { model: imgDataUrl ? 'gpt-4o' : 'gpt-4o-mini', temperature: 0.2 }
-      );
-      var t = typeof res === 'string' ? res
-        : res && res.message && res.message.content ? res.message.content
-        : res && res.content ? res.content : null;
-      if (t) result = t;
+      if (imgDataUrl) {
+        var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
+        if (vRes && vRes.source !== 'fallback') result = vRes.text;
+      } else {
+        var res = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.2 });
+        var t = typeof res === 'string' ? res
+          : res && res.message && res.message.content ? res.message.content
+          : res && res.content ? res.content : null;
+        if (t) result = t;
+      }
     }
   } catch(e) {}
 
@@ -8836,6 +8584,66 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
   <script src="https://js.puter.com/v2/"></script>
 <script>
+// ======= منع رسائل Puter الداخلية (Low Balance / Upgrade) نهائياً =======
+(function suppressPuterAlerts() {
+  var _origAlert = window.alert;
+  window.alert = function(msg) {
+    if (msg && typeof msg === 'string' &&
+      (msg.toLowerCase().includes('balance') ||
+       msg.toLowerCase().includes('upgrade') ||
+       msg.toLowerCase().includes('insufficient') ||
+       msg.toLowerCase().includes('billing') ||
+       msg.toLowerCase().includes('quota') ||
+       msg.toLowerCase().includes('fund') ||
+       msg.toLowerCase().includes('low balance'))) {
+      console.warn('[Puter suppressed alert]', msg);
+      return;
+    }
+    return _origAlert.apply(this, arguments);
+  };
+
+  function removePuterModals() {
+    try {
+      document.querySelectorAll('div,section,aside').forEach(function(el) {
+        if (!el || !el.innerText) return;
+        var txt = el.innerText || '';
+        if ((txt.includes('Low Balance') || txt.includes('not enough funding') || txt.includes('Upgrade Now')) && txt.length < 600) {
+          var modal = el.closest('[style*="position:fixed"],[style*="position: fixed"]') || el;
+          if (modal && modal !== document.body && modal !== document.documentElement) {
+            modal.style.setProperty('display','none','important');
+            modal.style.setProperty('visibility','hidden','important');
+            modal.style.setProperty('opacity','0','important');
+            try { modal.remove(); } catch(e2) {}
+          }
+        }
+      });
+    } catch(e) {}
+  }
+
+  var _puterObserver = new MutationObserver(function(mutations) {
+    var hasNew = false;
+    mutations.forEach(function(m) { if (m.addedNodes.length > 0) hasNew = true; });
+    if (hasNew) {
+      setTimeout(removePuterModals, 30);
+      setTimeout(removePuterModals, 150);
+      setTimeout(removePuterModals, 400);
+    }
+  });
+
+  function startObserver() {
+    if (document.body) {
+      _puterObserver.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startObserver);
+  } else {
+    startObserver();
+  }
+})();
+</script>
+<script>
 (function () {
   "use strict";
 
@@ -8843,7 +8651,8 @@ window.addEventListener('DOMContentLoaded', function() {
   var ZAI_MODEL        = "glm-4-flash";
   var MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
   var MISTRAL_MODEL    = "mistral-small-latest";
-  var PUTER_MODELS     = ["gpt-5.4-nano","gpt-5.4","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1"];
+  var PUTER_MODELS     = ["gpt-5.4-nano","gpt-5.4","gpt-5.3-chat","gpt-5.2-chat","gpt-5.1","gpt-4o-mini","gpt-4o","claude-sonnet-4-20250514","claude-3-5-haiku","meta-llama/llama-3.1-8b-instruct:free","mistralai/mistral-7b-instruct:free"];
+  var PUTER_VISION_MODELS = ["gpt-5.4","gpt-4o","gpt-5.4-nano","gpt-4o-mini","claude-sonnet-4-20250514","claude-3-5-haiku"];
   var _history = [];
 
   function _zaiKey()     { return window.__GEMINI_KEY  || null; }
@@ -8873,6 +8682,44 @@ window.addEventListener('DOMContentLoaded', function() {
     _history.forEach(function(m) { msgs.push({role:m.role==="assistant"?"assistant":"user", content:m.text}); });
     msgs.push({role:"user", content:msg});
     return msgs;
+  }
+
+  
+  // ======= VISION FALLBACK: تنقل تلقائي بين موديلات الرؤية =======
+  async function _tryPuterVision(imgDataUrl, promptText, idx) {
+    idx = idx || 0;
+    if (idx >= PUTER_VISION_MODELS.length) return null;
+    var model = PUTER_VISION_MODELS[idx];
+    try {
+      var res = await puter.ai.chat([{
+        role: "user",
+        content: [
+          { type: "text", text: promptText },
+          { type: "image_url", image_url: { url: imgDataUrl } }
+        ]
+      }], { model: model, temperature: 0.3 });
+      var text = typeof res === "string" ? res
+        : res && res.message && res.message.content ? res.message.content
+        : res && res.content ? res.content : null;
+      if (text && text.trim().length > 5) return { text: text, source: "Puter/" + model };
+      return await _tryPuterVision(imgDataUrl, promptText, idx + 1);
+    } catch(e) {
+      return await _tryPuterVision(imgDataUrl, promptText, idx + 1);
+    }
+  }
+
+  async function _smartVisionAnalysis(imgDataUrl, promptText) {
+    if (typeof puter !== "undefined" && puter.ai) {
+      var res = await _tryPuterVision(imgDataUrl, promptText, 0);
+      if (res) return res;
+    }
+    if (window.__ORKEY_FB) {
+      try {
+        var orRes = await tryOpenRouter("anthropic/claude-3-haiku", "", promptText);
+        if (orRes) return { text: orRes.text, source: "OpenRouter/Claude" };
+      } catch(e) {}
+    }
+    return { text: "تعذر تحليل الصورة تلقائياً. الرجاء إدخال اسم الطعام أو المكونات يدوياً.", source: "fallback" };
   }
 
   async function _tryPuter(msg, idx) {
@@ -9877,7 +9724,7 @@ window.addEventListener('DOMContentLoaded', function() {
       try { localStorage.setItem('tayyibat_pro_expiry_bonus', newExpiry.toString()); } catch(e) {}
 
       /* تفعيل PRO في الجلسة الحالية */
-      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
       if (window.currentUser) {
         window.currentUser.pro = window.currentUser.pro || {};
         window.currentUser.pro.active    = true;
@@ -10029,9 +9876,9 @@ async function handleGoogleUserData(googleUser) {
 
   if (currentUser.pro && currentUser.pro.active === true) {
     if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     } else if (!currentUser.pro.expiresAt) {
-      window.isProUser = true; if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges();
+      window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
     } else {
       currentUser.pro.active = false; window.isProUser = false;
     }
@@ -10270,7 +10117,46 @@ function doLogout() {
   showToast('👋 تم تسجيل الخروج');
 }
 
-/* ─── autoLogin: تم دمجها في التعريف الموحد أعلاه ─── */
+/* ─── autoLogin with Google support ───────────────── */
+async function autoLogin() {
+  var s = getSession();
+  if (!s) { hideLoader(); return; }
+  try {
+    var snap = await window.__firebaseGet(
+      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
+    );
+    if (snap.exists()) {
+      var data = snap.val();
+      if (data.loginMethod === 'google' && window.firebaseAuth) {
+        var done = await Promise.race([
+          new Promise(function(resolve) {
+            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
+              unsub();
+              if (user && user.uid === s) {
+                try { await handleGoogleUserData(user); resolve(true); }
+                catch(e) { resolve(false); }
+              } else { resolve(false); }
+            });
+          }),
+          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
+        ]);
+        if (done) return;
+        hideLoader(); return;
+      }
+    }
+    var u = await dbGetUser(s);
+    if (u) {
+      currentUser = Object.assign({}, u, { username: s });
+      if (currentUser.pro && currentUser.pro.active === true) {
+        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
+        else if (!currentUser.pro.expiresAt) { window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges(); }
+        else { currentUser.pro.active = false; window.isProUser = false; }
+      } else { window.isProUser = false; }
+      bootApp(); setTimeout(refreshGiftFab, 700); return;
+    }
+  } catch(e) {}
+  hideLoader();
+}
 </script>
 
 <script>
@@ -10414,8 +10300,6 @@ function incToolUsage(toolKey) {
 }
 function canUseTool(toolKey) {
   if (window.isProUser) return true;
-  // البرج الفلكي مجاني غير محدود
-  if (toolKey === 'zodiac') return true;
   return getToolUsage(toolKey) < FREE_TOOL_LIMIT;
 }
 function updateTrialBadges() {
@@ -10464,8 +10348,6 @@ function updateTrialBadges() {
     if (wrap) wrap.style.display = window.isProUser ? 'none' : 'inline-flex';
   });
 }
-// ✅ تعريض الدوال على window scope لضمان الوصول من أي block
-window.updateTrialBadges = updateTrialBadges;
 /* دالة خاصة بزر ماسح المنتجات الخارجي */
 function goSmartToolScanner() {
   if (!canUseTool('scanner')) {
@@ -10602,10 +10484,6 @@ function checkToolAndRun(toolKey, fn) {
   incToolUsage(toolKey);
   fn();
 }
-// ✅ تعريض دوال التنقل على window scope
-window.goSmartTool = goSmartTool;
-window.goSmartToolScanner = goSmartToolScanner;
-window.checkToolAndRun = checkToolAndRun;
 
 /* ════════════════════════════════════════════════════════════
    🍕 تصوير وتحليل الطعام
@@ -10641,58 +10519,33 @@ function fsOpenCamera() {
   if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
   var video = document.getElementById('fs-video');
   var fallback = document.getElementById('fs-fallback');
-  var resBox = document.getElementById('fs-result');
-  if (_fsStream) { /* الكاميرا مفتوحة — أغلقها */
-    stopLiveVisionAnalysis();
-    _fsStream.getTracks().forEach(function(t) { t.stop(); });
-    _fsStream = null;
-    video.style.display = 'none';
-    if (fallback) fallback.style.display = 'block';
-    return;
-  }
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
     .then(function(stream) {
       _fsStream = stream;
       video.srcObject = stream;
       video.style.display = 'block';
       if (fallback) fallback.style.display = 'none';
-      if (resBox) resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span id="fs-live-status" style="margin-right:8px;font-size:.85rem">📸 تحليل مباشر — جاري التعرف على الطعام...</span></div>';
-      /* ── ابدأ التحليل المباشر فوراً ── */
-      var livePrompt = 'أنت خبير تغذية. انظر لهذه الصورة من الكاميرا مباشرة وتعرف على كل طعام/وجبة موجودة.\nأجب فقط بهذا التنسيق JSON بدون أي markdown:\n{"name_ar":"اسم الوجبة","serving":"الكمية التقديرية بالجرام","calories":000,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"نصيحة صحية","items":[{"name":"صنف","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000}]}';
-      startLiveVisionAnalysis('fs-video', 'fs-result', livePrompt, 5000,
-        function(res) {
-          try {
-            var clean = res.replace(/```json|```/g,'').trim();
-            var data = JSON.parse(clean);
-            renderFoodAnalysisResult(data, resBox);
-          } catch(e) {
-            resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem;color:var(--txt)">' + res + '</div>';
-          }
-        },
-        function(status) {
-          var st = document.getElementById('fs-live-status');
-          if (st) st.textContent = status;
-        }
-      );
     }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
   }
 }
 
 function fsCameraCapture() {
-  /* إذا كانت الكاميرا مفتوحة، التقط صورة وحلّلها فوراً */
   if (!_fsStream) { fsOpenCamera(); return; }
   if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
-  stopLiveVisionAnalysis();
   var video = document.getElementById('fs-video');
-  _fsCurrentImage = captureFrameFromVideo(video, 0.92);
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _fsCurrentImage = canvas.toDataURL('image/jpeg', 0.85);
   incToolUsage('food-scan');
   fsAnalyzeImage(_fsCurrentImage);
+  // stop camera
   _fsStream.getTracks().forEach(function(t) { t.stop(); });
   _fsStream = null;
   video.style.display = 'none';
-  var fallback = document.getElementById('fs-fallback');
-  if (fallback) fallback.style.display = 'block';
+  document.getElementById('fs-fallback').style.display = 'block';
 }
 
 function fsLoadImage(event) {
@@ -11063,29 +10916,10 @@ function fakeImageOpenCamera() {
   .then(function(stream) {
     _fiStream = stream; video.srcObject = stream; area.style.display = 'block';
     document.getElementById('fi-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
-    /* ── تحليل مباشر فور فتح الكاميرا ── */
-    var resBox = document.getElementById('fi-result');
-    if (resBox) resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span id="fi-live-status" style="margin-right:8px;font-size:.85rem">🔍 يحلل الصورة مباشرة...</span></div>';
-    var livePrompt = 'أنت خبير كشف صور مزيفة. حلل هذه الصورة المباشرة: هل هي حقيقية أم مزيفة أم معدّلة؟ أعطِ نسبة الثقة ومؤشرات تقنية. أجب باللغة العربية بشكل مختصر ومباشر.';
-    startLiveVisionAnalysis('fi-video', 'fi-result', livePrompt, 6000,
-      function(res) {
-        var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:20px;overflow:hidden">';
-        html += '<div style="background:linear-gradient(135deg,rgba(255,152,0,.25),rgba(255,193,7,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
-        html += '<span style="font-size:1.6rem">🔍</span>';
-        html += '<div><div style="font-size:.92rem;font-weight:900;color:#ffc107">تقرير مباشر — تحليل الكاميرا</div>';
-        html += '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">كشف التزوير في الوقت الفعلي</div></div></div>';
-        html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
-        html += '</div>';
-        var box = document.getElementById('fi-result');
-        if (box) box.innerHTML = html;
-      },
-      function(status) { var s = document.getElementById('fi-live-status'); if (s) s.textContent = status; }
-    );
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
 function fakeImageStopCamera() {
-  stopLiveVisionAnalysis();
   if (_fiStream) { _fiStream.getTracks().forEach(function(t) { t.stop(); }); _fiStream = null; }
   var area = document.getElementById('fi-camera-area'); if (area) area.style.display = 'none';
   var btn = document.getElementById('fi-camera-btn');
@@ -11775,300 +11609,65 @@ function _emGetNewEmergencyAnim(type, stepIdx, step, color) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   🤖 وظائف استدعاء AI — مع تبديل تلقائي بين موديلات Puter
-   📸 + دعم التحليل المباشر عبر الكاميرا (Live Vision)
+   🤖 وظائف استدعاء Claude API
 ════════════════════════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════════════════════
-   🚫 حاجب رسالة Low Balance من Puter — يعمل فور تحميل الصفحة
-   يراقب DOM ويحذف أي modal/dialog يظهر من Puter تلقائياً
-══════════════════════════════════════════════════════════ */
-(function() {
-  /* ── 1: MutationObserver يحذف كل modal Low Balance فور ظهوره ── */
-  var _puterModalObserver = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(node) {
-        if (!node || node.nodeType !== 1) return;
-        _killPuterModal(node);
-        /* فحص الأبناء أيضاً */
-        try {
-          node.querySelectorAll && node.querySelectorAll('*').forEach(function(child) {
-            _killPuterModal(child);
-          });
-        } catch(e) {}
-      });
-    });
-  });
-  _puterModalObserver.observe(document.documentElement, { childList: true, subtree: true });
-
-  function _killPuterModal(el) {
-    if (!el || !el.textContent) return;
-    var txt = el.textContent.toLowerCase();
-    /* كلمات تشير لرسالة Puter */
-    if (
-      txt.includes('low balance') ||
-      txt.includes('not enough funding') ||
-      txt.includes('upgrade to continue') ||
-      txt.includes('upgrade now') && txt.includes('balance') ||
-      txt.includes('insufficient') && (txt.includes('fund') || txt.includes('credit'))
-    ) {
-      /* ابحث عن الـ container الأب الظاهر (modal/overlay) */
-      var target = el;
-      for (var i = 0; i < 10; i++) {
-        if (!target.parentElement) break;
-        var s = window.getComputedStyle(target);
-        if (s.position === 'fixed' || s.position === 'absolute' || s.zIndex > 100) {
-          break;
-        }
-        target = target.parentElement;
-      }
-      try { target.style.display = 'none'; } catch(e) {}
-      try { target.remove(); } catch(e) {}
-      /* أزل overlay خلفية أيضاً */
-      document.querySelectorAll('[class*="overlay"],[class*="modal"],[class*="dialog"],[class*="backdrop"]').forEach(function(ov) {
-        if (ov.textContent && ov.textContent.toLowerCase().includes('low balance')) {
-          try { ov.remove(); } catch(e) {}
-        }
-      });
-    }
-  }
-
-  /* ── 2: فحص دوري كل 200ms كإجراء احتياطي ── */
-  setInterval(function() {
-    document.querySelectorAll('body > *').forEach(function(el) {
-      _killPuterModal(el);
-    });
-  }, 200);
-
-  /* ── 3: تجاوز window.alert و window.confirm و window.prompt ── */
-  var _origAlert   = window.alert;
-  var _origConfirm = window.confirm;
-  window.alert = function(msg) {
-    if (msg && typeof msg === 'string' && (
-      msg.toLowerCase().includes('low balance') ||
-      msg.toLowerCase().includes('not enough') ||
-      msg.toLowerCase().includes('upgrade')
-    )) return; /* ابتلع الرسالة */
-    return _origAlert.apply(this, arguments);
-  };
-  window.confirm = function(msg) {
-    if (msg && typeof msg === 'string' && (
-      msg.toLowerCase().includes('low balance') ||
-      msg.toLowerCase().includes('not enough') ||
-      msg.toLowerCase().includes('upgrade')
-    )) return false;
-    return _origConfirm.apply(this, arguments);
-  };
-
-  /* ── 4: تجاوز puter.ui لمنع أي dialog يعرضه Puter ── */
-  function _patchPuterUI() {
-    if (typeof puter === 'undefined' || !puter) return;
-    if (puter.ui) {
-      ['alert','confirm','prompt','dialog','modal','toast'].forEach(function(method) {
-        if (typeof puter.ui[method] === 'function') {
-          var orig = puter.ui[method].bind(puter.ui);
-          puter.ui[method] = function() {
-            var args = Array.prototype.slice.call(arguments);
-            var txt = JSON.stringify(args).toLowerCase();
-            if (txt.includes('low balance') || txt.includes('not enough') || txt.includes('upgrade')) {
-              /* أعد Promise rejected بدلاً من عرض شيء */
-              return Promise.reject(new Error('puter_ui_blocked'));
-            }
-            return orig.apply(puter.ui, args);
-          };
-        }
-      });
-    }
-    /* تجاوز puter.ai.chat لاعتراض أخطاء الرصيد قبل ما تُعرض */
-    if (puter.ai && puter.ai.chat) {
-      var _origChat = puter.ai.chat.bind(puter.ai);
-      puter.ai.chat = function() {
-        var result = _origChat.apply(puter.ai, arguments);
-        /* إذا كانت Promise، اعترض rejection ذات الصلة بالرصيد */
-        if (result && typeof result.then === 'function') {
-          return result.catch(function(err) {
-            var msg = (err && (err.message || String(err))).toLowerCase();
-            if (
-              msg.includes('low balance') || msg.includes('insufficient') ||
-              msg.includes('upgrade') || msg.includes('not enough') ||
-              msg.includes('402') || msg.includes('payment')
-            ) {
-              /* أعد خطأ نظيف بدون UI */
-              throw new Error('PUTER_LOW_BALANCE');
-            }
-            throw err;
-          });
-        }
-        return result;
-      };
-    }
-  }
-
-  /* طبّق الـ patch فوراً وبعد تحميل Puter */
-  _patchPuterUI();
-  document.addEventListener('DOMContentLoaded', _patchPuterUI);
-  setTimeout(_patchPuterUI, 1000);
-  setTimeout(_patchPuterUI, 3000);
-  /* راقب تحميل Puter عبر polling */
-  var _puterPatchInterval = setInterval(function() {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      _patchPuterUI();
-      clearInterval(_puterPatchInterval);
-    }
-  }, 500);
-})();
-
-/* ── قائمة موديلات Puter مرتبة حسب الأولوية (رؤية + نص) ── */
-var _PUTER_VISION_MODELS = [
-  'gpt-4o',
-  'gpt-4o-mini',
-  'claude-sonnet-4-5',
-  'claude-opus-4-5',
-  'gemini-2.0-flash',
-  'gemini-1.5-pro',
-  'meta-llama/llama-3.2-11b-vision-instruct:free',
-  'google/gemma-3-27b-it:free',
-  'openai/gpt-4o-mini:free',
-  'mistralai/mistral-small-3.1-24b-instruct:free'
-];
-
-var _PUTER_TEXT_MODELS = [
-  'gpt-4o-mini',
-  'gpt-4o',
-  'claude-sonnet-4-5',
-  'claude-opus-4-5',
-  'gemini-2.0-flash',
-  'gemini-1.5-pro',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'deepseek/deepseek-r1-0528:free',
-  'google/gemma-3-27b-it:free',
-  'mistralai/mistral-small-3.1-24b-instruct:free',
-  'qwen/qwen3-8b:free'
-];
-
-/* ── دالة مساعدة: استخراج النص من رد Puter بأي صيغة ── */
-function _extractPuterText(res) {
-  if (!res) return null;
-  if (typeof res === 'string' && res.trim()) return res;
-  if (res.message && res.message.content) {
-    var c = res.message.content;
-    if (typeof c === 'string') return c;
-    if (Array.isArray(c)) {
-      var txt = c.filter(function(x){ return x.type === 'text'; }).map(function(x){ return x.text; }).join('');
-      return txt || null;
-    }
-  }
-  if (res.content) {
-    if (typeof res.content === 'string') return res.content;
-    if (Array.isArray(res.content)) {
-      var t2 = res.content.filter(function(x){ return x.type === 'text'; }).map(function(x){ return x.text; }).join('');
-      return t2 || null;
-    }
-  }
-  if (res.text && typeof res.text === 'string') return res.text;
-  return null;
-}
-
-/* ── دالة مساعدة: هل الخطأ يعني رصيد منتهٍ أو موديل ممنوع؟ ── */
-function _isPuterBalanceError(err) {
-  if (!err) return false;
-  var msg = (err.message || err.toString || function(){ return String(err); })().toLowerCase();
-  return msg.includes('low balance') || msg.includes('insufficient') || msg.includes('quota') ||
-         msg.includes('rate limit') || msg.includes('not enough') || msg.includes('402') ||
-         msg.includes('403') || msg.includes('payment') || msg.includes('credit') ||
-         msg.includes('billing') || msg.includes('model_not_found') || msg.includes('invalid model');
-}
-
-/* ══════════════════════════════════════════════════════
-   _callClaudeAPI — نص فقط — يجرب كل الموديلات تلقائياً
-══════════════════════════════════════════════════════ */
 async function _callClaudeAPI(prompt, systemPrompt) {
-
-  /* محاولة 1: Puter.js — تجربة جميع الموديلات */
-  if (typeof puter !== 'undefined' && puter.ai) {
-    var msgs = systemPrompt
-      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }]
-      : [{ role: 'user', content: prompt }];
-    for (var i = 0; i < _PUTER_TEXT_MODELS.length; i++) {
-      try {
-        var puRes = await puter.ai.chat(msgs, { model: _PUTER_TEXT_MODELS[i] });
-        var t = _extractPuterText(puRes);
-        if (t) return t;
-      } catch(e) {
-        /* تجاهل خطأ الرصيد/الموديل والانتقال للتالي */
-        if (!_isPuterBalanceError(e)) {
-          /* خطأ شبكة أو غير متوقع — جرب الموديل التالي أيضاً */
-        }
-        continue;
-      }
+  // محاولة 1: Anthropic API مباشرة
+  try {
+    var messages = [{ role: 'user', content: prompt }];
+    var body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: messages };
+    if (systemPrompt) body.system = systemPrompt;
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      var data = await res.json();
+      if (data.content && data.content[0] && data.content[0].text) return data.content[0].text;
     }
-  }
-
-  /* محاولة 2: Pollinations */
+  } catch(e) {}
+  
+  // محاولة 2: استخدام الـ AI المدمج في التطبيق (Pollinations)
   try {
     var poRes = await fetch(window.__POLLINATIONS_ENDPOINT || 'https://text.pollinations.ai/openai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'openai', messages: [{ role: 'user', content: prompt }], max_tokens: 1000 })
+      body: JSON.stringify({
+        model: 'openai', messages: [{ role: 'user', content: prompt }], max_tokens: 1000
+      })
     });
     if (poRes.ok) {
       var poData = await poRes.json();
       if (poData.choices && poData.choices[0]) return poData.choices[0].message.content;
     }
-  } catch(e2) {}
+  } catch(e) {}
 
-  /* محاولة 3: OpenRouter (إذا كان المفتاح متاحاً) */
-  var orKey = window.__OR_KEY_FB;
-  if (orKey) {
-    var orModels = ['openai/gpt-4o-mini', 'google/gemma-3-27b-it:free', 'meta-llama/llama-3.3-70b-instruct:free'];
-    for (var j = 0; j < orModels.length; j++) {
-      try {
-        var orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + orKey },
-          body: JSON.stringify({ model: orModels[j], messages: [{ role: 'user', content: prompt }], max_tokens: 1000 })
-        });
-        if (orRes.ok) {
-          var orData = await orRes.json();
-          if (orData.choices && orData.choices[0]) return orData.choices[0].message.content;
-        }
-      } catch(e3) { continue; }
+  // محاولة 3: Puter.js
+  try {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var puRes = await puter.ai.chat(prompt, { model: 'gpt-4o-mini', temperature: 0.3 });
+      var t = typeof puRes === 'string' ? puRes : puRes && puRes.message ? puRes.message.content : null;
+      if (t) return t;
     }
-  }
+  } catch(e) {}
 
   throw new Error('All AI endpoints failed');
 }
 
-/* ══════════════════════════════════════════════════════
-   _callClaudeAPIWithImage — رؤية مباشرة — يجرب كل الموديلات
-   imgDataUrl: base64 data URL أو frame من الكاميرا المباشرة
-══════════════════════════════════════════════════════ */
 async function _callClaudeAPIWithImage(prompt, imgDataUrl) {
-
-  /* محاولة 1: Puter.js — جميع موديلات الرؤية */
-  if (typeof puter !== 'undefined' && puter.ai) {
-    var visionContent = [
-      { type: 'text', text: prompt },
-      { type: 'image_url', image_url: { url: imgDataUrl } }
-    ];
-    for (var i = 0; i < _PUTER_VISION_MODELS.length; i++) {
-      try {
-        var pvRes = await puter.ai.chat(
-          [{ role: 'user', content: visionContent }],
-          { model: _PUTER_VISION_MODELS[i] }
-        );
-        var t = _extractPuterText(pvRes);
-        if (t) return t;
-      } catch(e) {
-        continue;
-      }
+  // محاولة Puter.js مع تنقل تلقائي بين الموديلات
+  try {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      var vRes = await _smartVisionAnalysis(imgDataUrl, prompt);
+      if (vRes && vRes.source !== 'fallback') return vRes.text;
     }
-  }
-
-  /* محاولة 2: Anthropic API مباشرة مع الصورة */
+  } catch(e) {}
+  
+  // محاولة Anthropic API مع الصورة
   try {
     var base64 = imgDataUrl.split(',')[1];
-    var mtype = imgDataUrl.split(';')[0].split(':')[1] || 'image/jpeg';
+    var mtype = imgDataUrl.split(';')[0].split(':')[1];
     var body = {
       model: 'claude-sonnet-4-20250514', max_tokens: 1000,
       messages: [{ role: 'user', content: [
@@ -12080,97 +11679,10 @@ async function _callClaudeAPIWithImage(prompt, imgDataUrl) {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     });
     if (r.ok) { var d = await r.json(); if (d.content && d.content[0]) return d.content[0].text; }
-  } catch(e2) {}
-
-  /* محاولة 3: OpenRouter مع صورة */
-  var orKey2 = window.__OR_KEY_FB;
-  if (orKey2) {
-    try {
-      var orVBody = {
-        model: 'openai/gpt-4o-mini',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: imgDataUrl } }
-        ]}]
-      };
-      var orVRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + orKey2 },
-        body: JSON.stringify(orVBody)
-      });
-      if (orVRes.ok) {
-        var orVData = await orVRes.json();
-        if (orVData.choices && orVData.choices[0]) return orVData.choices[0].message.content;
-      }
-    } catch(e3) {}
-  }
-
-  /* إذا فشل كل شيء: ارجع لتحليل نصي */
-  return await _callClaudeAPI(prompt + '\n(لا توجد صورة — قدم تحليلاً نصياً عاماً)', null);
-}
-
-/* ══════════════════════════════════════════════════════
-   📸 التحليل المباشر عبر الكاميرا (Live Vision)
-   يلتقط frame من الفيديو مباشرة ويحللها فوراً بدون توقف
-══════════════════════════════════════════════════════ */
-var _liveVisionTimer = null;
-var _liveVisionBusy = false;
-
-/**
- * captureFrameFromVideo — يأخذ إطاراً من عنصر <video> ويعيده كـ data URL
- */
-function captureFrameFromVideo(videoEl, quality) {
-  var canvas = document.createElement('canvas');
-  canvas.width = videoEl.videoWidth || 640;
-  canvas.height = videoEl.videoHeight || 480;
-  canvas.getContext('2d').drawImage(videoEl, 0, 0);
-  return canvas.toDataURL('image/jpeg', quality || 0.75);
-}
-
-/**
- * startLiveVisionAnalysis — يبدأ التحليل المتكرر من الكاميرا
- * @param {string}   videoId    - id لعنصر <video>
- * @param {string}   resultId   - id لعنصر عرض النتيجة
- * @param {string}   prompt     - البرومبت المراد إرساله
- * @param {number}   intervalMs - كل كم ميلي ثانية يعيد التحليل (افتراضي: 4000)
- * @param {function} onResult   - callback(resultText) عند الحصول على نتيجة
- * @param {function} onStatus   - callback(statusText) لتحديث حالة "جاري التحليل..."
- */
-function startLiveVisionAnalysis(videoId, resultId, prompt, intervalMs, onResult, onStatus) {
-  stopLiveVisionAnalysis(); /* أوقف أي جلسة سابقة */
-  intervalMs = intervalMs || 4000;
-
-  async function _doAnalysis() {
-    if (_liveVisionBusy) return;
-    var video = document.getElementById(videoId);
-    if (!video || !video.srcObject || video.readyState < 2) return;
-    _liveVisionBusy = true;
-    if (onStatus) onStatus('🔍 يحلل الكاميرا...');
-    try {
-      var frame = captureFrameFromVideo(video);
-      var result = await _callClaudeAPIWithImage(prompt, frame);
-      if (result) {
-        if (onResult) onResult(result);
-        else {
-          var box = document.getElementById(resultId);
-          if (box) box.innerHTML = '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.8;white-space:pre-line">' + result + '</div>';
-        }
-      }
-    } catch(err) {
-      if (onStatus) onStatus('⚠️ تعذر التحليل، إعادة المحاولة...');
-    }
-    _liveVisionBusy = false;
-  }
-
-  /* تحليل فوري عند البدء */
-  setTimeout(_doAnalysis, 800);
-  _liveVisionTimer = setInterval(_doAnalysis, intervalMs);
-}
-
-function stopLiveVisionAnalysis() {
-  if (_liveVisionTimer) { clearInterval(_liveVisionTimer); _liveVisionTimer = null; }
-  _liveVisionBusy = false;
+  } catch(e) {}
+  
+  // إذا فشل كل شيء: ارجع لتحليل نصي فقط
+  return await _callClaudeAPI(prompt + '\n(لا توجد صورة متاحة، قدم تحليلاً عاماً)', null);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -12294,16 +11806,13 @@ function zodiacDetect() {
     pisces:      { traits: [['🌊','الحدس الخارق','يشعر بما لا يُقال ولا يُرى — يلتقط مشاعر الآخرين ونواياهم قبل أن ينبسوا بكلمة واحدة'],['🎨','الخيال الإبداعي الواسع','يعيش في عالم حالم مليء بالألوان والإلهام، وهذا يمنحه طاقة إبداعية نادرة في الفن والكتابة والموسيقى'],['💜','التعاطف العميق','يحمل همّ الآخرين كأنه همّه — قلبه مفتوح ومشاعره صادقة، ويُشعر من حوله بالقبول والأمان'],['🔮','الروحانية والارتباط بعالم آخر','يحس بوجود بُعد روحاني في كل شيء، ولديه علاقة عميقة مع العالم الداخلي والمعنوي']], lucky:'7', color:'#26a69a', color2:'#e0f2f1', stone:'أكوامارين', day:'الخميس' }
   };
 
-  // ── تعريف td أولاً قبل أي استخدام ──
-  var td = traitDefs[_zodSign] || traitDefs.pisces;
-
   // ── بطاقة العمر المفصّلة ──
   var ageCard = document.getElementById('zodiac-age-card');
-  var yearVal = parseInt(document.getElementById('zod-year') ? document.getElementById('zod-year').value : 0);
-  var monthVal = parseInt(document.getElementById('zod-month') ? document.getElementById('zod-month').value : 0);
-  var dayVal = parseInt(document.getElementById('zod-day') ? document.getElementById('zod-day').value : 0);
+  var yearVal = parseInt(document.getElementById('zod-year')?.value);
+  var monthVal = parseInt(document.getElementById('zod-month')?.value);
+  var dayVal = parseInt(document.getElementById('zod-day')?.value);
   if (ageCard) {
-    if (yearVal && yearVal >= 1920 && yearVal <= new Date().getFullYear() && monthVal && dayVal) {
+    if (yearVal && yearVal >= 1920 && yearVal <= 2025 && monthVal && dayVal) {
       var birthDate = new Date(yearVal, monthVal - 1, dayVal);
       var now = new Date();
       var diffMs = now - birthDate;
@@ -12313,44 +11822,51 @@ function zodiacDetect() {
         var totalHrs = Math.floor(totalMin / 60);
         var totalDays = Math.floor(totalHrs / 24);
         var totalWeeks = Math.floor(totalDays / 7);
+        // حساب السنوات والأشهر الدقيقة
         var ageYears = now.getFullYear() - birthDate.getFullYear();
         var ageMonths = now.getMonth() - birthDate.getMonth();
         if (now.getDate() < birthDate.getDate()) ageMonths--;
         if (ageMonths < 0) { ageYears--; ageMonths += 12; }
         var ageDaysRem = Math.floor((now - new Date(now.getFullYear(), now.getMonth(), birthDate.getDate())) / 86400000);
         if (isNaN(ageDaysRem) || ageDaysRem < 0) ageDaysRem = 0;
-        var totalMonths = ageYears * 12 + ageMonths;
 
-        // عداد حي — يتحدث كل ثانية
+        // عداد تشغيل حي
         if (window._zodAgeInterval) clearInterval(window._zodAgeInterval);
-        (function(bd) {
-          window._zodAgeInterval = setInterval(function() {
-            var n = new Date();
-            var df = n - bd;
-            var ts = Math.floor(df / 1000);
-            var tm = Math.floor(ts / 60);
-            var th = Math.floor(tm / 60);
-            var td2 = Math.floor(th / 24);
-            var tw = Math.floor(td2 / 7);
-            var ay = n.getFullYear() - bd.getFullYear();
-            var am = n.getMonth() - bd.getMonth();
-            if (n.getDate() < bd.getDate()) am--;
-            if (am < 0) { ay--; am += 12; }
-            var totM = ay * 12 + am;
-            var e;
-            e = document.getElementById('zod-total-sec');    if (e) e.textContent = ts.toLocaleString('ar-EG');
-            e = document.getElementById('zod-total-min');    if (e) e.textContent = tm.toLocaleString('ar-EG');
-            e = document.getElementById('zod-total-hrs');    if (e) e.textContent = th.toLocaleString('ar-EG');
-            e = document.getElementById('zod-total-days');   if (e) e.textContent = td2.toLocaleString('ar-EG');
-            e = document.getElementById('zod-total-weeks');  if (e) e.textContent = tw.toLocaleString('ar-EG');
-            e = document.getElementById('zod-total-months'); if (e) e.textContent = totM.toLocaleString('ar-EG');
-            e = document.getElementById('zod-total-years-num'); if (e) e.textContent = ay.toLocaleString('ar-EG');
-          }, 1000);
-        })(birthDate);
+        function updateAgeCounters() {
+          var n = new Date();
+          var df = n - birthDate;
+          var ts = Math.floor(df/1000);
+          var tm = Math.floor(ts/60);
+          var th = Math.floor(tm/60);
+          var td2 = Math.floor(th/24);
+          var tw = Math.floor(td2/7);
+          // حساب الأشهر الكاملة
+          var ay = n.getFullYear() - birthDate.getFullYear();
+          var am = n.getMonth() - birthDate.getMonth();
+          if (n.getDate() < birthDate.getDate()) am--;
+          if (am < 0) { ay--; am += 12; }
+          var totMonths = ay * 12 + am;
+          var tdEl = document.getElementById('zod-total-days');
+          var twEl = document.getElementById('zod-total-weeks');
+          var tminEl = document.getElementById('zod-total-min');
+          var tsecEl = document.getElementById('zod-total-sec');
+          var thEl = document.getElementById('zod-total-hrs');
+          var tmEl = document.getElementById('zod-total-months');
+          var tyEl = document.getElementById('zod-total-years-num');
+          if (tdEl) tdEl.textContent = td2.toLocaleString('ar-EG');
+          if (twEl) twEl.textContent = tw.toLocaleString('ar-EG');
+          if (tminEl) tminEl.textContent = tm.toLocaleString('ar-EG');
+          if (tsecEl) tsecEl.textContent = ts.toLocaleString('ar-EG');
+          if (thEl) thEl.textContent = th.toLocaleString('ar-EG');
+          if (tmEl) tmEl.textContent = totMonths.toLocaleString('ar-EG');
+          if (tyEl) tyEl.textContent = ay.toLocaleString('ar-EG');
+        }
+        window._zodAgeInterval = setInterval(updateAgeCounters, 1000);
 
+        var totalMonths = ageYears * 12 + ageMonths;
         ageCard.style.display = 'block';
         ageCard.innerHTML =
-          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + td.color + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both">' +
+          '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(5,14,30,.99));border:2px solid ' + td.color + '55;border-radius:20px;overflow:hidden;animation:zodCardIn .5s cubic-bezier(.34,1.56,.64,1) both;width:100%">' +
             '<div style="background:linear-gradient(135deg,' + td.color + '30,' + td.color + '12);padding:12px 16px;border-bottom:1px solid ' + td.color + '30;display:flex;align-items:center;gap:10px">' +
               '<span style="font-size:1.6rem">⏳</span>' +
               '<div>' +
@@ -12359,37 +11875,40 @@ function zodiacDetect() {
               '</div>' +
             '</div>' +
             '<div style="padding:14px 16px">' +
-              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + td.color + '18;border-radius:14px;border:1.5px solid ' + td.color + '44">' +
-                '<div id="zod-total-years-num" style="font-size:2.6rem;font-weight:900;color:' + td.color + ';line-height:1">' + ageYears.toLocaleString('ar-EG') + '</div>' +
-                '<div style="font-size:.78rem;color:var(--txt2);margin-top:4px;font-weight:700">🔢 إجمالي السنوات' + (ageMonths ? ' — ' + ageMonths + ' شهر و' + ageDaysRem + ' يوم' : '') + '</div>' +
+              '<div style="text-align:center;margin-bottom:14px;padding:12px;background:' + td.color + '15;border-radius:14px;border:1.5px solid ' + td.color + '33">' +
+                '<div style="font-size:2.4rem;font-weight:900;color:' + td.color + ';line-height:1">' + ageYears + '</div>' +
+                '<div style="font-size:.78rem;color:var(--txt2);margin-top:4px;font-weight:700">سنة' + (ageMonths ? ' و ' + ageMonths + ' شهر' : '') + (ageDaysRem ? ' و ' + ageDaysRem + ' يوم' : '') + '</div>' +
               '</div>' +
               '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-months" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + totalMonths.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">📆 شهر</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-years-num" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + ageYears.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🔢 سنة</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-weeks" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + totalWeeks.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">🗓️ أسبوع</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-months" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalMonths.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">📆 شهر</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-days" style="font-size:1rem;font-weight:900;color:' + td.color + '">' + totalDays.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">📅 يوم</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 6px;text-align:center">' +
+                  '<div id="zod-total-weeks" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalWeeks.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:2px;font-weight:700">🗓️ أسبوع</div>' +
                 '</div>' +
               '</div>' +
-              '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-hrs" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalHrs.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">🕐 ساعة</div>' +
+              '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-days" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalDays.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">📅 يوم</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '33;border-radius:12px;padding:10px 6px;text-align:center">' +
-                  '<div id="zod-total-min" style="font-size:1rem;font-weight:900;color:' + td.color2 + '">' + totalMin.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">⏱️ دقيقة</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-hrs" style="font-size:1.05rem;font-weight:900;color:' + td.color2 + '">' + totalHrs.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">🕐 ساعة</div>' +
                 '</div>' +
-                '<div style="background:rgba(255,255,255,.05);border:1px solid ' + td.color + '55;border-radius:12px;padding:10px 6px;text-align:center;position:relative;overflow:hidden">' +
-                  '<div style="position:absolute;inset:0;background:' + td.color + '10;animation:zodAgeCountUp 1s ease infinite"></div>' +
-                  '<div id="zod-total-sec" style="position:relative;font-size:1rem;font-weight:900;color:' + td.color + '">' + totalSec.toLocaleString('ar-EG') + '</div>' +
-                  '<div style="position:relative;font-size:.58rem;color:var(--txt3);margin-top:3px;font-weight:700">⚡ ثانية</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-min" style="font-size:.95rem;font-weight:900;color:' + td.color2 + '">' + totalMin.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⏱️ دقيقة</div>' +
+                '</div>' +
+                '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center">' +
+                  '<div id="zod-total-sec" style="font-size:.95rem;font-weight:900;color:' + td.color + ';animation:zodAgeCountUp .3s ease">' + totalSec.toLocaleString('ar-EG') + '</div>' +
+                  '<div style="font-size:.6rem;color:var(--txt3);margin-top:2px;font-weight:700">⚡ ثانية</div>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -12402,6 +11921,7 @@ function zodiacDetect() {
     }
   }
 
+  var td = traitDefs[_zodSign] || traitDefs.pisces;
   var tc = document.getElementById('zodiac-trait-cards');
   tc.innerHTML = '';
 
@@ -12884,7 +12404,9 @@ function zodiacRead() {
   var month = document.getElementById('zod-month').value;
   var day = document.getElementById('zod-day').value;
   if (!month || !day) { showToast('اختر الشهر واليوم أولاً 📅'); return; }
-  if (!_zodGender) _zodGender = 'male';
+  if (!_zodGender) { showToast('اختر النوع (ذكر / أنثى) أولاً'); return; }
+  if (!canUseTool('zodiac')) { showTrialExpiredModal('zodiac'); return; }
+  incToolUsage('zodiac');
 
   zodiacDetect();
   var sign = _zodSign || getZodiacSign(month, day);
@@ -13125,110 +12647,42 @@ function palmLoadImage(event) {
   reader.readAsDataURL(file);
 }
 
-var _palmCountdownTimer = null;
-var _palmCountdownSec = 3;
-
 function palmOpenCamera() {
   var area = document.getElementById('palm-camera-area');
   var video = document.getElementById('palm-video');
   if (!area || !video) return;
   if (_palmStream) { palmStopCamera(); return; }
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }
-  }).then(function(stream) {
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } })
+  .then(function(stream) {
     _palmStream = stream;
     video.srcObject = stream;
     area.style.display = 'block';
-    document.getElementById('palm-camera-btn').innerHTML =
-      '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
-    // ابدأ العداد التنازلي تلقائياً بعد ثانية من فتح الكاميرا
-    setTimeout(palmStartCountdown, 1000);
+    document.getElementById('palm-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
-function palmStartCountdown() {
-  if (!_palmStream) return;
-  _palmCountdownSec = 3;
-  var overlay = document.getElementById('palm-countdown-overlay');
-  var numEl   = document.getElementById('palm-countdown-num');
-  var hintSec = document.getElementById('palm-hint-secs');
-  if (overlay) { overlay.style.display = 'flex'; }
-  if (numEl)   { numEl.textContent = _palmCountdownSec; }
-  if (hintSec) hintSec.textContent = _palmCountdownSec;
-
-  if (_palmCountdownTimer) clearInterval(_palmCountdownTimer);
-  _palmCountdownTimer = setInterval(function() {
-    if (!_palmStream) { clearInterval(_palmCountdownTimer); return; }
-    _palmCountdownSec--;
-    if (numEl)   numEl.textContent = _palmCountdownSec > 0 ? _palmCountdownSec : '📸';
-    if (hintSec) hintSec.textContent = Math.max(0, _palmCountdownSec);
-    if (_palmCountdownSec <= 0) {
-      clearInterval(_palmCountdownTimer);
-      palmCaptureAndAnalyze();
-    }
-  }, 1000);
-}
-
-function palmCaptureNow() {
-  // إلغاء العداد وتصوير فوري
-  if (_palmCountdownTimer) clearInterval(_palmCountdownTimer);
-  var overlay = document.getElementById('palm-countdown-overlay');
-  if (overlay) overlay.style.display = 'none';
-  palmCaptureAndAnalyze();
-}
-
-function palmCaptureAndAnalyze() {
-  var video = document.getElementById('palm-video');
-  if (!video || !_palmStream) { showToast('الكاميرا غير مفعلة'); return; }
-
-  // وميض الشاشة
-  var area = document.getElementById('palm-camera-area');
-  if (area) { area.style.animation = 'palmFlash .3s ease'; setTimeout(function(){ area.style.animation=''; }, 300); }
-
-  // إخفاء العداد وإظهار التحليل
-  var countdown = document.getElementById('palm-countdown-overlay');
-  var analyzing = document.getElementById('palm-analyzing-overlay');
-  if (countdown) countdown.style.display = 'none';
-  if (analyzing) analyzing.style.display = 'flex';
-
-  // التقاط الصورة
-  var canvas = document.createElement('canvas');
-  canvas.width  = video.videoWidth  || 1280;
-  canvas.height = video.videoHeight || 960;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  _palmImageData = canvas.toDataURL('image/jpeg', 0.92);
-
-  // إيقاف الكاميرا وإظهار المعاينة
-  palmStopCamera();
-  var preview = document.getElementById('palm-preview');
-  var img     = document.getElementById('palm-img-preview');
-  if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
-  if (analyzing) analyzing.style.display = 'none';
-
-  // بدء التحليل فوراً
-  palmAnalyze();
-}
-
 function palmStopCamera() {
-  if (_palmCountdownTimer) { clearInterval(_palmCountdownTimer); _palmCountdownTimer = null; }
   if (_palmStream) { _palmStream.getTracks().forEach(function(t) { t.stop(); }); _palmStream = null; }
   var area = document.getElementById('palm-camera-area');
   if (area) area.style.display = 'none';
-  var overlay = document.getElementById('palm-countdown-overlay');
-  if (overlay) overlay.style.display = 'none';
-  var analyzing = document.getElementById('palm-analyzing-overlay');
-  if (analyzing) analyzing.style.display = 'none';
   var btn = document.getElementById('palm-camera-btn');
   if (btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير كفك الآن</span>';
-  var hintSec = document.getElementById('palm-hint-secs');
-  if (hintSec) hintSec.textContent = '3';
 }
 
 function palmCapture() {
-  // احتياط: نادياً الدالة الجديدة
-  palmCaptureAndAnalyze();
+  var video = document.getElementById('palm-video');
+  if (!video || !_palmStream) { showToast('الكاميرا غير مفعلة'); return; }
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 960;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _palmImageData = canvas.toDataURL('image/jpeg', 0.95);
+  palmStopCamera();
+  var preview = document.getElementById('palm-preview');
+  var img = document.getElementById('palm-img-preview');
+  if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
+  showToast('✅ تم التقاط صورة الكف — اضغط اقرأ كفّي');
 }
-
 
 function palmAnalyze() {
   if (!_palmImageData) { showToast('صوّر أو ارفع صورة كفك أولاً 🖐'); return; }
@@ -13271,7 +12725,7 @@ document.addEventListener('DOMContentLoaded', function() {
   loadSettingsToggles();
 });
 // تحديث فوري
-setTimeout(function(){ if (typeof window.updateTrialBadges === 'function') window.updateTrialBadges(); if (typeof window.updatePremiumTabBadges === 'function') window.updatePremiumTabBadges(); }, 500);
+setTimeout(function(){ updateTrialBadges(); updatePremiumTabBadges(); }, 500);
 
 // ── فحص إعادة ضبط التجربة من الأدمن ──
 function checkAdminTrialReset() {
