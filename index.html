@@ -285,18 +285,7 @@
     window.firebaseReady     = true;
     window.__firebaseReady   = true;
 
-    try {
-      const cfgSnap = await get(child(ref(db), 'config/ai'));
-      if (cfgSnap.exists()) {
-        const cfg = cfgSnap.val();
-        if (cfg.endpoint)              window.__aiEndpoint  = cfg.endpoint;
-        if (Array.isArray(cfg.models)) window.__aiModels    = cfg.models;
-        if (cfg.apiKey)                window.__aiApiKey    = cfg.apiKey;
-        if (cfg.openrouterKey)         window.__OR_KEY_FB   = cfg.openrouterKey;
-        if (cfg.geminiKey)           { window.__GEMINI_KEY  = cfg.geminiKey; window.__geminiReady = true; }
-        if (cfg.mistralKey)            window.__MISTRAL_KEY = cfg.mistralKey;
-      }
-    } catch(_) {}
+    // API keys removed — Puter only
 
   } catch(e) {
     window.__firebaseReady = false;
@@ -5405,14 +5394,12 @@ async function runPremiumHealthAnalyzer() {
   
   var sysPrompt = buildUserContext();
   var response = null;
-  
-  if (window.__OR_KEY_FB) {
-    var oRes = await tryOpenRouter(OR_MODELS[0].id, sysPrompt, promptText);
-    if(oRes) response = oRes.text;
-  }
-  if (!response) {
-    var pRes = await tryPollinations(AI_MODELS[0].id, sysPrompt, promptText);
-    if(pRes) response = pRes.text;
+  for (var _hi = 0; _hi < PUTER_AI_MODELS.length; _hi++) {
+    try {
+      var _hr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:promptText}], {model:PUTER_AI_MODELS[_hi], temperature:0.7});
+      var _ht = typeof _hr==='string'?_hr:(_hr&&_hr.message&&_hr.message.content?(Array.isArray(_hr.message.content)?_hr.message.content[0].text:_hr.message.content):(_hr&&_hr.content?_hr.content:null));
+      if (_ht) { response = _ht; break; }
+    } catch(e) {}
   }
   
   if(response) {
@@ -5449,13 +5436,13 @@ async function sendPremiumCoachMsg() {
   var sysPrompt = "أنت مدرب صحي مخصص ومرافق للمستخدم خطوة بخطوة في تطبيق نظام الطيبات الغذائي للدكتور ضياء العوضي رحمه الله. أجب على الأسئلة بروح الالتزام الكامل والتوجيه الإيجابي.";
   var response = null;
   
-  if (window.__OR_KEY_FB) {
-    var oRes = await tryOpenRouter(OR_MODELS[0].id, sysPrompt, query);
-    if(oRes) response = oRes.text;
-  }
-  if (!response) {
-    var pRes = await tryPollinations(AI_MODELS[0].id, sysPrompt, query);
-    if(pRes) response = pRes.text;
+  var response = null;
+  for (var _ci = 0; _ci < PUTER_AI_MODELS.length; _ci++) {
+    try {
+      var _cr = await puter.ai.chat([{role:'system',content:sysPrompt},{role:'user',content:query}], {model:PUTER_AI_MODELS[_ci], temperature:0.7});
+      var _ct = typeof _cr==='string'?_cr:(_cr&&_cr.message&&_cr.message.content?(Array.isArray(_cr.message.content)?_cr.message.content[0].text:_cr.message.content):(_cr&&_cr.content?_cr.content:null));
+      if (_ct) { response = _ct; break; }
+    } catch(e) {}
   }
   
   if(response) {
@@ -5693,44 +5680,14 @@ async function _scanAnalyzeAI(ingredients) {
 
   var result = null;
 
-  /* ١. Puter.js */
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      var res = await puter.ai.chat(prompt, {model:PUTER_AI_MODELS[0], temperature:0.3});
-      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (t) result = {text:t, source:"Puter.js"};
-    }
-  } catch(e) {}
-
-  /* ٢. Mistral */
-  if (!result && window.__MISTRAL_KEY) {
+  /* Puter.js — مع fallback على النماذج الثلاثة */
+  for (var _si = 0; _si < PUTER_AI_MODELS.length; _si++) {
     try {
-      var r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer "+window.__MISTRAL_KEY},
-        body:JSON.stringify({model:"mistral-small-latest",messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
-      });
-      if (r.ok) { var d=await r.json(); var t2=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:null; if(t2) result={text:t2,source:"Mistral"}; }
-    } catch(e) {}
-  }
-
-  /* ٣. Z.ai */
-  if (!result && window.__GEMINI_KEY) {
-    try {
-      var r2 = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer "+window.__GEMINI_KEY},
-        body:JSON.stringify({model:"glm-4-flash",messages:[{role:"user",content:prompt}],temperature:0.3,max_tokens:512})
-      });
-      if (r2.ok) { var d2=await r2.json(); var t3=d2&&d2.choices&&d2.choices[0]&&d2.choices[0].message?d2.choices[0].message.content:null; if(t3) result={text:t3,source:"Z.ai"}; }
-    } catch(e) {}
-  }
-
-  /* ٤. OpenRouter fallback */
-  if (!result && window.ORKEYFB) {
-    try {
-      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext(), prompt);
-      if (oRes) result = {text:oRes.text, source:"OpenRouter"};
+      if (typeof puter !== "undefined" && puter.ai) {
+        var _sr = await puter.ai.chat(prompt, {model:PUTER_AI_MODELS[_si], temperature:0.3});
+        var _st = typeof _sr==="string"?_sr:(_sr&&_sr.message&&_sr.message.content?(Array.isArray(_sr.message.content)?_sr.message.content[0].text:_sr.message.content):(_sr&&_sr.content?_sr.content:null));
+        if (_st) { result = {text:_st, source:"Puter / "+PUTER_AI_MODELS[_si]}; break; }
+      }
     } catch(e) {}
   }
 
@@ -5908,24 +5865,19 @@ async function _analyzeMedicineWithAI(imgDataUrl, textInput) {
     (textInput ? "الدواء: " + textInput : "انظر للصورة واستخرج اسم الدواء والمعلومات منه");
 
   var result = null;
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      var content = imgDataUrl
-        ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
-        : prompt;
-      var res = await puter.ai.chat(
-        imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? PUTER_AI_MODELS[0] : PUTER_AI_MODELS[0], temperature:0.3}
-      );
-      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (t) result = {text:t, source:"AI Pharma"};
-    }
-  } catch(e) {}
-
-  if (!result && window.ORKEYFB) {
+  for (var _mi2 = 0; _mi2 < PUTER_AI_MODELS.length; _mi2++) {
     try {
-      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext ? buildUserContext() : "", prompt);
-      if (oRes) result = {text:oRes.text, source:"AI Pharma"};
+      if (typeof puter !== "undefined" && puter.ai) {
+        var content = imgDataUrl
+          ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
+          : prompt;
+        var _mr = await puter.ai.chat(
+          imgDataUrl ? [{role:"user",content:content}] : prompt,
+          {model: PUTER_AI_MODELS[_mi2], temperature:0.3}
+        );
+        var _mt = typeof _mr==="string"?_mr:(_mr&&_mr.message&&_mr.message.content?(Array.isArray(_mr.message.content)?_mr.message.content[0].text:_mr.message.content):(_mr&&_mr.content?_mr.content:null));
+        if (_mt) { result = {text:_mt, source:"Puter / "+PUTER_AI_MODELS[_mi2]}; break; }
+      }
     } catch(e) {}
   }
   if (!result) result = {text:"تعذر تحليل الدواء. أدخل اسم الدواء يدوياً أو حاول مرة أخرى.", source:"محلي"};
@@ -6123,24 +6075,19 @@ async function _analyzeReportWithAI(imgDataUrl, textInput) {
     (textInput ? "نتائج التقرير:\n" + textInput : "انظر للصورة واقرأ التقرير الطبي المكتوب فيها بدقة");
 
   var result = null;
-  try {
-    if (typeof puter !== "undefined" && puter.ai) {
-      var content = imgDataUrl
-        ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
-        : prompt;
-      var res = await puter.ai.chat(
-        imgDataUrl ? [{role:"user",content:content}] : prompt,
-        {model: imgDataUrl ? PUTER_AI_MODELS[0] : PUTER_AI_MODELS[0], temperature:0.3}
-      );
-      var t = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
-      if (t) result = {text:t, source:"AI Doctor"};
-    }
-  } catch(e) {}
-
-  if (!result && window.ORKEYFB) {
+  for (var _ri = 0; _ri < PUTER_AI_MODELS.length; _ri++) {
     try {
-      var oRes = await tryOpenRouter("deepseek/deepseek-chat", buildUserContext ? buildUserContext() : "", prompt);
-      if (oRes) result = {text:oRes.text, source:"AI Doctor"};
+      if (typeof puter !== "undefined" && puter.ai) {
+        var content = imgDataUrl
+          ? [{type:"text",text:prompt},{type:"image_url",image_url:{url:imgDataUrl}}]
+          : prompt;
+        var _rr = await puter.ai.chat(
+          imgDataUrl ? [{role:"user",content:content}] : prompt,
+          {model: PUTER_AI_MODELS[_ri], temperature:0.3}
+        );
+        var _rt = typeof _rr==="string"?_rr:(_rr&&_rr.message&&_rr.message.content?(Array.isArray(_rr.message.content)?_rr.message.content[0].text:_rr.message.content):(_rr&&_rr.content?_rr.content:null));
+        if (_rt) { result = {text:_rt, source:"Puter / "+PUTER_AI_MODELS[_ri]}; break; }
+      }
     } catch(e) {}
   }
   if (!result) result = {text:"تعذر تحليل التقرير. أدخل النتائج يدوياً أو حاول مرة أخرى.", source:"محلي"};
@@ -6638,28 +6585,20 @@ async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
 
   var result = null;
 
-  // 1. Puter.js (vision للصورة)
-  try {
-    if (typeof puter !== 'undefined' && puter.ai) {
-      var content = imgDataUrl
-        ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imgDataUrl } }]
-        : prompt;
-      var res = await puter.ai.chat(
-        imgDataUrl ? [{ role: 'user', content: content }] : prompt,
-        { model: imgDataUrl ? PUTER_AI_MODELS[1] : PUTER_AI_MODELS[1], temperature: 0.2 }
-      );
-      var t = typeof res === 'string' ? res
-        : res && res.message && res.message.content ? res.message.content
-        : res && res.content ? res.content : null;
-      if (t) result = t;
-    }
-  } catch(e) {}
-
-  // 2. OpenRouter fallback
-  if (!result && window.ORKEYFB) {
+  // Puter.js مع fallback على النماذج
+  for (var _pxi = 0; _pxi < PUTER_AI_MODELS.length; _pxi++) {
     try {
-      var oRes = await tryOpenRouter('deepseek/deepseek-chat', '', prompt);
-      if (oRes) result = oRes.text;
+      if (typeof puter !== 'undefined' && puter.ai) {
+        var content = imgDataUrl
+          ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imgDataUrl } }]
+          : prompt;
+        var _pxr = await puter.ai.chat(
+          imgDataUrl ? [{ role: 'user', content: content }] : prompt,
+          { model: PUTER_AI_MODELS[_pxi], temperature: 0.2 }
+        );
+        var _pxt = typeof _pxr==='string'?_pxr:(_pxr&&_pxr.message&&_pxr.message.content?(Array.isArray(_pxr.message.content)?_pxr.message.content[0].text:_pxr.message.content):(_pxr&&_pxr.content?_pxr.content:null));
+        if (_pxt) { result = _pxt; break; }
+      }
     } catch(e) {}
   }
 
@@ -6870,10 +6809,11 @@ async function _rxLookupAndShow(name, db, container) {
           'دواعي_الاستخدام: (متى يوصف هذا الدواء — جملة أو جملتان)\n' +
           'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
         var res2 = null;
-        if (typeof puter !== 'undefined' && puter.ai) {
-          try { var pr2=await puter.ai.chat(aiPrompt2,{model:PUTER_AI_MODELS[1],temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?pr2.message.content:(pr2&&pr2.content?pr2.content:null)); } catch(e) {}
+        for (var _dfi = 0; _dfi < PUTER_AI_MODELS.length; _dfi++) {
+          if (typeof puter !== 'undefined' && puter.ai) {
+            try { var pr2=await puter.ai.chat(aiPrompt2,{model:PUTER_AI_MODELS[_dfi],temperature:0.2}); res2=typeof pr2==='string'?pr2:(pr2&&pr2.message&&pr2.message.content?(Array.isArray(pr2.message.content)?pr2.message.content[0].text:pr2.message.content):(pr2&&pr2.content?pr2.content:null)); if(res2) break; } catch(e) {}
+          }
         }
-        if (!res2 && window.__OR_KEY_FB) { try { var orR2=await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt2); if(orR2) res2=orR2.text; } catch(e) {} }
         if (!res2) throw new Error('no result');
         var uM=res2.match(/الاستخدامات\s*:\s*([^\n]+)/i);
         var iM=res2.match(/دواعي_?الاستخدام\s*:\s*([^\n]+)/i);
@@ -6938,14 +6878,14 @@ async function _rxLookupAndShow(name, db, container) {
         'الآثار_الجانبية: (أبرز 3-4 آثار جانبية مفصولة بفاصلة)';
 
       var res = null;
-      if (typeof puter !== 'undefined' && puter.ai) {
-        try {
-          var pr = await puter.ai.chat(aiPrompt, {model:PUTER_AI_MODELS[1], temperature:0.2});
-          res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?pr.message.content:(pr&&pr.content?pr.content:null));
-        } catch(e) {}
-      }
-      if (!res && window.__OR_KEY_FB) {
-        try { var orR = await tryOpenRouter('deepseek/deepseek-chat','',aiPrompt); if(orR) res=orR.text; } catch(e) {}
+      for (var _dfi2 = 0; _dfi2 < PUTER_AI_MODELS.length; _dfi2++) {
+        if (typeof puter !== 'undefined' && puter.ai) {
+          try {
+            var pr = await puter.ai.chat(aiPrompt, {model:PUTER_AI_MODELS[_dfi2], temperature:0.2});
+            res = typeof pr==='string'?pr:(pr&&pr.message&&pr.message.content?(Array.isArray(pr.message.content)?pr.message.content[0].text:pr.message.content):(pr&&pr.content?pr.content:null));
+            if (res) break;
+          } catch(e) {}
+        }
       }
       if (!res) throw new Error('no result');
 
@@ -8121,26 +8061,24 @@ async function sendAiMessage() {
   if (window.__firebaseReady && currentUser) {
     try { window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'questions/' + qKey), { userId: currentUser.username, question: txt, ts: parseInt(qKey), type: 'ai', answer: '' }).catch(function(){}); } catch(e) {}
   }
-  var sysPrompt = buildUserContext(), reply = null, usedModel = null, usedSource = null;
-  var orKey = window.__OR_KEY_FB;
-  if (orKey) {
-    updateThinkText('🌐 OpenRouter — جاري البحث...');
-    for (var j = 0; j < OR_MODELS.length; j++) {
-      var oidx = (currentORIdx + j) % OR_MODELS.length, om = OR_MODELS[oidx];
-      try { var oRes = await tryOpenRouter(om.id, sysPrompt, txt); if (oRes) { reply = oRes.text; usedModel = om; usedSource = 'openrouter'; currentORIdx = (oidx + 1) % OR_MODELS.length; break; } } catch(e) { continue; }
-    }
-  }
-  if (!reply) {
-    updateThinkText('🌸 Pollinations — جاري التجربة...');
-    var polModels = (window.__aiModels && window.__aiModels.length) ? window.__aiModels : AI_MODELS;
-    for (var i = 0; i < polModels.length; i++) {
-      var pidx = (currentModelIdx + i) % polModels.length, pm = polModels[pidx];
-      try { var pRes = await tryPollinations(pm.id, sysPrompt, txt); if (pRes) { reply = pRes.text; usedModel = pm; usedSource = 'pollinations'; currentModelIdx = (pidx + 1) % polModels.length; break; } } catch(e) { continue; }
-    }
+  var sysPrompt = buildUserContext(), reply = null, usedModelName = null;
+  updateThinkText('🤖 Puter AI — جاري التفكير...');
+  for (var _pi = 0; _pi < PUTER_AI_MODELS.length; _pi++) {
+    try {
+      var _pr = await puter.ai.chat(
+        [{role:'system',content:sysPrompt},{role:'user',content:txt}],
+        {model: PUTER_AI_MODELS[_pi], temperature: 0.7}
+      );
+      var _pt = typeof _pr === 'string' ? _pr
+        : (_pr && _pr.message && _pr.message.content
+            ? (Array.isArray(_pr.message.content) ? _pr.message.content[0].text : _pr.message.content)
+            : (_pr && _pr.content ? _pr.content : null));
+      if (_pt) { reply = _pt; usedModelName = PUTER_AI_MODELS[_pi]; break; }
+    } catch(e) {}
   }
   removeThink();
   var finalReply = reply || generateLocalResponse(txt);
-  var replySource = reply ? (usedSource === 'openrouter' ? usedModel.name + ' · OR' : usedModel.name) : 'رد محلي';
+  var replySource = reply ? ('Puter / ' + usedModelName) : 'رد محلي';
   // تحديث السجل في Firebase بإضافة الجواب
   if (window.__firebaseReady && currentUser) {
     try { window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'questions/' + qKey), { userId: currentUser.username, question: txt, ts: parseInt(qKey), type: 'ai', answer: finalReply.replace(/<[^>]*>/g, '').substring(0, 500), model: replySource }).catch(function(){}); } catch(e) {}
@@ -8612,15 +8550,7 @@ window.addEventListener('DOMContentLoaded', function() {
 (function () {
   "use strict";
 
-  var ZAI_ENDPOINT     = "https://api.z.ai/api/paas/v4/chat/completions";
-  var ZAI_MODEL        = "glm-4-flash";
-  var MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
-  var MISTRAL_MODEL    = "mistral-small-latest";
-  var PUTER_MODELS     = PUTER_AI_MODELS.slice(); // النماذج الثلاثة المعتمدة
-  var _history = [];
-
-  function _zaiKey()     { return window.__GEMINI_KEY  || null; }
-  function _mistralKey() { return window.__MISTRAL_KEY || null; }
+  // Puter only — no external API keys needed
 
   function _buildPrompt() {
     var u = window.currentUser || {};
@@ -8659,25 +8589,7 @@ window.addEventListener('DOMContentLoaded', function() {
     } catch(e) { return await _tryPuter(msg, idx+1); }
   }
 
-  async function _tryMistral(msg) {
-    var key = _mistralKey(); if (!key) throw new Error("NO_KEY");
-    var res = await fetch(MISTRAL_ENDPOINT, {method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:MISTRAL_MODEL,messages:_buildMessages(msg),temperature:0.7,max_tokens:1024})});
-    if (!res.ok) throw new Error("HTTP_"+res.status);
-    var data = await res.json();
-    var text = data&&data.choices&&data.choices[0]&&data.choices[0].message ? data.choices[0].message.content : null;
-    if (!text) throw new Error("EMPTY");
-    return {text:text, source:"Mistral / "+MISTRAL_MODEL};
-  }
-
-  async function _tryZai(msg) {
-    var key = _zaiKey(); if (!key) throw new Error("NO_KEY");
-    var res = await fetch(ZAI_ENDPOINT, {method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:ZAI_MODEL,messages:_buildMessages(msg),temperature:0.7,max_tokens:1024})});
-    if (!res.ok) throw new Error("HTTP_"+res.status);
-    var data = await res.json();
-    var text = data&&data.choices&&data.choices[0]&&data.choices[0].message ? data.choices[0].message.content : null;
-    if (!text) throw new Error("EMPTY");
-    return {text:text, source:"Z.ai / GLM-4-Flash"};
-  }
+  // Mistral and Z.ai removed — Puter only
 
   function _localFallback() {
     var name = (window.currentUser&&(window.currentUser.nameAr||window.currentUser.name))||"صديقي";
@@ -8691,8 +8603,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
   async function _smartSend(msg) {
     try { return await _tryPuter(msg, 0); } catch(e) {}
-    try { return await _tryMistral(msg); } catch(e) {}
-    try { return await _tryZai(msg);     } catch(e) {}
     await new Promise(function(r){ setTimeout(r, 1500); });
     try { return await _tryPuter(msg, 0); } catch(e) {}
     return _localFallback();
