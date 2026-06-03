@@ -150,6 +150,27 @@
     } catch(e) { return await _tryLLM7(messages, modelIdx + 1); }
   }
 
+  /* تقليص الصورة إذا كانت كبيرة (تجنب 400 Bad Request في LLM7) */
+  async function _resizeImage(imgDataUrl, maxSize) {
+    maxSize = maxSize || 640;
+    return new Promise(function(resolve) {
+      try {
+        var img = new Image();
+        img.onload = function() {
+          if (img.width <= maxSize && img.height <= maxSize) { resolve(imgDataUrl); return; }
+          var ratio = Math.min(maxSize/img.width, maxSize/img.height);
+          var c = document.createElement('canvas');
+          c.width  = Math.round(img.width  * ratio);
+          c.height = Math.round(img.height * ratio);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.78));
+        };
+        img.onerror = function() { resolve(imgDataUrl); };
+        img.src = imgDataUrl;
+      } catch(e) { resolve(imgDataUrl); }
+    });
+  }
+
   /* Vision عبر LLM7 */
   async function _tryLLM7Vision(imgDataUrl, prompt, modelIdx) {
     modelIdx = modelIdx || 0;
@@ -314,12 +335,15 @@
   }
 
   async function _universalVision(imgDataUrl, prompt) {
+    // تقليص الصورة مرة واحدة لكل الموفرين
+    var smallImg = imgDataUrl;
+    try { smallImg = await _resizeImage(imgDataUrl, 640); } catch(e) {}
     // Cloudflare Worker أولاً (الأكثر موثوقية)
-    try { var r = await _tryCloudflareVision(imgDataUrl, prompt); if (r) return r; } catch(e) {}
+    try { var r = await _tryCloudflareVision(smallImg, prompt); if (r) return r; } catch(e) {}
     // LLM7 Vision ثانياً (يدعم GPT-4o وClaude وGemini)
-    try { var r = await _tryLLM7Vision(imgDataUrl, prompt, 0); if (r) return r; } catch(e) {}
+    try { var r = await _tryLLM7Vision(smallImg, prompt, 0); if (r) return r; } catch(e) {}
     // Pollinations Vision ثالثاً
-    try { var r = await _tryPollinationsVision(imgDataUrl, prompt, 0); if (r) return r; } catch(e) {}
+    try { var r = await _tryPollinationsVision(smallImg, prompt, 0); if (r) return r; } catch(e) {}
     return null;
   }
 
