@@ -5545,6 +5545,54 @@ function startPremiumCameraScanner(onReady) {
 }
 
 
+
+/* ======= PUTER VISION MODELS & FALLBACK - Global Scope ======= */
+var PUTER_VISION_MODELS = ["gpt-5.4","gpt-4o","gpt-5.4-nano","gpt-4o-mini","claude-sonnet-4-20250514","claude-3-5-haiku"];
+
+async function _tryPuterVision(imgDataUrl, promptText, modelIndex) {
+  modelIndex = modelIndex || 0;
+  if (modelIndex >= PUTER_VISION_MODELS.length) return null;
+  var model = PUTER_VISION_MODELS[modelIndex];
+  try {
+    // timeout 12 ثانية لكل موديل لمنع التجمد
+    var timeoutPromise = new Promise(function(_, reject) {
+      setTimeout(function() { reject(new Error('TIMEOUT')); }, 12000);
+    });
+    var chatPromise = puter.ai.chat([{
+      role: "user",
+      content: [
+        { type: "text", text: promptText },
+        { type: "image_url", image_url: { url: imgDataUrl } }
+      ]
+    }], { model: model, temperature: 0.3 });
+    var res = await Promise.race([chatPromise, timeoutPromise]);
+    var text = typeof res === "string" ? res
+      : res && res.message && res.message.content ? res.message.content
+      : res && res.content ? res.content : null;
+    if (text && text.trim().length > 5) return { text: text, source: "Puter/" + model };
+    return await _tryPuterVision(imgDataUrl, promptText, modelIndex + 1);
+  } catch(e) {
+    return await _tryPuterVision(imgDataUrl, promptText, modelIndex + 1);
+  }
+}
+
+async function _smartVisionAnalysis(imgDataUrl, promptText) {
+  if (typeof puter !== "undefined" && puter.ai) {
+    try {
+      var res = await _tryPuterVision(imgDataUrl, promptText, 0);
+      if (res) return res;
+    } catch(e) {}
+  }
+  if (window.__ORKEY_FB) {
+    try {
+      var orRes = await tryOpenRouter("anthropic/claude-3-haiku", "", promptText);
+      if (orRes) return { text: orRes.text, source: "OpenRouter/Claude" };
+    } catch(e) {}
+  }
+  return { text: "تعذر تحليل الصورة تلقائياً. الرجاء إدخال اسم الطعام أو المكونات يدوياً.", source: "fallback" };
+}
+/* ======= END PUTER VISION FALLBACK ======= */
+
 async function captureAndScanProductBlob() {
   var video  = document.getElementById("pa-video-stream");
   var resBox = document.getElementById("pa-scan-result");
@@ -8582,58 +8630,37 @@ window.addEventListener('DOMContentLoaded', function() {
   autoLogin().then(function() { clearTimeout(safetyTimeout); });
 });
 </script>
-  <script src="https://js.puter.com/v2/"></script>
+  <script src="https://js.puter.com/v2/" async></script>
 <script>
 // ======= منع رسائل Puter الداخلية (Low Balance / Upgrade) نهائياً =======
 (function suppressPuterAlerts() {
+  // تجاوز window.alert
   var _origAlert = window.alert;
   window.alert = function(msg) {
     if (msg && typeof msg === 'string' &&
-      (msg.toLowerCase().includes('balance') ||
-       msg.toLowerCase().includes('upgrade') ||
-       msg.toLowerCase().includes('insufficient') ||
-       msg.toLowerCase().includes('billing') ||
-       msg.toLowerCase().includes('quota') ||
-       msg.toLowerCase().includes('fund') ||
-       msg.toLowerCase().includes('low balance'))) {
-      console.warn('[Puter suppressed alert]', msg);
+      /(balance|upgrade|insufficient|billing|quota|fund)/i.test(msg)) {
       return;
     }
     return _origAlert.apply(this, arguments);
   };
 
-  function removePuterModals() {
-    try {
-      document.querySelectorAll('div,section,aside').forEach(function(el) {
-        if (!el || !el.innerText) return;
-        var txt = el.innerText || '';
-        if ((txt.includes('Low Balance') || txt.includes('not enough funding') || txt.includes('Upgrade Now')) && txt.length < 600) {
-          var modal = el.closest('[style*="position:fixed"],[style*="position: fixed"]') || el;
-          if (modal && modal !== document.body && modal !== document.documentElement) {
-            modal.style.setProperty('display','none','important');
-            modal.style.setProperty('visibility','hidden','important');
-            modal.style.setProperty('opacity','0','important');
-            try { modal.remove(); } catch(e2) {}
-          }
+  // إخفاء سريع للعناصر الجديدة فقط بدون فحص innerText
+  var _puterObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (!node || node.nodeType !== 1) return;
+        // فحص textContent فقط للعقد الجديدة المضافة (أخف بكثير من innerText)
+        var txt = node.textContent || '';
+        if (txt.includes('Low Balance') || txt.includes('not enough funding') || txt.includes('Upgrade Now')) {
+          node.style.cssText += ';display:none!important;visibility:hidden!important;';
+          setTimeout(function(){ try{ node.remove(); }catch(e){} }, 0);
         }
       });
-    } catch(e) {}
-  }
-
-  var _puterObserver = new MutationObserver(function(mutations) {
-    var hasNew = false;
-    mutations.forEach(function(m) { if (m.addedNodes.length > 0) hasNew = true; });
-    if (hasNew) {
-      setTimeout(removePuterModals, 30);
-      setTimeout(removePuterModals, 150);
-      setTimeout(removePuterModals, 400);
-    }
+    });
   });
 
   function startObserver() {
-    if (document.body) {
-      _puterObserver.observe(document.body, { childList: true, subtree: true });
-    }
+    _puterObserver.observe(document.body, { childList: true, subtree: false });
   }
 
   if (document.readyState === 'loading') {
@@ -8685,48 +8712,15 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   
-  // ======= VISION FALLBACK: تنقل تلقائي بين موديلات الرؤية =======
-  async function _tryPuterVision(imgDataUrl, promptText, idx) {
-    idx = idx || 0;
-    if (idx >= PUTER_VISION_MODELS.length) return null;
-    var model = PUTER_VISION_MODELS[idx];
-    try {
-      var res = await puter.ai.chat([{
-        role: "user",
-        content: [
-          { type: "text", text: promptText },
-          { type: "image_url", image_url: { url: imgDataUrl } }
-        ]
-      }], { model: model, temperature: 0.3 });
-      var text = typeof res === "string" ? res
-        : res && res.message && res.message.content ? res.message.content
-        : res && res.content ? res.content : null;
-      if (text && text.trim().length > 5) return { text: text, source: "Puter/" + model };
-      return await _tryPuterVision(imgDataUrl, promptText, idx + 1);
-    } catch(e) {
-      return await _tryPuterVision(imgDataUrl, promptText, idx + 1);
-    }
-  }
-
-  async function _smartVisionAnalysis(imgDataUrl, promptText) {
-    if (typeof puter !== "undefined" && puter.ai) {
-      var res = await _tryPuterVision(imgDataUrl, promptText, 0);
-      if (res) return res;
-    }
-    if (window.__ORKEY_FB) {
-      try {
-        var orRes = await tryOpenRouter("anthropic/claude-3-haiku", "", promptText);
-        if (orRes) return { text: orRes.text, source: "OpenRouter/Claude" };
-      } catch(e) {}
-    }
-    return { text: "تعذر تحليل الصورة تلقائياً. الرجاء إدخال اسم الطعام أو المكونات يدوياً.", source: "fallback" };
-  }
-
   async function _tryPuter(msg, idx) {
     idx = idx || 0;
     if (idx >= PUTER_MODELS.length) throw new Error("ALL_PUTER_FAILED");
     try {
-      var res = await puter.ai.chat(_buildMessages(msg), {model:PUTER_MODELS[idx], temperature:0.7});
+      var timeoutP = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("TIMEOUT")); }, 10000); });
+      var res = await Promise.race([
+        puter.ai.chat(_buildMessages(msg), {model:PUTER_MODELS[idx], temperature:0.7}),
+        timeoutP
+      ]);
       var text = typeof res==="string" ? res : res&&res.message&&res.message.content ? res.message.content : res&&res.content ? res.content : null;
       if (!text) throw new Error("EMPTY");
       return {text:text, source:"Puter / "+PUTER_MODELS[idx]};
@@ -10228,27 +10222,7 @@ async function _autoScanMedicine() {
 }
 /* ============================================ */
 </script>
-
 <script>
-/* === حماية الكود — ملكية خاصة بالمهندس محمد حماد === */
-(function(){
-  document.addEventListener('contextmenu',function(e){e.preventDefault();});
-  document.addEventListener('keydown',function(e){
-    if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','i','J','j','C','c'].indexOf(e.key)>-1)||(e.ctrlKey&&['U','u','S','s'].indexOf(e.key)>-1)){
-      e.preventDefault();return false;
-    }
-  });
-  window._msgProtect = function msg(){
-    try{console.clear();}catch(x){}
-    try{
-      console.log('%cتوقف!','color:#ef5350;font-size:52px;font-weight:900;font-family:Tajawal,Arial');
-      console.log('%c❤️ هذا الكود ملكية خاصة بالمهندس محمد حماد','color:#ffa726;font-size:20px;font-weight:bold;font-family:Tajawal,Arial');
-      console.log('%cيرجى التواصل معه عبر الواتساب:','color:#fff;font-size:14px;font-family:Tajawal,Arial');
-      console.log('%cwa.me/201279934735','color:#26c6da;font-size:20px;font-weight:900');
-    }catch(x){}
-  }
-})();
-
 /* ════════════════════════════════════════════════════════════
    🆕 نظام التجارب المجانية — 3 استخدامات لكل أداة
 ════════════════════════════════════════════════════════════ */
@@ -12857,19 +12831,7 @@ setTimeout(checkAdminTrialReset, 3000);
   } catch(e) {}
 })();
 
-(function(){
-  ['log','warn','error','info','debug','table','dir','trace'].forEach(function(k){
-    try{console[k]=function(){if(window._msgProtect)window._msgProtect();};}catch(x){}
-  });
-  setInterval(function(){
-    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160){if(window._msgProtect)window._msgProtect();}
-  },800);
-  setInterval(function(){
-    var t=performance.now();
-    (function(){debugger;})();
-    if(performance.now()-t>100){if(window._msgProtect)window._msgProtect();}
-  },3000);
-})();
+/* anti-debug removed */
 /* ============================================================ */
 </script>
 </body>
