@@ -39,6 +39,15 @@ self.addEventListener('activate', event => {
 /* ── قواعد الجلب ── */
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
+  /* لا تخزن طلبات POST أبداً */
+  if (event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request).catch(() =>
+      new Response('{"error":"offline"}', { status: 503, headers: { 'Content-Type': 'application/json' } })
+    ));
+    return;
+  }
+
   /* 1. طلبات Firebase — دائماً من الشبكة */
   if (url.hostname.includes('firebase') ||
       url.hostname.includes('firebaseio') ||
@@ -50,6 +59,9 @@ self.addEventListener('fetch', event => {
   if (url.hostname.includes('pollinations') ||
       url.hostname.includes('openrouter') ||
       url.hostname.includes('openai') ||
+      url.hostname.includes('llm7') ||
+      url.hostname.includes('workers.dev') ||
+      url.hostname.includes('ovh') ||
       url.pathname.includes('/api/')) {
     event.respondWith(fetch(event.request).catch(() => new Response('{"error":"offline"}', {
       status: 503,
@@ -64,8 +76,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          if (response && response.status === 200 && event.request.method === 'GET') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(event.request))
@@ -77,7 +91,7 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(cached => {
       const networkFetch = fetch(event.request)
         .then(response => {
-          if (response && response.status === 200 && response.type !== 'opaque') {
+          if (response && response.status === 200 && response.type !== 'opaque' && event.request.method === 'GET') {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           }
