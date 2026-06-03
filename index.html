@@ -302,7 +302,7 @@
 
 <!-- ═══════════════════════════════════════════════════
      📡 OpenRouter AI — بديل Puter.js
-     يجلب API Key من Firebase: config/openrouter_key
+     يجلب API Key من Firebase: config/ai/openrouter_key
 ════════════════════════════════════════════════════ -->
 <script>
 (function () {
@@ -339,11 +339,11 @@
       if (!window.__firebaseReady || !window.__firebaseGet || !window.__firebaseRef || !window.__firebaseDB) {
         setTimeout(_tryFetch, 500); return;
       }
-      window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'config/openrouter_key'))
+      window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'config/ai/openrouter_key'))
         .then(function(snap) {
           var key = snap && snap.exists() ? snap.val() : null;
           if (key) { console.log('[OpenRouter] ✅ API Key loaded'); _done(key); }
-          else     { console.warn('[OpenRouter] ⚠️ Key not found at config/openrouter_key'); _done(null); }
+          else     { console.warn('[OpenRouter] ⚠️ Key not found at config/ai/openrouter_key'); _done(null); }
         }).catch(function(e){ console.error('[OpenRouter] Firebase error:', e); _done(null); });
     }
     _tryFetch();
