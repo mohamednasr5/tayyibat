@@ -4478,7 +4478,12 @@ async function dbGetUser(u) {
 
 async function dbSaveUser(u, d) {
   if (window.__firebaseReady) {
-    try { await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + u), d); } catch(e) {}
+    try {
+      // استخدم Firebase UID الحقيقي إذا كان المستخدم مصادقاً
+      var fbAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
+      var fbKey = fbAuth ? window.__firebaseAuth.currentUser.uid : u;
+      await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + fbKey), d);
+    } catch(e) {}
   }
   var local = JSON.parse(localStorage.getItem('tayyibat_users') || '{}');
   local[u] = d; localStorage.setItem('tayyibat_users', JSON.stringify(local));
@@ -5903,7 +5908,18 @@ async function captureAndScanProductBlob() {
       + "4. اقترح بديلا ان وجد.\n"
       + "اذا لم تتضح الصورة اطلب ادخال المكونات يدويا. الرد مختصر 120 كلمة بدون **";
   }
-  var imgData = canvas.toDataURL("image/jpeg", 0.85);
+  // تقليص الصورة لأقصى 640px للتوافق مع LLM7 (يرفض الصور الكبيرة جداً)
+  var imgData;
+  if (canvas.width > 640 || canvas.height > 640) {
+    var resC = document.createElement('canvas');
+    var ratio = Math.min(640/canvas.width, 640/canvas.height);
+    resC.width = Math.round(canvas.width * ratio);
+    resC.height = Math.round(canvas.height * ratio);
+    resC.getContext('2d').drawImage(canvas, 0, 0, resC.width, resC.height);
+    imgData = resC.toDataURL("image/jpeg", 0.80);
+  } else {
+    imgData = canvas.toDataURL("image/jpeg", 0.80);
+  }
   var vResult = await _smartVisionAnalysis(imgData, vPrompt);
   if (vResult && vResult.source !== "fallback") {
     _renderScanResult(vResult.text, vResult.source);
@@ -8943,29 +8959,16 @@ window.puter = {
     var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
     var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "غير محدد";
     var gender = u.gender==="male" ? "ذكر" : "انثى";
-    return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.
-"
-      + "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.
-
-"
-      + "بيانات المستخدم:
-"
-      + "- الاسم: "+(u.nameAr||u.name||"مستخدم")+"
-"
-      + "- العمر: "+age+" سنة | الجنس: "+gender+"
-"
-      + "- BMI: "+(u.bmi||"؟")+" | الوزن: "+(u.weight||"؟")+"كجم | الطول: "+(u.height||"؟")+"سم
-"
-      + "- الحالات الصحية: "+diseases+"
-
-"
-      + "نظام الطيبات:
-"
-      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.
-"
-      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.
-
-"
+    return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n"
+      + "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n"
+      + "بيانات المستخدم:\n"
+      + "- الاسم: "+(u.nameAr||u.name||"مستخدم")+"\n"
+      + "- العمر: "+age+" سنة | الجنس: "+gender+"\n"
+      + "- BMI: "+(u.bmi||"؟")+" | الوزن: "+(u.weight||"؟")+"كجم | الطول: "+(u.height||"؟")+"سم\n"
+      + "- الحالات الصحية: "+diseases+"\n\n"
+      + "نظام الطيبات:\n"
+      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.\n"
+      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.\n\n"
       + "القواعد: راع الحالة الصحية دائما، ذكر باستشارة الطبيب، لا تتجاوز 400 كلمة الا اذا طلب.";
   }
 
@@ -9657,9 +9660,14 @@ window.puter = {
 
   function _fetchNetDate(cb) {
     if (_netDateFetched && _netDate) { cb(_netDate); return; }
-    fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo')
-      .then(function(r){ return r.json(); })
+    // إضافة timeout 5 ثوانٍ لتجنب الانتظار الطويل
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var tid = controller ? setTimeout(function(){ controller.abort(); }, 5000) : null;
+    var opts = controller ? { signal: controller.signal } : {};
+    fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo', opts)
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
       .then(function(d){
+        clearTimeout(tid);
         _netDate = new Date(d.utc_datetime);
         _netDateFetched = true;
         var el = document.getElementById('drp-sync-status');
@@ -9667,7 +9675,8 @@ window.puter = {
         cb(_netDate);
       })
       .catch(function(){
-        /* Fallback: try another time API */
+        clearTimeout(tid);
+        /* Fallback: try timeapi.io */
         fetch('https://timeapi.io/api/Time/current/zone?timeZone=Africa%2FCairo')
           .then(function(r){ return r.json(); })
           .then(function(d){
@@ -9678,7 +9687,8 @@ window.puter = {
             cb(_netDate);
           })
           .catch(function(){
-            _netDate = new Date(); /* last resort: device time */
+            /* آخر ملجأ: وقت الجهاز */
+            _netDate = new Date();
             _netDateFetched = true;
             var el = document.getElementById('drp-sync-status');
             if (el) el.textContent = '⚠️ تعذر المزامنة - يستخدم وقت الجهاز';
@@ -10412,10 +10422,11 @@ function incToolUsage(toolKey) {
   var newVal = getToolUsage(toolKey) + 1;
   try { localStorage.setItem('tayyibat_trial_' + toolKey, newVal); } catch(e) {}
   updateTrialBadges();
-  // ── Sync to Firebase for admin dashboard ──
+  // ── Sync to Firebase — فقط للمستخدمين المصادقين (email/Google) ──
   try {
-    if (window.__firebaseReady && window.currentUser && window.__firebaseSet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = window.currentUser.username;
+    var hasFirebaseAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
+    if (hasFirebaseAuth && window.__firebaseReady && window.currentUser && window.__firebaseSet && window.__firebaseRef && window.__firebaseDB) {
+      var uid = window.__firebaseAuth.currentUser.uid;
       window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/' + toolKey), newVal).catch(function(){});
     }
   } catch(e) {}
