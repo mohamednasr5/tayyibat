@@ -2382,6 +2382,9 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
   <div style="padding:12px 16px">
     <div class="camera-view-wrap" id="fs-camera-viewport" onclick="fsCameraCapture()" style="cursor:pointer">
       <video id="fs-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
+      <div id="fs-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
+        <span id="fs-live-status-text" style="background:rgba(0,0,0,.7);color:#2ec951;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px;backdrop-filter:blur(8px)">🔍 جاري التحليل...</span>
+      </div>
       <div id="fs-fallback" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
         <i class="fas fa-utensils" style="font-size:2.5rem;display:block;margin-bottom:8px;opacity:.4"></i>
         اضغط لفتح الكاميرا وتصوير طعامك
@@ -2605,6 +2608,9 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
     <div id="fi-camera-area" style="display:none;margin-bottom:12px;position:relative">
       <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(255,152,0,.4)">
         <video id="fi-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
+        <div id="fi-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
+          <span style="background:rgba(0,0,0,.7);color:#4fc3f7;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">🔍 تحليل مباشر نشط...</span>
+        </div>
         <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #ff9800;border-right:2px solid #ff9800;border-radius:0 4px 0 0"></div>
         <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #ff9800;border-left:2px solid #ff9800;border-radius:4px 0 0 0"></div>
         <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #ff9800;border-right:2px solid #ff9800;border-radius:0 0 4px 0"></div>
@@ -2659,6 +2665,9 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
     <div id="hw-camera-area" style="display:none;margin-bottom:12px;position:relative">
       <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(33,150,243,.4)">
         <video id="hw-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
+        <div id="hw-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
+          <span style="background:rgba(0,0,0,.7);color:#ffb74d;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">⏳ وجّه الكاميرا نحو السؤال...</span>
+        </div>
         <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 4px 0 0"></div>
         <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:4px 0 0 0"></div>
         <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 0 4px 0"></div>
@@ -2721,6 +2730,9 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
     <div id="palm-camera-area" style="display:none;margin-bottom:12px;position:relative">
       <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(255,87,34,.4)">
         <video id="palm-video" autoplay playsinline style="width:100%;max-height:300px;object-fit:cover;display:block"></video>
+        <div id="palm-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center;z-index:3">
+          <span style="background:rgba(0,0,0,.75);color:#ce93d8;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px">🔮 ضع كفك أمام الكاميرا...</span>
+        </div>
         <!-- إطار توجيهي لوضع الكف -->
         <div style="position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center">
           <div style="width:65%;height:80%;border:2px dashed rgba(255,138,101,.7);border-radius:16px;display:flex;align-items:center;justify-content:center">
@@ -3056,6 +3068,12 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
           <button onclick="ptSaveCycle()" id="pt-save-btn" style="width:100%;padding:13px;border:none;border-radius:14px;background:linear-gradient(135deg,#e91e63,#f06292);color:#fff;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(233,30,99,.35);display:flex;align-items:center;justify-content:center;gap:8px">
             <span>💾</span> حفظ هذه الدورة
           </button>
+
+          <!-- زر تحليل AI للدورة -->
+          <button onclick="ptAiAnalyze()" id="pt-ai-btn" style="width:100%;padding:13px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,.35);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px">
+            <i class="fas fa-robot"></i> 🌸 تحليل ذكي بالـ AI
+          </button>
+          <div id="pt-ai-result" style="display:none;margin-top:12px;background:linear-gradient(145deg,rgba(124,58,237,.08),rgba(168,85,247,.05));border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:14px;font-size:.84rem;line-height:1.8;color:var(--txt)"></div>
           <div id="pt-save-msg" style="display:none;margin-top:10px;text-align:center;font-size:.8rem;font-weight:700;border-radius:10px;padding:9px"></div>
         </div>
       </div>
@@ -3214,53 +3232,81 @@ async function obgynSend() {
   var btn = document.getElementById('obgyn-send-btn');
   if (!inp || !inp.value.trim()) return;
 
-  if (!obgynCanUse()) {
-    showTrialExpiredModal('obgyn-ai');
-    return;
-  }
+  if (!obgynCanUse()) { showTrialExpiredModal('obgyn-ai'); return; }
 
   var q = inp.value.trim();
-  inp.value = '';
-  inp.style.height = 'auto';
-
+  inp.value = ''; inp.style.height = 'auto';
   obgynAppendMsg('user', q);
   _obgynMsgs.push({ role: 'user', content: q });
 
-  var thinkDiv = obgynAppendMsg('assistant', '<div style="display:flex;align-items:center;gap:8px;color:var(--txt2);font-size:.8rem"><div style="display:flex;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:#f06292;animation:dotPulse .8s ease-in-out infinite;display:inline-block"></span><span style="width:7px;height:7px;border-radius:50%;background:#f06292;animation:dotPulse .8s ease-in-out .15s infinite;display:inline-block"></span><span style="width:7px;height:7px;border-radius:50%;background:#f06292;animation:dotPulse .8s ease-in-out .3s infinite;display:inline-block"></span></div> د. طيبات تفكر...</div>');
+  var thinkDiv = obgynAppendMsg('assistant',
+    '<div style="display:flex;align-items:center;gap:8px;color:var(--txt2);font-size:.8rem">' +
+    '<div style="display:flex;gap:4px">' +
+    '<span style="width:7px;height:7px;border-radius:50%;background:#f06292;animation:dotPulse .8s ease-in-out infinite;display:inline-block"></span>' +
+    '<span style="width:7px;height:7px;border-radius:50%;background:#f06292;animation:dotPulse .8s ease-in-out .15s infinite;display:inline-block"></span>' +
+    '<span style="width:7px;height:7px;border-radius:50%;background:#f06292;animation:dotPulse .8s ease-in-out .3s infinite;display:inline-block"></span>' +
+    '</div> د. طيبات تفكر...</div>');
+
   if (btn) { btn.disabled = true; btn.textContent = '⏳ جارٍ...'; }
 
-  var OBGYN_SYSTEM = 'أنتِ د. طيبات، طبيبة متخصصة في أمراض النساء والتوليد وصحة المرأة. تتحدثين بالعربية فقط بأسلوب دافئ وطبي احترافي. تجيبين على أسئلة المرأة بشكل علمي دقيق وبتعاطف كامل.\n\nتخصصاتكِ:\n- الدورة الشهرية: الانتظام، التأخر، الألم (عسر الطمث)، غزارة النزيف\n- الإفرازات المهبلية: الألوان (أبيض، أصفر، أخضر، بني، وردي)، الرائحة، القوام، الأسباب\n- الحمل: أعراضه المبكرة، المتابعة، الغثيان، الألم، المشاكل\n- أمراض النساء: تكيس المبايض (PCOS)، بطانة الرحم المهاجرة (Endometriosis)، الأورام الليفية، التهابات المهبل والرحم\n- وسائل منع الحمل والهرمونات\n- سن اليأس والهبات الساخنة\n- الخصوبة والحمل\n\nقواعد مهمة:\n- دائماً أجيبي بدفء وتعاطف\n- اذكري متى يجب مراجعة طبيبة فعلية\n- لا تتجاهلي أي عرض قد يكون خطيراً\n- اشرحي بأسلوب مبسط مع المصطلح الطبي\n- أجيبي بتفصيل كافٍ ولكن مركز\n- ابدئي دائماً بـ "حبيبتي" أو "يا عزيزتي" للحفاظ على الدفء';
+  var OBGYN_SYSTEM = 'أنتِ د. طيبات، طبيبة متخصصة في أمراض النساء والتوليد وصحة المرأة. تتحدثين بالعربية فقط بأسلوب دافئ وطبي احترافي. تخصصاتكِ: الدورة الشهرية، الإفرازات، الحمل، تكيس المبايض، الخصوبة، سن اليأس. ابدئي دائماً بـ "حبيبتي" وأجيبي بتعاطف.';
 
+  // بناء رسائل السياق
+  var ctxMsgs = [{ role: 'user', content: OBGYN_SYSTEM + '\n\n' + q }];
+  if (_obgynMsgs.length > 2) {
+    ctxMsgs = _obgynMsgs.slice(-6).map(function(m){ return {role:m.role, content:m.content}; });
+    ctxMsgs[0].content = OBGYN_SYSTEM + '\n\n' + ctxMsgs[0].content;
+  }
+
+  var txt = null;
+
+  // 1. Pollinations (مجاني - بدون key)
   try {
-    var messages = [{ role: 'user', content: 'أنتِ طبيبة نساء وتوليد متخصصة، أجيبي على هذا السؤال:\n\n' + q }];
-    if (_obgynMsgs.length > 1) {
-      messages = _obgynMsgs.slice(-6).map(function(m) { return { role: m.role, content: m.content }; });
+    var poRes = await Promise.race([
+      fetch('https://text.pollinations.ai/openai', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ model:'openai-large', messages:ctxMsgs, max_tokens:900, system:OBGYN_SYSTEM })
+      }),
+      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, 12000); })
+    ]);
+    if (poRes && poRes.ok) {
+      var pd = await poRes.json();
+      if (pd.choices && pd.choices[0]) txt = pd.choices[0].message.content;
     }
-    var body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: messages, system: OBGYN_SYSTEM };
-    var res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    var txt = '';
-    if (res.ok) {
-      var data = await res.json();
-      if (data.content && data.content[0]) txt = data.content[0].text;
-    }
-    if (!txt) {
-      var poRes = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'openai', messages: [{ role: 'system', content: OBGYN_SYSTEM }, ...messages], max_tokens: 1000 }) });
-      if (poRes.ok) { var pd = await poRes.json(); if (pd.choices && pd.choices[0]) txt = pd.choices[0].message.content; }
-    }
-    if (thinkDiv) thinkDiv.remove();
-    if (txt) {
-      _obgynMsgs.push({ role: 'assistant', content: txt });
-      obgynAppendMsg('assistant', txt.replace(/\n/g, '<br>'));
-      if (!window.isProUser) { obgynIncUsage(); obgynUpdateCounter(); }
-    } else {
-      obgynAppendMsg('assistant', 'عذراً يا عزيزتي، حدث خطأ في الاتصال. حاولي مرة أخرى 💕');
-    }
-  } catch(e) {
-    if (thinkDiv) thinkDiv.remove();
-    obgynAppendMsg('assistant', 'عذراً حبيبتي، حدث خطأ. حاولي مجدداً 💕');
+  } catch(e) {}
+
+  // 2. HuggingFace
+  if (!txt && window.__HF_KEY) {
+    try {
+      var hfR = await _tryHuggingFace(ctxMsgs, 0);
+      if (hfR && hfR.text) txt = hfR.text;
+    } catch(e) {}
+  }
+
+  // 3. Puter
+  if (!txt) {
+    try {
+      if (typeof puter !== 'undefined' && puter.ai) {
+        var fullPrompt = OBGYN_SYSTEM + '\n\nسؤال المريضة: ' + q;
+        var pr = await puter.ai.chat(fullPrompt, { model:'gpt-4o-mini', temperature:0.5 });
+        var t = typeof pr==='string'?pr:pr&&pr.message?pr.message.content:null;
+        if (t) txt = t;
+      }
+    } catch(e) {}
+  }
+
+  if (thinkDiv) thinkDiv.remove();
+
+  if (txt) {
+    _obgynMsgs.push({ role:'assistant', content:txt });
+    obgynAppendMsg('assistant', txt.replace(/\n/g,'<br>'));
+    if (!window.isProUser) { obgynIncUsage(); obgynUpdateCounter(); }
+  } else {
+    obgynAppendMsg('assistant', 'عذراً يا عزيزتي، حدث خطأ في الاتصال. حاولي مرة أخرى 💕');
   }
   if (btn) { btn.disabled = false; btn.textContent = '💕 أرسلي سؤالكِ'; }
 }
+
 
 function obgynClear() {
   _obgynMsgs = [];
@@ -3408,6 +3454,65 @@ async function ptApplySmartAverage() {
   } catch(e) {}
 }
 
+/* ════════════════════════════════════════════════════════
+   🤖 تحليل AI للدورة الشهرية
+════════════════════════════════════════════════════════ */
+async function ptAiAnalyze() {
+  var btn = document.getElementById('pt-ai-btn');
+  var resBox = document.getElementById('pt-ai-result');
+  if (!resBox) return;
+
+  var lastDate = document.getElementById('pt-last-date') ? document.getElementById('pt-last-date').value : '';
+  var cycleLen = document.getElementById('pt-cycle-len') ? document.getElementById('pt-cycle-len').value : '28';
+  var periodLen = document.getElementById('pt-period-len') ? document.getElementById('pt-period-len').value : '5';
+  var age = window.currentUser ? (window.currentUser.age || '') : '';
+
+  var symptoms = [];
+  document.querySelectorAll('.pt-symptom-check:checked').forEach(function(el){ symptoms.push(el.value || el.name || ''); });
+
+  var bleeding = [];
+  for (var i=1; i<=parseInt(periodLen||5); i++) {
+    var sel = document.getElementById('pt-bleed-day-' + i);
+    if (sel) bleeding.push('اليوم ' + i + ': ' + sel.value);
+  }
+
+  if (!lastDate) { showToast('❌ أدخلي تاريخ آخر دورة أولاً'); return; }
+
+  if (btn) { btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري التحليل...'; }
+  resBox.style.display='block';
+  resBox.innerHTML='<div style="text-align:center;padding:14px;color:#a855f7"><i class="fas fa-spinner fa-spin" style="font-size:1.2rem"></i><br><span style="font-size:.8rem">الذكاء الاصطناعي يحلل دورتك...</span></div>';
+
+  var nextPeriod = document.getElementById('pt-next-period') ? document.getElementById('pt-next-period').textContent : '';
+  var ovulation  = document.getElementById('pt-ovulation')   ? document.getElementById('pt-ovulation').textContent   : '';
+  var countdown  = document.getElementById('pt-countdown')   ? document.getElementById('pt-countdown').textContent   : '';
+
+  var parts = [
+    'أنتِ طبيبة نسائية ذكية ومتعاطفة. قدّمي تحليلاً شاملاً ونصائح مخصصة بناءً على بيانات دورة هذه المرأة.',
+    'تاريخ آخر دورة: ' + lastDate,
+    'طول الدورة: ' + cycleLen + ' يوم',
+    'مدة الحيض: ' + periodLen + ' أيام'
+  ];
+  if (age)        parts.push('العمر: ' + age + ' سنة');
+  if (nextPeriod) parts.push('الدورة القادمة: ' + nextPeriod);
+  if (countdown)  parts.push('الوضع الحالي: ' + countdown);
+  if (ovulation)  parts.push('التبويض المتوقع: ' + ovulation);
+  if (bleeding.length)  parts.push('شدة النزف: ' + bleeding.join('، '));
+  if (symptoms.length)  parts.push('الأعراض: ' + symptoms.join('، '));
+  parts.push('المطلوب: 1) تحليل انتظام الدورة 2) نصائح لتخفيف الآلام 3) أفضل الأطعمة لكل مرحلة 4) علامات تستدعي الطبيب 5) وصفات طبيعية 6) نصائح الرياضة. اكتبي بأسلوب لطيف. اللغة: عربية.');
+
+  var prompt = parts.join('\n');
+
+  var result = await _aiAsk(prompt, null, null);
+
+  if (btn) { btn.disabled=false; btn.innerHTML='<i class="fas fa-robot"></i> 🌸 تحليل ذكي بالـ AI'; }
+
+  if (result) {
+    resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g,'<br>') + '</div>';
+  } else {
+    resBox.innerHTML = '<div style="color:#ef5350;padding:10px;text-align:center">❌ تعذّر التحليل — تحققي من الاتصال وحاولي مجدداً</div>';
+  }
+  resBox.scrollIntoView({behavior:'smooth', block:'start'});
+}
 /* ════════════════════════════════════════════════════════
    💾 حفظ الدورة في Firestore
 ════════════════════════════════════════════════════════ */
@@ -4374,6 +4479,15 @@ function logActivity(type, text, detail) {
   if (!window.__firebaseReady || !currentUser) return;
   var uid = currentUser.username;
   var entry = { type: type, text: text, detail: detail || '', ts: Date.now() };
+  // حفظ محلي دائماً
+  try {
+    var localLog = JSON.parse(localStorage.getItem('tayyibat_activity') || '[]');
+    localLog.unshift(entry); if(localLog.length > 50) localLog.length = 50;
+    localStorage.setItem('tayyibat_activity', JSON.stringify(localLog));
+  } catch(e) {}
+  // Firebase فقط إذا كان المستخدم مصادقاً (email/Google)
+  var hasFirebaseAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
+  if (!hasFirebaseAuth) return;
   try {
     var ts = Date.now();
     var newRef = window.__firebaseRef(window.__firebaseDB, 'activityLog/' + uid + '/' + ts);
@@ -6052,6 +6166,79 @@ function setScanMode(mode) {
   }
 }
 
+/* ════════════════════════════════════════════════════════
+   🎥 Live Vision Engine — تحليل مباشر من الكاميرا
+════════════════════════════════════════════════════════ */
+async function _liveVisionAnalyze(videoEl, prompt, onResult, onError) {
+  if (!videoEl || !videoEl.videoWidth) { if(onError) onError('الكاميرا غير جاهزة'); return null; }
+  var canvas = document.createElement('canvas');
+  canvas.width = videoEl.videoWidth; canvas.height = videoEl.videoHeight;
+  canvas.getContext('2d').drawImage(videoEl, 0, 0);
+  var imgData = canvas.toDataURL('image/jpeg', 0.82);
+  var result = null;
+
+  // HF أولاً
+  if (!result && window.__HF_KEY) {
+    try {
+      var r = await _smartVisionAnalysis(imgData, prompt);
+      if (r && r.source !== 'fallback' && r.text) result = r.text;
+    } catch(e) {}
+  }
+  // Pollinations ثانياً
+  if (!result) {
+    try {
+      var r2 = await _tryPollinations([
+        {role:'user', content:[
+          {type:'text', text: prompt},
+          {type:'image_url', image_url:{url: imgData}}
+        ]}
+      ], 0);
+      if (r2 && r2.text) result = r2.text;
+    } catch(e) {}
+  }
+  // Puter أخيراً
+  if (!result) {
+    try {
+      if (typeof puter !== 'undefined' && puter.ai) {
+        var r3 = await puter.ai.chat([
+          {role:'user', content:[
+            {type:'text', text: prompt},
+            {type:'image_url', image_url:{url: imgData}}
+          ]}
+        ], {model:'gpt-4o-mini'});
+        var t = typeof r3==='string'?r3:r3&&r3.message?r3.message.content:null;
+        if (t) result = t;
+      }
+    } catch(e) {}
+  }
+
+  if (result) { if(onResult) onResult(result, imgData); return result; }
+  else { if(onError) onError('تعذّر التحليل — حاول مجدداً'); return null; }
+}
+
+/* دالة مساعدة: تشغيل AI عبر أي نموذج متاح (نص فقط) */
+async function _aiAsk(prompt, onResult, onError) {
+  var result = null;
+  var msgs = [{role:'user', content: prompt}];
+  if (!result && window.__HF_KEY) {
+    try { var r=await _tryHuggingFace(msgs,0); if(r&&r.text) result=r.text; } catch(e) {}
+  }
+  if (!result) {
+    try { var r=await _tryPollinations(msgs,0); if(r&&r.text) result=r.text; } catch(e) {}
+  }
+  if (!result) {
+    try {
+      if (typeof puter!=='undefined'&&puter.ai) {
+        var r=await puter.ai.chat(prompt,{model:'gpt-4o-mini',temperature:0.4});
+        var t=typeof r==='string'?r:r&&r.message?r.message.content:null;
+        if(t) result=t;
+      }
+    } catch(e) {}
+  }
+  if (result) { if(onResult) onResult(result); return result; }
+  else { if(onError) onError('تعذّر الحصول على إجابة'); return null; }
+}
+
 /* ══════════════════════════════════════════════
    MEDICINE BOX READER - قراءة علبة الدواء
 ══════════════════════════════════════════════ */
@@ -6799,8 +6986,7 @@ async function analyzePrescriptionFromText() {
 async function _analyzePrescriptionWithAI(imgDataUrl, textInput) {
   var resBox = document.getElementById('pa-scan-result');
 
-  var prompt =
-    'أنت صيدلاني وطبيب خبير متخصص في قراءة روشتات الأطباء المصريين والعرب.\n' +
+  var prompt = 'أنت صيدلاني وطبيب خبير متخصص في قراءة روشتات الأطباء المصريين والعرب.\n' +
     'خط الأطباء صعب القراءة — حاول قراءته بأفضل ما يمكن واستخدم سياق الكلمة والاسم الطبي.\n\n' +
     'المطلوب: استخرج كل الأدوية الموجودة في الروشتة وأجب بالتنسيق التالي الحرفي فقط (بدون ** أو markdown):\n\n' +
     'دواء_1:\n' +
@@ -10686,23 +10872,52 @@ function fsOpenCamera() {
   }
 }
 
-function fsCameraCapture() {
-  if (!_fsStream) { fsOpenCamera(); return; }
+var _fsLiveInterval = null;
+function fsOpenLiveCamera() {
   if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
   var video = document.getElementById('fs-video');
-  var canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  _fsCurrentImage = canvas.toDataURL('image/jpeg', 0.85);
-  incToolUsage('food-scan');
-  fsAnalyzeImage(_fsCurrentImage);
-  // stop camera
-  _fsStream.getTracks().forEach(function(t) { t.stop(); });
-  _fsStream = null;
-  video.style.display = 'none';
-  document.getElementById('fs-fallback').style.display = 'block';
+  var btn = document.querySelector('[onclick="fsCameraCapture()"]') || document.querySelector('[onclick="fsOpenLiveCamera()"]');
+  if (_fsStream) {
+    // إيقاف
+    clearInterval(_fsLiveInterval); _fsLiveInterval = null;
+    _fsStream.getTracks().forEach(function(t){t.stop()}); _fsStream = null;
+    video.style.display='none';
+    document.getElementById('fs-fallback').style.display='block';
+    if(btn) btn.innerHTML='<i class="fas fa-camera"></i> فتح الكاميرا';
+    document.getElementById('fs-live-status') && (document.getElementById('fs-live-status').style.display='none');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}})
+  .then(function(stream){
+    _fsStream = stream; video.srcObject = stream; video.style.display='block';
+    document.getElementById('fs-fallback').style.display='none';
+    if(btn) btn.innerHTML='<i class="fas fa-stop-circle"></i> إيقاف الكاميرا';
+    // عرض مؤشر التحليل المباشر
+    var statusEl = document.getElementById('fs-live-status');
+    if(statusEl) statusEl.style.display='block';
+    // تحليل مباشر كل 3 ثوانٍ
+    var analyzing = false;
+    _fsLiveInterval = setInterval(function(){
+      if(analyzing || !_fsStream) return;
+      analyzing = true;
+      var statusText = document.getElementById('fs-live-status-text');
+      if(statusText) statusText.textContent = '🔍 جاري التحليل...';
+      var prompt = 'انظر للصورة واكتشف الطعام أمامك. اكتب اسم الطعام وسعراته الحرارية التقريبية والبروتين والكارب والدهون. كن مختصراً ودقيقاً. اللغة: عربية.';
+      _liveVisionAnalyze(video, prompt, function(result){
+        analyzing = false;
+        if(statusText) statusText.textContent = '✅ تم الكشف';
+        _fsCurrentImage = null;
+        incToolUsage('food-scan');
+        // تحليل النتيجة
+        fsParseAndDisplay(result);
+      }, function(){
+        analyzing = false;
+        if(statusText) statusText.textContent = '⏳ في انتظار الصورة...';
+      });
+    }, 3000);
+  }).catch(function(){ showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
+function fsCameraCapture() { fsOpenLiveCamera(); }
 
 function fsLoadImage(event) {
   if (!canUseTool('food-scan')) { showTrialExpiredModal('food-scan'); return; }
@@ -11063,15 +11278,44 @@ function fakeImageLoad(event) {
   reader.readAsDataURL(file);
 }
 
+var _fiLiveInterval = null;
 function fakeImageOpenCamera() {
   var area = document.getElementById('fi-camera-area');
   var video = document.getElementById('fi-video');
+  var btn = document.getElementById('fi-camera-btn');
   if (!area || !video) return;
-  if (_fiStream) { fakeImageStopCamera(); return; }
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  if (_fiStream) {
+    clearInterval(_fiLiveInterval); _fiLiveInterval = null;
+    _fiStream.getTracks().forEach(function(t){t.stop()}); _fiStream = null;
+    area.style.display = 'none';
+    if(btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير بالكاميرا</span>';
+    return;
+  }
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}})
   .then(function(stream) {
     _fiStream = stream; video.srcObject = stream; area.style.display = 'block';
-    document.getElementById('fi-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+    if(btn) btn.innerHTML = '<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
+    // تحليل مباشر كل 3 ثوانٍ
+    var analyzing = false;
+    var statusEl = document.getElementById('fi-live-status');
+    if(statusEl) statusEl.style.display='block';
+    _fiLiveInterval = setInterval(function(){
+      if(analyzing || !_fiStream) return;
+      analyzing = true;
+      var prompt = 'صف ما تراه في الصورة بدقة. إذا كان طعاماً اذكر محتواه الغذائي، وإذا كان شخصاً صف مظهره العام، وإذا كان منتجاً اذكر تفاصيله. كن وصفياً ومفيداً. اللغة: عربية.';
+      _liveVisionAnalyze(video, prompt, function(result){
+        analyzing = false;
+        var resBox = document.getElementById('fi-result');
+        if(resBox) {
+          resBox.style.display='block';
+          resBox.innerHTML = '<div style="padding:12px;font-size:.83rem;line-height:1.7;color:var(--txt)">'+result.replace(/\n/g,'<br>')+'</div>';
+        }
+        if(statusEl) statusEl.querySelector('span').textContent = '✅ تم الكشف';
+      }, function(){
+        analyzing = false;
+        if(statusEl) statusEl.querySelector('span').textContent = '⏳ في انتظار الصورة...';
+      });
+    }, 3000);
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
@@ -11136,14 +11380,52 @@ function hwLoadImage(event) {
   reader.readAsDataURL(file);
 }
 
+var _hwLiveInterval = null;
 function hwOpenCamera() {
   var area = document.getElementById('hw-camera-area'); var video = document.getElementById('hw-video');
+  var btn = document.getElementById('hw-camera-btn');
   if (!area || !video) return;
-  if (_hwStream) { hwStopCamera(); return; }
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  if (_hwStream) {
+    clearInterval(_hwLiveInterval); _hwLiveInterval = null;
+    _hwStream.getTracks().forEach(function(t){t.stop()}); _hwStream = null;
+    area.style.display = 'none';
+    if(btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير السؤال</span>';
+    return;
+  }
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}})
   .then(function(stream) {
     _hwStream = stream; video.srcObject = stream; area.style.display = 'block';
-    document.getElementById('hw-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+    if(btn) btn.innerHTML = '<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
+    var analyzing = false;
+    var statusEl = document.getElementById('hw-live-status');
+    if(statusEl) statusEl.style.display='block';
+    // تحليل فوري بعد ثانيتين من فتح الكاميرا
+    setTimeout(function(){
+      if(!_hwStream) return;
+      _hwLiveInterval = setInterval(function(){
+        if(analyzing || !_hwStream) return;
+        analyzing = true;
+        var grade = document.getElementById('hw-grade') ? document.getElementById('hw-grade').value : '';
+        var subject = document.getElementById('hw-subject') ? document.getElementById('hw-subject').value : '';
+        var prompt = 'أنت معلم متخصص. انظر للصورة واحل أو اشرح ما فيها من أسئلة أو مسائل دراسية.' +
+          (grade ? ' الصف الدراسي: ' + grade + '.' : '') +
+          (subject ? ' المادة: ' + subject + '.' : '') +
+          ' قدّم الحل خطوة بخطوة بشكل واضح. اللغة: عربية.';
+        _liveVisionAnalyze(video, prompt, function(result){
+          analyzing = false;
+          clearInterval(_hwLiveInterval); _hwLiveInterval = null;
+          var resBox = document.getElementById('hw-result');
+          if(resBox) {
+            resBox.style.display='block';
+            resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g,'<br>') + '</div>';
+          }
+          if(statusEl) statusEl.querySelector('span').textContent = '✅ تم الحل — أوقف الكاميرا';
+        }, function(){
+          analyzing = false;
+          if(statusEl) statusEl.querySelector('span').textContent = '⏳ وجّه الكاميرا نحو السؤال...';
+        });
+      }, 3500);
+    }, 2000);
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
@@ -12797,17 +13079,57 @@ function palmLoadImage(event) {
   reader.readAsDataURL(file);
 }
 
+var _palmLiveInterval = null;
 function palmOpenCamera() {
   var area = document.getElementById('palm-camera-area');
   var video = document.getElementById('palm-video');
+  var btn = document.getElementById('palm-camera-btn');
   if (!area || !video) return;
-  if (_palmStream) { palmStopCamera(); return; }
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } })
+  if (_palmStream) {
+    clearInterval(_palmLiveInterval); _palmLiveInterval = null;
+    _palmStream.getTracks().forEach(function(t){t.stop()}); _palmStream = null;
+    area.style.display = 'none';
+    if(btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير كفك الآن</span>';
+    return;
+  }
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}}})
   .then(function(stream) {
-    _palmStream = stream;
-    video.srcObject = stream;
-    area.style.display = 'block';
-    document.getElementById('palm-camera-btn').innerHTML = '<i class="fas fa-camera-slash" style="font-size:1.4rem"></i><span style="margin-top:4px">إغلاق الكاميرا</span>';
+    _palmStream = stream; video.srcObject = stream; area.style.display = 'block';
+    if(btn) btn.innerHTML = '<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
+    var analyzing = false;
+    var statusEl = document.getElementById('palm-live-status');
+    if(statusEl) statusEl.style.display='block';
+    // تحليل بعد 2.5 ثانية تلقائياً
+    setTimeout(function(){
+      if(!_palmStream) return;
+      analyzing = true;
+      if(statusEl) statusEl.querySelector('span').textContent = '🔮 جاري قراءة خطوط كفك...';
+      var prompt = 'أنت خبير في قراءة الكف. انظر بدقة لهذه الصورة واكتشف خطوط الكف (خط الحياة، خط القلب، خط العقل، خط الحظ). اكتب قراءة مفصلة وشيّقة لكل خط. ملاحظة: هذا للترفيه فقط. اللغة: عربية.';
+      _liveVisionAnalyze(video, prompt, function(result){
+        analyzing = false;
+        clearInterval(_palmLiveInterval); _palmLiveInterval = null;
+        var resBox = document.getElementById('palm-result') || document.getElementById('palm-reading-result');
+        if(resBox) {
+          resBox.style.display='block';
+          resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;direction:rtl;color:var(--txt)">' + result.replace(/\n/g,'<br>') + '</div>';
+        }
+        if(statusEl) statusEl.querySelector('span').textContent = '✅ تمت القراءة';
+      }, function(){
+        analyzing = false;
+        if(statusEl) statusEl.querySelector('span').textContent = '⚠️ لم أتمكن من رؤية الكف — حاول مرة أخرى';
+        // إعادة المحاولة كل 4 ثوانٍ
+        _palmLiveInterval = setInterval(function(){
+          if(analyzing||!_palmStream) return;
+          analyzing=true;
+          _liveVisionAnalyze(video, prompt, function(r){
+            analyzing=false; clearInterval(_palmLiveInterval);
+            var rb=document.getElementById('palm-result')||document.getElementById('palm-reading-result');
+            if(rb){rb.style.display='block';rb.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">'+r.replace(/\n/g,'<br>')+'</div>';}
+            if(statusEl) statusEl.querySelector('span').textContent='✅ تمت القراءة';
+          },function(){analyzing=false;});
+        },4000);
+      });
+    }, 2500);
   }).catch(function() { showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 
