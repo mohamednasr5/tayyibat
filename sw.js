@@ -13,7 +13,6 @@ const STATIC_ASSETS = [
   './icons/apple-touch-icon.png',
   './icons/icon-180.png'
 ];
-
 /* ── التثبيت: تخزين الملفات الأساسية في الكاش ── */
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -27,7 +26,6 @@ self.addEventListener('install', event => {
   );
   self.skipWaiting();
 });
-
 /* ── التفعيل: حذف الكاش القديم ── */
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -38,11 +36,9 @@ self.addEventListener('activate', event => {
     ).then(() => self.clients.claim())
   );
 });
-
 /* ── قواعد الجلب ── */
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-
   /* 1. طلبات Firebase — دائماً من الشبكة */
   if (url.hostname.includes('firebase') ||
       url.hostname.includes('firebaseio') ||
@@ -50,7 +46,6 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(event.request).catch(() => new Response('', { status: 503 })));
     return;
   }
-
   /* 2. طلبات AI API — دائماً من الشبكة بلا كاش */
   if (url.hostname.includes('pollinations') ||
       url.hostname.includes('openrouter') ||
@@ -62,7 +57,6 @@ self.addEventListener('fetch', event => {
     })));
     return;
   }
-
   /* 3. الخطوط والمكتبات الخارجية — شبكة أولاً ثم كاش */
   if (url.hostname.includes('fonts.') ||
       url.hostname.includes('cdnjs') ||
@@ -78,7 +72,6 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
-
   /* 4. باقي الطلبات (HTML, CSS, JS, Icons) — كاش أولاً ثم شبكة */
   event.respondWith(
     caches.match(event.request).then(cached => {
@@ -95,7 +88,6 @@ self.addEventListener('fetch', event => {
     })
   );
 });
-
 /* ── Push Notifications (للمستقبل) ── */
 self.addEventListener('push', event => {
   if (!event.data) return;
