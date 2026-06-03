@@ -1486,9 +1486,52 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
 .cpb-btn-skip{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--txt2);border-radius:14px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
 .cpb-progress-bar-wrap{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:20px;overflow:hidden}
 .cpb-progress-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .8s ease;width:0%}
+/* ══ حاجب CSS لرسائل Puter المزعجة ══ */
+[class*="puter"],[id*="puter"]{--puter-ui-hidden:none}
+/* إخفاء أي overlay/modal يظهر فوق التطبيق بـ z-index عالي جداً من Puter */
+body > div[style*="z-index: 9"]:not(#daily-reward-panel):not(#pro-modal):not(.modal),
+body > div[style*="z-index:9"]:not(#daily-reward-panel):not(#pro-modal):not(.modal){
+  /* لا نخفي كل شيء — نتركه للـ JS observer */
+}
 </style>
 </head>
 <body>
+<!-- ══ حاجب رسائل Puter المبكر — يعمل قبل أي شيء آخر ══ -->
+<script>
+(function(){
+  /* حذف فوري لأي عنصر يحتوي "Low Balance" */
+  function _nukePuterModals(){
+    var all = document.querySelectorAll('body > *');
+    for(var i=0;i<all.length;i++){
+      var el=all[i];
+      if(!el||!el.textContent)continue;
+      var t=el.textContent.toLowerCase();
+      if(t.includes('low balance')||t.includes('not enough funding')||t.includes('upgrade to continue')){
+        el.style.cssText='display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important';
+        try{el.remove();}catch(e){}
+      }
+    }
+  }
+  /* MutationObserver مبكر جداً */
+  var obs=new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if(!n||n.nodeType!==1)return;
+        var t=(n.textContent||'').toLowerCase();
+        if(t.includes('low balance')||t.includes('not enough funding')||t.includes('upgrade to continue')){
+          n.style.cssText='display:none!important;visibility:hidden!important;opacity:0!important';
+          try{n.remove();}catch(e){}
+        }
+      });
+    });
+  });
+  obs.observe(document.documentElement,{childList:true,subtree:true});
+  /* polling سريع */
+  var _t=setInterval(_nukePuterModals,100);
+  setTimeout(function(){clearInterval(_t);setInterval(_nukePuterModals,500);},10000);
+  window._nukePuterModals=_nukePuterModals;
+})();
+</script>
 <canvas id="universe-canvas"></canvas>
 <div id="loader">
   <div id="loader-game-wrap">
@@ -11599,6 +11642,145 @@ function _emGetNewEmergencyAnim(type, stepIdx, step, color) {
    🤖 وظائف استدعاء AI — مع تبديل تلقائي بين موديلات Puter
    📸 + دعم التحليل المباشر عبر الكاميرا (Live Vision)
 ════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════
+   🚫 حاجب رسالة Low Balance من Puter — يعمل فور تحميل الصفحة
+   يراقب DOM ويحذف أي modal/dialog يظهر من Puter تلقائياً
+══════════════════════════════════════════════════════════ */
+(function() {
+  /* ── 1: MutationObserver يحذف كل modal Low Balance فور ظهوره ── */
+  var _puterModalObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (!node || node.nodeType !== 1) return;
+        _killPuterModal(node);
+        /* فحص الأبناء أيضاً */
+        try {
+          node.querySelectorAll && node.querySelectorAll('*').forEach(function(child) {
+            _killPuterModal(child);
+          });
+        } catch(e) {}
+      });
+    });
+  });
+  _puterModalObserver.observe(document.documentElement, { childList: true, subtree: true });
+
+  function _killPuterModal(el) {
+    if (!el || !el.textContent) return;
+    var txt = el.textContent.toLowerCase();
+    /* كلمات تشير لرسالة Puter */
+    if (
+      txt.includes('low balance') ||
+      txt.includes('not enough funding') ||
+      txt.includes('upgrade to continue') ||
+      txt.includes('upgrade now') && txt.includes('balance') ||
+      txt.includes('insufficient') && (txt.includes('fund') || txt.includes('credit'))
+    ) {
+      /* ابحث عن الـ container الأب الظاهر (modal/overlay) */
+      var target = el;
+      for (var i = 0; i < 10; i++) {
+        if (!target.parentElement) break;
+        var s = window.getComputedStyle(target);
+        if (s.position === 'fixed' || s.position === 'absolute' || s.zIndex > 100) {
+          break;
+        }
+        target = target.parentElement;
+      }
+      try { target.style.display = 'none'; } catch(e) {}
+      try { target.remove(); } catch(e) {}
+      /* أزل overlay خلفية أيضاً */
+      document.querySelectorAll('[class*="overlay"],[class*="modal"],[class*="dialog"],[class*="backdrop"]').forEach(function(ov) {
+        if (ov.textContent && ov.textContent.toLowerCase().includes('low balance')) {
+          try { ov.remove(); } catch(e) {}
+        }
+      });
+    }
+  }
+
+  /* ── 2: فحص دوري كل 200ms كإجراء احتياطي ── */
+  setInterval(function() {
+    document.querySelectorAll('body > *').forEach(function(el) {
+      _killPuterModal(el);
+    });
+  }, 200);
+
+  /* ── 3: تجاوز window.alert و window.confirm و window.prompt ── */
+  var _origAlert   = window.alert;
+  var _origConfirm = window.confirm;
+  window.alert = function(msg) {
+    if (msg && typeof msg === 'string' && (
+      msg.toLowerCase().includes('low balance') ||
+      msg.toLowerCase().includes('not enough') ||
+      msg.toLowerCase().includes('upgrade')
+    )) return; /* ابتلع الرسالة */
+    return _origAlert.apply(this, arguments);
+  };
+  window.confirm = function(msg) {
+    if (msg && typeof msg === 'string' && (
+      msg.toLowerCase().includes('low balance') ||
+      msg.toLowerCase().includes('not enough') ||
+      msg.toLowerCase().includes('upgrade')
+    )) return false;
+    return _origConfirm.apply(this, arguments);
+  };
+
+  /* ── 4: تجاوز puter.ui لمنع أي dialog يعرضه Puter ── */
+  function _patchPuterUI() {
+    if (typeof puter === 'undefined' || !puter) return;
+    if (puter.ui) {
+      ['alert','confirm','prompt','dialog','modal','toast'].forEach(function(method) {
+        if (typeof puter.ui[method] === 'function') {
+          var orig = puter.ui[method].bind(puter.ui);
+          puter.ui[method] = function() {
+            var args = Array.prototype.slice.call(arguments);
+            var txt = JSON.stringify(args).toLowerCase();
+            if (txt.includes('low balance') || txt.includes('not enough') || txt.includes('upgrade')) {
+              /* أعد Promise rejected بدلاً من عرض شيء */
+              return Promise.reject(new Error('puter_ui_blocked'));
+            }
+            return orig.apply(puter.ui, args);
+          };
+        }
+      });
+    }
+    /* تجاوز puter.ai.chat لاعتراض أخطاء الرصيد قبل ما تُعرض */
+    if (puter.ai && puter.ai.chat) {
+      var _origChat = puter.ai.chat.bind(puter.ai);
+      puter.ai.chat = function() {
+        var result = _origChat.apply(puter.ai, arguments);
+        /* إذا كانت Promise، اعترض rejection ذات الصلة بالرصيد */
+        if (result && typeof result.then === 'function') {
+          return result.catch(function(err) {
+            var msg = (err && (err.message || String(err))).toLowerCase();
+            if (
+              msg.includes('low balance') || msg.includes('insufficient') ||
+              msg.includes('upgrade') || msg.includes('not enough') ||
+              msg.includes('402') || msg.includes('payment')
+            ) {
+              /* أعد خطأ نظيف بدون UI */
+              throw new Error('PUTER_LOW_BALANCE');
+            }
+            throw err;
+          });
+        }
+        return result;
+      };
+    }
+  }
+
+  /* طبّق الـ patch فوراً وبعد تحميل Puter */
+  _patchPuterUI();
+  document.addEventListener('DOMContentLoaded', _patchPuterUI);
+  setTimeout(_patchPuterUI, 1000);
+  setTimeout(_patchPuterUI, 3000);
+  /* راقب تحميل Puter عبر polling */
+  var _puterPatchInterval = setInterval(function() {
+    if (typeof puter !== 'undefined' && puter.ai) {
+      _patchPuterUI();
+      clearInterval(_puterPatchInterval);
+    }
+  }, 500);
+})();
 
 /* ── قائمة موديلات Puter مرتبة حسب الأولوية (رؤية + نص) ── */
 var _PUTER_VISION_MODELS = [
