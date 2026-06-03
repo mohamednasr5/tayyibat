@@ -295,6 +295,7 @@
         if (cfg.openrouterKey)         window.__OR_KEY_FB   = cfg.openrouterKey;
         if (cfg.geminiKey)           { window.__GEMINI_KEY  = cfg.geminiKey; window.__geminiReady = true; }
         if (cfg.mistralKey)            window.__MISTRAL_KEY = cfg.mistralKey;
+        if (cfg.huggingfaceKey)        window.__HF_KEY      = cfg.huggingfaceKey;
       }
     } catch(_) {}
 
@@ -5576,16 +5577,187 @@ async function _tryPuterVision(imgDataUrl, promptText, modelIndex) {
   }
 }
 
+
+
+/* ======= HUGGING FACE INFERENCE API - Primary AI ======= */
+// Models for text
+var HF_TEXT_MODELS = [
+  "mistralai/Mistral-7B-Instruct-v0.3",
+  "HuggingFaceH4/zephyr-7b-beta",
+  "meta-llama/Meta-Llama-3-8B-Instruct",
+  "microsoft/Phi-3-mini-4k-instruct",
+  "mistralai/Mixtral-8x7B-Instruct-v0.1"
+];
+
+// Models for vision
+var HF_VISION_MODELS = [
+  "Salesforce/blip-image-captioning-large",
+  "nlpconnect/vit-gpt2-image-captioning",
+  "microsoft/git-large-coco"
+];
+
+async function _tryHuggingFace(messages, modelIndex) {
+  var key = window.__HF_KEY;
+  if (!key) return null;
+  modelIndex = modelIndex || 0;
+  if (modelIndex >= HF_TEXT_MODELS.length) return null;
+  var model = HF_TEXT_MODELS[modelIndex];
+  try {
+    var timeoutP = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("TIMEOUT")); }, 20000); });
+    // تحويل messages إلى prompt نصي
+    var prompt = messages.map(function(m){
+      if (m.role === "system") return "<s>[INST] <<SYS>>\n" + m.content + "\n<</SYS>>\n\n";
+      if (m.role === "user") return m.content + " [/INST]";
+      return m.content + " </s><s>[INST] ";
+    }).join("");
+    var fetchP = fetch("https://api-inference.huggingface.co/models/" + model, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + key,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: { max_new_tokens: 1024, temperature: 0.7, return_full_text: false }
+      })
+    }).then(function(r){ return r.json(); });
+    var data = await Promise.race([fetchP, timeoutP]);
+    var text = null;
+    if (Array.isArray(data) && data[0] && data[0].generated_text) {
+      text = data[0].generated_text;
+    } else if (data && data.generated_text) {
+      text = data.generated_text;
+    } else if (data && data.error) {
+      // Model loading - try next
+      return await _tryHuggingFace(messages, modelIndex + 1);
+    }
+    if (text && text.trim().length > 5) return { text: text.trim(), source: "HuggingFace/" + model.split("/")[1] };
+    return await _tryHuggingFace(messages, modelIndex + 1);
+  } catch(e) {
+    return await _tryHuggingFace(messages, modelIndex + 1);
+  }
+}
+
+async function _tryHuggingFaceVision(imgDataUrl, promptText) {
+  var key = window.__HF_KEY;
+  if (!key) return null;
+  try {
+    // تحويل base64 إلى blob
+    var base64Data = imgDataUrl.split(",")[1];
+    if (!base64Data) return null;
+    var byteChars = atob(base64Data);
+    var byteArr = new Uint8Array(byteChars.length);
+    for (var i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+    var blob = new Blob([byteArr], { type: "image/jpeg" });
+
+    var timeoutP = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("TIMEOUT")); }, 20000); });
+    var fetchP = fetch("https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + key },
+      body: blob
+    }).then(function(r){ return r.json(); });
+    var data = await Promise.race([fetchP, timeoutP]);
+    var caption = Array.isArray(data) && data[0] ? data[0].generated_text : null;
+    if (caption && caption.length > 3) {
+      // نستخدم النتيجة مع prompt في Pollinations
+      var fullPrompt = promptText + "\n\nوصف الصورة: " + caption;
+      var polRes = await _tryPollinationsVision(imgDataUrl, fullPrompt, 0);
+      if (polRes) return { text: polRes.text, source: "HuggingFace+Pollinations" };
+      return { text: caption, source: "HuggingFace/BLIP" };
+    }
+    return null;
+  } catch(e) { return null; }
+}
+/* ======= END HUGGING FACE ======= */
+
+/* ======= POLLINATIONS.AI - Free AI No Key Required ======= */
+var POLLINATIONS_TEXT_MODELS = ["openai", "openai-large", "claude-hybridspace", "mistral", "gemini"];
+
+async function _tryPollinations(messages, modelIndex) {
+  modelIndex = modelIndex || 0;
+  if (modelIndex >= POLLINATIONS_TEXT_MODELS.length) return null;
+  var model = POLLINATIONS_TEXT_MODELS[modelIndex];
+  try {
+    var timeoutP = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("TIMEOUT")); }, 15000); });
+    var fetchP = fetch("https://text.pollinations.ai/openai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: model,
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1500
+      })
+    }).then(function(r){ return r.json(); });
+    var data = await Promise.race([fetchP, timeoutP]);
+    var text = data && data.choices && data.choices[0] && data.choices[0].message
+      ? data.choices[0].message.content : null;
+    if (text && text.trim().length > 5) return { text: text, source: "Pollinations/" + model };
+    return await _tryPollinations(messages, modelIndex + 1);
+  } catch(e) {
+    return await _tryPollinations(messages, modelIndex + 1);
+  }
+}
+
+async function _tryPollinationsVision(imgDataUrl, promptText, modelIndex) {
+  modelIndex = modelIndex || 0;
+  var visionModels = ["openai", "openai-large"];
+  if (modelIndex >= visionModels.length) return null;
+  var model = visionModels[modelIndex];
+  try {
+    var timeoutP = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("TIMEOUT")); }, 15000); });
+    var fetchP = fetch("https://text.pollinations.ai/openai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: model,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: promptText },
+            { type: "image_url", image_url: { url: imgDataUrl } }
+          ]
+        }],
+        temperature: 0.3,
+        max_tokens: 1500
+      })
+    }).then(function(r){ return r.json(); });
+    var data = await Promise.race([fetchP, timeoutP]);
+    var text = data && data.choices && data.choices[0] && data.choices[0].message
+      ? data.choices[0].message.content : null;
+    if (text && text.trim().length > 5) return { text: text, source: "Pollinations/" + model };
+    return await _tryPollinationsVision(imgDataUrl, promptText, modelIndex + 1);
+  } catch(e) {
+    return await _tryPollinationsVision(imgDataUrl, promptText, modelIndex + 1);
+  }
+}
+/* ======= END POLLINATIONS ======= */
+
 async function _smartVisionAnalysis(imgDataUrl, promptText) {
+  // 1. HuggingFace Vision (إن وجد مفتاح - الأساسي)
+  if (window.__HF_KEY) {
+    try {
+      var hfRes = await _tryHuggingFaceVision(imgDataUrl, promptText);
+      if (hfRes) return hfRes;
+    } catch(e) {}
+  }
+  // 2. Pollinations Vision (مجاني بدون مفتاح)
+  try {
+    var polRes = await _tryPollinationsVision(imgDataUrl, promptText, 0);
+    if (polRes) return polRes;
+  } catch(e) {}
+  // 3. Puter Vision (6 models)
   if (typeof puter !== "undefined" && puter.ai) {
     try {
       var res = await _tryPuterVision(imgDataUrl, promptText, 0);
       if (res) return res;
     } catch(e) {}
   }
-  if (window.__ORKEY_FB) {
+  // 4. OpenRouter fallback
+  if (window.__ORKEY_FB || window.__OR_KEY_FB) {
     try {
-      var orRes = await tryOpenRouter("anthropic/claude-3-haiku", "", promptText);
+      var orKey = window.__ORKEY_FB || window.__OR_KEY_FB;
+      var orRes = await tryOpenRouter("anthropic/claude-3-haiku", orKey, promptText);
       if (orRes) return { text: orRes.text, source: "OpenRouter/Claude" };
     } catch(e) {}
   }
@@ -8758,11 +8930,38 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   async function _smartSend(msg) {
+    var msgs = _buildMessages(msg);
+    // 1. HuggingFace (الأساسي - إن وجد مفتاح)
+    if (window.__HF_KEY) {
+      try {
+        var hfRes = await _tryHuggingFace(msgs, 0);
+        if (hfRes) return hfRes;
+      } catch(e) {}
+    }
+    // 2. Pollinations (مجاني بدون مفتاح)
+    try {
+      var polRes = await _tryPollinations(msgs, 0);
+      if (polRes) return polRes;
+    } catch(e) {}
+    // 3. Puter (11 models)
     try { return await _tryPuter(msg, 0); } catch(e) {}
+    // 4. Mistral (if key)
     try { return await _tryMistral(msg); } catch(e) {}
-    try { return await _tryZai(msg);     } catch(e) {}
-    await new Promise(function(r){ setTimeout(r, 1500); });
-    try { return await _tryPuter(msg, 0); } catch(e) {}
+    // 5. ZAI (if key)
+    try { return await _tryZai(msg); } catch(e) {}
+    // 6. Retry HF
+    if (window.__HF_KEY) {
+      await new Promise(function(r){ setTimeout(r, 1500); });
+      try {
+        var hfRes2 = await _tryHuggingFace(msgs, 0);
+        if (hfRes2) return hfRes2;
+      } catch(e) {}
+    }
+    // 7. Retry Pollinations
+    try {
+      var polRes2 = await _tryPollinations(msgs, 0);
+      if (polRes2) return polRes2;
+    } catch(e) {}
     return _localFallback();
   }
 
