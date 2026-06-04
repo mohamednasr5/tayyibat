@@ -1597,6 +1597,7 @@ td{padding:10px 14px;font-size:.82rem;color:var(--txt)}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getDatabase, ref, get, set, push, child, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyBf7IUVNUr7bihe4CqtqUwd3UbNRacq2po",
@@ -1608,8 +1609,9 @@ const firebaseConfig = {
   appId:"1:278890052232:web:06d85004268fdf9f4afd3d"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
+const app  = initializeApp(firebaseConfig);
+const db   = getDatabase(app);
+const auth = getAuth(app);
 
 // ─── Globals ───
 let ALL_USERS = {};
@@ -1648,7 +1650,7 @@ function toggleLoginPw(){
 }
 window.toggleLoginPw = toggleLoginPw;
 
-function doLogin(){
+async function doLogin(){
   const pw = document.getElementById('login-pw').value;
   const sec = document.getElementById('login-secret').value.trim();
   const err = document.getElementById('login-err-1');
@@ -1656,6 +1658,8 @@ function doLogin(){
     err.style.display='none';
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('loading-screen').style.display='flex';
+    // تسجيل دخول مجهول للحصول على صلاحية قراءة Firebase
+    try { await signInAnonymously(auth); } catch(_) {}
     loadData();
   } else {
     err.style.display='block';
