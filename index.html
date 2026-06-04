@@ -10619,9 +10619,12 @@ function goSmartTool(toolKey) {
   var pageName = pageMap[toolKey] || toolKey;
   goPage(pageName);
   // تهيئة خاصة بكل أداة
-  if (toolKey === 'food-scan') setTimeout(initFoodScan, 100);
+  if (toolKey === 'food-scan') { setTimeout(initFoodScan, 100); setTimeout(function(){ _autoCamLaunch('food-scan'); }, 400); }
   if (toolKey === 'barcode-boycott') bbInit();
   if (toolKey === 'scanner') setTimeout(function(){ setScanMode('product'); }, 150);
+  if (toolKey === 'fake-image') setTimeout(function(){ _autoCamLaunch('fake-image'); }, 400);
+  if (toolKey === 'homework')   setTimeout(function(){ _autoCamLaunch('homework'); }, 400);
+  if (toolKey === 'palm')       setTimeout(function(){ _autoCamLaunch('palm'); }, 400);
 }
 
 function checkToolAndRun(toolKey, fn) {
@@ -12839,7 +12842,7 @@ function palmOpenCamera() {
     if(btn) btn.innerHTML = '<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير كفك الآن</span>';
     return;
   }
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}}})
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:960}}}).catch(function(){return navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}})})
   .then(function(stream) {
     _palmStream = stream; video.srcObject = stream; area.style.display = 'block';
     if(btn) btn.innerHTML = '<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
@@ -13763,6 +13766,386 @@ setTimeout(checkAdminTrialReset, 3000);
       });
     });
   }
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     AUTO-CAMERA PATCH v1.0 — فتح الكاميرا الخلفية تلقائياً
+     تصوير الطعام | كشف الصور المزيفة | علبة الدواء |
+     التعرف على الطعام | مكونات العلبة | التقارير |
+     الروشتة | الواجبات | قراءة الكف (خلفية بدلاً من أمامية)
+══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── مساعدات أساسية ── */
+function openBackCamera(videoEl, streamRef, onReady, onError) {
+  if (!videoEl) { if(onError) onError('no video el'); return; }
+  if (streamRef.stream) { streamRef.stream.getTracks().forEach(function(t){t.stop();}); streamRef.stream=null; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { if(onError) onError('no API'); return; }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:960}}})
+    .catch(function(){ return navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}}); })
+    .then(function(stream){
+      streamRef.stream = stream;
+      videoEl.srcObject = stream;
+      videoEl.style.display = 'block';
+      var fired = false;
+      function fire(){ if(!fired){ fired=true; if(onReady) onReady(stream); } }
+      videoEl.onloadedmetadata = fire;
+      setTimeout(fire, 900);
+    }).catch(function(e){ if(onError) onError(e); });
+}
+
+function captureFrame(videoEl, q){
+  q = q||0.88;
+  if(!videoEl||!videoEl.videoWidth) return null;
+  var c=document.createElement('canvas');
+  c.width=videoEl.videoWidth; c.height=videoEl.videoHeight;
+  c.getContext('2d').drawImage(videoEl,0,0);
+  return c.toDataURL('image/jpeg',q);
+}
+
+function showThinkingBox(id, msg){
+  var b=document.getElementById(id); if(!b) return;
+  b.style.display='block';
+  b.innerHTML='<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">'+msg+'</span></div>';
+}
+
+function setStatusText(id, html){
+  var el=document.getElementById(id); if(el) el.innerHTML=html;
+}
+
+function visionRace(imgData, prompt, onResult, onError){
+  var p;
+  if(window.TayyibatAI && typeof window.TayyibatAI.vision==='function'){
+    p=window.TayyibatAI.vision(imgData,prompt);
+  } else if(typeof window._smartVisionAnalysis==='function'){
+    p=window._smartVisionAnalysis(imgData,prompt);
+  } else if(typeof window._callClaudeAPIWithImage==='function'){
+    p=window._callClaudeAPIWithImage(prompt,imgData).then(function(t){return {text:t,source:'api'};});
+  } else { if(onError) onError('AI not ready'); return; }
+  p.then(function(r){
+    var t=r&&(r.text||r);
+    if(t&&String(t).trim().length>5){ if(onResult) onResult(String(t).trim()); }
+    else { if(onError) onError('empty'); }
+  }).catch(function(e){ if(onError) onError(e); });
+}
+
+function stopStream(ref, videoId, areaId, btnId, btnHtml){
+  if(ref.stream){ ref.stream.getTracks().forEach(function(t){t.stop();}); ref.stream=null; }
+  var v=document.getElementById(videoId); if(v){v.style.display='none';v.srcObject=null;}
+  var a=document.getElementById(areaId); if(a) a.style.display='none';
+  var b=document.getElementById(btnId); if(b&&btnHtml) b.innerHTML=btnHtml;
+}
+
+/* ════════════════════════════
+   1. تصوير الطعام — food-scan
+════════════════════════════ */
+var _fsRef={stream:null}, _fsAnalyzing=false, _fsIv=null;
+
+function _autoCamFoodScan(){
+  var video=document.getElementById('fs-video');
+  var fallback=document.getElementById('fs-fallback');
+  var statusTxt=document.getElementById('fs-live-status-text');
+  var statusEl=document.getElementById('fs-live-status');
+  if(_fsRef.stream) return;
+  if(fallback) fallback.style.display='none';
+  if(statusEl) statusEl.style.display='block';
+  if(statusTxt) statusTxt.textContent='📷 جاري تشغيل الكاميرا...';
+  openBackCamera(video, _fsRef, function(){
+    if(statusTxt) statusTxt.textContent='🍽️ جاري التعرف على الطعام...';
+    clearInterval(_fsIv);
+    setTimeout(function(){ _fsScan(video,statusTxt); }, 1500);
+    _fsIv=setInterval(function(){ _fsScan(video,statusTxt); }, 4000);
+  }, function(){ if(statusTxt) statusTxt.textContent='❌ لم يتم منح صلاحية الكاميرا'; });
+}
+
+function _fsScan(video, statusTxt){
+  if(_fsAnalyzing||!_fsRef.stream) return;
+  _fsAnalyzing=true;
+  if(statusTxt) statusTxt.textContent='🔍 جاري التحليل...';
+  var img=captureFrame(video); if(!img){_fsAnalyzing=false;return;}
+  var prompt='أنت خبير تغذية. انظر للصورة وتعرف على الطعام. اكتب:\n- اسم الطعام بالعربية\n- السعرات الحرارية التقريبية\n- البروتين والكارب والدهون بالجرام\n- نصيحة صحية قصيرة\nكن مختصراً ومباشراً. اللغة: عربية فقط.';
+  visionRace(img, prompt, function(result){
+    _fsAnalyzing=false;
+    if(statusTxt) statusTxt.textContent='✅ تم التعرف';
+    clearInterval(_fsIv);
+    if(typeof window.fsParseAndDisplay==='function'){
+      window.fsParseAndDisplay(result);
+    } else {
+      var rb=document.getElementById('fs-result')||document.getElementById('fs-ai-result');
+      if(rb){rb.style.display='block';rb.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">'+result.replace(/\n/g,'<br>')+'</div>';}
+    }
+    setTimeout(function(){ if(_fsRef.stream) _fsIv=setInterval(function(){ _fsScan(video,statusTxt); },4000); },5000);
+  }, function(){ _fsAnalyzing=false; if(statusTxt) statusTxt.textContent='⏳ وجّه الكاميرا نحو الطعام...'; });
+}
+
+function _stopFoodScan(){
+  clearInterval(_fsIv); _fsIv=null; _fsAnalyzing=false;
+  stopStream(_fsRef,'fs-video',null,null,null);
+  var v=document.getElementById('fs-video'); if(v) v.style.display='none';
+  var fb=document.getElementById('fs-fallback'); if(fb) fb.style.display='block';
+}
+
+/* ════════════════════════════════
+   2. كشف الصور المزيفة — fake-image
+════════════════════════════════ */
+var _fiRef={stream:null}, _fiAnalyzing=false, _fiIv=null;
+
+function _autoCamFakeImage(){
+  var area=document.getElementById('fi-camera-area');
+  var video=document.getElementById('fi-video');
+  var statusEl=document.getElementById('fi-live-status');
+  var btn=document.getElementById('fi-camera-btn');
+  if(_fiRef.stream) return;
+  if(area) area.style.display='block';
+  if(btn) btn.innerHTML='<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
+  if(statusEl){statusEl.style.display='block'; var s=statusEl.querySelector('span'); if(s) s.textContent='📷 جاري تشغيل الكاميرا...';}
+  openBackCamera(video, _fiRef, function(){
+    var s=statusEl&&statusEl.querySelector('span');
+    if(s) s.textContent='🔍 يحلل ما أمام الكاميرا...';
+    clearInterval(_fiIv);
+    setTimeout(function(){ _fiScan(video,statusEl); },1500);
+    _fiIv=setInterval(function(){ _fiScan(video,statusEl); },4500);
+  }, function(){var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='❌ لا يوجد صلاحية للكاميرا';});
+}
+
+function _fiScan(video, statusEl){
+  if(_fiAnalyzing||!_fiRef.stream) return;
+  _fiAnalyzing=true;
+  var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='🔬 جاري التحليل...';
+  var img=captureFrame(video); if(!img){_fiAnalyzing=false;return;}
+  var prompt='أنت خبير في الجنايات الرقمية وكشف التزوير.\nحلّل هذه الصورة:\n1. هل هي حقيقية أم مزيفة أم مولودة بـ AI؟\n2. نسبة الثقة بأنها حقيقية (0-100%)\n3. أبرز المؤشرات التقنية\n4. الحكم النهائي\nكن مختصراً ومباشراً. اللغة: عربية.';
+  visionRace(img, prompt, function(result){
+    _fiAnalyzing=false;
+    if(s) s.textContent='✅ تم التحليل';
+    clearInterval(_fiIv);
+    var rb=document.getElementById('fi-result');
+    if(rb){rb.style.display='block';rb.innerHTML='<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">🔍 <b style="color:#ffc107">تقرير تحليل الصورة</b><br><br>'+result+'</div>';}
+    setTimeout(function(){ if(_fiRef.stream) _fiIv=setInterval(function(){ _fiScan(video,statusEl); },4500); },6000);
+  }, function(){ _fiAnalyzing=false; if(s) s.textContent='⏳ وجّه الكاميرا نحو الصورة...'; });
+}
+
+function _stopFakeImage(){
+  clearInterval(_fiIv); _fiIv=null; _fiAnalyzing=false;
+  stopStream(_fiRef,'fi-video','fi-camera-area','fi-camera-btn','<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير بالكاميرا</span>');
+}
+
+/* ════════════════════════════════
+   3. حل الواجبات — homework
+════════════════════════════════ */
+var _hwRef={stream:null}, _hwAutoAnalyzing=false, _hwIv=null;
+
+function _autoCamHomework(){
+  var area=document.getElementById('hw-camera-area');
+  var video=document.getElementById('hw-video');
+  var statusEl=document.getElementById('hw-live-status');
+  var btn=document.getElementById('hw-camera-btn');
+  if(_hwRef.stream) return;
+  if(area) area.style.display='block';
+  if(btn) btn.innerHTML='<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
+  if(statusEl){statusEl.style.display='block'; var s=statusEl.querySelector('span'); if(s) s.textContent='📷 جاري تشغيل الكاميرا...';}
+  openBackCamera(video, _hwRef, function(){
+    var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='📚 وجّه الكاميرا نحو السؤال...';
+    clearInterval(_hwIv);
+    setTimeout(function(){ _hwScan(video,statusEl); },2000);
+    _hwIv=setInterval(function(){ _hwScan(video,statusEl); },4000);
+  }, function(){var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='❌ لم يتم منح صلاحية الكاميرا';});
+}
+
+function _hwScan(video, statusEl){
+  if(_hwAutoAnalyzing||!_hwRef.stream) return;
+  _hwAutoAnalyzing=true;
+  var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='🧠 جاري حل السؤال...';
+  var img=captureFrame(video); if(!img){_hwAutoAnalyzing=false;return;}
+  var grade=document.getElementById('hw-grade')?document.getElementById('hw-grade').value:'';
+  var subject=document.getElementById('hw-subject')?document.getElementById('hw-subject').value:'';
+  var prompt='أنت مدرس خبير بالمناهج المصرية. انظر للصورة.'+(grade?' الصف: '+grade+'.':'')+(subject?' المادة: '+subject+'.':'')+'\nاقرأ السؤال وقدّم:\n1. السؤال كما هو\n2. الإجابة النموذجية خطوة بخطوة\n3. الشرح المبسط\nاللغة: عربية. إذا لم تجد سؤالاً اكتب: "وجّه الكاميرا نحو السؤال".';
+  visionRace(img, prompt, function(result){
+    _hwAutoAnalyzing=false; clearInterval(_hwIv);
+    if(s) s.textContent='✅ تم الحل';
+    var rb=document.getElementById('hw-result');
+    if(rb){rb.style.display='block';rb.innerHTML='<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">🧠 <b style="color:#64b5f6">الإجابة النموذجية</b><br><br>'+result+'</div>';}
+    setTimeout(function(){ if(_hwRef.stream) _hwIv=setInterval(function(){ _hwScan(video,statusEl); },4000); },5000);
+  }, function(){ _hwAutoAnalyzing=false; if(s) s.textContent='⏳ وجّه الكاميرا نحو السؤال...'; });
+}
+
+function _stopHomework(){
+  clearInterval(_hwIv); _hwIv=null; _hwAutoAnalyzing=false;
+  stopStream(_hwRef,'hw-video','hw-camera-area','hw-camera-btn','<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير السؤال</span>');
+}
+
+/* ════════════════════════════════
+   4. قراءة الكف — palm (خلفية ✅)
+════════════════════════════════ */
+var _palmAutoRef={stream:null}, _palmAutoAnalyzing=false;
+
+function _autoCamPalm(){
+  var area=document.getElementById('palm-camera-area');
+  var video=document.getElementById('palm-video');
+  var statusEl=document.getElementById('palm-live-status');
+  var btn=document.getElementById('palm-camera-btn');
+  if(_palmAutoRef.stream) return;
+  if(area) area.style.display='block';
+  if(btn) btn.innerHTML='<i class="fas fa-stop-circle" style="font-size:1.4rem"></i><span style="margin-top:4px">إيقاف الكاميرا</span>';
+  if(statusEl){statusEl.style.display='block'; var s=statusEl.querySelector('span'); if(s) s.textContent='📷 الكاميرا الخلفية تعمل...';}
+  openBackCamera(video, _palmAutoRef, function(){
+    var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='🖐 ضع كفك أمام الكاميرا...';
+    setTimeout(function(){
+      if(!_palmAutoRef.stream||_palmAutoAnalyzing) return;
+      _palmAutoAnalyzing=true;
+      if(s) s.textContent='🔮 جاري قراءة خطوط كفك...';
+      var img=captureFrame(video); if(!img){_palmAutoAnalyzing=false;return;}
+      var mode=window._palmMode||'full';
+      var modeP={full:'قدّم قراءة شاملة: الشخصية، العواطف، المسار المهني، الصحة.',love:'ركّز على الجانب العاطفي وخط القلب والعلاقات.',career:'ركّز على المسار المهني وخط القدر والطموح.',health:'ركّز على الصحة وخط الحياة والحيوية.'};
+      var prompt='أنت قارئ كف خبير. انظر لهذه الصورة وحلّل راحة اليد.\n\n'+(modeP[mode]||modeP.full)+'\n\nاتبع هذا الهيكل:\n🖐 شكل الكف والأصابع:\n📏 الخطوط الرئيسية (الحياة، القلب، الرأس، القدر):\n✨ ملاحظات خاصة:\n🔮 القراءة الشاملة:\n\nاكتب بالعربية الواضحة. اختم بـ: "هذه القراءة للترفيه والاستئناس فقط."';
+      visionRace(img, prompt, function(result){
+        _palmAutoAnalyzing=false; if(s) s.textContent='✅ تمت القراءة';
+        var rb=document.getElementById('palm-result')||document.getElementById('palm-reading-result');
+        if(rb){rb.style.display='block';rb.innerHTML='<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">🖐 <b style="color:#ff8a65">قراءة الكف</b><br><br>'+result+'</div>';}
+      }, function(){
+        _palmAutoAnalyzing=false; if(s) s.textContent='⚠️ ضع كفك بشكل واضح أمام الكاميرا ثم انتظر...';
+        setTimeout(function(){
+          if(!_palmAutoRef.stream||_palmAutoAnalyzing) return;
+          _palmAutoAnalyzing=true;
+          var img2=captureFrame(video); if(!img2){_palmAutoAnalyzing=false;return;}
+          visionRace(img2,prompt,function(r){_palmAutoAnalyzing=false;if(s)s.textContent='✅ تمت القراءة';var rb2=document.getElementById('palm-result')||document.getElementById('palm-reading-result');if(rb2){rb2.style.display='block';rb2.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt);white-space:pre-line">'+r+'</div>';}},function(){_palmAutoAnalyzing=false;});
+        },3000);
+      });
+    },2500);
+  }, function(){var s=statusEl&&statusEl.querySelector('span');if(s) s.textContent='❌ لم يتم منح صلاحية الكاميرا';});
+}
+
+function _stopPalmAuto(){
+  _palmAutoAnalyzing=false;
+  stopStream(_palmAutoRef,'palm-video','palm-camera-area','palm-camera-btn','<i class="fas fa-camera" style="font-size:1.4rem"></i><span style="margin-top:4px">تصوير كفك الآن</span>');
+}
+
+/* ════════════════════════════════
+   5. أوضاع الماسح (food/medicine/report/prescription)
+   تحليل فوري من pa-video-stream
+════════════════════════════════ */
+var _scanAutoAnalyzing=false, _scanAutoIv=null;
+
+function _startScannerAutoLoop(mode){
+  clearInterval(_scanAutoIv); _scanAutoIv=null; _scanAutoAnalyzing=false;
+  var video=document.getElementById('pa-video-stream');
+  if(!video) return;
+  var resBox=document.getElementById('pa-scan-result');
+
+  var prompts={
+    food:'أنت مستشار تغذية. انظر للصورة وتعرف على الطعام أمامك وأصدر حكماً:\n✅ مسموح / ⚠️ بالاعتدال / 🚫 ممنوع\nاذكر: اسم الطعام — الحكم مع السبب — نصيحة واحدة.\nاللغة: عربية مختصرة. إذا لم تجد طعاماً اكتب: "وجّه الكاميرا نحو الطعام".',
+    medicine:'أنت صيدلاني خبير. انظر لعلبة الدواء واستخرج:\n1. اسم الدواء التجاري والعلمي\n2. الجرعة والتركيز\n3. الاستخدامات الرئيسية\n4. أبرز التحذيرات\n5. طريقة الاستخدام\nاللغة: عربية. إذا لم تجد علبة دواء اكتب: "وجّه الكاميرا نحو علبة الدواء".',
+    report:'أنت طبيب متخصص. انظر للتقرير الطبي:\n1. نوع التقرير\n2. القيم والأرقام المهمة\n3. اشرح كل قيمة بلغة بسيطة\n4. ما هو طبيعي وما يحتاج انتباهاً\nاختم بـ: "هذا شرح توعوي، استشر طبيبك."\nاللغة: عربية. إذا لم تجد تقريراً اكتب: "وجّه الكاميرا نحو التقرير الطبي".',
+    prescription:'أنت صيدلاني متخصص. انظر للروشتة الطبية. لكل دواء:\n- الاسم التجاري والعلمي\n- الجرعة\n- طريقة الاستخدام والوقت\n- أبرز التحذيرات\nاللغة: عربية واضحة. إذا لم تجد روشتة اكتب: "وجّه الكاميرا نحو الروشتة الطبية".'
+  };
+
+  var colors={food:'#d4a017',medicine:'#42a5f5',report:'#ce93d8',prescription:'#ffb74d'};
+  var icons={food:'🍎',medicine:'💊',report:'🔬',prescription:'📋'};
+  var titles={food:'نتيجة تحليل الطعام',medicine:'نتيجة تحليل الدواء',report:'نتيجة تحليل التقرير',prescription:'نتيجة قراءة الروشتة'};
+  var thinkMsgs={food:'🍎 جاري التعرف على الطعام...',medicine:'💊 جاري قراءة علبة الدواء...',report:'🔬 جاري قراءة التقرير الطبي...',prescription:'📋 جاري قراءة الروشتة...'};
+
+  var prompt=prompts[mode]; if(!prompt) return;
+  if(resBox) showThinkingBox('pa-scan-result', thinkMsgs[mode]||'🔍 جاري التحليل...');
+
+  var delay = (mode==='medicine'||mode==='report'||mode==='prescription') ? 2000 : 1500;
+  var interval = (mode==='food') ? 4000 : 5000;
+
+  function doScan(){
+    if(_scanAutoAnalyzing) return;
+    var s=video&&video.srcObject; if(!s) return;
+    _scanAutoAnalyzing=true;
+    var img=captureFrame(video); if(!img){_scanAutoAnalyzing=false;return;}
+    visionRace(img, prompt, function(result){
+      _scanAutoAnalyzing=false; clearInterval(_scanAutoIv);
+      if(resBox){
+        var c=colors[mode]||'#2ec951';
+        if(mode==='food'){
+          if(result.includes('مسموح')) c='#2ec951';
+          else if(result.includes('ممنوع')) c='#f44336';
+          else c='#ff9800';
+        }
+        resBox.style.display='block';
+        resBox.innerHTML='<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid '+c+'44;border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">'+(icons[mode]||'🔍')+' <b style="color:'+c+'">'+(titles[mode]||'النتيجة')+'</b><br><br>'+result+'</div>';
+      }
+      setTimeout(function(){ if(video&&video.srcObject) _scanAutoIv=setInterval(doScan,interval); },6000);
+    }, function(){ _scanAutoAnalyzing=false; });
+  }
+
+  setTimeout(doScan, delay);
+  _scanAutoIv=setInterval(doScan, interval);
+}
+
+/* ════════════════════════════════
+   إيقاف كل الكاميرات
+════════════════════════════════ */
+function _stopAllAutoCams(){
+  _stopFoodScan(); _stopFakeImage(); _stopHomework(); _stopPalmAuto();
+  clearInterval(_scanAutoIv); _scanAutoIv=null; _scanAutoAnalyzing=false;
+}
+
+/* ════════════════════════════════
+   الدالة المركزية للتشغيل
+════════════════════════════════ */
+function _autoCamLaunch(toolKey){
+  if(toolKey==='food-scan')  _autoCamFoodScan();
+  if(toolKey==='fake-image') _autoCamFakeImage();
+  if(toolKey==='homework')   _autoCamHomework();
+  if(toolKey==='palm')       _autoCamPalm();
+}
+window._autoCamLaunch = _autoCamLaunch;
+
+/* ════════════════════════════════
+   Hook على setScanMode
+   يبدأ التحليل فور اختيار الوضع
+════════════════════════════════ */
+var _origSetScanMode = window.setScanMode;
+window.setScanMode = function(mode){
+  clearInterval(_scanAutoIv); _scanAutoIv=null; _scanAutoAnalyzing=false;
+  if(typeof _origSetScanMode==='function') _origSetScanMode(mode);
+  if(mode==='food'||mode==='medicine'||mode==='report'||mode==='prescription'){
+    setTimeout(function(){
+      var video=document.getElementById('pa-video-stream');
+      var ready = video&&video.srcObject&&video.style.display!=='none';
+      if(ready){
+        _startScannerAutoLoop(mode);
+      } else {
+        if(typeof window.startPremiumCameraScanner==='function'){
+          window.startPremiumCameraScanner(function(){ _startScannerAutoLoop(mode); });
+        }
+      }
+    },500);
+  }
+  if(mode==='product'){
+    setTimeout(function(){
+      if(typeof window._startCameraAndScanNow==='function') window._startCameraAndScanNow();
+    },400);
+  }
+};
+
+/* ════════════════════════════════
+   إيقاف عند الرجوع للصفحات الرئيسية
+════════════════════════════════ */
+var _origGoPage=window.goPage;
+window.goPage=function(n){
+  if(['home','food','ai','fast','profile','experiences'].indexOf(n)>=0) _stopAllAutoCams();
+  if(typeof _origGoPage==='function') _origGoPage(n);
+};
+
+/* ════════════════════════════════
+   تصدير للاستخدام الخارجي
+════════════════════════════════ */
+window._autoCamera={
+  stopAll:_stopAllAutoCams,
+  stopFoodScan:_stopFoodScan,
+  stopFakeImage:_stopFakeImage,
+  stopHomework:_stopHomework,
+  stopPalm:_stopPalmAuto,
+  launch:_autoCamLaunch
+};
+
+console.log('[AutoCamera] ✅ v1.0 — كاميرا خلفية تلقائية لـ 9 أدوات');
 })();
 </script>
 </body>
