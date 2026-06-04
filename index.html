@@ -1,3 +1,15 @@
+
+// ===== Helper آمن للحصول على UID المستخدم =====
+function getSafeUid() {
+    if (window.firebaseAuth && window.firebaseAuth.currentUser && window.getSafeUid()) {
+        return window.getSafeUid();
+    }
+    if (window.currentUser && window.currentUser.username) {
+        return window.currentUser.username;
+    }
+    return null;
+}
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
@@ -3254,7 +3266,7 @@ function obgynIncUsage() {
       window.__firebaseRef &&
       window.__firebaseDB
     ) {
-      var uid = window.firebaseAuth.currentUser.uid;
+      var uid = window.getSafeUid();
       window.__firebaseSet(
         window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/obgyn-ai'),
         newVal
@@ -3462,7 +3474,7 @@ function ptBuildBleedingDays(periodLen) {
 async function ptApplySmartAverage() {
   try {
     if (!window.__firebaseReady || !window.currentUser || !window.__firebaseGet || !window.__firebaseRef || !window.__firebaseDB) return;
-    var uid = firebaseAuth.currentUser.uid;
+    var uid = getSafeUid();
     var snap = await window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/periodCycles'));
     if (!snap || !snap.exists()) return;
     var cycles = [];
@@ -3601,7 +3613,7 @@ async function ptSaveCycle() {
     var notes = (document.getElementById('pt-notes') || {}).value || '';
 
     // بناء كائن البيانات
-    var uid = firebaseAuth.currentUser.uid;
+    var uid = getSafeUid();
     var cycleId = 'cycle_' + lastDate.replace(/-/g,'');
     var cycleData = {
       lastDate:       lastDate,
@@ -4520,7 +4532,7 @@ async function dbSaveUser(u, d) {
     try {
       // استخدم Firebase UID الحقيقي إذا كان المستخدم مصادقاً
       var fbAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
-      var fbKey = fbAuth ? window.__firebaseAuth.currentUser.uid : u;
+      var fbKey = fbAuth ? window.__getSafeUid() : u;
       await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + fbKey), d);
     } catch(e) {}
   }
@@ -10064,28 +10076,6 @@ chatBox.innerHTML +=
 
   });
 }
-      .catch(function(){
-        clearTimeout(tid);
-        /* Fallback: try timeapi.io */
-        fetch('https://timeapi.io/api/Time/current/zone?timeZone=Africa%2FCairo')
-          .then(function(r){ return r.json(); })
-          .then(function(d){
-            _netDate = new Date(d.dateTime);
-            _netDateFetched = true;
-            var el = document.getElementById('drp-sync-status');
-            if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
-            cb(_netDate);
-          })
-          .catch(function(){
-            /* آخر ملجأ: وقت الجهاز */
-            _netDate = new Date();
-            _netDateFetched = true;
-            var el = document.getElementById('drp-sync-status');
-            if (el) el.textContent = '⚠️ تعذر المزامنة - يستخدم وقت الجهاز';
-            cb(_netDate);
-          });
-      });
-  }
 
   function _todayStr(date) {
     return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
@@ -10093,7 +10083,7 @@ chatBox.innerHTML +=
 
   /* ─── مفتاح التخزين مرتبط بالمستخدم الحالي ─── */
   function _stateKey() {
-    var u = (window.currentUser && firebaseAuth.currentUser.uid) ? firebaseAuth.currentUser.uid : 'guest';
+    var u = (window.currentUser && firebaseAuth && firebaseAuth.currentUser && getSafeUid()) ? getSafeUid() : 'guest';
     return 'tayyibat_daily_reward_v3_' + u;
   }
 
@@ -10274,7 +10264,7 @@ chatBox.innerHTML +=
 
       /* حفظ في Firebase */
       if (typeof dbSaveUser === 'function' && window.currentUser) {
-        try { dbSaveUser(firebaseAuth.currentUser.uid, window.currentUser); } catch(e) {}
+        try { dbSaveUser(getSafeUid(), window.currentUser); } catch(e) {}
       }
 
       /* تحديث العداد التنازلي إن كان مفتوحاً */
@@ -10816,7 +10806,7 @@ function incToolUsage(toolKey) {
   try {
     var hasFirebaseAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
     if (hasFirebaseAuth && window.__firebaseReady && window.currentUser && window.__firebaseSet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = window.__firebaseAuth.currentUser.uid;
+      var uid = window.__getSafeUid();
       window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/' + toolKey), newVal).catch(function(){});
     }
   } catch(e) {}
@@ -11289,7 +11279,10 @@ function diAnalyze() {
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري فحص التداخلات الدوائية...</span></div>';
   var diSysPrompt = 'أنت صيدلاني سريري خبير في مصر متخصص في التفاعلات الدوائية. الأسعار دائماً بالجنيه المصري EGP.\nأجب فقط بـ JSON صالح بدون أي نص خارجه أو markdown.\nصنّف الخطورة: خطير (قد يُهدد الحياة) / تحذير (يحتاج متابعة) / آمن نسبياً (تفاعل بسيط).\nإذا لم يوجد تفاعل، اجعل interactions مصفوفة فارغة وsummary يوضح ذلك.';
   var prompt = 'افحص التداخلات الدوائية بين:\n' + _diDrugs.map(function(d,i){ return (i+1)+'. '+d; }).join('\n') + '\n\nأجب بـ JSON فقط:\n{"interactions":[{"drug1":"دواء1","drug2":"دواء2","severity":"خطير/تحذير/آمن نسبياً","description":"آلية التداخل وتأثيره السريري","recommendation":"ما يجب فعله"}],"summary":"ملخص سريري شامل للمريض","overall_risk":"مستوى الخطر الكلي: مرتفع/متوسط/منخفض"}';
-  _callClaudeAPI(prompt, diSysPrompt).then(function(res) {
+  var msgs = [{role:'system',content:diSysPrompt},{role:'user',content:prompt}];
+  var handled = false;
+  function onResult(res) {
+    if (handled) return; handled = true;
     try {
       var clean = res.replace(/```json|```/g,'').trim();
       var data = JSON.parse(clean);
@@ -11297,10 +11290,22 @@ function diAnalyze() {
     } catch(e) {
       resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
     }
-  }).catch(function() {
-    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل، حاول مرة أخرى.</div>';
-  });
+  }
+  function onFail() {
+    if (handled) return; handled = true;
+    resBox.innerHTML = '<div style="padding:14px;color:var(--txt3);font-size:.8rem;text-align:right;background:rgba(255,255,255,.03);border-radius:10px">تعذر تحليل التداخلات حاليًا. تأكد من اتصالك بالإنترنت أو حاول مرة أخرى.</div>';
+  }
+  if (typeof universalChat === 'function') {
+    universalChat(msgs).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
+  } else if (typeof smartChat === 'function') {
+    smartChat(diSysPrompt, prompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
+  } else if (typeof window.TayyibatAI !== 'undefined' && window.TayyibatAI.chat) {
+    window.TayyibatAI.chat(prompt, diSysPrompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
+  } else {
+    onFail();
+  }
 }
+
 
 function renderDiResult(data, resBox) {
   var sevColor = { 'خطير': '#f44336', 'تحذير': '#ff9800', 'آمن': '#2ec951', 'آمن نسبياً': '#4caf50' };
@@ -11337,7 +11342,10 @@ function daSearch() {
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري البحث عن البدائل...</span></div>';
   var sysPrompt = 'أنت صيدلاني سريري خبير في مصر. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP فقط. كل بديل في alternatives يجب أن يحتوي على حقل "name".';
   var prompt = 'الدواء: "' + drug + '"\n\nأجب بهذا JSON الحرفي فقط (لا شيء قبله ولا بعده):\n{"drug_name":"اسم الدواء","active_ingredient":"المادة الفعالة عربي","active_ingredient_en":"Active Ingredient En","drug_class":"تصنيف الدواء","main_use":"الاستخدام الرئيسي","price_range":"نطاق السعر بالجنيه المصري EGP","alternatives":[{"name":"الاسم التجاري للبديل","active":"مادته الفعالة","price":"سعره بالجنيه المصري EGP","notes":"ملاحظة الفرق"},{"name":"بديل 2","active":"مادته الفعالة","price":"سعره","notes":"ملاحظة"},{"name":"بديل 3","active":"مادته الفعالة","price":"سعره","notes":"ملاحظة"}],"warnings":"أهم التحذيرات والتفاعلات الدوائية","note":"استشر الطبيب أو الصيدلاني قبل تغيير الدواء"}';
-  _callClaudeAPI(prompt, sysPrompt).then(function(res) {
+  var msgs = [{role:'system',content:sysPrompt},{role:'user',content:prompt}];
+  var handled = false;
+  function onResult(res) {
+    if (handled) return; handled = true;
     try {
       var clean = res.replace(/```json|```/g,'').trim();
       var data = JSON.parse(clean);
@@ -11345,10 +11353,22 @@ function daSearch() {
     } catch(e) {
       resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
     }
-  }).catch(function() {
-    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر البحث.</div>';
-  });
+  }
+  function onFail() {
+    if (handled) return; handled = true;
+    resBox.innerHTML = '<div style="padding:14px;color:var(--txt3);font-size:.8rem;text-align:right;background:rgba(255,255,255,.03);border-radius:10px">تعذر الحصول على بدائل الدواء حاليًا. تأكد من اتصالك بالإنترنت أو جرّب اسماً مختلفاً.</div>';
+  }
+  if (typeof universalChat === 'function') {
+    universalChat(msgs).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
+  } else if (typeof smartChat === 'function') {
+    smartChat(sysPrompt, prompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
+  } else if (typeof window.TayyibatAI !== 'undefined' && window.TayyibatAI.chat) {
+    window.TayyibatAI.chat(prompt, sysPrompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
+  } else {
+    onFail();
+  }
 }
+
 
 function renderDaResult(data, resBox) {
   // دالة تنظيف القيم — تتجاهل "undefined" و null والقيم الفارغة
@@ -13364,7 +13384,7 @@ setTimeout(function(){
 function checkAdminTrialReset() {
   try {
     if (window.__firebaseReady && window.currentUser && window.__firebaseGet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = firebaseAuth.currentUser.uid;
+      var uid = getSafeUid();
       window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialReset')).then(function(snap) {
         if (!snap || !snap.exists()) return;
         var adminReset = snap.val();
@@ -13417,7 +13437,7 @@ setTimeout(checkAdminTrialReset, 3000);
         // ── تفعيل / إلغاء تفعيل PRO ──
         case 'SET_PRO':
           if (window.currentUser) {
-            localStorage.setItem('tayyibat_pro_' + (firebaseAuth.currentUser.uid || 'user'), JSON.stringify({
+            localStorage.setItem('tayyibat_pro_' + (getSafeUid() || 'user'), JSON.stringify({
               active: !!cmd.active,
               expiresAt: cmd.expiresAt || 0,
               lifetime: !!cmd.lifetime
@@ -13485,8 +13505,8 @@ user: window.currentUser
       username:
         (firebaseAuth &&
          firebaseAuth.currentUser &&
-         firebaseAuth.currentUser.uid)
-          ? firebaseAuth.currentUser.uid
+         getSafeUid())
+          ? getSafeUid()
           : window.currentUser.username,
       nameAr: window.currentUser.nameAr
     }
@@ -15349,10 +15369,14 @@ function _cfChat(messages) {
 
   /* ── توافق مع الكود القديم ── */
   global._callClaudeAPI = function(prompt, imageDataUrl) {
-    if (imageDataUrl)
+    // Only treat 2nd arg as imageDataUrl if it genuinely looks like a data URL or http URL
+    var isImage = imageDataUrl && typeof imageDataUrl === 'string' &&
+                  (imageDataUrl.startsWith('data:image') || imageDataUrl.startsWith('http'));
+    if (isImage)
       return _universalVision(imageDataUrl, prompt).then(function(r) { return r ? r.text : ''; });
-    return smartChat(typeof buildUserContext === 'function' ? buildUserContext() : 'أنت مساعد صحي.', prompt)
-      .then(function(r) { return r.text; });
+    // Otherwise treat it as sysPrompt
+    var sys = imageDataUrl || (typeof buildUserContext === 'function' ? buildUserContext() : 'أنت مساعد صحي.');
+    return smartChat(sys, prompt).then(function(r) { return r ? r.text : ''; });
   };
   global._callClaudeAPIWithImage = function(prompt, imageDataUrl) {
     return _universalVision(imageDataUrl, prompt).then(function(r) { return r ? r.text : ''; });
@@ -15371,6 +15395,33 @@ function _cfChat(messages) {
   console.log('[TayyibatAI] ✅ v' + TayyibatAI.version + ' — CF-WORKER PRIORITY | Fallback: LLM7 + Pollinations + Kepler + OpenRouter');
 
 })(window);
+
+
+// ===== Daily Reward: مزامنة الوقت من الإنترنت مع fallback =====
+var netDate = null;
+var netDateFetched = false;
+
+function fetchNetDate(cb) {
+    fetch("https://timeapi.io/api/Time/current/zone?timeZone=Africa/Cairo")
+        .then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+        })
+        .then(function (d) {
+            netDate = new Date(d.dateTime);
+            netDateFetched = true;
+            var el = document.getElementById("drp-sync-status");
+            if (el) el.textContent = "تمت مزامنة الوقت بنجاح ✅";
+            if (typeof cb === "function") cb(netDate);
+        })
+        .catch(function () {
+            netDate = new Date();
+            netDateFetched = false;
+            var el = document.getElementById("drp-sync-status");
+            if (el) el.textContent = "تعذر المزامنة، تم استخدام وقت الجهاز";
+            if (typeof cb === "function") cb(netDate);
+        });
+}
 
 </script>
 </body>
