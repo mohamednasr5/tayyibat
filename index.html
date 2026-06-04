@@ -3247,7 +3247,7 @@ function obgynIncUsage() {
   // ── Sync to Firebase ──
   try {
     if (window.__firebaseReady && window.currentUser && window.__firebaseSet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = window.currentUser.username;
+      var uid = firebaseAuth.currentUser.uid;
       window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/obgyn-ai'), newVal).catch(function(){});
     }
   } catch(e) {}
@@ -3452,7 +3452,7 @@ function ptBuildBleedingDays(periodLen) {
 async function ptApplySmartAverage() {
   try {
     if (!window.__firebaseReady || !window.currentUser || !window.__firebaseGet || !window.__firebaseRef || !window.__firebaseDB) return;
-    var uid = window.currentUser.username;
+    var uid = firebaseAuth.currentUser.uid;
     var snap = await window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/periodCycles'));
     if (!snap || !snap.exists()) return;
     var cycles = [];
@@ -3591,7 +3591,7 @@ async function ptSaveCycle() {
     var notes = (document.getElementById('pt-notes') || {}).value || '';
 
     // بناء كائن البيانات
-    var uid = window.currentUser.username;
+    var uid = firebaseAuth.currentUser.uid;
     var cycleId = 'cycle_' + lastDate.replace(/-/g,'');
     var cycleData = {
       lastDate:       lastDate,
@@ -10057,7 +10057,7 @@ chatBox.innerHTML +=
 
   /* ─── مفتاح التخزين مرتبط بالمستخدم الحالي ─── */
   function _stateKey() {
-    var u = (window.currentUser && window.currentUser.username) ? window.currentUser.username : 'guest';
+    var u = (window.currentUser && firebaseAuth.currentUser.uid) ? firebaseAuth.currentUser.uid : 'guest';
     return 'tayyibat_daily_reward_v3_' + u;
   }
 
@@ -10238,7 +10238,7 @@ chatBox.innerHTML +=
 
       /* حفظ في Firebase */
       if (typeof dbSaveUser === 'function' && window.currentUser) {
-        try { dbSaveUser(window.currentUser.username, window.currentUser); } catch(e) {}
+        try { dbSaveUser(firebaseAuth.currentUser.uid, window.currentUser); } catch(e) {}
       }
 
       /* تحديث العداد التنازلي إن كان مفتوحاً */
@@ -13313,7 +13313,7 @@ setTimeout(function(){
 function checkAdminTrialReset() {
   try {
     if (window.__firebaseReady && window.currentUser && window.__firebaseGet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = window.currentUser.username;
+      var uid = firebaseAuth.currentUser.uid;
       window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialReset')).then(function(snap) {
         if (!snap || !snap.exists()) return;
         var adminReset = snap.val();
@@ -13366,7 +13366,7 @@ setTimeout(checkAdminTrialReset, 3000);
         // ── تفعيل / إلغاء تفعيل PRO ──
         case 'SET_PRO':
           if (window.currentUser) {
-            localStorage.setItem('tayyibat_pro_' + (window.currentUser.username || 'user'), JSON.stringify({
+            localStorage.setItem('tayyibat_pro_' + (firebaseAuth.currentUser.uid || 'user'), JSON.stringify({
               active: !!cmd.active,
               expiresAt: cmd.expiresAt || 0,
               lifetime: !!cmd.lifetime
@@ -13429,7 +13429,7 @@ setTimeout(checkAdminTrialReset, 3000);
     setInterval(function() {
       ch.postMessage({
         type: 'INDEX_HEARTBEAT',
-        user: window.currentUser ? { username: window.currentUser.username, nameAr: window.currentUser.nameAr } : null,
+        user: window.currentUser ? { username: firebaseAuth.currentUser.uid, nameAr: window.currentUser.nameAr } : null,
         page: document.querySelector('.page.active')?.id || 'unknown',
         ts: Date.now()
       });
