@@ -6113,7 +6113,7 @@ function setScanMode(mode) {
   if (lbl) lbl.textContent = cfg.label;
   if (inp) inp.placeholder = cfg.placeholder;
 
-  // === تشغيل الكاميرا تلقائياً عند اختيار أي وضع ===
+  // === عرض زر "افتح الكاميرا" بدلاً من الفتح التلقائي ===
   var _camStatusEl = document.getElementById('camera-status-text');
   var _modeLabelsLocal = {
     'product':      'مكونات العلبة',
@@ -6122,21 +6122,77 @@ function setScanMode(mode) {
     'report':       'قراءة التقارير',
     'prescription': 'قراءة الروشتة'
   };
+  var _modeColors = {
+    'product':'#2ec951','food':'#d4a017','medicine':'#2196f3','report':'#9c27b0','prescription':'#ff6f00'
+  };
+  var _modeIcons = {
+    'product':'📦','food':'🍎','medicine':'💊','report':'🩺','prescription':'📋'
+  };
   // ازل overlay "اضغط للمسح" عند تغيير الوضع
   var _oldOverlay = document.getElementById('tap-to-rescan');
   if (_oldOverlay) _oldOverlay.remove();
 
-  if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
   var _vid = document.getElementById('pa-video-stream');
   var _already = _vid && _vid.srcObject && _vid.style.display !== 'none';
-  if (!_already) {
-    startPremiumCameraScanner(function(){
-      if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
-      if (mode === 'medicine') _startMedicineAutoScan();
-    });
-  } else {
+
+  if (_already) {
+    // الكاميرا مفتوحة بالفعل - استمر بالوضع الجديد فقط
     if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
     if (mode === 'medicine') _startMedicineAutoScan();
+  } else {
+    // الكاميرا مغلقة - عرض زر الفتح
+    if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-camera" style="margin-left:5px;color:'+(_modeColors[mode]||'#2ec951')+'"></i> جاهز — اضغط الزر لفتح الكاميرا';
+
+    // إزالة أي زر سابق
+    var _oldCamBtn = document.getElementById('_scanner_cam_ready_btn');
+    if (_oldCamBtn) _oldCamBtn.remove();
+
+    var _viewport = document.getElementById('pa-camera-viewport');
+    if (_viewport) {
+      var _readyWrap = document.createElement('div');
+      _readyWrap.id = '_scanner_cam_ready_btn';
+      _readyWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 16px;background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px dashed rgba(255,255,255,.12);border-radius:20px;text-align:center;margin:6px 0;';
+
+      var _bigIcon = document.createElement('div');
+      _bigIcon.style.cssText = 'font-size:3.2rem;filter:drop-shadow(0 0 14px '+(_modeColors[mode]||'#2ec951')+'88)';
+      _bigIcon.textContent = _modeIcons[mode]||'📷';
+
+      var _hintTxt = document.createElement('div');
+      _hintTxt.style.cssText = 'font-size:.78rem;color:rgba(255,255,255,.4);font-family:Tajawal,sans-serif;';
+      _hintTxt.textContent = 'الكاميرا لن تفتح حتى تضغط الزر';
+
+      var _startBtn = document.createElement('button');
+      var _c = _modeColors[mode]||'#2ec951';
+      _startBtn.style.cssText = 'background:linear-gradient(135deg,'+_c+','+_c+'cc);color:#050e1f;border:none;border-radius:16px;padding:14px 28px;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 4px 20px '+_c+'55;min-width:230px;';
+      _startBtn.textContent = (_modeIcons[mode]||'📷') + ' افتح الكاميرا وابدأ ' + (_modeLabelsLocal[mode]||'المسح');
+      _startBtn.onclick = function(){
+        _readyWrap.remove();
+        if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
+        startPremiumCameraScanner(function(){
+          if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
+          if (mode === 'medicine') _startMedicineAutoScan();
+        });
+      };
+
+      _readyWrap.appendChild(_bigIcon);
+      _readyWrap.appendChild(_hintTxt);
+      _readyWrap.appendChild(_startBtn);
+      _viewport.insertBefore(_readyWrap, _viewport.firstChild);
+    } else {
+      // fallback: إذا لم نجد الحاوية - افتح الكاميرا بالضغط على حالة الكاميرا
+      if (_camStatusEl) {
+        _camStatusEl.style.cursor = 'pointer';
+        _camStatusEl.onclick = function(){
+          _camStatusEl.onclick = null;
+          _camStatusEl.style.cursor = '';
+          _camStatusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-left:5px"></i> جاري تشغيل الكاميرا...';
+          startPremiumCameraScanner(function(){
+            if (_camStatusEl) _camStatusEl.innerHTML = '<i class="fas fa-circle" style="color:#f44336;margin-left:5px"></i> الكاميرا تعمل — ' + (_modeLabelsLocal[mode]||mode);
+            if (mode === 'medicine') _startMedicineAutoScan();
+          });
+        };
+      }
+    }
   }
 }
 
@@ -10674,13 +10730,13 @@ function goSmartTool(toolKey) {
   };
   var pageName = pageMap[toolKey] || toolKey;
   goPage(pageName);
-  // تهيئة خاصة بكل أداة
-  if (toolKey === 'food-scan') { setTimeout(initFoodScan, 100); setTimeout(function(){ _autoCamLaunch('food-scan'); }, 400); }
+  // تهيئة خاصة بكل أداة — الكاميرا لا تفتح تلقائياً، بل عند ضغط الزر فقط
+  if (toolKey === 'food-scan') { setTimeout(initFoodScan, 100); setTimeout(function(){ _showCameraReadyBtn('food-scan'); }, 300); }
   if (toolKey === 'barcode-boycott') bbInit();
   if (toolKey === 'scanner') setTimeout(function(){ setScanMode('product'); }, 150);
-  if (toolKey === 'fake-image') setTimeout(function(){ _autoCamLaunch('fake-image'); }, 400);
-  if (toolKey === 'homework')   setTimeout(function(){ _autoCamLaunch('homework'); }, 400);
-  if (toolKey === 'palm')       setTimeout(function(){ _autoCamLaunch('palm'); }, 400);
+  if (toolKey === 'fake-image') setTimeout(function(){ _showCameraReadyBtn('fake-image'); }, 300);
+  if (toolKey === 'homework')   setTimeout(function(){ _showCameraReadyBtn('homework'); }, 300);
+  if (toolKey === 'palm')       setTimeout(function(){ _showCameraReadyBtn('palm'); }, 300);
 }
 
 function checkToolAndRun(toolKey, fn) {
@@ -14142,6 +14198,77 @@ function _stopAllAutoCams(){
 }
 
 /* ════════════════════════════════
+   زر فتح الكاميرا (يمنع الفتح التلقائي)
+════════════════════════════════ */
+var _camReadyBtnConfigs = {
+  'food-scan':  { videoId:'fs-video',   fallbackId:'fs-fallback',  statusId:'fs-live-status', statusTxtId:'fs-live-status-text', btnLabel:'🍽️ افتح الكاميرا وحلّل الطعام',    color:'#2ec951', fn:function(){ _autoCamFoodScan(); } },
+  'fake-image': { videoId:'fi-video',   areaId:'fi-camera-area',   statusId:null,             btnLabel:'🔍 افتح الكاميرا وحلّل الصورة',  color:'#ffc107', fn:function(){ _autoCamFakeImage(); } },
+  'homework':   { videoId:'hw-video',   areaId:'hw-camera-area',   statusId:null,             btnLabel:'📚 افتح الكاميرا وحلّل السؤال',  color:'#64b5f6', fn:function(){ _autoCamHomework(); } },
+  'palm':       { videoId:'palm-video', areaId:'palm-camera-area', statusId:null,             btnLabel:'🖐 افتح الكاميرا واقرأ كفك',      color:'#ff8a65', fn:function(){ _autoCamPalm(); } }
+};
+
+function _showCameraReadyBtn(toolKey){
+  var cfg = _camReadyBtnConfigs[toolKey];
+  if(!cfg) return;
+
+  // إذا كانت الكاميرا تعمل فعلاً، لا نعرض الزر
+  var video = document.getElementById(cfg.videoId);
+  if(video && video.srcObject) return;
+
+  // إخفاء اللايف ستاتس إن وجد
+  if(cfg.statusId){ var st=document.getElementById(cfg.statusId); if(st) st.style.display='none'; }
+  if(cfg.areaId){ var ar=document.getElementById(cfg.areaId); if(ar) ar.style.display='none'; }
+
+  // إزالة أي زر سابق
+  var oldBtn = document.getElementById('_cam_ready_btn_'+toolKey);
+  if(oldBtn) oldBtn.remove();
+
+  // إيجاد حاوية مناسبة لوضع الزر فيها
+  var container = null;
+  var fallback = cfg.fallbackId ? document.getElementById(cfg.fallbackId) : null;
+  var area = cfg.areaId ? document.getElementById(cfg.areaId) : null;
+  if(fallback) container = fallback.parentNode;
+  else if(area) container = area.parentNode;
+  else if(video) container = video.parentNode;
+  if(!container) return;
+
+  // إنشاء زر احترافي
+  var wrap = document.createElement('div');
+  wrap.id = '_cam_ready_btn_'+toolKey;
+  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 16px;margin:10px 0;background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px dashed rgba(255,255,255,.12);border-radius:20px;text-align:center;';
+
+  var icon = document.createElement('div');
+  icon.style.cssText = 'font-size:3rem;line-height:1;filter:drop-shadow(0 0 12px '+cfg.color+'88)';
+  icon.textContent = cfg.btnLabel.split(' ')[0];
+
+  var hint = document.createElement('div');
+  hint.style.cssText = 'font-size:.8rem;color:rgba(255,255,255,.45);font-family:Tajawal,sans-serif;';
+  hint.textContent = 'الكاميرا لن تفتح حتى تضغط الزر';
+
+  var btn = document.createElement('button');
+  btn.style.cssText = 'background:linear-gradient(135deg,'+cfg.color+','+cfg.color+'cc);color:#050e1f;border:none;border-radius:16px;padding:14px 28px;font-family:Tajawal,sans-serif;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 4px 20px '+cfg.color+'55;transition:all .2s;min-width:220px;';
+  btn.textContent = cfg.btnLabel.substring(cfg.btnLabel.indexOf(' ')+1);
+  btn.onclick = function(){
+    wrap.remove();
+    cfg.fn();
+  };
+  btn.onmouseover = function(){ btn.style.transform='scale(1.04)'; };
+  btn.onmouseout  = function(){ btn.style.transform='scale(1)'; };
+
+  wrap.appendChild(icon);
+  wrap.appendChild(hint);
+  wrap.appendChild(btn);
+
+  // إدراج قبل الفيديو أو في بداية الحاوية
+  if(video && video.parentNode === container){
+    container.insertBefore(wrap, video);
+  } else {
+    container.insertBefore(wrap, container.firstChild);
+  }
+}
+window._showCameraReadyBtn = _showCameraReadyBtn;
+
+/* ════════════════════════════════
    الدالة المركزية للتشغيل
 ════════════════════════════════ */
 function _autoCamLaunch(toolKey){
@@ -14160,24 +14287,19 @@ var _origSetScanMode = window.setScanMode;
 window.setScanMode = function(mode){
   clearInterval(_scanAutoIv); _scanAutoIv=null; _scanAutoAnalyzing=false;
   if(typeof _origSetScanMode==='function') _origSetScanMode(mode);
+  // لا تفتح الكاميرا تلقائياً — الكاميرا تُفتح فقط بالزر الذي يظهره setScanMode
+  // لكن إذا كانت الكاميرا مفتوحة بالفعل، ابدأ التحليل التلقائي
   if(mode==='food'||mode==='medicine'||mode==='report'||mode==='prescription'){
     setTimeout(function(){
       var video=document.getElementById('pa-video-stream');
       var ready = video&&video.srcObject&&video.style.display!=='none';
       if(ready){
         _startScannerAutoLoop(mode);
-      } else {
-        if(typeof window.startPremiumCameraScanner==='function'){
-          window.startPremiumCameraScanner(function(){ _startScannerAutoLoop(mode); });
-        }
       }
+      // إذا لم تكن الكاميرا جاهزة، setScanMode قد عرضت زر الفتح بالفعل
     },500);
   }
-  if(mode==='product'){
-    setTimeout(function(){
-      if(typeof window._startCameraAndScanNow==='function') window._startCameraAndScanNow();
-    },400);
-  }
+  // وضع product: لا تشغل الكاميرا تلقائياً — الزر في setScanMode يتولى ذلك
 };
 
 /* ════════════════════════════════
