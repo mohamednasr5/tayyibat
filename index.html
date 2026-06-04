@@ -10013,21 +10013,47 @@ chatBox.innerHTML +=
   var _netDateFetched = false;
 
   function _fetchNetDate(cb) {
-    if (_netDateFetched && _netDate) { cb(_netDate); return; }
-    // إضافة timeout 5 ثوانٍ لتجنب الانتظار الطويل
-    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var tid = controller ? setTimeout(function(){ controller.abort(); }, 5000) : null;
-    var opts = controller ? { signal: controller.signal } : {};
-    fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo', opts)
-      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-      .then(function(d){
-        clearTimeout(tid);
-        _netDate = new Date(d.utc_datetime);
-        _netDateFetched = true;
-        var el = document.getElementById('drp-sync-status');
-        if (el) el.textContent = '✅ الوقت متزامن مع الإنترنت';
-        cb(_netDate);
-      })
+
+  fetch(
+    'https://timeapi.io/api/Time/current/zone?timeZone=Africa/Cairo'
+  )
+  .then(function(r) {
+
+    if (!r.ok) {
+      throw new Error('HTTP ' + r.status);
+    }
+
+    return r.json();
+
+  })
+  .then(function(d) {
+
+    _netDate = new Date(d.dateTime);
+    _netDateFetched = true;
+
+    var el = document.getElementById('drp-sync-status');
+
+    if (el) {
+      el.textContent = '✅ الوقت متزامن مع الإنترنت';
+    }
+
+    cb(_netDate);
+
+  })
+  .catch(function() {
+
+    _netDate = new Date();
+
+    var el = document.getElementById('drp-sync-status');
+
+    if (el) {
+      el.textContent = '⚠️ تم استخدام وقت الجهاز';
+    }
+
+    cb(_netDate);
+
+  });
+}
       .catch(function(){
         clearTimeout(tid);
         /* Fallback: try timeapi.io */
@@ -11315,36 +11341,51 @@ function daSearch() {
 }
 
 function renderDaResult(data, resBox) {
+  // دالة تنظيف القيم — تتجاهل "undefined" و null والقيم الفارغة
+  function safeVal(v) {
+    if (!v || v === 'undefined' || v === 'null' || String(v).trim() === '') return '';
+    return String(v).trim();
+  }
+
   var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(156,39,176,.35);border-radius:20px;overflow:hidden;margin-bottom:12px">';
   html += '<div style="background:linear-gradient(135deg,rgba(156,39,176,.25),rgba(103,58,183,.15));padding:12px 14px">';
-  html += '<div style="font-size:1rem;font-weight:900;color:#ce93d8">💊 ' + (data.drug_name || '') + '</div>';
-  html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:2px">' + (data.active_ingredient || '') + ' — ' + (data.active_ingredient_en || '') + '</div>';
+  html += '<div style="font-size:1rem;font-weight:900;color:#ce93d8">💊 ' + (safeVal(data.drug_name) || 'الدواء') + '</div>';
+  var activeLine = [safeVal(data.active_ingredient), safeVal(data.active_ingredient_en)].filter(Boolean).join(' — ');
+  if (activeLine) html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:2px">' + activeLine + '</div>';
   html += '</div>';
   html += '<div style="padding:12px 14px">';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
   [['🏷️ التصنيف',data.drug_class],['💊 الاستخدام',data.main_use],['💰 السعر التقريبي',data.price_range]].forEach(function(r) {
-    if (r[1]) html += '<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:8px 10px"><div style="font-size:.65rem;color:var(--txt3)">' + r[0] + '</div><div style="font-size:.8rem;color:var(--txt);font-weight:700;margin-top:2px">' + r[1] + '</div></div>';
+    var v = safeVal(r[1]);
+    if (v) html += '<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:8px 10px"><div style="font-size:.65rem;color:var(--txt3)">' + r[0] + '</div><div style="font-size:.8rem;color:var(--txt);font-weight:700;margin-top:2px">' + v + '</div></div>';
   });
   html += '</div>';
   if (data.alternatives && data.alternatives.length > 0) {
-    html += '<div style="font-size:.82rem;font-weight:800;color:#ce93d8;margin-bottom:10px">🔄 البدائل المتاحة (' + data.alternatives.length + '):</div>';
-    data.alternatives.forEach(function(alt) {
-      // دعم حقول بديلة: name / drug_name / brand_name / trade_name
-      var altName = alt.name || alt.drug_name || alt.brand_name || alt.trade_name || alt.اسم || '';
-      var altActive = alt.active || alt.active_ingredient || alt.active_ingredient_ar || alt.المادة_الفعالة || '';
-      var altPrice = alt.price || alt.price_range || alt.السعر || '';
-      var altNotes = alt.notes || alt.note || alt.ملاحظة || '';
-      if (!altName) return; // تخطي البدائل الفارغة
-      html += '<div style="background:rgba(156,39,176,.08);border:1px solid rgba(156,39,176,.2);border-radius:12px;padding:10px 12px;margin-bottom:8px">';
-      html += '<div style="font-size:.85rem;font-weight:800;color:#e1bee7">💊 ' + altName + '</div>';
-      if (altActive) html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:3px">المادة الفعالة: ' + altActive + '</div>';
-      if (altPrice) html += '<div style="font-size:.72rem;color:#a5d6a7;margin-top:2px">💰 ' + altPrice + '</div>';
-      if (altNotes) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:4px">📝 ' + altNotes + '</div>';
-      html += '</div>';
+    // فلترة البدائل الصالحة فقط (لها اسم حقيقي)
+    var validAlts = data.alternatives.filter(function(alt) {
+      var n = safeVal(alt.name || alt.drug_name || alt.brand_name || alt.trade_name || alt['اسم'] || '');
+      return n.length > 0;
     });
+    if (validAlts.length > 0) {
+      html += '<div style="font-size:.82rem;font-weight:800;color:#ce93d8;margin-bottom:10px">🔄 البدائل المتاحة (' + validAlts.length + '):</div>';
+      validAlts.forEach(function(alt) {
+        var altName   = safeVal(alt.name || alt.drug_name || alt.brand_name || alt.trade_name || alt['اسم'] || '');
+        var altActive = safeVal(alt.active || alt.active_ingredient || alt.active_ingredient_ar || alt['المادة_الفعالة'] || '');
+        var altPrice  = safeVal(alt.price || alt.price_range || alt['السعر'] || '');
+        var altNotes  = safeVal(alt.notes || alt.note || alt['ملاحظة'] || '');
+        html += '<div style="background:rgba(156,39,176,.08);border:1px solid rgba(156,39,176,.2);border-radius:12px;padding:10px 12px;margin-bottom:8px">';
+        html += '<div style="font-size:.85rem;font-weight:800;color:#e1bee7">💊 ' + altName + '</div>';
+        if (altActive) html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:3px">المادة الفعالة: ' + altActive + '</div>';
+        if (altPrice) html += '<div style="font-size:.72rem;color:#a5d6a7;margin-top:2px">💰 ' + altPrice + '</div>';
+        if (altNotes) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:4px">📝 ' + altNotes + '</div>';
+        html += '</div>';
+      });
+    }
   }
-  if (data.warnings) html += '<div style="background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.75rem;color:#ef9a9a;line-height:1.6;margin-top:4px">⚠️ ' + data.warnings + '</div>';
-  if (data.note) html += '<div style="font-size:.72rem;color:var(--txt3);text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">📋 ' + data.note + '</div>';
+  var warnings = safeVal(data.warnings);
+  var note = safeVal(data.note);
+  if (warnings) html += '<div style="background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.75rem;color:#ef9a9a;line-height:1.6;margin-top:4px">⚠️ ' + warnings + '</div>';
+  if (note) html += '<div style="font-size:.72rem;color:var(--txt3);text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">📋 ' + note + '</div>';
   html += '</div></div>';
   resBox.innerHTML = html;
 }
