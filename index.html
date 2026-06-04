@@ -229,7 +229,7 @@
      Google AdSense
 ════════════════════════════════════════════════════ -->
 <meta name="google-adsense-account" content="ca-pub-1767845591267587">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1767845591267587" crossorigin="anonymous"></script>
+
 
 <!-- ═══════════════════════════════════════════════════
      Preconnect & Performance
@@ -257,9 +257,10 @@
 <!-- Tesseract.js — OCR يعمل داخل المتصفح -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js" crossorigin="anonymous" defer></script>
 <!-- خدمة البيانات المجانية -->
+
 <script src="js/data-service.js" defer></script>
 <!-- محرك الذكاء الاصطناعي (يُحمّل بعد data-service) -->
-<script src="js/ai-engine.js" defer></script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -1487,6 +1488,23 @@ top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:linear-gra
 </style>
 </head>
 <body>
+<!-- ═══ طوارئ: تعريف مبكر للدوال الأساسية ═══ -->
+<script>
+// تعريف مبكر لمنع خطأ "not defined" قبل تحميل ai-engine
+window._callClaudeAPI = window._callClaudeAPI || function(p, s) {
+  if (window.TayyibatAI) return window.TayyibatAI.chat(p);
+  return Promise.resolve('جاري تحميل الذكاء الاصطناعي...');
+};
+window._callClaudeAPIWithImage = window._callClaudeAPIWithImage || function(p, img) {
+  if (window.TayyibatAI) return window.TayyibatAI.vision(img, p).then(function(r){return r.text||r;});
+  return Promise.resolve('جاري تحميل الذكاء الاصطناعي...');
+};
+window.geminiQuick = window.geminiQuick || function(msg) {
+  setTimeout(function() { if (window.geminiQuick && window.geminiQuick !== arguments.callee) window.geminiQuick(msg); }, 500);
+};
+window.geminiSend = window.geminiSend || function() {};
+</script>
+
 <canvas id="universe-canvas"></canvas>
 <div id="loader">
   <div class="ldr-stars" id="ldr-stars"></div>
@@ -8009,10 +8027,16 @@ function showToast(m, d) {
 }
 
 /* ══════════ Sound ══════════ */
+var _audioUserInteracted = false;
+document.addEventListener('click',  function(){ _audioUserInteracted = true; }, {once:true, capture:true});
+document.addEventListener('touchend',function(){ _audioUserInteracted = true; }, {once:true, capture:true});
+document.addEventListener('keydown', function(){ _audioUserInteracted = true; }, {once:true, capture:true});
+
 function playSound(type) {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !_audioUserInteracted) return;
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
     var o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.connect(g); g.connect(audioCtx.destination);
     if (type === 'click') { o.frequency.value = 880; g.gain.setValueAtTime(.12, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .08); }
@@ -9043,19 +9067,22 @@ function _buildPrompt() {
 
   var gender = u.gender === "male" ? "ذكر" : "أنثى";
 
-  return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n" +
-    "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n" +
-    "بيانات المستخدم:\n" +
-    "- الاسم: " + (u.nameAr || u.name || "مستخدم") + "\n" +
-    "- العمر: " + age + " سنة | الجنس: " + gender + "\n" +
-    "- BMI: " + (u.bmi || "؟") +
-    " | الوزن: " + (u.weight || "؟") +
-    " كجم | الطول: " + (u.height || "؟") + " سم\n" +
-    "- الحالات الصحية: " + diseases + "\n\n" +
-    "نظام الطيبات:\n" +
-    "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.\n" +
-    "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.\n\n" +
-    "القواعد: راع الحالة الصحية دائما، ذكر باستشارة الطبيب، لا تتجاوز 400 كلمة الا اذا طلب.";
+  return "أنت مساعد صحي ذكي متخصص لتطبيق طيبات الصحي، تعمل بإشراف منهج الدكتور ضياء العوضي رحمه الله.\n\n" +
+    "📋 بيانات المستخدم الحالي:\n" +
+    "• الاسم: " + (u.nameAr || u.name || "مستخدم") + "\n" +
+    "• العمر: " + age + " سنة | الجنس: " + gender + "\n" +
+    "• BMI: " + (u.bmi || "؟") + " | الوزن: " + (u.weight || "؟") + " كجم | الطول: " + (u.height || "؟") + " سم\n" +
+    "• الحالات الصحية: " + diseases + "\n\n" +
+    "🌿 قواعد نظام الطيبات:\n" +
+    "✅ مسموح يومياً: أرز، بطاطس مسلوقة، زيت زيتون بكر، عسل طبيعي، تمر، قهوة تركية، ماء، خضار مطبوخة.\n" +
+    "✅ مسموح أسبوعياً: لحم خروف، سمك بحري، حمام، أرنب، سمان، مكسرات طبيعية، فواكه موسمية.\n" +
+    "🚫 ممنوع: دجاج وبيض وفروج، دقيق أبيض وخبز، ألبان سائلة، بقوليات، خضار نيئة، مشروبات غازية، سكر مكرر، معلبات.\n\n" +
+    "🎯 أسلوب الإجابة:\n" +
+    "- راعِ الحالة الصحية للمستخدم في كل توصية\n" +
+    "- اجب بالعربية الفصيحة بأسلوب ودود ومنظم\n" +
+    "- استخدم الرموز التعبيرية بشكل معتدل لتسهيل القراءة\n" +
+    "- لا تتجاوز 350 كلمة إلا إذا طُلب شرح مفصل\n" +
+    "- نبّه دائماً لاستشارة الطبيب في الأسئلة الطبية";
 }
 
 function _buildMessages(msg) {
@@ -9178,6 +9205,208 @@ chatBox.innerHTML +=
   var _orig = null;
   function _patched(n) { if(_orig) _orig(n); if(n==="ai") { _updateCtx(); } }
   if (document.readyState==="loading") { document.addEventListener("DOMContentLoaded",_patch); } else { setTimeout(_patch,500); }
+
+  // تصدير الدوال المهمة لـ window لكي يراها الـ IIFE التالي
+  window._smartSend = _smartSend;
+  window._buildPrompt = _buildPrompt;
+  window._buildMessages = _buildMessages;
+  window.updateAIContext = _updateCtx;
+})();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   🤖 طيبات AI — جسر الدوال المفقودة
+   يربط كل أزرار الشات والأدوات بـ TayyibatAI / _universalAICall
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+
+  /* ───── ثوابت الشات المجاني ───── */
+  var CHAT_FREE_LIMIT = 6;
+  var CHAT_STORAGE_KEY = 'tayyibat_ai_chat_count';
+
+  function getChatCount() {
+    try { return parseInt(localStorage.getItem(CHAT_STORAGE_KEY) || '0'); } catch(e) { return 0; }
+  }
+  function incChatCount() {
+    try { localStorage.setItem(CHAT_STORAGE_KEY, getChatCount() + 1); } catch(e) {}
+  }
+  function resetChatCount() {
+    try { localStorage.removeItem(CHAT_STORAGE_KEY); } catch(e) {}
+  }
+
+  /* ───── تحديث عداد المحادثات ───── */
+  function _updateCounter() {
+    var used = getChatCount();
+    var rem  = Math.max(0, CHAT_FREE_LIMIT - used);
+    var txt  = document.getElementById('gemini-trial-counter-text');
+    var wrap = document.getElementById('gemini-trial-counter-wrap');
+    if (txt)  txt.textContent = rem > 0 ? rem + ' أسئلة مجانية متبقية' : '✨ بدون حد مع Pro';
+    if (wrap) wrap.style.display = 'flex';
+  }
+  window.geminiUpdateCounter = _updateCounter;
+
+  /* ───── حالة الـ dot ───── */
+  function _setDot(ready) {
+    var dot = document.getElementById('gemini-dot');
+    var txt = document.getElementById('gemini-status-txt');
+    if (dot) { dot.className = 'gemini-status-dot ' + (ready ? 'ready' : 'off'); }
+    if (txt)  txt.textContent = ready ? 'AI جاهز ✅' : 'AI جاري التحميل...';
+  }
+
+  /* ───── الحاوية الرئيسية للشات ───── */
+  function _chatBox() {
+    return document.getElementById('gemini-chat-wrap');
+  }
+
+  /* ───── إضافة رسالة في الشات ───── */
+  function _appendMsg(html) {
+    var box = _chatBox();
+    if (!box) return;
+    box.insertAdjacentHTML('beforeend', html);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  /* ───── إزالة مؤشر التفكير ───── */
+  function _removeThinking() {
+    var el = document.getElementById('_gemini_thinking');
+    if (el) el.remove();
+  }
+
+  /* ───── إرسال رسالة للـ AI ───── */
+  async function _doSend(msg) {
+    if (!msg || !msg.trim()) return;
+    msg = msg.trim();
+
+    // تعطيل زر الإرسال أثناء الانتظار
+    var btn = document.getElementById('gemini-send-btn');
+    if (btn) btn.disabled = true;
+
+    // رسالة المستخدم
+    _appendMsg(
+      '<div class="ai-msg user-msg"><span>' +
+      msg.replace(/</g,'&lt;').replace(/>/g,'&gt;') +
+      '</span></div>'
+    );
+
+    // مؤشر التفكير
+    _appendMsg(
+      '<div class="ai-msg ai-thinking" id="_gemini_thinking">' +
+      '<div class="ai-dots"><span></span><span></span><span></span></div></div>'
+    );
+
+    try {
+      var result = null;
+
+      // 1. استخدام _smartSend عبر window (يحتفظ بالتاريخ ويستخدم context الصحيح)
+      if (typeof window._smartSend === 'function') {
+        result = await window._smartSend(msg);
+      }
+
+      // 2. fallback: _universalAICall مع _buildPrompt
+      if (!result && typeof _universalAICall === 'function') {
+        var sysContent = typeof window._buildPrompt === 'function' ? window._buildPrompt() : 'أنت مساعد صحي لنظام طيبات. تتحدث بالعربية.';
+        result = await _universalAICall([
+          {role:'system', content: sysContent},
+          {role:'user', content: msg}
+        ]);
+      }
+
+      // 3. fallback: window._universalAICall
+      if (!result && typeof window._universalAICall === 'function') {
+        result = await window._universalAICall([
+          {role:'system', content: 'أنت مساعد صحي لنظام طيبات. تتحدث بالعربية.'},
+          {role:'user', content: msg}
+        ]);
+      }
+
+      // 4. fallback: TayyibatAI
+      if (!result && window.TayyibatAI) {
+        result = await window.TayyibatAI.chat(msg);
+      }
+
+      _removeThinking();
+
+      var text  = (result && result.text)   ? result.text   : (result && typeof result==='string' ? result : 'عذراً، لم أتمكن من الإجابة الآن. حاول مجدداً.');
+      var badge = (result && result.source) ? '<span style="font-size:.6rem;opacity:.55;margin-right:4px">' + result.source + '</span>' : '';
+
+      _appendMsg(
+        '<div class="ai-msg bot-msg">' +
+        '<div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI ' + badge + '</div>' +
+        '<span>' + String(text).replace(/\n/g,'<br>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&lt;br&gt;/g,'<br>') + '</span>' +
+        '</div>'
+      );
+
+      incChatCount();
+      _updateCounter();
+      _setDot(true);
+
+    } catch(e) {
+      _removeThinking();
+      _appendMsg(
+        '<div class="ai-msg bot-msg">' +
+        '<div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI</div>' +
+        '<span>⚠️ تعذّر الاتصال. تأكد من الإنترنت وأعد المحاولة.</span>' +
+        '</div>'
+      );
+      _setDot(false);
+    }
+
+    if (btn) btn.disabled = false;
+  }
+
+  /* ───── الدوال العامة المستدعاة من الـ HTML ───── */
+
+  window.geminiSend = function() {
+    var inp = document.getElementById('gemini-input');
+    if (!inp) return;
+    var msg = inp.value.trim();
+    if (!msg) return;
+    inp.value = '';
+    inp.style.height = '';
+    _doSend(msg);
+  };
+
+  window.geminiQuick = function(msg) {
+    _doSend(msg);
+  };
+
+  window.geminiClear = function() {
+    var box = _chatBox();
+    if (box) box.innerHTML =
+      '<div class="ai-msg assistant" id="gemini-welcome-msg">' +
+      '<div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI ' +
+      '<span class="ai-model-badge">CF-Worker ★ Priority</span></div>' +
+      '<div>تم مسح المحادثة ✅<br><em style="font-size:.73rem;opacity:.65">توصياتي توعوية ولا تغني عن استشارة الطبيب.</em></div>' +
+      '</div>';
+    resetChatCount();
+    _updateCounter();
+  };
+
+  /* ───── تهيئة عند تحميل الصفحة ───── */
+  function _init() {
+    _updateCounter();
+    // اختبر الاتصال بـ CF-Worker بعد ثانية
+    setTimeout(function() {
+      if (window.TayyibatAI) {
+        _setDot(true);
+      } else {
+        _setDot(false);
+        // انتظر حتى يُحمَّل ai-engine
+        var chk = setInterval(function(){
+          if (window.TayyibatAI) { _setDot(true); clearInterval(chk); }
+        }, 500);
+        setTimeout(function(){ clearInterval(chk); }, 10000);
+      }
+    }, 1200);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    setTimeout(_init, 100);
+  }
+
 })();
 </script>
 <!-- ═══════════════ DAILY REWARD SYSTEM ═══════════════ -->
@@ -10859,8 +11088,9 @@ function fsAnalyzeText() {
   incToolUsage('food-scan');
   var resBox = document.getElementById('fs-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل الطعام...</span></div>';
-  var prompt = 'أنت خبير تغذية متخصص.\nحلل الطعام التالي وأعطني معلومات غذائية دقيقة لكل 100 جرام منه:\nالطعام: ' + text + '\n\nأجب فقط بهذا التنسيق JSON (بدون أي نص آخر أو markdown):\n{"name_ar":"اسم الطعام بالعربي","name_en":"اسم الطعام بالإنجليزي","serving":"حجم الحصة الطبيعية بالجرام","calories":000,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"ملاحظة صحية مفيدة","items":[{"name":"صنف1 بالعربية","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000},{"name":"صنف2","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000}]}';
-  _callClaudeAPI(prompt, null).then(function(res) {
+  var foodSysPrompt = 'أنت خبير تغذية سريري معتمد. أجب فقط بـ JSON صالح بدون أي نص خارجه أو markdown أو ```.\nالأرقام يجب أن تكون أرقاماً حقيقية وليست صفراً أو أصفاراً وهمية.\nإذا كانت الوجبة مركبة أدرج كل مكون في items.';
+  var prompt = 'حلل القيم الغذائية الدقيقة لـ 100 جرام من: ' + text + '\n\nأجب بـ JSON فقط:\n{"name_ar":"اسم الطعام بالعربي","name_en":"Food Name","serving":"حجم الحصة الطبيعية","calories":0,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"نصيحة غذائية مختصرة ومفيدة","items":[{"name":"مكون بالعربية","cal_per_100g":0,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":0}]}';
+  _callClaudeAPI(prompt, foodSysPrompt).then(function(res) {
     try {
       var clean = res.replace(/```json|```/g,'').trim();
       var data = JSON.parse(clean);
@@ -10876,7 +11106,8 @@ function fsAnalyzeText() {
 async function fsAnalyzeImage(imgDataUrl) {
   var resBox = document.getElementById('fs-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل صورة الطعام... 🍕</span></div>';
-  var prompt = 'أنت خبير تغذية متخصص. انظر لهذه الصورة وتعرف على كل طعام/وجبة/صنف موجود في الصورة.\nلكل صنف تراه أعطه اسماً بالعربية والقيم الغذائية الدقيقة لكل 100 جرام.\n\nأجب فقط بهذا التنسيق JSON (بدون أي نص آخر أو markdown):\n{"name_ar":"اسم الوجبة الكاملة","serving":"الكمية التقديرية بالجرام","calories":000,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"نصيحة صحية","items":[{"name":"اسم الصنف بالعربية","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000},{"name":"صنف2","cal_per_100g":000,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":000}]}';
+  var foodImgSysPrompt = 'أنت خبير تغذية سريري. انظر للصورة وتعرف على الطعام.\nأجب فقط بـ JSON صالح بدون أي نص خارجه أو markdown.\nقدّر الكميات بناءً على ما تراه في الصورة بشكل واقعي.';
+  var prompt = 'انظر للصورة وتعرف على كل طعام موجود فيها. حلل القيم الغذائية لكل مكون ولمجموع الوجبة.\n\nأجب بـ JSON فقط:\n{"name_ar":"اسم الوجبة الكاملة بالعربي","serving":"الكمية التقديرية الكلية بالجرام","calories":0,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"نصيحة غذائية مختصرة","items":[{"name":"اسم المكون بالعربية","cal_per_100g":0,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":0}]}';
   try {
     var res = await _callClaudeAPIWithImage(prompt, imgDataUrl);
     try {
@@ -11020,8 +11251,9 @@ function diAnalyze() {
   incToolUsage('drug-interaction');
   var resBox = document.getElementById('di-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري فحص التداخلات الدوائية...</span></div>';
-  var prompt = 'أنت صيدلاني وطبيب خبير.\nافحص التداخلات الدوائية المحتملة بين الأدوية التالية:\n' + _diDrugs.map(function(d,i){ return (i+1)+'. '+d; }).join('\n') + '\n\nلكل تداخل محتمل، أذكر:\n- الدواءين المتفاعلان\n- مستوى الخطورة (خطير / تحذير / آمن نسبياً)\n- طبيعة التداخل\n- التوصية\n\nأجب بتنسيق JSON فقط بدون أي نص إضافي:\n{"interactions":[{"drug1":"دواء1","drug2":"دواء2","severity":"خطير/تحذير/آمن","description":"وصف التداخل","recommendation":"التوصية"},...],"summary":"ملخص عام","overall_risk":"مستوى الخطر الكلي"}';
-  _callClaudeAPI(prompt, null).then(function(res) {
+  var diSysPrompt = 'أنت صيدلاني سريري خبير في مصر متخصص في التفاعلات الدوائية. الأسعار دائماً بالجنيه المصري EGP.\nأجب فقط بـ JSON صالح بدون أي نص خارجه أو markdown.\nصنّف الخطورة: خطير (قد يُهدد الحياة) / تحذير (يحتاج متابعة) / آمن نسبياً (تفاعل بسيط).\nإذا لم يوجد تفاعل، اجعل interactions مصفوفة فارغة وsummary يوضح ذلك.';
+  var prompt = 'افحص التداخلات الدوائية بين:\n' + _diDrugs.map(function(d,i){ return (i+1)+'. '+d; }).join('\n') + '\n\nأجب بـ JSON فقط:\n{"interactions":[{"drug1":"دواء1","drug2":"دواء2","severity":"خطير/تحذير/آمن نسبياً","description":"آلية التداخل وتأثيره السريري","recommendation":"ما يجب فعله"}],"summary":"ملخص سريري شامل للمريض","overall_risk":"مستوى الخطر الكلي: مرتفع/متوسط/منخفض"}';
+  _callClaudeAPI(prompt, diSysPrompt).then(function(res) {
     try {
       var clean = res.replace(/```json|```/g,'').trim();
       var data = JSON.parse(clean);
@@ -11067,8 +11299,9 @@ function daSearch() {
   incToolUsage('drug-alt');
   var resBox = document.getElementById('da-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري البحث عن البدائل...</span></div>';
-  var prompt = 'أنت صيدلاني خبير.\nأعطني معلومات كاملة عن دواء "' + drug + '" وبدائله المتاحة.\n\nأجب فقط بتنسيق JSON بدون أي نص إضافي:\n{"drug_name":"اسم الدواء المُدخل","active_ingredient":"المادة الفعالة بالعربي","active_ingredient_en":"المادة الفعالة بالإنجليزي","drug_class":"تصنيف الدواء","main_use":"الاستخدام الرئيسي","price_range":"نطاق السعر التقريبي","alternatives":[{"name":"اسم البديل","active":"مادته الفعالة","price":"سعره التقريبي","notes":"ملاحظة"},...],"warnings":"تحذيرات مهمة","note":"تنبيه للمراجعة الطبية"}';
-  _callClaudeAPI(prompt, null).then(function(res) {
+  var sysPrompt = 'أنت صيدلاني سريري خبير في مصر. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP فقط. كل بديل في alternatives يجب أن يحتوي على حقل "name".';
+  var prompt = 'الدواء: "' + drug + '"\n\nأجب بهذا JSON الحرفي فقط (لا شيء قبله ولا بعده):\n{"drug_name":"اسم الدواء","active_ingredient":"المادة الفعالة عربي","active_ingredient_en":"Active Ingredient En","drug_class":"تصنيف الدواء","main_use":"الاستخدام الرئيسي","price_range":"نطاق السعر بالجنيه المصري EGP","alternatives":[{"name":"الاسم التجاري للبديل","active":"مادته الفعالة","price":"سعره بالجنيه المصري EGP","notes":"ملاحظة الفرق"},{"name":"بديل 2","active":"مادته الفعالة","price":"سعره","notes":"ملاحظة"},{"name":"بديل 3","active":"مادته الفعالة","price":"سعره","notes":"ملاحظة"}],"warnings":"أهم التحذيرات والتفاعلات الدوائية","note":"استشر الطبيب أو الصيدلاني قبل تغيير الدواء"}';
+  _callClaudeAPI(prompt, sysPrompt).then(function(res) {
     try {
       var clean = res.replace(/```json|```/g,'').trim();
       var data = JSON.parse(clean);
@@ -11096,11 +11329,17 @@ function renderDaResult(data, resBox) {
   if (data.alternatives && data.alternatives.length > 0) {
     html += '<div style="font-size:.82rem;font-weight:800;color:#ce93d8;margin-bottom:10px">🔄 البدائل المتاحة (' + data.alternatives.length + '):</div>';
     data.alternatives.forEach(function(alt) {
+      // دعم حقول بديلة: name / drug_name / brand_name / trade_name
+      var altName = alt.name || alt.drug_name || alt.brand_name || alt.trade_name || alt.اسم || '';
+      var altActive = alt.active || alt.active_ingredient || alt.active_ingredient_ar || alt.المادة_الفعالة || '';
+      var altPrice = alt.price || alt.price_range || alt.السعر || '';
+      var altNotes = alt.notes || alt.note || alt.ملاحظة || '';
+      if (!altName) return; // تخطي البدائل الفارغة
       html += '<div style="background:rgba(156,39,176,.08);border:1px solid rgba(156,39,176,.2);border-radius:12px;padding:10px 12px;margin-bottom:8px">';
-      html += '<div style="font-size:.85rem;font-weight:800;color:#e1bee7">' + alt.name + '</div>';
-      html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:3px">المادة الفعالة: ' + (alt.active || '-') + '</div>';
-      if (alt.price) html += '<div style="font-size:.72rem;color:#a5d6a7;margin-top:2px">💰 ' + alt.price + '</div>';
-      if (alt.notes) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:4px">' + alt.notes + '</div>';
+      html += '<div style="font-size:.85rem;font-weight:800;color:#e1bee7">💊 ' + altName + '</div>';
+      if (altActive) html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:3px">المادة الفعالة: ' + altActive + '</div>';
+      if (altPrice) html += '<div style="font-size:.72rem;color:#a5d6a7;margin-top:2px">💰 ' + altPrice + '</div>';
+      if (altNotes) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:4px">📝 ' + altNotes + '</div>';
       html += '</div>';
     });
   }
@@ -11265,7 +11504,7 @@ function fakeImageAnalyze() {
   incToolUsage('fake-image');
   var resBox = document.getElementById('fi-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🔍 بيحلل الصورة...</span></div>';
-  var prompt = 'أنت خبير متخصص في الجنايات الرقمية وتحليل الصور وكشف التزوير والتعديل.\n\nحلل الصورة دي بشكل احترافي وقدّم تقرير شامل يتضمن:\n\n1. **الحكم الرئيسي**: هل الصورة حقيقية أم مزيفة أم معدّلة؟\n2. **نسبة الثقة**: نسبة مئوية من 0% لـ 100% إنها حقيقية\n3. **نوع التعديل** (لو موجود): \n   - مولودة بالذكاء الاصطناعي (AI Generated)\n   - معدّلة بـ Photoshop أو برامج مشابهة\n   - فلاتر مكثفة\n   - تعديل جزئي في عناصر معينة\n4. **المؤشرات التقنية**: اللي لفت نظرك في الصورة (إضاءة، ظلال، حواف، بكسلات، تناسق)\n5. **التقرير النهائي**: ملخص احترافي\n\nاستخدم أسلوب واضح ومباشر.';
+  var prompt = 'أنت محلل صور رقمي محترف متخصص في كشف التزوير والتعديل وتمييز صور الذكاء الاصطناعي.\n\nافحص هذه الصورة تحليلاً تقنياً دقيقاً وقدّم تقريراً مفصلاً:\n\n🔎 أولاً — الحكم الرئيسي:\nهل الصورة: حقيقية 100% / مولودة بـ AI / معدّلة بـ Photoshop / فلاتر مكثفة / تعديل جزئي؟\n\n📊 ثانياً — نسبة الثقة:\nاذكر نسبة مئوية لاحتمال أن الصورة حقيقية غير معدّلة (مثال: 85% حقيقية)\n\n🔬 ثالثاً — المؤشرات التقنية:\nاذكر كل ما لاحظته: الإضاءة والظلال، حواف الأشياء، التناسق والتناظر، تفاصيل البشرة أو الشعر أو الخلفية، علامات التقطيع أو الدمج، أنماط الضجيج (noise patterns).\n\n📋 رابعاً — التقرير النهائي:\nجملة واضحة تُلخص الحكم النهائي وأبرز دليل عليه.\n\nاكتب بالعربية بأسلوب مهني واضح.';
   _callClaudeAPIWithImage(prompt, _fiImageData).then(function(res) {
     var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:20px;overflow:hidden">';
     html += '<div style="background:linear-gradient(135deg,rgba(255,152,0,.25),rgba(255,193,7,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
@@ -11376,8 +11615,11 @@ function hwSolve() {
   incToolUsage('homework');
   var resBox = document.getElementById('hw-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🧠 بيحل السؤال...</span></div>';
-  var systemPrompt = 'أنت مدرس خبير ومتخصص في كل المناهج المصرية من الابتدائي للثانوي العام. بتعرف كل الكتب والمناهج المعتمدة من وزارة التربية والتعليم المصرية. بتشرح وتجاوب بأسلوب واضح ومبسط وبتدي إجابات نموذجية كاملة زي ما في كتاب الإجابات بالضبط. لو السؤال تصوير قديم أو مش واضح — استنتج السؤال وجاوب عليه.';
-  var prompt = 'السؤال ده من ماده دراسية مصرية:\n' + (textInput ? textInput + '\n' : '') + '\nالمطلوب:\n1. اكتب السؤال كما هو (لو من صورة)\n2. الإجابة النموذجية الكاملة خطوة بخطوة\n3. الشرح المبسط لو محتاج\n4. أي قوانين أو معلومات مهمة متعلقة بالسؤال';
+  var systemPrompt = 'أنت معلم ومدرس خبير في جميع المناهج الدراسية العربية (المصرية والخليجية والسورية واللبنانية).\nأسلوبك: واضح، منظم، خطوة بخطوة، مناسب لمستوى الطالب.\nإذا كان السؤال من صورة واستطعت قراءته، اكتبه أولاً ثم أجب.\nإذا لم تستطع قراءة الصورة بوضوح، اطلب إعادة التصوير بشكل مرتب.';
+  var grade = document.getElementById('hw-grade') ? document.getElementById('hw-grade').value : '';
+  var subject = document.getElementById('hw-subject') ? document.getElementById('hw-subject').value : '';
+  var gradeInfo = (grade ? 'الصف: ' + grade + '.' : '') + (subject ? ' المادة: ' + subject + '.' : '');
+  var prompt = (gradeInfo ? gradeInfo + '\n\n' : '') + 'السؤال الدراسي:\n' + (textInput ? textInput + '\n' : '(من الصورة المرفقة)') + '\n\nالمطلوب:\n1️⃣ السؤال كما هو\n2️⃣ الإجابة النموذجية الكاملة خطوة بخطوة\n3️⃣ الشرح المبسط\n4️⃣ القوانين أو المعلومات المهمة المرتبطة بالسؤال (إن وجدت)';
   var apiCall = _hwImageData ? _callClaudeAPIWithImage(prompt, _hwImageData) : _callClaudeAPI(prompt, systemPrompt);
   apiCall.then(function(res) {
     var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">';
@@ -11437,8 +11679,9 @@ function symAnalyze() {
   var resBox = document.getElementById('sym-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري تحليل الأعراض...</span></div>';
   var genderText = _symGender === 'male' ? 'ذكر' : _symGender === 'female' ? 'أنثى' : 'غير محدد';
-  var prompt = 'أنت طبيب عام خبير ومستشار صحي.\nالمريض: عمره ' + age + ' سنة، الجنس: ' + genderText + (chronic ? '، أمراض مزمنة: ' + chronic : '') + '.\nالأعراض: ' + symptoms + '\n\nقدم تحليلاً مهنياً يشمل:\n1. الاحتمالات التشخيصية الأكثر ترجيحاً (من الأكثر للأقل احتمالاً)\n2. الأسباب الشائعة لهذه الأعراض\n3. اقتراح علاج مناسب من الأدوية الشائعة المتاحة بدون وصفة (إن أمكن)\n4. العلامات الخطيرة التي تستوجب زيارة الطبيب فوراً\n5. نصائح منزلية مساعدة\n\nنبّه في النهاية أن هذا للاسترشاد فقط وليس تشخيصاً نهائياً.';
-  _callClaudeAPI(prompt, null).then(function(res) {
+  var symSysPrompt = 'أنت طبيب عام استشاري ذو خبرة واسعة، تعمل بأسلوب منهجي ودقيق.\nأجب بالعربية الفصيحة بأسلوب مهني وواضح.\nرتّب إجابتك بوضوح باستخدام أرقام وعناوين.\nتذكير مهم: هذا التحليل للاستئناس فقط ولا يُغني عن الفحص الطبي.';
+  var prompt = 'بيانات المريض:\n- العمر: ' + age + ' سنة | الجنس: ' + genderText + (chronic ? '\n- أمراض مزمنة: ' + chronic : '') + '\n- الأعراض: ' + symptoms + '\n\nقدم تقريراً طبياً استرشادياً يتضمن:\n\n1. 🔍 التشخيصات الاحتمالية\nاذكر من 2 إلى 4 احتمالات مرتبة من الأكثر للأقل ترجيحاً مع سبب كل منها.\n\n2. 💊 التوصيات العلاجية الأولية\nأدوية بدون وصفة أو إجراءات منزلية مناسبة للحالة والعمر.\n\n3. 🚨 إشارات الخطر\nما الأعراض التي تستوجب التوجه للطارئ فوراً؟\n\n4. 🏠 النصائح المنزلية\n3 إلى 4 نصائح عملية تساعد على الراحة والتعافي.\n\n⚠️ هذا التقرير استرشادي ولا يُغني عن تقييم الطبيب.';
+  _callClaudeAPI(prompt, symSysPrompt).then(function(res) {
     renderSymResult(res, resBox);
   }).catch(function() {
     resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل.</div>';
@@ -13034,7 +13277,7 @@ function palmAnalyze() {
     health: 'ركّز على جانب الصحة والطاقة: خط الحياة، الحيوية، نقاط القوة والضعف الجسدية.'
   };
 
-  var prompt = 'أنت قارئ كف (palmist) خبير متخصص في علم قراءة الكف والخطوط والفلسفة الشرقية والغربية لهذا العلم.\n\nانظر إلى هذه الصورة لراحة اليد وحلّل ما تراه بدقة واحترافية.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nاتبع هذا الهيكل بالضبط في ردّك:\n\n**🖐 أولاً — شكل الكف والأصابع:**\nنوع الكف (ناري / ترابي / هوائي / مائي) وما يدل عليه من الشخصية.\n\n**📏 ثانياً — الخطوط الرئيسية:**\n• خط الحياة: وصف واضح ودلالته\n• خط القلب: وصف واضح ودلالته في العواطف\n• خط الرأس: وصف واضح ودلالته في التفكير\n• خط القدر (إن ظهر): وصف واضح ودلالته\n\n**✨ ثالثاً — ملاحظات خاصة:**\nأي علامات أو خطوط إضافية لافتة (خط الشمس، نجوم، مربعات، إلخ).\n\n**🔮 رابعاً — القراءة الشاملة:**\nفقرة واحدة واضحة تلخص شخصية صاحب الكف وأبرز ما يميزه.\n\nقواعد مهمة:\n- اكتب بالعربية الفصيحة البسيطة المفهومة تماماً\n- لا كلام غامض أو مبهم — كل جملة لها معنى واضح\n- كن محدداً وتفصيلياً بناءً على ما تراه في الصورة\n- في النهاية أضف: "هذه القراءة للترفيه والاستئناس فقط"';
+  var prompt = 'أنت خبير في علم قراءة الكف يجمع بين مناهج Cheiro وBenham والتراث الشرقي الهندي.\n\n' + (modePrompts[_palmMode] || modePrompts.full) + '\n\nانظر لصورة الكف بدقة وحلّل ما تراه وفق هذا الهيكل:\n\n🖐 أولاً — شكل الكف والأصابع:\nحدد نوع الكف (ناري/ترابي/هوائي/مائي) وما يدل عليه من الشخصية والطاقة.\n\n📏 ثانياً — الخطوط الرئيسية:\n• خط الحياة: شكله وطوله ودلالته على الصحة والحيوية\n• خط القلب: شكله ودلالته في العلاقات والعواطف\n• خط الرأس: شكله ودلالته في التفكير والذكاء\n• خط القدر (إن ظهر): وصف ودلالته\n\n✨ ثالثاً — ملاحظات خاصة:\nأي علامات لافتة: خط الشمس، النجوم، المربعات، التصليبات، خطوط ثانوية مميزة.\n\n🔮 رابعاً — القراءة الشاملة:\nفقرة ختامية تلخص شخصية صاحب الكف وأبرز سماته بأسلوب شيّق وواضح.\n\nاكتب بالعربية البسيطة الواضحة. ⚠️ هذه القراءة للترفيه والاستئناس فقط.';
 
   _callClaudeAPIWithImage(prompt, _palmImageData).then(function(res) {
     var modeLabels = { full: 'قراءة شاملة', love: 'الحياة العاطفية', career: 'المسار المهني', health: 'الصحة والحيوية' };
@@ -14149,10 +14392,10 @@ function _startScannerAutoLoop(mode){
   var resBox=document.getElementById('pa-scan-result');
 
   var prompts={
-    food:'أنت مستشار تغذية. انظر للصورة وتعرف على الطعام أمامك وأصدر حكماً:\n✅ مسموح / ⚠️ بالاعتدال / 🚫 ممنوع\nاذكر: اسم الطعام — الحكم مع السبب — نصيحة واحدة.\nاللغة: عربية مختصرة. إذا لم تجد طعاماً اكتب: "وجّه الكاميرا نحو الطعام".',
-    medicine:'أنت صيدلاني خبير. انظر لعلبة الدواء واستخرج:\n1. اسم الدواء التجاري والعلمي\n2. الجرعة والتركيز\n3. الاستخدامات الرئيسية\n4. أبرز التحذيرات\n5. طريقة الاستخدام\nاللغة: عربية. إذا لم تجد علبة دواء اكتب: "وجّه الكاميرا نحو علبة الدواء".',
-    report:'أنت طبيب متخصص. انظر للتقرير الطبي:\n1. نوع التقرير\n2. القيم والأرقام المهمة\n3. اشرح كل قيمة بلغة بسيطة\n4. ما هو طبيعي وما يحتاج انتباهاً\nاختم بـ: "هذا شرح توعوي، استشر طبيبك."\nاللغة: عربية. إذا لم تجد تقريراً اكتب: "وجّه الكاميرا نحو التقرير الطبي".',
-    prescription:'أنت صيدلاني متخصص. انظر للروشتة الطبية. لكل دواء:\n- الاسم التجاري والعلمي\n- الجرعة\n- طريقة الاستخدام والوقت\n- أبرز التحذيرات\nاللغة: عربية واضحة. إذا لم تجد روشتة اكتب: "وجّه الكاميرا نحو الروشتة الطبية".'
+    food:'أنت خبير تغذية متخصص في نظام طيبات للدكتور ضياء العوضي.\nانظر للصورة وتعرف على الطعام ثم أصدر حكماً واضحاً:\n✅ مسموح — أو — ⚠️ بالاعتدال — أو — 🚫 ممنوع في نظام الطيبات\nاذكر: اسم الطعام، الحكم مع السبب المختصر، نصيحة واحدة عملية.\nإذا لم تجد طعاماً اكتب: "وجّه الكاميرا نحو الطعام". اللغة: عربية مختصرة.',
+    medicine:'أنت صيدلاني سريري خبير. انظر لعلبة الدواء أو الغلاف واستخرج:\n1. الاسم التجاري والمادة الفعالة\n2. الجرعة والتركيز\n3. الاستخدامات الرئيسية\n4. أهم التحذيرات والتفاعلات\n5. طريقة الاستخدام الصحيحة\nإذا لم تجد علبة دواء اكتب: "وجّه الكاميرا نحو علبة الدواء". اللغة: عربية.',
+    report:'أنت طبيب استشاري. انظر للتقرير الطبي واشرحه:\n1. نوع التقرير\n2. القيم والأرقام المهمة مع وحدات القياس\n3. اشرح كل قيمة بلغة بسيطة (طبيعي / مرتفع / منخفض)\n4. ما يستوجب الانتباه والمتابعة\nاختم بـ: "هذا شرح توعوي فقط. استشر طبيبك للتشخيص الدقيق."\nإذا لم تجد تقريراً اكتب: "وجّه الكاميرا نحو التقرير". اللغة: عربية.',
+    prescription:'أنت صيدلاني متخصص. انظر للروشتة الطبية وفسّرها. لكل دواء:\n- الاسم التجاري والمادة الفعالة\n- الجرعة المحددة\n- وقت الاستخدام (قبل/بعد الأكل، صباح/مساء)\n- أبرز التحذيرات وتعليمات الحفظ\nإذا لم تجد روشتة اكتب: "وجّه الكاميرا نحو الروشتة". اللغة: عربية واضحة.'
   };
 
   var colors={food:'#d4a017',medicine:'#42a5f5',report:'#ce93d8',prescription:'#ffb74d'};
@@ -14327,6 +14570,747 @@ window._autoCamera={
 
 console.log('[AutoCamera] ✅ v1.0 — كاميرا خلفية تلقائية لـ 9 أدوات');
 })();
+</script>
+
+<!-- ═══ ai-engine.js مدمج مباشرة ═══ -->
+<script>
+/** 
+ * ══════════════════════════════════════════════════════════════════
+ *  🌿 طيبات — محرك الذكاء الاصطناعي المجاني
+ *  ai-engine.js  |  v4.1  — CF-WORKER PRIORITY ENGINE
+ *
+ *  ✅ الأولوية الأولى دائماً: Cloudflare Worker (taybat-ai.studegy8.workers.dev)
+ *  ✅ إذا فشل CF-Worker فقط: LLM7 + Pollinations + Kepler + OpenRouter بالتوازي
+ *  ✅ Timeout صارم 8 ثوانٍ للـ CF-Worker
+ *  ✅ رد محلي ذكي عند فشل الكل (لا "رد غبي")
+ * ══════════════════════════════════════════════════════════════════
+ */
+
+(function (global) {
+  'use strict';
+
+  /* ══════════════════════════════════
+     CONFIG
+  ══════════════════════════════════ */
+  var CFG = {
+    // ① Cloudflare Worker — vision + chat
+    cfWorker: 'https://taybat-ai.studegy8.workers.dev',
+
+    // ② OVH Kepler — مجاني، لكن بطيء بعد أول طلب
+    keplerEndpoint: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions',
+    keplerModel:    'Llama-3.3-70B-Instruct',
+
+    // ③ LLM7.io — 30 RPM
+    llm7Endpoint: 'https://api.llm7.io/v1/chat/completions',
+    llm7ChatModel:   'gpt-4o-mini',
+    llm7VisionModel: 'gpt-4o',
+
+    // ④ Pollinations — مجاني بدون مفتاح
+    pollinationsText: 'https://text.pollinations.ai/openai',
+    pollinationsChat:   'openai',
+    pollinationsVision: 'openai-large',
+
+    // ⑤ OpenRouter — نماذج مجانية
+    orEndpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    orFreeModel: 'meta-llama/llama-3.1-8b-instruct:free',
+
+    // ⑥ Fallback Kepler models (تجرب واحد واحد بسرعة)
+    keplerFallbacks: ['DeepSeek-R1', 'Qwen3-32B', 'Mistral-Nemo-Instruct-2407'],
+
+    // ⑦ LLM7 fallback models
+    llm7Fallbacks: ['gpt-4.1', 'claude-3-5-sonnet-20241022', 'gemini-1.5-pro', 'deepseek-chat'],
+
+    // Open Food Facts
+    offSearch:  'https://world.openfoodfacts.org/cgi/search.pl',
+    offBarcode: 'https://world.openfoodfacts.org/api/v2/product/',
+
+    // الأدوية
+    fdaDrugSearch: 'https://api.fda.gov/drug/label.json',
+
+    // Tesseract OCR
+    tesseractCDN: 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js',
+
+    // ⏱ Timeouts
+    FAST_TIMEOUT:   8000,   // أقصى وقت لكل طلب AI
+    RACE_TIMEOUT:   9000,   // أقصى وقت لنتيجة race
+    API_TIMEOUT:    7000,   // APIs خارجية (Food, Drug)
+  };
+
+  /* ══════════════════════════════════
+     HELPERS
+  ══════════════════════════════════ */
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise(function(_, rej) {
+        setTimeout(function() { rej(new Error('TIMEOUT_' + ms)); }, ms);
+      })
+    ]);
+  }
+
+  function extractText(data) {
+    if (!data) return null;
+    if (data.choices && data.choices[0]) {
+      var msg = data.choices[0].message || data.choices[0];
+      return (msg.content || msg.text || null);
+    }
+    if (typeof data === 'string' && data.length > 3) return data;
+    if (data.response) return data.response;
+    return null;
+  }
+
+  function isGoodText(t) {
+    return typeof t === 'string' && t.trim().length > 5;
+  }
+
+  // POST JSON مع timeout سريع
+  async function postJSON(url, body, headers, timeoutMs) {
+    timeoutMs = timeoutMs || CFG.FAST_TIMEOUT;
+    headers = Object.assign({ 'Content-Type': 'application/json' }, headers || {});
+    var resp = await withTimeout(
+      fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) }),
+      timeoutMs
+    );
+    if (!resp.ok) throw new Error('HTTP_' + resp.status);
+    return resp.json();
+  }
+
+  /* ══════════════════════════════════
+     SINGLE-CALL PROVIDERS  (Chat)
+     كل واحد يرجع Promise<{text,source}|null>
+  ══════════════════════════════════ */
+
+  // ① Cloudflare Worker chat
+  // ① Cloudflare Worker chat
+function _cfChat(messages) {
+
+  console.log('USING CLOUDFLARE AI');
+
+  var prompt = messages
+    .map(function(m) {
+      return m.role + ': ' + m.content;
+    })
+    .join('\n');
+
+  return fetch(CFG.cfWorker, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt: prompt
+    })
+  })
+  .then(function(resp) {
+
+    if (!resp.ok) {
+      throw new Error('HTTP_' + resp.status);
+    }
+
+    return resp.json();
+
+  })
+  .then(function(data) {
+
+    console.log('CF RESPONSE:', data);
+
+    if (
+      data &&
+      data.result &&
+      data.result.response
+    ) {
+
+      console.log('CF SUCCESS');
+
+      return {
+        text: data.result.response.trim(),
+        source: 'CF-Worker'
+      };
+    }
+
+    // احتياطي لو تغير شكل الرد مستقبلاً
+    var t = extractText(data);
+
+    if (isGoodText(t)) {
+      return {
+        text: t.trim(),
+        source: 'CF-Worker'
+      };
+    }
+
+    console.log('CF EMPTY RESPONSE');
+
+    return null;
+
+  })
+  .catch(function(err) {
+
+    console.error('Cloudflare Error:', err);
+
+    return null;
+
+  });
+}
+
+  // ② OVH Kepler — model واحد بدون انتظار
+  function _keplerChat(messages, modelOverride) {
+    var model = modelOverride || CFG.keplerModel;
+    return postJSON(CFG.keplerEndpoint, { model: model, messages: messages, max_tokens: 1200, temperature: 0.7 })
+      .then(function(d) {
+        var t = extractText(d);
+        return isGoodText(t) ? { text: t.trim(), source: 'Kepler/' + model } : null;
+      }).catch(function() { return null; });
+  }
+
+  // ③ LLM7 — model واحد بدون انتظار
+  function _llm7Chat(messages, modelOverride) {
+    var model = modelOverride || CFG.llm7ChatModel;
+    return postJSON(CFG.llm7Endpoint, { model: model, messages: messages, max_tokens: 1200, temperature: 0.7 })
+      .then(function(d) {
+        var t = extractText(d);
+        return isGoodText(t) ? { text: t.trim(), source: 'LLM7/' + model } : null;
+      }).catch(function() { return null; });
+  }
+
+  // ④ Pollinations
+  function _pollinationsChat(messages, modelOverride) {
+    var model = modelOverride || CFG.pollinationsChat;
+    return postJSON(CFG.pollinationsText, { model: model, messages: messages, max_tokens: 1200, temperature: 0.7 })
+      .then(function(d) {
+        var t = extractText(d);
+        return isGoodText(t) ? { text: t.trim(), source: 'Pollinations/' + model } : null;
+      }).catch(function() { return null; });
+  }
+
+  // ⑤ OpenRouter Free
+  function _orChat(messages, modelOverride) {
+    var model = modelOverride || CFG.orFreeModel;
+    var headers = {
+      'Content-Type':  'application/json',
+      'HTTP-Referer':  'https://tayyibat.online',
+      'X-Title':       'Tayyibat'
+    };
+    var key = window.__OR_KEY_FB || window.__OR_KEY || null;
+    if (key) headers['Authorization'] = 'Bearer ' + key;
+    return postJSON(CFG.orEndpoint, { model: model, messages: messages, max_tokens: 1200, temperature: 0.7 }, headers)
+      .then(function(d) {
+        var t = extractText(d);
+        return isGoodText(t) ? { text: t.trim(), source: 'OpenRouter/' + model.split('/').pop().replace(':free','') } : null;
+      }).catch(function() { return null; });
+  }
+
+  /* ══════════════════════════════════
+     RACE ENGINE — Chat
+     كل المزودين بالتوازي — أول رد يفوز
+  ══════════════════════════════════ */
+  function _raceFirst(promises) {
+    // Promise.any — أول نتيجة غير null تفوز
+    return new Promise(function(resolve) {
+      var settled = 0;
+      var total = promises.length;
+      if (!total) { resolve(null); return; }
+      promises.forEach(function(p) {
+        Promise.resolve(p).then(function(result) {
+          settled++;
+          if (result) { resolve(result); }
+          else if (settled >= total) { resolve(null); }
+        }).catch(function() {
+          settled++;
+          if (settled >= total) { resolve(null); }
+        });
+      });
+    });
+  }
+
+  async function _universalChat(messages) {
+    // ═══ الأولوية ١: Cloudflare Worker وحده أولاً ═══
+    var cfResult = await withTimeout(_cfChat(messages), CFG.FAST_TIMEOUT).catch(function() { return null; });
+    if (cfResult) return cfResult;
+
+    // ═══ الأولوية ٢: باقي المزودين بالتوازي ═══
+    var round1 = await withTimeout(
+      _raceFirst([
+        _llm7Chat(messages),
+        _pollinationsChat(messages),
+        _orChat(messages),
+        _keplerChat(messages)
+      ]),
+      CFG.RACE_TIMEOUT
+    ).catch(function() { return null; });
+
+    if (round1) return round1;
+
+    // ═══ الأولوية ٣: fallback بنماذج بديلة ═══
+    var round2 = await withTimeout(
+      _raceFirst([
+        _llm7Chat(messages, 'gpt-4.1'),
+        _llm7Chat(messages, 'deepseek-chat'),
+        _pollinationsChat(messages, 'mistral'),
+        _keplerChat(messages, 'Qwen3-32B')
+      ]),
+      CFG.RACE_TIMEOUT
+    ).catch(function() { return null; });
+
+    return round2 || null;
+  }
+
+  /* ══════════════════════════════════
+     SINGLE-CALL PROVIDERS  (Vision)
+  ══════════════════════════════════ */
+
+  // ① Cloudflare Worker Vision
+  function _cfVision(imgUrl, prompt) {
+    return postJSON(CFG.cfWorker, {
+      messages: [{ role: 'user', content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: imgUrl } }
+      ]}],
+      max_tokens: 1200, temperature: 0.3
+    }).then(function(d) {
+      var t = extractText(d);
+      return isGoodText(t) ? { text: t.trim(), source: 'CF-Worker-Vision' } : null;
+    }).catch(function() { return null; });
+  }
+
+  // ② LLM7 Vision
+  function _llm7Vision(imgUrl, prompt, modelOverride) {
+    var model = modelOverride || CFG.llm7VisionModel;
+    return postJSON(CFG.llm7Endpoint, {
+      model: model,
+      messages: [{ role: 'user', content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: imgUrl } }
+      ]}],
+      max_tokens: 1200, temperature: 0.3
+    }).then(function(d) {
+      var t = extractText(d);
+      return isGoodText(t) ? { text: t.trim(), source: 'LLM7-Vision/' + model } : null;
+    }).catch(function() { return null; });
+  }
+
+  // ③ Pollinations Vision
+  function _pollinationsVision(imgUrl, prompt) {
+    return postJSON(CFG.pollinationsText, {
+      model: CFG.pollinationsVision,
+      messages: [{ role: 'user', content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: imgUrl } }
+      ]}],
+      max_tokens: 1200, temperature: 0.3
+    }).then(function(d) {
+      var t = extractText(d);
+      return isGoodText(t) ? { text: t.trim(), source: 'Pollinations-Vision' } : null;
+    }).catch(function() { return null; });
+  }
+
+  /* تقليص الصورة لتسريع الإرسال */
+  function _resizeImage(imgDataUrl, maxSize) {
+    maxSize = maxSize || 640;
+    return new Promise(function(resolve) {
+      try {
+        var img = new Image();
+        img.onload = function() {
+          if (img.width <= maxSize && img.height <= maxSize) { resolve(imgDataUrl); return; }
+          var ratio = Math.min(maxSize / img.width, maxSize / img.height);
+          var c = document.createElement('canvas');
+          c.width  = Math.round(img.width  * ratio);
+          c.height = Math.round(img.height * ratio);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.78));
+        };
+        img.onerror = function() { resolve(imgDataUrl); };
+        img.src = imgDataUrl;
+      } catch(e) { resolve(imgDataUrl); }
+    });
+  }
+
+  /* ══════════════════════════════════
+     RACE ENGINE — Vision
+  ══════════════════════════════════ */
+  async function _universalVision(imgDataUrl, prompt) {
+    var smallImg = imgDataUrl;
+    try { smallImg = await _resizeImage(imgDataUrl, 640); } catch(e) {}
+
+    // ═══ الأولوية ١: Cloudflare Worker وحده أولاً ═══
+    var cfResult = await withTimeout(_cfVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
+    if (cfResult) return cfResult;
+
+    // ═══ الأولوية ٢: باقي vision providers بالتوازي ═══
+    var result = await withTimeout(
+      _raceFirst([
+        _llm7Vision(smallImg, prompt),
+        _pollinationsVision(smallImg, prompt)
+      ]),
+      CFG.RACE_TIMEOUT
+    ).catch(function() { return null; });
+
+    if (result) return result;
+
+    // ═══ الأولوية ٣: LLM7 بنماذج بديلة ═══
+    var r2 = await withTimeout(
+      _raceFirst([
+        _llm7Vision(smallImg, prompt, 'gpt-4.1'),
+        _llm7Vision(smallImg, prompt, 'claude-3-5-sonnet-20241022')
+      ]),
+      CFG.RACE_TIMEOUT
+    ).catch(function() { return null; });
+
+    return r2 || null;
+  }
+
+  /* ══════════════════════════════════
+     smartChat — الدالة العامة للمحادثة
+  ══════════════════════════════════ */
+  async function smartChat(sysPrompt, userMsg) {
+    var messages = [
+      { role: 'system', content: sysPrompt || 'أنت مساعد صحي مفيد باللغة العربية.' },
+      { role: 'user',   content: userMsg }
+    ];
+    var result = await _universalChat(messages);
+    if (result) return result;
+    return { text: _smartLocalFallback(userMsg), source: 'local' };
+  }
+
+  /* ══════════════════════════════════
+     رد محلي ذكي (لا ردود "عبيطة")
+  ══════════════════════════════════ */
+  var _LOCAL_TIPS = [
+    'تناول الطعام الحقيقي غير المصنّع قدر الإمكان وتجنب المواد الحافظة.',
+    'شرب 8 أكواب ماء يومياً يحسن الهضم ويقلل الشهية الكاذبة.',
+    'الصيام المتقطع 16:8 يُحسّن حساسية الأنسولين ويساعد على حرق الدهون.',
+    'مرق العظام غني بالكولاجين والجلوتامين — مفيد للأمعاء والمفاصل.',
+    'النوم قبل منتصف الليل يُنظّم هرموني الجريلين واللبتين (الجوع والشبع).',
+    'زيت الزيتون البكر والسمن البلدي من أجود الدهون الصحية للطهي.',
+    'تناول البروتين في وجبة الإفطار يقلل الشهية طوال اليوم.'
+  ];
+  var _localIdx = 0;
+
+  function _smartLocalFallback(question) {
+    var q = (question || '').toLowerCase();
+    if (q.includes('صيام') || q.includes('fasting'))
+      return '🕐 الصيام المتقطع (16:8): امتنع عن الأكل 16 ساعة وكل في نافذة 8 ساعات. ابدأ بـ 12 ساعة وزد تدريجياً. الشاي والقهوة بدون سكر مسموح أثناء الصيام.';
+    if (q.includes('سكري') || q.includes('سكر') || q.includes('انسولين'))
+      return '🩸 لمرضى السكري: قلّل النشويات البيضاء والسكريات، وركّز على البروتين والخضروات والدهون الصحية. المشي 15 دقيقة بعد الوجبات يُخفض السكر بفاعلية.';
+    if (q.includes('وزن') || q.includes('رجيم') || q.includes('تخسيس') || q.includes('سمنة'))
+      return '⚖️ لإنقاص الوزن بصحة: تناول الطعام الحقيقي، تجنب السكر والمصنّع، مارس الصيام المتقطع، وانم مبكراً. لا حاجة لحسابات سعرات معقدة — ركّز على نوعية الطعام.';
+    if (q.includes('ضغط') || q.includes('قلب'))
+      return '❤️ لصحة القلب والضغط: قلّل الملح والأطعمة المصنّعة، تناول المغنيسيوم (خضروات ورقية، مكسرات)، ومارس المشي يومياً.';
+    if (q.includes('كوليسترول') || q.includes('دهون'))
+      return '🫀 الكوليسترول الضار ترتفع مستوياته بسبب السكر والنشويات أكثر من الدهون الطبيعية. ركّز على تقليل السكر وزيادة الأوميغا 3 (سمك، بذر كتان).';
+    if (q.includes('دواء') || q.includes('medication') || q.includes('علاج'))
+      return '💊 للحصول على معلومات دقيقة عن الدواء، تأكد من الاتصال بالإنترنت. دائماً استشر طبيبك أو صيدلانيك قبل تغيير جرعة أو إيقاف دواء.';
+    if (q.includes('تقرير') || q.includes('تحاليل') || q.includes('فحص'))
+      return '🔬 لتفسير نتائج التحاليل تحتاج اتصال بالإنترنت لتحليل دقيق. القيم الطبيعية تختلف بحسب المختبر والعمر والجنس. استشر طبيبك للتفسير الكامل.';
+    if (q.includes('باركود') || q.includes('منتج') || q.includes('مكونات'))
+      return '🏷️ لتحليل المنتج والمكونات تأكد من الاتصال بالإنترنت. يمكنك قراءة مكونات المنتج على العبوة وابحث عن: E250 (نيتريت)، E621 (MSG)، E951 (أسبارتام).';
+    var tip = _LOCAL_TIPS[_localIdx % _LOCAL_TIPS.length];
+    _localIdx++;
+    return '💡 ' + tip + '\n\n⚠️ تعذّر الوصول للذكاء الاصطناعي الآن — تأكد من الاتصال بالإنترنت للحصول على تحليل مخصص.';
+  }
+
+  /* ══════════════════════════════════
+     OCR — Tesseract.js
+  ══════════════════════════════════ */
+  var _tesseractLoaded = false;
+
+  function _loadTesseract() {
+    return new Promise(function(resolve, reject) {
+      if (_tesseractLoaded && window.Tesseract) { resolve(); return; }
+      var s = document.createElement('script');
+      s.src = CFG.tesseractCDN;
+      s.onload = function() { _tesseractLoaded = true; resolve(); };
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ocrImage(imageDataUrl, lang) {
+    lang = lang || 'ara+eng';
+    try {
+      await _loadTesseract();
+      var result = await window.Tesseract.recognize(imageDataUrl, lang, {
+        logger: function(m) {
+          if (m.status === 'recognizing text' && global.onOCRProgress)
+            global.onOCRProgress(Math.round(m.progress * 100));
+        }
+      });
+      return (result.data && result.data.text) ? result.data.text.trim() : '';
+    } catch(e) {
+      // fallback: اطلب من AI استخراج النص
+      var r = await _universalVision(imageDataUrl, 'استخرج كل النص الموجود في هذه الصورة بدقة كما هو دون تعديل.');
+      return r ? r.text : '';
+    }
+  }
+
+  /* ══════════════════════════════════
+     Open Food Facts
+  ══════════════════════════════════ */
+  async function foodSearch(query, maxResults) {
+    maxResults = maxResults || 5;
+    var url = CFG.offSearch + '?' + new URLSearchParams({
+      search_terms: query, search_simple: 1, action: 'process',
+      json: 1, page_size: maxResults,
+      fields: 'product_name,brands,ingredients_text,nutriments,nutriscore_grade,ecoscore_grade,additives_tags,allergens,image_url,code'
+    });
+    var res = await withTimeout(fetch(url), CFG.API_TIMEOUT);
+    if (!res.ok) return [];
+    var data = await res.json();
+    return _formatOFF(data.products || []);
+  }
+
+  async function foodBarcode(barcode) {
+    var res = await withTimeout(fetch(CFG.offBarcode + encodeURIComponent(barcode) + '.json'), CFG.API_TIMEOUT);
+    if (!res.ok) return null;
+    var data = await res.json();
+    if (data.status !== 1 || !data.product) return null;
+    return _formatOFF([data.product])[0] || null;
+  }
+
+  function _formatOFF(products) {
+    return products.filter(Boolean).map(function(p) {
+      var n = p.nutriments || {};
+      return {
+        name: p.product_name || 'غير محدد',
+        brand: p.brands || '',
+        code: p.code || '',
+        ingredients: p.ingredients_text || '',
+        image: p.image_url || '',
+        nutriscore: (p.nutriscore_grade || '').toUpperCase(),
+        ecoscore:   (p.ecoscore_grade   || '').toUpperCase(),
+        additives:  p.additives_tags || [],
+        allergens:  p.allergens || '',
+        calories:   Math.round(n['energy-kcal_100g'] || 0),
+        fat:        (n.fat_100g              || 0).toFixed(1),
+        carbs:      (n.carbohydrates_100g    || 0).toFixed(1),
+        protein:    (n.proteins_100g         || 0).toFixed(1),
+        sugar:      (n.sugars_100g           || 0).toFixed(1),
+        salt:       (n.salt_100g             || 0).toFixed(2),
+        fiber:      (n.fiber_100g            || 0).toFixed(1)
+      };
+    });
+  }
+
+  /* ══════════════════════════════════
+     Drug Search — OpenFDA
+  ══════════════════════════════════ */
+  async function drugSearch(name) {
+    var results = [];
+    try {
+      var fdaUrl = CFG.fdaDrugSearch + '?search=openfda.generic_name:"' + encodeURIComponent(name) + '"&limit=3';
+      var fdaRes = await withTimeout(fetch(fdaUrl), CFG.API_TIMEOUT);
+      if (fdaRes.ok) {
+        var fdaData = await fdaRes.json();
+        if (fdaData.results) fdaData.results.forEach(function(item) {
+          var ofd = item.openfda || {};
+          results.push({
+            source: 'openfda',
+            name:        (ofd.brand_name   && ofd.brand_name[0])   || name,
+            generic:     (ofd.generic_name && ofd.generic_name[0]) || '',
+            brand:       (ofd.brand_name   && ofd.brand_name[0])   || '',
+            indications: (item.indications_and_usage || [''])[0].substring(0, 400),
+            warnings:    (item.warnings               || [''])[0].substring(0, 400),
+            dosage:      (item.dosage_and_administration || [''])[0].substring(0, 300)
+          });
+        });
+      }
+    } catch(e) {}
+    return results;
+  }
+
+  /* ══════════════════════════════════
+     المواد المضافة
+  ══════════════════════════════════ */
+  var ADDITIVES_DB = {
+    'E250': { name: 'نيتريت الصوديوم',           risk: 'high',   iarc: 1,    note: 'مسرطن مؤكد — مرتبط بسرطان القولون' },
+    'E249': { name: 'نيتريت البوتاسيوم',          risk: 'high',   iarc: 1,    note: 'مسرطن مؤكد' },
+    'E251': { name: 'نيترات الصوديوم',            risk: 'medium', iarc: '2A', note: 'مسرطن محتمل' },
+    'E621': { name: 'غلوتامات أحادي الصوديوم (MSG)', risk: 'medium', note: 'حساسية لدى بعض الأشخاص' },
+    'E211': { name: 'بنزوات الصوديوم',            risk: 'medium', note: 'قد يتحول لمادة مسرطنة مع فيتامين C' },
+    'E102': { name: 'تارترازين',                  risk: 'medium', note: 'صبغة اصطناعية — فرط نشاط لدى الأطفال' },
+    'E320': { name: 'BHA',                        risk: 'medium', iarc: '2B', note: 'مسرطن محتمل' },
+    'E321': { name: 'BHT',                        risk: 'medium', note: 'مضاد أكسدة — مثير للجدل' },
+    'E951': { name: 'أسبارتام',                   risk: 'medium', iarc: '2B', note: 'مسرطن محتمل — 2023' },
+    'E407': { name: 'الكاراجينان',                risk: 'medium', note: 'مثير للجدل صحياً للأمعاء' },
+    'E120': { name: 'كارمين',                     risk: 'medium', note: 'مستخرج من حشرات — راجع علماءك' },
+    'E441': { name: 'الجيلاتين',                  risk: 'medium', note: 'من عظام الحيوانات — راجع علماءك' },
+    'E330': { name: 'حمض الستريك',               risk: 'low',    note: 'آمن عموماً' },
+    'E300': { name: 'حمض الأسكوربيك (فيتامين C)', risk: 'safe',   note: 'آمن تماماً' }
+  };
+
+  function checkAdditives(ingredientsText) {
+    var found = [];
+    var text = ingredientsText.toUpperCase();
+    Object.keys(ADDITIVES_DB).forEach(function(code) {
+      if (text.includes(code.toUpperCase())) found.push(Object.assign({ code: code }, ADDITIVES_DB[code]));
+    });
+    var nameMap = {
+      'aspartame': 'E951', 'أسبارتام': 'E951',
+      'sodium nitrite': 'E250', 'نيتريت الصوديوم': 'E250',
+      'msg': 'E621', 'bha': 'E320', 'bht': 'E321',
+      'sodium benzoate': 'E211', 'tartrazine': 'E102',
+      'carrageenan': 'E407', 'carmine': 'E120', 'gelatin': 'E441'
+    };
+    var lower = ingredientsText.toLowerCase();
+    Object.keys(nameMap).forEach(function(kw) {
+      if (lower.includes(kw)) {
+        var code = nameMap[kw];
+        if (ADDITIVES_DB[code] && !found.some(function(f) { return f.code === code; }))
+          found.push(Object.assign({ code: code }, ADDITIVES_DB[code]));
+      }
+    });
+    return found;
+  }
+
+  /* ══════════════════════════════════
+     تحليل صورة منتج
+  ══════════════════════════════════ */
+  async function analyzeProductImage(imageDataUrl) {
+    var result = { barcode: null, productName: null, ingredients: null, food: null, additives: [] };
+
+    // ① Barcode detection (instantaneous إذا متوفر)
+    if ('BarcodeDetector' in window) {
+      try {
+        var detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','qr_code'] });
+        var img = new Image(); img.src = imageDataUrl;
+        await new Promise(function(res) { img.onload = res; img.onerror = res; });
+        var codes = await detector.detect(img);
+        if (codes && codes.length) {
+          result.barcode = codes[0].rawValue;
+          result.food = await foodBarcode(result.barcode).catch(function() { return null; });
+        }
+      } catch(e) {}
+    }
+
+    // ② Vision + OCR بالتوازي (لا تنتظر واحدة الثانية)
+    var [vRes, ocrText] = await Promise.allSettled([
+      _universalVision(imageDataUrl, 'انظر لهذه الصورة. إذا وجدت منتجاً أو طعاماً أو دواءً، اذكر اسمه التجاري فقط في سطر واحد.'),
+      ocrImage(imageDataUrl, 'ara+eng')
+    ]);
+
+    if (vRes.status === 'fulfilled' && vRes.value)
+      result.productName = vRes.value.text.trim().split('\n')[0];
+
+    if (ocrText.status === 'fulfilled' && ocrText.value && ocrText.value.length > 20) {
+      result.ingredients = ocrText.value;
+      result.additives   = checkAdditives(ocrText.value);
+    }
+
+    // ③ Food lookup من الاسم إذا لم يوجد barcode
+    if (!result.food && result.productName) {
+      var foods = await foodSearch(result.productName, 3).catch(function() { return []; });
+      if (foods.length) result.food = foods[0];
+    }
+
+    return result;
+  }
+
+  /* ══════════════════════════════════
+     تحليل الروشتة
+  ══════════════════════════════════ */
+  async function analyzePrescription(imageDataUrl, textFallback) {
+    var extractedText = textFallback || '';
+
+    if (imageDataUrl && !textFallback) {
+      // OCR + Vision بالتوازي
+      var [ocrR, vR] = await Promise.allSettled([
+        ocrImage(imageDataUrl, 'ara+eng'),
+        _universalVision(imageDataUrl, 'هذه صورة روشتة طبية. اقرأ جميع أسماء الأدوية والجرعات والتعليمات بدقة. أعد النص كما هو.')
+      ]);
+      var ocrTxt = (ocrR.status === 'fulfilled') ? ocrR.value : '';
+      var vTxt   = (vR.status   === 'fulfilled' && vR.value) ? vR.value.text : '';
+      extractedText = ocrTxt.length >= 30 ? ocrTxt : (vTxt || ocrTxt);
+    }
+
+    if (!extractedText) return null;
+    var sys = 'أنت صيدلاني ومساعد طبي محترف. تحلل وصفات طبية وتشرحها للمريض بوضوح.';
+    var usr = 'هذا نص الروشتة الطبية:\n\n' + extractedText + '\n\nقدم لكل دواء: الاسم، النوع، الجرعة، طريقة الأخذ. أجب بالعربية فقط.';
+    return await smartChat(sys, usr);
+  }
+
+  /* ══════════════════════════════════
+     تحليل التقرير الطبي
+  ══════════════════════════════════ */
+  async function analyzeMedicalReport(imageDataUrl, textFallback) {
+    var extractedText = textFallback || '';
+
+    if (imageDataUrl && !textFallback) {
+      var [ocrR, vR] = await Promise.allSettled([
+        ocrImage(imageDataUrl, 'ara+eng'),
+        _universalVision(imageDataUrl, 'هذه صورة تقرير طبي أو تحاليل. اقرأ جميع الأرقام والقيم والنتائج بدقة.')
+      ]);
+      var ocrTxt = (ocrR.status === 'fulfilled') ? ocrR.value : '';
+      var vTxt   = (vR.status   === 'fulfilled' && vR.value) ? vR.value.text : '';
+      extractedText = ocrTxt.length >= 30 ? ocrTxt : (vTxt || ocrTxt);
+    }
+
+    if (!extractedText) return null;
+    var sys = 'أنت طبيب ومساعد صحي. تشرح نتائج التحاليل الطبية للمريض بلغة بسيطة.';
+    var usr = 'هذا نص التقرير:\n\n' + extractedText + '\n\n1. اشرح كل قيمة\n2. هل هي ضمن الطبيعي؟\n3. ما يجب الانتباه إليه؟\n\nأجب بالعربية. اختم بـ: "هذا شرح توعوي فقط، استشر طبيبك."';
+    return await smartChat(sys, usr);
+  }
+
+  /* ══════════════════════════════════
+     الواجهة العامة
+  ══════════════════════════════════ */
+  var TayyibatAI = {
+    version: '4.1.0',
+
+    chat: function(prompt, systemContext) {
+      var sys = systemContext || (typeof buildUserContext === 'function' ? buildUserContext() : 'أنت مساعد صحي تابع لنظام طيبات. تتحدث بالعربية وتقدم نصائح صحية مفيدة.');
+      return smartChat(sys, prompt);
+    },
+
+    vision: function(imageDataUrl, question) {
+      return _universalVision(imageDataUrl, question)
+        .then(function(r) {
+          return r || { text: 'تعذر تحليل الصورة. الرجاء إدخال البيانات يدوياً.', source: 'fallback' };
+        })
+        .catch(function() {
+          return ocrImage(imageDataUrl)
+            .then(function(t) { return { text: t || 'تعذر استخراج النص.', source: 'ocr-fallback' }; });
+        });
+    },
+
+    ocr:              function(imageDataUrl, lang)  { return ocrImage(imageDataUrl, lang); },
+    foodLookup:       function(query)               { return foodSearch(query); },
+    barcode:          function(barcode)             { return foodBarcode(barcode); },
+    drugLookup:       function(name)                { return drugSearch(name); },
+    carcinogenCheck:  function(ingredientsText)     { return checkAdditives(ingredientsText); },
+    analyzeProduct:   function(imageDataUrl)        { return analyzeProductImage(imageDataUrl); },
+    analyzePrescription:  function(img, txt)        { return analyzePrescription(img, txt); },
+    analyzeMedicalReport: function(img, txt)        { return analyzeMedicalReport(img, txt); },
+    localFallback:    function(question)            { return { text: _smartLocalFallback(question), source: 'local' }; },
+
+    additivesDB: ADDITIVES_DB
+  };
+
+  global.TayyibatAI = TayyibatAI;
+
+  /* ── توافق مع الكود القديم ── */
+  global._callClaudeAPI = function(prompt, imageDataUrl) {
+    if (imageDataUrl)
+      return _universalVision(imageDataUrl, prompt).then(function(r) { return r ? r.text : ''; });
+    return smartChat(typeof buildUserContext === 'function' ? buildUserContext() : 'أنت مساعد صحي.', prompt)
+      .then(function(r) { return r.text; });
+  };
+  global._callClaudeAPIWithImage = function(prompt, imageDataUrl) {
+    return _universalVision(imageDataUrl, prompt).then(function(r) { return r ? r.text : ''; });
+  };
+  global._smartVisionAnalysis = function(imageDataUrl, prompt) {
+    return _universalVision(imageDataUrl, prompt)
+      .then(function(r) { return r || { text: 'تعذر التحليل.', source: 'fallback' }; });
+  };
+  global._universalAICall = function(messages, opts) {
+    opts = opts || {};
+    if (opts.imageDataUrl)
+      return _universalVision(opts.imageDataUrl, opts.promptText || '').then(function(r) { return r || null; });
+    return _universalChat(messages);
+  };
+
+  console.log('[TayyibatAI] ✅ v' + TayyibatAI.version + ' — CF-WORKER PRIORITY | Fallback: LLM7 + Pollinations + Kepler + OpenRouter');
+
+})(window);
+
 </script>
 </body>
 </html>
