@@ -343,15 +343,10 @@ function _cfChat(messages) {
     ];
   }
 
-  // ① Cloudflare Worker Vision — يرسل messages بصيغة OpenAI (يدعم data URL في gpt-4o)
+  // ① Cloudflare Worker Vision — معطّل: Worker النصي لا يدعم Vision (يقبل {prompt} فقط)
+  //    سيُستخدم _llm7Vision و_pollinationsVision بدلاً منه
   function _cfVision(imgUrl, prompt) {
-    return postJSON(CFG.cfWorker, {
-      messages: [{ role: 'user', content: _buildImageContent(imgUrl, prompt) }],
-      max_tokens: 1200, temperature: 0.3
-    }).then(function(d) {
-      var t = extractText(d);
-      return isGoodText(t) ? { text: t.trim(), source: 'CF-Worker-Vision' } : null;
-    }).catch(function() { return null; });
+    return Promise.resolve(null);
   }
 
   // ② LLM7 Vision — gpt-4o يدعم Base64 data URLs
@@ -797,8 +792,10 @@ function _cfChat(messages) {
 
   /* ── توافق مع الكود القديم ── */
   global._callClaudeAPI = function(prompt, imageDataUrl) {
-    if (imageDataUrl)
+    // إذا كان imageDataUrl يبدو كـ data URL حقيقي (صورة) → Vision
+    if (imageDataUrl && typeof imageDataUrl === 'string' && imageDataUrl.startsWith('data:image'))
       return _universalVision(imageDataUrl, prompt).then(function(r) { return r ? r.text : ''; });
+    // أي قيمة أخرى (sysPrompt نصي مثلاً) → تجاهلها والمتابعة كـ Chat
     return smartChat(typeof buildUserContext === 'function' ? buildUserContext() : 'أنت مساعد صحي.', prompt)
       .then(function(r) { return r.text; });
   };
