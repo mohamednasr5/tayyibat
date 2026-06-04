@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
@@ -37,6 +38,7 @@
 <meta property="og:locale:alternate" content="ar_AE">
 <meta property="og:locale:alternate" content="ar_EG">
 <meta property="og:locale:alternate" content="ar_KW">
+
 <!-- ═══════════════════════════════════════════════════
      Twitter / X Card
 ════════════════════════════════════════════════════ -->
@@ -11327,8 +11329,24 @@ function daSearch() {
   incToolUsage('drug-alt');
   var resBox = document.getElementById('da-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري البحث عن البدائل...</span></div>';
-  var sysPrompt = 'أنت صيدلاني سريري خبير في مصر. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP فقط. كل بديل في alternatives يجب أن يحتوي على حقل "name".';
-  var prompt = 'الدواء: "' + drug + '"\n\nأجب بهذا JSON الحرفي فقط (لا شيء قبله ولا بعده):\n{"drug_name":"اسم الدواء","active_ingredient":"المادة الفعالة عربي","active_ingredient_en":"Active Ingredient En","drug_class":"تصنيف الدواء","main_use":"الاستخدام الرئيسي","price_range":"نطاق السعر بالجنيه المصري EGP","alternatives":[{"name":"الاسم التجاري للبديل","active":"مادته الفعالة","price":"سعره بالجنيه المصري EGP","notes":"ملاحظة الفرق"},{"name":"بديل 2","active":"مادته الفعالة","price":"سعره","notes":"ملاحظة"},{"name":"بديل 3","active":"مادته الفعالة","price":"سعره","notes":"ملاحظة"}],"warnings":"أهم التحذيرات والتفاعلات الدوائية","note":"استشر الطبيب أو الصيدلاني قبل تغيير الدواء"}';
+  var sysPrompt = 'أنت صيدلاني سريري خبير في مصر. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP فقط. كل عنصر في alternatives يجب أن يحتوي على حقل "name" وهو اسم دواء تجاري حقيقي متوفر في مصر (لا تكتب بديل 1 أو بديل 2 أو أسماء عامة).';
+  var prompt = 'الدواء: "' + drug + '"\n\n' +
+    'أجب بهذا JSON الحرفي فقط (لا شيء قبله ولا بعده):\n' +
+    '{' +
+      '"drug_name":"اسم الدواء التجاري في مصر",' +
+      '"active_ingredient":"المادة الفعالة بالعربي",' +
+      '"active_ingredient_en":"Active Ingredient En",' +
+      '"drug_class":"تصنيف الدواء",' +
+      '"main_use":"الاستخدام الرئيسي",' +
+      '"price_range":"نطاق تقريبي لسعر الدواء بالجنيه المصري EGP",' +
+      '"alternatives":[' +
+         '{"name":"اسم بديل حقيقي متوفر في مصر","active":"مادته الفعالة","price":"سعره التقريبي بالجنيه المصري EGP","notes":"ملاحظة الفرق"},' +
+         '{"name":"اسم بديل حقيقي آخر في مصر","active":"مادته الفعالة","price":"سعره التقريبي","notes":"متى يُفضّل"},' +
+         '{"name":"بديل ثالث حقيقي في مصر","active":"مادته الفعالة","price":"سعره التقريبي","notes":"معلومة إضافية"}' +
+      '],' +
+      '"warnings":"أهم التحذيرات والتفاعلات الدوائية",' +
+      '"note":"استشر الطبيب أو الصيدلاني قبل تغيير الدواء"' +
+    '}';
   var msgs = [{role:'system',content:sysPrompt},{role:'user',content:prompt}];
   var handled = false;
   function onResult(res) {
@@ -11355,6 +11373,7 @@ function daSearch() {
     onFail();
   }
 }
+
 
 
 function renderDaResult(data, resBox) {
@@ -12996,13 +13015,7 @@ function getStars(c) {
     return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="'+c+'" opacity=".7"><animate attributeName="opacity" values=".7;0;.7" dur="'+dur+'s" repeatCount="indefinite"/><animate attributeName="r" values="2.5;1;2.5" dur="'+dur+'s" repeatCount="indefinite"/></circle>';
   }).join('');
 }
-function getSafeUid() {
-    return (
-        window.firebaseAuth?.currentUser?.uid ||
-        window.currentUser?.username ||
-        null
-    );
-}
+
 function zodiacRead() {
   var month = document.getElementById('zod-month').value;
   var day = document.getElementById('zod-day').value;
@@ -15097,6 +15110,17 @@ function _cfChat(messages) {
       document.head.appendChild(s);
     });
   }
+
+// ===== Helper آمن للحصول على UID المستخدم =====
+function getSafeUid() {
+    if (window.firebaseAuth && window.firebaseAuth.currentUser && window.getSafeUid()) {
+        return window.getSafeUid();
+    }
+    if (window.currentUser && window.currentUser.username) {
+        return window.currentUser.username;
+    }
+    return null;
+}
 
   async function ocrImage(imageDataUrl, lang) {
     lang = lang || 'ara+eng';
