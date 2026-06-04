@@ -9160,9 +9160,11 @@ async function _smartSend(msg) {
 
     var srcBadge = result.source ? ' <span style="font-size:.6rem;opacity:.6;margin-right:4px">'+result.source+'</span>' : '';
     if (chatBox) {
-      chatBox.innerHTML += '<div class="ai-msg bot-msg"><div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI'+srcBadge+'</div><span>'+result.text.replace(/
-/g,'<br>')+'</span></div>';
-      chatBox.scrollTop = chatBox.scrollHeight;
+chatBox.innerHTML +=
+  '<div class="ai-msg bot-msg">' +
+  '<div class="ai-msg-label"><i class="fas fa-robot"></i> طيبات AI' + srcBadge + '</div>' +
+  '<span>' + String(result.text || '').replace(/\n/g, '<br>') + '</span>' +
+  '</div>';
     }
     _history.push({role:"assistant", text: result.text});
   }
