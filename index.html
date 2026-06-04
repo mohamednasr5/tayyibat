@@ -3246,9 +3246,19 @@ function obgynIncUsage() {
   try { localStorage.setItem('tayyibat_obgyn_usage', newVal); } catch(e) {}
   // ── Sync to Firebase ──
   try {
-    if (window.__firebaseReady && window.currentUser && window.__firebaseSet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = firebaseAuth.currentUser.uid;
-      window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/obgyn-ai'), newVal).catch(function(){});
+    if (
+      window.__firebaseReady &&
+      window.firebaseAuth &&
+      window.firebaseAuth.currentUser &&
+      window.__firebaseSet &&
+      window.__firebaseRef &&
+      window.__firebaseDB
+    ) {
+      var uid = window.firebaseAuth.currentUser.uid;
+      window.__firebaseSet(
+        window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/obgyn-ai'),
+        newVal
+      ).catch(function(){});
     }
   } catch(e) {}
 }
