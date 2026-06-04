@@ -13480,8 +13480,18 @@ setTimeout(checkAdminTrialReset, 3000);
     setInterval(function() {
       ch.postMessage({
         type: 'INDEX_HEARTBEAT',
-        user: window.currentUser ? { username: firebaseAuth.currentUser.uid, nameAr: window.currentUser.nameAr } : null,
-        page: document.querySelector('.page.active')?.id || 'unknown',
+user: window.currentUser
+  ? {
+      username:
+        (firebaseAuth &&
+         firebaseAuth.currentUser &&
+         firebaseAuth.currentUser.uid)
+          ? firebaseAuth.currentUser.uid
+          : window.currentUser.username,
+      nameAr: window.currentUser.nameAr
+    }
+  : null,
+           page: document.querySelector('.page.active')?.id || 'unknown',
         ts: Date.now()
       });
     }, 30000);
