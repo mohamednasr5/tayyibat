@@ -1,15 +1,3 @@
-
-// ===== Helper آمن للحصول على UID المستخدم =====
-function getSafeUid() {
-    if (window.firebaseAuth && window.firebaseAuth.currentUser && window.getSafeUid()) {
-        return window.getSafeUid();
-    }
-    if (window.currentUser && window.currentUser.username) {
-        return window.currentUser.username;
-    }
-    return null;
-}
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
@@ -49,7 +37,6 @@ function getSafeUid() {
 <meta property="og:locale:alternate" content="ar_AE">
 <meta property="og:locale:alternate" content="ar_EG">
 <meta property="og:locale:alternate" content="ar_KW">
-
 <!-- ═══════════════════════════════════════════════════
      Twitter / X Card
 ════════════════════════════════════════════════════ -->
@@ -13009,7 +12996,13 @@ function getStars(c) {
     return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="'+c+'" opacity=".7"><animate attributeName="opacity" values=".7;0;.7" dur="'+dur+'s" repeatCount="indefinite"/><animate attributeName="r" values="2.5;1;2.5" dur="'+dur+'s" repeatCount="indefinite"/></circle>';
   }).join('');
 }
-
+function getSafeUid() {
+    return (
+        window.firebaseAuth?.currentUser?.uid ||
+        window.currentUser?.username ||
+        null
+    );
+}
 function zodiacRead() {
   var month = document.getElementById('zod-month').value;
   var day = document.getElementById('zod-day').value;
