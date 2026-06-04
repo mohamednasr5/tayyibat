@@ -105,7 +105,6 @@
   ══════════════════════════════════ */
 
   // ① Cloudflare Worker chat
-  // ① Cloudflare Worker chat
 function _cfChat(messages) {
 
   console.log('USING CLOUDFLARE AI');
@@ -134,68 +133,66 @@ function _cfChat(messages) {
     return resp.json();
 
   })
-  .then(function(data) {
+ .then(function(data) {
 
-    console.log('CF RESPONSE:', data);
+  console.log('CF RESPONSE:', data);
+
+  var responseText = '';
 
   if (
-  data &&
-  data.result &&
-  data.result.response
-) {
+    data &&
+    data.result &&
+    data.result.response
+  ) {
 
-  console.log('CF SUCCESS');
+    console.log('CF SUCCESS');
 
-  let responseText = '';
+    if (typeof data.result.response === 'string') {
 
-  if (typeof data.result.response === 'string') {
+      responseText = data.result.response;
 
-    responseText = data.result.response;
+    } else if (Array.isArray(data.result.response)) {
 
-  } else if (Array.isArray(data.result.response)) {
+      responseText = data.result.response
+        .map(function(item) {
+          return item.text || item.content || '';
+        })
+        .join(' ');
 
-    responseText = data.result.response
-      .map(function(item) {
-        return item.text || item.content || '';
-      })
-      .join(' ');
+    } else {
 
-  } else {
+      responseText = JSON.stringify(data.result.response);
 
-    responseText = String(data.result.response);
-
-  }
-
-  return {
-    text: responseText.trim(),
-    source: 'CF-Worker'
-  };
-}
-
-    // احتياطي لو تغير شكل الرد مستقبلاً
-    var t = extractText(data);
-
-    if (isGoodText(t)) {
-      return {
-        text: t.trim(),
-        source: 'CF-Worker'
-      };
     }
 
-    console.log('CF EMPTY RESPONSE');
+    return {
+      text: String(responseText).trim(),
+      source: data.provider || 'CF-Worker'
+    };
+  }
 
-    return null;
+  var t = extractText(data);
 
-  })
-  .catch(function(err) {
+  if (isGoodText(t)) {
+    return {
+      text: String(t).trim(),
+      source: data.provider || 'CF-Worker'
+    };
+  }
 
-    console.error('Cloudflare Error:', err);
+  console.log('CF EMPTY RESPONSE');
 
-    return null;
+  return null;
 
-  });
+})
+.catch(function(err) {
+
+  console.error('Cloudflare Error:', err);
+
+  return null;
+
+});
 }
-
   // ② OVH Kepler — model واحد بدون انتظار
   function _keplerChat(messages, modelOverride) {
     var model = modelOverride || CFG.keplerModel;
