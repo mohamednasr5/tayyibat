@@ -138,19 +138,39 @@ function _cfChat(messages) {
 
     console.log('CF RESPONSE:', data);
 
-    if (
-      data &&
-      data.result &&
-      data.result.response
-    ) {
+  if (
+  data &&
+  data.result &&
+  data.result.response
+) {
 
-      console.log('CF SUCCESS');
+  console.log('CF SUCCESS');
 
-      return {
-        text: data.result.response.trim(),
-        source: 'CF-Worker'
-      };
-    }
+  let responseText = '';
+
+  if (typeof data.result.response === 'string') {
+
+    responseText = data.result.response;
+
+  } else if (Array.isArray(data.result.response)) {
+
+    responseText = data.result.response
+      .map(function(item) {
+        return item.text || item.content || '';
+      })
+      .join(' ');
+
+  } else {
+
+    responseText = String(data.result.response);
+
+  }
+
+  return {
+    text: responseText.trim(),
+    source: 'CF-Worker'
+  };
+}
 
     // احتياطي لو تغير شكل الرد مستقبلاً
     var t = extractText(data);
