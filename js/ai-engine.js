@@ -1,12 +1,11 @@
 /**
  * ══════════════════════════════════════════════════════════════════
  *  🌿 طيبات — محرك الذكاء الاصطناعي المجاني
- *  ai-engine.js  |  v4.0  — FAST PARALLEL RACE ENGINE
+ *  ai-engine.js  |  v4.1  — CF-WORKER PRIORITY ENGINE
  *
- *  ✅ المبدأ الجديد: كل المزودين يعملون بالتوازي — أول رد يفوز
- *  ✅ Timeout صارم 8 ثوانٍ لكل طلب
- *  ✅ لا waits بين المزودين — لا انتظار مجمّع
- *  ✅ Cloudflare Worker → OVH Kepler → LLM7 → Pollinations → OpenRouter
+ *  ✅ الأولوية الأولى دائماً: Cloudflare Worker (taybat-ai.studegy8.workers.dev)
+ *  ✅ إذا فشل CF-Worker فقط: LLM7 + Pollinations + Kepler + OpenRouter بالتوازي
+ *  ✅ Timeout صارم 8 ثوانٍ للـ CF-Worker
  *  ✅ رد محلي ذكي عند فشل الكل (لا "رد غبي")
  * ══════════════════════════════════════════════════════════════════
  */
@@ -242,10 +241,13 @@ function _cfChat(messages) {
   }
 
   async function _universalChat(messages) {
-    // جولة ١: كل المزودين بالتوازي مع timeout 8 ثواني
+    // ═══ الأولوية ١: Cloudflare Worker وحده أولاً ═══
+    var cfResult = await withTimeout(_cfChat(messages), CFG.FAST_TIMEOUT).catch(function() { return null; });
+    if (cfResult) return cfResult;
+
+    // ═══ الأولوية ٢: باقي المزودين بالتوازي ═══
     var round1 = await withTimeout(
       _raceFirst([
-        _cfChat(messages),
         _llm7Chat(messages),
         _pollinationsChat(messages),
         _orChat(messages),
@@ -256,7 +258,7 @@ function _cfChat(messages) {
 
     if (round1) return round1;
 
-    // جولة ٢: fallback سريع — LLM7 بنماذج بديلة + Pollinations بنموذج ثانٍ
+    // ═══ الأولوية ٣: fallback بنماذج بديلة ═══
     var round2 = await withTimeout(
       _raceFirst([
         _llm7Chat(messages, 'gpt-4.1'),
@@ -347,10 +349,13 @@ function _cfChat(messages) {
     var smallImg = imgDataUrl;
     try { smallImg = await _resizeImage(imgDataUrl, 640); } catch(e) {}
 
-    // جولة ١: كل vision providers بالتوازي
+    // ═══ الأولوية ١: Cloudflare Worker وحده أولاً ═══
+    var cfResult = await withTimeout(_cfVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
+    if (cfResult) return cfResult;
+
+    // ═══ الأولوية ٢: باقي vision providers بالتوازي ═══
     var result = await withTimeout(
       _raceFirst([
-        _cfVision(smallImg, prompt),
         _llm7Vision(smallImg, prompt),
         _pollinationsVision(smallImg, prompt)
       ]),
@@ -359,7 +364,7 @@ function _cfChat(messages) {
 
     if (result) return result;
 
-    // جولة ٢: LLM7 بنموذج بديل
+    // ═══ الأولوية ٣: LLM7 بنماذج بديلة ═══
     var r2 = await withTimeout(
       _raceFirst([
         _llm7Vision(smallImg, prompt, 'gpt-4.1'),
@@ -666,7 +671,7 @@ function _cfChat(messages) {
      الواجهة العامة
   ══════════════════════════════════ */
   var TayyibatAI = {
-    version: '4.0.0',
+    version: '4.1.0',
 
     chat: function(prompt, systemContext) {
       var sys = systemContext || (typeof buildUserContext === 'function' ? buildUserContext() : 'أنت مساعد صحي تابع لنظام طيبات. تتحدث بالعربية وتقدم نصائح صحية مفيدة.');
@@ -720,6 +725,6 @@ function _cfChat(messages) {
     return _universalChat(messages);
   };
 
-  console.log('[TayyibatAI] ✅ v' + TayyibatAI.version + ' — PARALLEL RACE ENGINE | CF-Worker + LLM7 + Pollinations + Kepler + OpenRouter');
+  console.log('[TayyibatAI] ✅ v' + TayyibatAI.version + ' — CF-WORKER PRIORITY | Fallback: LLM7 + Pollinations + Kepler + OpenRouter');
 
 })(window);
