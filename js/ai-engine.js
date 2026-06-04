@@ -297,15 +297,56 @@ function _cfChat(messages) {
 
   /* ══════════════════════════════════
      SINGLE-CALL PROVIDERS  (Vision)
+     ✅ كل provider يدعم Base64 data URLs من الكاميرا
   ══════════════════════════════════ */
 
-  // ① Cloudflare Worker Vision
-  function _cfVision(imgUrl, prompt) {
-    return postJSON(CFG.cfWorker, {
-      messages: [{ role: 'user', content: [
+  /* استخراج بيانات Base64 من data URL */
+  function _parseDataUrl(dataUrl) {
+    // يرجع { mediaType, base64 } أو null إذا لم يكن data URL
+    if (!dataUrl || !dataUrl.startsWith('data:')) return null;
+    var parts = dataUrl.split(',');
+    if (parts.length < 2) return null;
+    var header = parts[0]; // "data:image/jpeg;base64"
+    var base64  = parts[1];
+    var mediaType = (header.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
+    return { mediaType: mediaType, base64: base64 };
+  }
+
+  /* بناء content block للصورة — يدعم data URL وURL عادي */
+  function _buildImageContent(imgUrl, prompt) {
+    var parsed = _parseDataUrl(imgUrl);
+    if (parsed) {
+      // Base64 inline — OpenAI format مع data URL كما هو (مدعوم في gpt-4o)
+      return [
         { type: 'text', text: prompt },
         { type: 'image_url', image_url: { url: imgUrl } }
-      ]}],
+      ];
+    }
+    return [
+      { type: 'text', text: prompt },
+      { type: 'image_url', image_url: { url: imgUrl } }
+    ];
+  }
+
+  /* بناء content block بصيغة Anthropic الأصلية (base64 source) */
+  function _buildAnthropicContent(imgUrl, prompt) {
+    var parsed = _parseDataUrl(imgUrl);
+    if (parsed) {
+      return [
+        { type: 'image', source: { type: 'base64', media_type: parsed.mediaType, data: parsed.base64 } },
+        { type: 'text', text: prompt }
+      ];
+    }
+    return [
+      { type: 'image', source: { type: 'url', url: imgUrl } },
+      { type: 'text', text: prompt }
+    ];
+  }
+
+  // ① Cloudflare Worker Vision — يرسل messages بصيغة OpenAI (يدعم data URL في gpt-4o)
+  function _cfVision(imgUrl, prompt) {
+    return postJSON(CFG.cfWorker, {
+      messages: [{ role: 'user', content: _buildImageContent(imgUrl, prompt) }],
       max_tokens: 1200, temperature: 0.3
     }).then(function(d) {
       var t = extractText(d);
@@ -313,15 +354,12 @@ function _cfChat(messages) {
     }).catch(function() { return null; });
   }
 
-  // ② LLM7 Vision
+  // ② LLM7 Vision — gpt-4o يدعم Base64 data URLs
   function _llm7Vision(imgUrl, prompt, modelOverride) {
     var model = modelOverride || CFG.llm7VisionModel;
     return postJSON(CFG.llm7Endpoint, {
       model: model,
-      messages: [{ role: 'user', content: [
-        { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: imgUrl } }
-      ]}],
+      messages: [{ role: 'user', content: _buildImageContent(imgUrl, prompt) }],
       max_tokens: 1200, temperature: 0.3
     }).then(function(d) {
       var t = extractText(d);
@@ -329,14 +367,11 @@ function _cfChat(messages) {
     }).catch(function() { return null; });
   }
 
-  // ③ Pollinations Vision
+  // ③ Pollinations Vision — يدعم Base64 data URLs مع openai-large
   function _pollinationsVision(imgUrl, prompt) {
     return postJSON(CFG.pollinationsText, {
       model: CFG.pollinationsVision,
-      messages: [{ role: 'user', content: [
-        { type: 'text', text: prompt },
-        { type: 'image_url', image_url: { url: imgUrl } }
-      ]}],
+      messages: [{ role: 'user', content: _buildImageContent(imgUrl, prompt) }],
       max_tokens: 1200, temperature: 0.3
     }).then(function(d) {
       var t = extractText(d);
@@ -344,9 +379,32 @@ function _cfChat(messages) {
     }).catch(function() { return null; });
   }
 
+  // ④ Anthropic API Vision — يدعم Base64 بشكل أصلي ومضمون (أفضل provider للكاميرا)
+  function _anthropicVision(imgUrl, prompt) {
+    var content = _buildAnthropicContent(imgUrl, prompt);
+    return withTimeout(
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1200,
+          messages: [{ role: 'user', content: content }]
+        })
+      })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP_' + r.status); return r.json(); })
+      .then(function(d) {
+        var t = (d.content && d.content[0] && d.content[0].text) || null;
+        return isGoodText(t) ? { text: t.trim(), source: 'Anthropic-Vision' } : null;
+      })
+      .catch(function() { return null; }),
+      CFG.FAST_TIMEOUT
+    ).catch(function() { return null; });
+  }
+
   /* تقليص الصورة لتسريع الإرسال */
   function _resizeImage(imgDataUrl, maxSize) {
-    maxSize = maxSize || 640;
+    maxSize = maxSize || 800;
     return new Promise(function(resolve) {
       try {
         var img = new Image();
@@ -357,7 +415,7 @@ function _cfChat(messages) {
           c.width  = Math.round(img.width  * ratio);
           c.height = Math.round(img.height * ratio);
           c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-          resolve(c.toDataURL('image/jpeg', 0.78));
+          resolve(c.toDataURL('image/jpeg', 0.82));
         };
         img.onerror = function() { resolve(imgDataUrl); };
         img.src = imgDataUrl;
@@ -367,31 +425,41 @@ function _cfChat(messages) {
 
   /* ══════════════════════════════════
      RACE ENGINE — Vision
+     ✅ محسّن لدعم الكاميرا (Base64)
   ══════════════════════════════════ */
   async function _universalVision(imgDataUrl, prompt) {
+    var isBase64 = imgDataUrl && imgDataUrl.startsWith('data:');
     var smallImg = imgDataUrl;
-    try { smallImg = await _resizeImage(imgDataUrl, 640); } catch(e) {}
+    try { smallImg = await _resizeImage(imgDataUrl, 800); } catch(e) {}
 
-    // ═══ الأولوية ١: Cloudflare Worker وحده أولاً ═══
+    // ═══ الأولوية ١: إذا كانت الصورة Base64 (من الكاميرا) → Anthropic أولاً لأنه يدعمها بشكل أصلي ═══
+    if (isBase64) {
+      var anthropicResult = await withTimeout(_anthropicVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
+      if (anthropicResult) return anthropicResult;
+    }
+
+    // ═══ الأولوية ٢: Cloudflare Worker ═══
     var cfResult = await withTimeout(_cfVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
     if (cfResult) return cfResult;
 
-    // ═══ الأولوية ٢: باقي vision providers بالتوازي ═══
+    // ═══ الأولوية ٣: LLM7 + Pollinations بالتوازي ═══
     var result = await withTimeout(
       _raceFirst([
         _llm7Vision(smallImg, prompt),
-        _pollinationsVision(smallImg, prompt)
+        _pollinationsVision(smallImg, prompt),
+        isBase64 ? _anthropicVision(smallImg, prompt) : Promise.resolve(null)
       ]),
       CFG.RACE_TIMEOUT
     ).catch(function() { return null; });
 
     if (result) return result;
 
-    // ═══ الأولوية ٣: LLM7 بنماذج بديلة ═══
+    // ═══ الأولوية ٤: نماذج بديلة ═══
     var r2 = await withTimeout(
       _raceFirst([
         _llm7Vision(smallImg, prompt, 'gpt-4.1'),
-        _llm7Vision(smallImg, prompt, 'claude-3-5-sonnet-20241022')
+        _llm7Vision(smallImg, prompt, 'claude-3-5-sonnet-20241022'),
+        _pollinationsVision(smallImg, prompt)
       ]),
       CFG.RACE_TIMEOUT
     ).catch(function() { return null; });
