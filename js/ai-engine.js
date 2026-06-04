@@ -136,33 +136,23 @@ function _cfChat(messages) {
   })
   .then(function(data) {
 
-  console.log("CF RESPONSE:", data);
+    console.log('CF RESPONSE:', data);
 
-  if (
-    data &&
-    data.result &&
-    data.result.response
-  ) {
+    if (
+      data &&
+      data.result &&
+      data.result.response
+    ) {
 
-    console.log("CF SUCCESS");
+      console.log('CF SUCCESS');
 
-    return {
-      text: data.result.response.trim(),
-      source: "CF-Worker"
-    };
-  }
-
-  console.log("CF EMPTY RESPONSE");
-
-  return null;
-})
       return {
         text: data.result.response.trim(),
         source: 'CF-Worker'
       };
     }
 
-    // احتياطى لو تغير شكل الرد مستقبلاً
+    // احتياطي لو تغير شكل الرد مستقبلاً
     var t = extractText(data);
 
     if (isGoodText(t)) {
@@ -171,6 +161,8 @@ function _cfChat(messages) {
         source: 'CF-Worker'
       };
     }
+
+    console.log('CF EMPTY RESPONSE');
 
     return null;
 
