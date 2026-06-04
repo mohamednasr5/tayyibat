@@ -136,12 +136,26 @@ function _cfChat(messages) {
   })
   .then(function(data) {
 
-    // Cloudflare Worker Response
-    if (
-      data &&
-      data.result &&
-      data.result.response
-    ) {
+  console.log("CF RESPONSE:", data);
+
+  if (
+    data &&
+    data.result &&
+    data.result.response
+  ) {
+
+    console.log("CF SUCCESS");
+
+    return {
+      text: data.result.response.trim(),
+      source: "CF-Worker"
+    };
+  }
+
+  console.log("CF EMPTY RESPONSE");
+
+  return null;
+})
       return {
         text: data.result.response.trim(),
         source: 'CF-Worker'
