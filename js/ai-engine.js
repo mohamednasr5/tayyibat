@@ -106,13 +106,70 @@
   ══════════════════════════════════ */
 
   // ① Cloudflare Worker chat
-  function _cfChat(messages) {
-    return postJSON(CFG.cfWorker, { messages: messages, max_tokens: 1200, temperature: 0.7 })
-      .then(function(d) {
-        var t = extractText(d);
-        return isGoodText(t) ? { text: t.trim(), source: 'CF-Worker' } : null;
-      }).catch(function() { return null; });
-  }
+  // ① Cloudflare Worker chat
+function _cfChat(messages) {
+
+  console.log('USING CLOUDFLARE AI');
+
+  var prompt = messages
+    .map(function(m) {
+      return m.role + ': ' + m.content;
+    })
+    .join('\n');
+
+  return fetch(CFG.cfWorker, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt: prompt
+    })
+  })
+  .then(function(resp) {
+
+    if (!resp.ok) {
+      throw new Error('HTTP_' + resp.status);
+    }
+
+    return resp.json();
+
+  })
+  .then(function(data) {
+
+    // Cloudflare Worker Response
+    if (
+      data &&
+      data.result &&
+      data.result.response
+    ) {
+      return {
+        text: data.result.response.trim(),
+        source: 'CF-Worker'
+      };
+    }
+
+    // احتياطى لو تغير شكل الرد مستقبلاً
+    var t = extractText(data);
+
+    if (isGoodText(t)) {
+      return {
+        text: t.trim(),
+        source: 'CF-Worker'
+      };
+    }
+
+    return null;
+
+  })
+  .catch(function(err) {
+
+    console.error('Cloudflare Error:', err);
+
+    return null;
+
+  });
+}
 
   // ② OVH Kepler — model واحد بدون انتظار
   function _keplerChat(messages, modelOverride) {
