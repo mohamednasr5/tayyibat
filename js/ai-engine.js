@@ -815,4 +815,154 @@ function _cfChat(messages) {
 
   console.log('[TayyibatAI] ✅ v' + TayyibatAI.version + ' — CF-WORKER PRIORITY | Fallback: LLM7 + Pollinations + Kepler + OpenRouter');
 
+  /* ═══════════════════════════════════════════════════════════════
+     نظام التحليل الحي المباشر
+  ═══════════════════════════════════════════════════════════════ */
+  var liveAnalysisEngine = {
+    isRunning: false,
+    currentStream: null,
+    currentMode: null,
+    frameCount: 0,
+    skipFrames: 12,
+
+    start: function(videoId, canvasId, mode) {
+      var self = this;
+      if (this.isRunning) return;
+      
+      var videoEl = document.getElementById(videoId);
+      var canvasEl = document.getElementById(canvasId);
+      
+      if (!videoEl || !canvasEl) {
+        console.error('عناصر الفيديو أو Canvas غير موجودة');
+        return;
+      }
+
+      this.isRunning = true;
+      this.currentMode = mode;
+      this.frameCount = 0;
+
+      navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false 
+      })
+      .then(function(stream) {
+        self.currentStream = stream;
+        videoEl.srcObject = stream;
+        videoEl.style.display = 'block';
+        document.getElementById('pa-camera-fallback-msg').style.display = 'none';
+        document.getElementById('live-analysis-status').style.display = 'block';
+        
+        self._analyzeContinuously(videoEl, canvasEl, mode);
+      })
+      .catch(function(err) {
+        console.error('خطأ الكاميرا:', err);
+        alert('خطأ: لا يمكن فتح الكاميرا');
+      });
+    },
+
+    _analyzeContinuously: function(videoEl, canvasEl, mode) {
+      var self = this;
+      var ctx = canvasEl.getContext('2d');
+
+      var analyze = function() {
+        if (!self.isRunning) return;
+
+        self.frameCount++;
+
+        if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
+          canvasEl.width = videoEl.videoWidth;
+          canvasEl.height = videoEl.videoHeight;
+          ctx.drawImage(videoEl, 0, 0);
+
+          if (self.frameCount % self.skipFrames === 0) {
+            var base64 = canvasEl.toDataURL('image/jpeg', 0.6).split(',')[1];
+            var prompt = self._getPromptByMode(mode);
+
+            _universalVision('data:image/jpeg;base64,' + base64, prompt)
+              .then(function(result) {
+                if (result && result.text) {
+                  self.stop();
+                  self._showResults(result.text, mode);
+                }
+              })
+              .catch(function(e) {
+                console.warn('خطأ في التحليل:', e);
+              });
+          }
+        }
+
+        requestAnimationFrame(analyze);
+      };
+
+      analyze();
+    },
+
+    _getPromptByMode: function(mode) {
+      var prompts = {
+        'product': 'احلل مكونات العلبة والمنتج بالتفصيل. أعطني: الاسم والمكونات والسعرات والقيم الغذائية والتحذيرات الصحية.',
+        'food': 'احلل الطعام في الصورة. أعطني: اسم الطعام والسعرات الحرارية والبروتين والكربوهيدرات والدهون والفوائد والنصائح.',
+        'medicine': 'اقرأ معلومات الدواء بالتفصيل. أعطني: الاسم والمادة الفعالة والجرعة والاستخدامات والآثار الجانبية والتحذيرات.',
+        'report': 'اقرأ التقرير الطبي. أعطني: التشخيص والنتائج المهمة والتوصيات والملاحظات الطبية.',
+        'prescription': 'اقرأ الروشتة الطبية. أعطني: الأدوية والجرعات والتكرار والمحاذير والملاحظات.'
+      };
+      return prompts[mode] || 'احلل الصورة بالتفصيل';
+    },
+
+    _showResults: function(text, mode) {
+      var resultEl = document.getElementById('pa-scan-result');
+      if (resultEl) {
+        var html = '<div style="' +
+          'background: linear-gradient(135deg, rgba(46,201,81,0.1) 0%, rgba(0,201,167,0.05) 100%);' +
+          'border: 2px solid #2ec951;' +
+          'border-radius: 12px;' +
+          'padding: 16px;' +
+          'margin: 12px 0;' +
+          'line-height: 1.8;' +
+          'color: #e0e0e0;' +
+          'font-size: 0.9rem;' +
+          '">' +
+          '<h3 style="color: #2ec951; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">' +
+          '<i class="fas fa-check-circle"></i> النتائج' +
+          '</h3>' +
+          '<div style="white-space: pre-wrap; word-wrap: break-word;">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>' +
+          '<button onclick="liveAnalysisEngine.restart()" style="' +
+          'width: 100%; margin-top: 12px; padding: 12px; ' +
+          'background: linear-gradient(135deg, #2ec951 0%, #27ae60 100%); ' +
+          'color: white; border: none; border-radius: 8px; ' +
+          'font-family: Tajawal, sans-serif; font-weight: 700; cursor: pointer;' +
+          '"><i class="fas fa-redo-alt" style="margin-left: 6px;"></i> اضغط لإعادة تفعيل الكاميرا والتحليل</button>' +
+          '</div>';
+        resultEl.innerHTML = html;
+      }
+      document.getElementById('live-analysis-status').style.display = 'none';
+    },
+
+    stop: function() {
+      this.isRunning = false;
+      if (this.currentStream) {
+        this.currentStream.getTracks().forEach(function(t) { t.stop(); });
+        this.currentStream = null;
+      }
+      var videoEl = document.getElementById('pa-video-stream');
+      if (videoEl) {
+        videoEl.style.display = 'none';
+        videoEl.pause();
+      }
+    },
+
+    restart: function() {
+      var resultEl = document.getElementById('pa-scan-result');
+      if (resultEl) resultEl.innerHTML = '';
+      document.getElementById('live-analysis-status').style.display = 'block';
+      this.frameCount = 0;
+      this.isRunning = true;
+      
+      var videoEl = document.getElementById('pa-video-stream');
+      var canvasEl = document.getElementById('pa-live-canvas');
+      this._analyzeContinuously(videoEl, canvasEl, this.currentMode);
+    }
+  };
+
+  global.liveAnalysisEngine = liveAnalysisEngine;
+
 })(window);
