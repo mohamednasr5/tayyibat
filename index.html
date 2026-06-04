@@ -8964,62 +8964,118 @@ window.puter = {
 
   var _history = [];
 
-  function _buildPrompt() {
-    var u = window.currentUser || {};
-    var dm = {sugar:"السكري",pressure:"الضغط",allergy:"الحساسية",chemo:"الكيمو",heart:"القلب",kidney:"الكلى"};
-    var diseases = (u.diseases||[]).map(function(d){return dm[d]||d;}).join(", ")||"لا يوجد";
-    var age = u.dob ? (new Date().getFullYear()-new Date(u.dob).getFullYear()) : "غير محدد";
-    var gender = u.gender==="male" ? "ذكر" : "انثى";
-    return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n"
-      + "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n"
-      + "بيانات المستخدم:\n"
-      + "- الاسم: "+(u.nameAr||u.name||"مستخدم")+"\n"
-      + "- العمر: "+age+" سنة | الجنس: "+gender+"\n"
-      + "- BMI: "+(u.bmi||"؟")+" | الوزن: "+(u.weight||"؟")+"كجم | الطول: "+(u.height||"؟")+"سم\n"
-      + "- الحالات الصحية: "+diseases+"\n\n"
-      + "نظام الطيبات:\n"
-      + "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.\n"
-      + "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.\n\n"
-      + "القواعد: راع الحالة الصحية دائما، ذكر باستشارة الطبيب، لا تتجاوز 400 كلمة الا اذا طلب.";
-  }
+function _buildPrompt() {
+  var u = window.currentUser || {};
+  var dm = {
+    sugar: "السكري",
+    pressure: "الضغط",
+    allergy: "الحساسية",
+    chemo: "الكيمو",
+    heart: "القلب",
+    kidney: "الكلى"
+  };
 
-  function _buildMessages(msg) {
-    var msgs = [{role:"system", content:_buildPrompt()}];
-    _history.forEach(function(m) { msgs.push({role:m.role==="assistant"?"assistant":"user", content:m.text}); });
-    msgs.push({role:"user", content:msg});
-    return msgs;
-  }
+  var diseases = (u.diseases || [])
+    .map(function(d) {
+      return dm[d] || d;
+    })
+    .join(", ") || "لا يوجد";
 
-  function _localFallback() {
-    var name = (window.currentUser&&(window.currentUser.nameAr||window.currentUser.name))||"صديقي";
-    var tips = [
-      "انا هنا معك "+name+"! الاتصال غير متاح الان.
+  var age = u.dob
+    ? (new Date().getFullYear() - new Date(u.dob).getFullYear())
+    : "غير محدد";
 
-المسموح: لحم الخروف، السمك، الارز، البطاطس، العسل، التمر.
-الممنوع: الدجاج، البيض، الدقيق الابيض، الالبان.
+  var gender = u.gender === "male" ? "ذكر" : "أنثى";
 
-اعد المحاولة بعد لحظات.",
-      "مرحبا "+name+"! الخادم مشغول.
+  return "انت مساعد صحي ذكي لتطبيق طيبات الصحي، متخصص في نظام الطيبات للدكتور ضياء العوضي رحمه الله.\n" +
+    "اجب باللغة العربية الفصحى باسلوب ودود ومنظم ومختصر.\n\n" +
+    "بيانات المستخدم:\n" +
+    "- الاسم: " + (u.nameAr || u.name || "مستخدم") + "\n" +
+    "- العمر: " + age + " سنة | الجنس: " + gender + "\n" +
+    "- BMI: " + (u.bmi || "؟") +
+    " | الوزن: " + (u.weight || "؟") +
+    " كجم | الطول: " + (u.height || "؟") + " سم\n" +
+    "- الحالات الصحية: " + diseases + "\n\n" +
+    "نظام الطيبات:\n" +
+    "مسموح: لحم خروف، سمك بحري، ارز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية، خضار مطبوخة.\n" +
+    "ممنوع: دجاج، بيض، دقيق ابيض، البان سائلة، بقوليات، خضار نيئة، غازيات، سكر مكرر.\n\n" +
+    "القواعد: راع الحالة الصحية دائما، ذكر باستشارة الطبيب، لا تتجاوز 400 كلمة الا اذا طلب.";
+}
 
-نصيحة: اشرب 8 اكواب ماء يوميا وامش 30 دقيقة.
-
-اضغط ارسال مرة اخرى.",
-      "اعتذر "+name+"، الشبكة غير مستقرة.
-
-وجبة مثالية: ارز + سمك مشوي + زيت زيتون + تمر.
-
-حاول مجددا."
-    ];
-    return {text:tips[Math.floor(Math.random()*tips.length)], source:"محلي"};
-  }
-
-  async function _smartSend(msg) {
-    var msgs = _buildMessages(msg);
-    if (typeof _universalAICall === "function") {
-      try { var res = await _universalAICall(msgs); if (res && res.text) return res; } catch(e) {}
+function _buildMessages(msg) {
+  var msgs = [
+    {
+      role: "system",
+      content: _buildPrompt()
     }
-    return _localFallback();
+  ];
+
+  _history.forEach(function(m) {
+    msgs.push({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: m.text
+    });
+  });
+
+  msgs.push({
+    role: "user",
+    content: msg
+  });
+
+  return msgs;
+}
+
+function _localFallback() {
+
+  var name =
+    (window.currentUser &&
+      (window.currentUser.nameAr || window.currentUser.name))
+    || "صديقي";
+
+  var tips = [
+
+    "انا هنا معك " + name + "! الاتصال غير متاح الان.\n\n" +
+    "المسموح: لحم الخروف، السمك، الارز، البطاطس، العسل، التمر.\n" +
+    "الممنوع: الدجاج، البيض، الدقيق الابيض، الالبان.\n\n" +
+    "اعد المحاولة بعد لحظات.",
+
+    "مرحبا " + name + "! الخادم مشغول.\n\n" +
+    "نصيحة: اشرب 8 اكواب ماء يوميا وامش 30 دقيقة.\n\n" +
+    "اضغط ارسال مرة اخرى.",
+
+    "اعتذر " + name + "، الشبكة غير مستقرة.\n\n" +
+    "وجبة مثالية: ارز + سمك مشوي + زيت زيتون + تمر.\n\n" +
+    "حاول مجددا."
+
+  ];
+
+  return {
+    text: tips[Math.floor(Math.random() * tips.length)],
+    source: "محلي"
+  };
+}
+
+async function _smartSend(msg) {
+
+  var msgs = _buildMessages(msg);
+
+  if (typeof _universalAICall === "function") {
+    try {
+
+      var res = await _universalAICall(msgs);
+
+      if (res && res.text) {
+        return res;
+      }
+
+    } catch (e) {
+      console.error(e);
+    }
   }
+
+  return _localFallback();
+}
+
 
   function _updateCtx() {
     var u = window.currentUser || {};
