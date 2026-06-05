@@ -14711,8 +14711,11 @@ function _cfChat(messages) {
   data.result.response
 ) {
 
-  console.log('CF SUCCESS');
-
+console.log('CF SUCCESS');
+console.log('FULL RESPONSE', data);
+console.log('RESULT', data.result);
+console.log('RESPONSE', data.result.response);
+console.log('TYPE', typeof data.result.response);
   var responseText = '';
 
   if (typeof data.result.response === 'string') {
