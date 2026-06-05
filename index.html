@@ -15330,13 +15330,13 @@ function fetchNetDate(cb) {
             if (el) el.textContent = "تمت مزامنة الوقت بنجاح ✅";
             if (typeof cb === "function") cb(netDate);
         })
-        .catch(function () {
-            netDate = new Date();
-            netDateFetched = false;
-            var el = document.getElementById("drp-sync-status");
-            if (el) el.textContent = "تعذر المزامنة، تم استخدام وقت الجهاز";
-            if (typeof cb === "function") cb(netDate);
-        });
+.catch(function () {
+    netDate = new Date();
+    netDateFetched = false;
+    var el = document.getElementById("drp-sync-status");
+    if (el) el.textContent = "تعذر المزامنة، تم استخدام وقت الجهاز";
+    if (typeof cb === "function") cb(netDate);
+});
 }
 
 </script>
