@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
@@ -5829,45 +5828,84 @@ async function _tryOpenRouterFree(messages, modelIndex) {
 ════════════════════════════════════════════════════════ */
 var CLOUDFLARE_WORKER_ENDPOINT = 'https://taybat-ai.studegy8.workers.dev';
 
+/* ─── مستخرج النص من أي صيغة رد يرجعها الـ Worker ─── */
+function _extractWorkerText(data) {
+  if (!data) return null;
+  // صيغة OpenAI choices
+  if (data.choices && data.choices[0]) {
+    var msg = data.choices[0].message || data.choices[0];
+    var t = msg.content || msg.text || null;
+    if (t && t.trim().length > 5) return t.trim();
+  }
+  // صيغة Cloudflare AI result.response
+  if (data.result && data.result.response) {
+    var r = data.result.response;
+    if (typeof r === 'string' && r.trim().length > 5) return r.trim();
+    if (Array.isArray(r)) return r.map(function(x){ return x.text||x.content||''; }).join(' ').trim();
+  }
+  // نص مباشر
+  if (typeof data === 'string' && data.trim().length > 5) return data.trim();
+  if (data.response && typeof data.response === 'string') return data.response.trim();
+  return null;
+}
+
 async function _tryCloudflareWorkerVision(imgDataUrl, promptText) {
   try {
+    // ── استخراج base64 خام من data URL ──
+    var imageBase64 = imgDataUrl;
+    var mediaType   = 'image/jpeg';
+    if (imgDataUrl && imgDataUrl.startsWith('data:')) {
+      var parts = imgDataUrl.split(',');
+      imageBase64 = parts[1] || imgDataUrl;
+      var hm = parts[0].match(/data:([^;]+)/);
+      if (hm) mediaType = hm[1];
+    }
+
     var resp = await Promise.race([
       fetch(CLOUDFLARE_WORKER_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'text', text: promptText },
-              { type: 'image_url', image_url: { url: imgDataUrl } }
-            ]
-          }],
-          max_tokens: 1200,
-          temperature: 0.3
+          prompt:    promptText || 'حلل الصورة بالتفصيل بالعربية',
+          image:     imageBase64,
+          mediaType: mediaType
         })
       }),
-      new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('CF_TIMEOUT')); }, 15000); })
+      new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('CF_TIMEOUT')); }, 18000); })
     ]);
     if (!resp.ok) return null;
     var data = await resp.json();
-    var text = null;
-    if (data.choices && data.choices[0] && data.choices[0].message)
-      text = data.choices[0].message.content;
-    else if (typeof data === 'string') text = data;
-    else if (data.content) text = data.content;
-    if (text && text.trim().length > 5) return { text: text.trim(), source: 'Cloudflare-Worker' };
+    var text = _extractWorkerText(data);
+    if (text) return { text: text, source: data.provider || 'CF-Worker-Vision' };
     return null;
   } catch(e) { return null; }
 }
 
-/* Universal AI Router — LLM7 → Pollinations → OpenRouter → Kepler */
+async function _tryCloudflareWorkerChat(promptText) {
+  try {
+    var resp = await Promise.race([
+      fetch(CLOUDFLARE_WORKER_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText })
+      }),
+      new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('CF_TIMEOUT')); }, 10000); })
+    ]);
+    if (!resp.ok) return null;
+    var data = await resp.json();
+    var text = _extractWorkerText(data);
+    if (text) return { text: text, source: data.provider || 'CF-Worker-Chat' };
+    return null;
+  } catch(e) { return null; }
+}
+
+/* Universal AI Router — CF-Worker → LLM7 → Pollinations → OpenRouter → Kepler */
 async function _universalAICall(messages, opts) {
   opts = opts || {};
   var isVision = !!(opts.imageDataUrl);
 
   if (isVision) {
-    // Cloudflare Worker أولاً (الأكثر موثوقية وجودة)
+    // Cloudflare Worker Vision أولاً (الصيغة الجديدة { prompt, image })
     try { var cfR = await _tryCloudflareWorkerVision(opts.imageDataUrl, opts.promptText||""); if (cfR) return cfR; } catch(e) {}
     try { var r = await _tryLLM7Vision(opts.imageDataUrl, opts.promptText||"", 0); if (r) return r; } catch(e) {}
     try { var r = await _tryPollinationsVision(opts.imageDataUrl, opts.promptText||"", 0); if (r) return r; } catch(e) {}
@@ -5875,6 +5913,9 @@ async function _universalAICall(messages, opts) {
     return await _universalAICall(textMsgs);
   }
 
+  // Chat: CF Worker أولاً ثم باقي المزودين
+  var chatPrompt = messages.map(function(m){ return (m.role==='system'?'[سياق]: ':'')+m.content; }).join('\n');
+  try { var cfChat = await _tryCloudflareWorkerChat(chatPrompt); if (cfChat) return cfChat; } catch(e) {}
   try { var r = await _tryLLM7(messages, 0); if (r) return r; } catch(e) {}
   try { var r = await _tryPollinations(messages, 0); if (r) return r; } catch(e) {}
   try { var r = await _tryOpenRouterFree(messages, 0); if (r) return r; } catch(e) {}
