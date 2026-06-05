@@ -15012,12 +15012,14 @@ console.log('TYPE', typeof data.result.response);
 
 // ===== Helper آمن للحصول على UID المستخدم =====
 function getSafeUid() {
-    if (window.firebaseAuth && window.firebaseAuth.currentUser && window.getSafeUid()) {
-        return window.getSafeUid();
+    if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+        return window.firebaseAuth.currentUser.uid;
     }
+
     if (window.currentUser && window.currentUser.username) {
         return window.currentUser.username;
     }
+
     return null;
 }
 
