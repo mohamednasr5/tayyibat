@@ -101,9 +101,15 @@
       /* استخراج النص من أي صيغة رد ممكنة */
       if (data.choices && data.choices[0]) {
         var msg = data.choices[0].message || data.choices[0];
-        return msg.content || msg.text || null;
+        var t = msg.content || msg.text || null;
+        if (t && t.trim().length > 5) return t.trim();
       }
-      if (data.result && data.result.response) return data.result.response;
+      if (data.result && data.result.response) {
+        var r = data.result.response;
+        return (typeof r === 'string' ? r : JSON.stringify(r)).trim();
+      }
+      if (typeof data === 'string' && data.trim().length > 5) return data.trim();
+      if (data.response && typeof data.response === 'string') return data.response.trim();
       return null;
     } catch (e) {
       clearTimeout(tid);
@@ -555,6 +561,23 @@
   }
 
   /* ── بطاقات نصية ذكية (للردود النصية غير JSON) ── */
+  /* regex لكشف سطر عنوان: إيموجي في البداية أو رقم أو ## */
+  var _HEADER_RE = /^(?:[🔥💊📋🖐🧠🔍📝📦🥗📊✅⚠️🌿💡🔬📏✨🔮🩺⭐🏷️🏭🎯⏱️🔄🤒🍽️❄️🔎🎨🔭📖🚨☀️✨❤️☀️🩺🧪🎯🔴💡🔎📊🔬📋🏥💉🧬🧫🩻🧠🩹])|(?:#{1,3}\s)|(?:\d+[\.\)]\s)|(?:[—–-]\s)/.source;
+
+  function _isHeaderLine(line) {
+    var t = line.trim();
+    if (!t) return false;
+    /* إيموجي في البداية */
+    if (/^\p{Emoji}/u.test(t)) return true;
+    /* ## heading */
+    if (/^#{1,3}\s/.test(t)) return true;
+    /* رقم في البداية */
+    if (/^\d+[\.\)]\s/.test(t)) return true;
+    /* سطر قصير ينتهي بـ : */
+    if (t.length < 55 && t.endsWith(':') && !t.includes('\n')) return true;
+    return false;
+  }
+
   function _textCards(text, mode, th) {
     /* تنظيف */
     var clean = text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/```[^\n]*\n?/g, '').trim();
@@ -569,7 +592,41 @@
       if (title && content) sections.push({ title: title, content: content });
     }
 
-    /* إذا لم تنجح → ابحث عن أنماط رقمية أو نقطية */
+    /* ── طريقة ٢: تقسيم سطراً سطراً على أي عنوان (إيموجي / رقم / : ) ── */
+    if (sections.length < 2) {
+      sections = [];
+      var allLines = clean.split('\n');
+      var cur = null;
+      allLines.forEach(function (line) {
+        var trimmed = line.trim();
+        if (!trimmed) {
+          /* سطر فارغ: أنهِ القسم الحالي إن وُجد */
+          if (cur && cur.content.trim()) { sections.push(cur); cur = null; }
+          return;
+        }
+        if (_isHeaderLine(trimmed)) {
+          /* احفظ القسم السابق */
+          if (cur && cur.content.trim()) sections.push(cur);
+          /* العنوان هو السطر نفسه (نظّفه) */
+          var hTitle = trimmed
+            .replace(/^#{1,3}\s*/, '')
+            .replace(/:$/, '')
+            .trim();
+          /* القيمة قد تكون في نفس السطر بعد : */
+          var colonIdx = trimmed.indexOf(':');
+          var inlineVal = (colonIdx > 0 && colonIdx < trimmed.length - 1)
+            ? trimmed.slice(colonIdx + 1).trim() : '';
+          cur = { title: hTitle, content: inlineVal };
+        } else {
+          /* سطر محتوى */
+          if (!cur) cur = { title: 'النتيجة', content: '' };
+          cur.content += (cur.content ? '\n' : '') + trimmed;
+        }
+      });
+      if (cur && cur.content.trim()) sections.push(cur);
+    }
+
+    /* ── طريقة ٣: تقسيم على فقرات ── */
     if (sections.length < 2) {
       sections = [];
       var blocks = clean.split(/\n{2,}/);
@@ -577,15 +634,10 @@
         if (!block.trim()) return;
         var lines = block.trim().split('\n');
         var first = lines[0].trim();
-        /* هل السطر الأول عنوان؟ */
-        var isHeader =
-          /^[🔥💊📋🖐🧠🔍📝📦🥗📊✅⚠️🌿💡🔬📏✨🔮🩺⭐🏷️🏭🎯⏱️🔄🤒🍽️❄️🔎📊🔬🎨🔭📖🩺🚨☀️✨]/.test(first) ||
-          /^\d+[\.\)]\s/.test(first) ||
-          /^[—–-]\s/.test(first) ||
-          (first.length < 60 && first.endsWith(':'));
-        var title   = isHeader ? first.replace(/^[\d]+[\.\)]\s*/, '').replace(/^[—–-]\s*/, '').replace(/:$/, '').trim() : null;
-        var body    = isHeader ? lines.slice(1).join('\n').trim() : block.trim();
-        if (title || body) sections.push({ title: title || 'النتيجة', content: body });
+        var isHdr = _isHeaderLine(first);
+        var secTitle  = isHdr ? first.replace(/^[\d]+[\.\)]\s*/, '').replace(/^[—–-]\s*/, '').replace(/:$/, '').trim() : null;
+        var body   = isHdr ? lines.slice(1).join('\n').trim() : block.trim();
+        if (secTitle || body) sections.push({ title: secTitle || 'النتيجة', content: body });
       });
     }
 
