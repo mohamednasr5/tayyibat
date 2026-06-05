@@ -14705,42 +14705,34 @@ function _cfChat(messages) {
 
     console.log('CF RESPONSE:', data);
 
-    if (
-      data &&
-      data.result &&
-      data.result.response
-    ) {
+   if (
+  data &&
+  data.result &&
+  data.result.response
+) {
 
-      console.log('CF SUCCESS');
+  console.log('CF SUCCESS');
 
-      return {
-        text: data.result.response.trim(),
-        source: 'CF-Worker'
-      };
-    }
+  var responseText = '';
 
-    // احتياطي لو تغير شكل الرد مستقبلاً
-    var t = extractText(data);
+  if (typeof data.result.response === 'string') {
 
-    if (isGoodText(t)) {
-      return {
-        text: t.trim(),
-        source: 'CF-Worker'
-      };
-    }
+    responseText = data.result.response;
 
-    console.log('CF EMPTY RESPONSE');
+  } else if (typeof data.result.response === 'object') {
 
-    return null;
+    responseText =
+      data.result.response.text ||
+      data.result.response.answer ||
+      data.result.response.content ||
+      JSON.stringify(data.result.response, null, 2);
 
-  })
-  .catch(function(err) {
+  }
 
-    console.error('Cloudflare Error:', err);
-
-    return null;
-
-  });
+  return {
+    text: String(responseText || '').trim(),
+    source: 'CF-Worker'
+  };
 }
 
   // ② OVH Kepler — model واحد بدون انتظار
