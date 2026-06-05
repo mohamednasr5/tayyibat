@@ -2376,15 +2376,20 @@ window.geminiSend = window.geminiSend || function() {};
   </div>
 
   <div style="padding:12px 16px">
-    <div class="camera-view-wrap" id="pa-camera-viewport" onclick="(function(){ var ol=document.getElementById('tap-to-rescan'); if(ol){ ol.remove(); _startCameraAndScanNow(); } else if(paStreamRef){ captureSmartByMode(); } })()" style="cursor:pointer">
+    <div class="camera-view-wrap" id="pa-camera-viewport" style="cursor:pointer">
       <div class="scanner-laser-line" id="pa-laser" style="display:none"></div>
       <video id="pa-video-stream" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
       <div id="pa-camera-fallback-msg" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
         <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4"></i>
-        اختر وضعاً أعلاه لبدء الكاميرا
+        اختر وضعاً أعلاه ثم اضغط زر فتح الكاميرا
       </div>
     </div>
-    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"><i class="fas fa-hand-pointer" style="margin-left:5px"></i> اختر وضع المسح أعلاه لبدء الكاميرا تلقائياً</span></div>
+    <div style="margin:10px 0">
+      <button onclick="openDirectVisionCamera('scanner')" id="pa-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+        📷 فتح الكاميرا
+      </button>
+    </div>
+    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"></span></div>
     <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">
       <div style="flex:1;height:1px;background:var(--border)"></div>
       <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
@@ -2457,14 +2462,10 @@ window.geminiSend = window.geminiSend || function() {};
         اضغط لفتح الكاميرا وتصوير طعامك
       </div>
     </div>
-    <div style="display:flex;gap:8px;margin:10px 0">
-      <button onclick="fsOpenCamera()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:10px;font-size:.82rem">
-        <i class="fas fa-camera"></i> فتح الكاميرا
+    <div style="margin:10px 0">
+      <button onclick="openDirectVisionCamera('food-scan')" id="fs-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+        📷 فتح الكاميرا
       </button>
-      <label class="btn" style="flex:1;background:rgba(255,255,255,.06);color:var(--txt2);border:1.5px solid var(--border);padding:10px;font-size:.82rem;cursor:pointer;text-align:center">
-        <i class="fas fa-image"></i> رفع صورة
-        <input type="file" accept="image/*" onchange="fsLoadImage(event)" style="display:none">
-      </label>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin:8px 0">
       <div style="flex:1;height:1px;background:var(--border)"></div>
@@ -2661,15 +2662,9 @@ window.geminiSend = window.geminiSend || function() {};
     <div style="background:rgba(255,152,0,.08);border:1.5px solid rgba(255,152,0,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#ffcc80;line-height:1.6">
       📸 صوّر أو ارفع أي صورة وهيكشف لك: هل هي حقيقية، مولودة بـ AI، أو معدّلة بفلاتر
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,152,0,.1);color:#ff9800;border:2px dashed rgba(255,152,0,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="fi-upload-label">
-        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
-        رفع صورة
-        <input type="file" accept="image/*" onchange="fakeImageLoad(event)" style="display:none">
-      </label>
-      <button onclick="fakeImageOpenCamera()" class="btn" id="fi-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,193,7,.1);color:#ffc107;border:2px dashed rgba(255,193,7,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
-        <i class="fas fa-camera" style="font-size:1.4rem"></i>
-        تصوير بالكاميرا
+    <div style="margin-bottom:12px">
+      <button onclick="openDirectVisionCamera('fake-image')" id="fi-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(255,193,7,.1));color:#ffc107;border:1.5px solid rgba(255,152,0,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+        📷 فتح الكاميرا
       </button>
     </div>
     <div id="fi-camera-area" style="display:none;margin-bottom:12px;position:relative">
@@ -2678,27 +2673,11 @@ window.geminiSend = window.geminiSend || function() {};
         <div id="fi-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
           <span style="background:rgba(0,0,0,.7);color:#4fc3f7;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">🔍 تحليل مباشر نشط...</span>
         </div>
-        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #ff9800;border-right:2px solid #ff9800;border-radius:0 4px 0 0"></div>
-        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #ff9800;border-left:2px solid #ff9800;border-radius:4px 0 0 0"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #ff9800;border-right:2px solid #ff9800;border-radius:0 0 4px 0"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #ff9800;border-left:2px solid #ff9800;border-radius:0 0 0 4px"></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="fakeImageCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,152,0,.3),rgba(255,193,7,.2));color:#ffc107;border:1.5px solid rgba(255,152,0,.5);padding:12px;font-size:.88rem;font-weight:800">
-          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط
-        </button>
-        <button onclick="fakeImageStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
-          <i class="fas fa-stop"></i>
-        </button>
       </div>
     </div>
     <div id="fi-preview" style="display:none;margin-bottom:12px;text-align:center">
       <img id="fi-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(255,152,0,.4)">
-      <div style="margin-top:6px;font-size:.72rem;color:#ffc107"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للتحليل</div>
     </div>
-    <button onclick="fakeImageAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#e65100,#f57c00);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
-      <i class="fas fa-microscope"></i> حلّل الصورة
-    </button>
     <div id="fi-result"></div>
   </div>
 </div>
@@ -2718,15 +2697,9 @@ window.geminiSend = window.geminiSend || function() {};
     <div style="background:rgba(33,150,243,.08);border:1.5px solid rgba(33,150,243,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#90caf9;line-height:1.6">
       📚 صوّر السؤال أو اكتبه — هيجاوب عليك إجابة نموذجية زي كتاب الإجابات بالضبط
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(33,150,243,.1);color:#2196f3;border:2px dashed rgba(33,150,243,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="hw-upload-label">
-        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
-        رفع صورة السؤال
-        <input type="file" accept="image/*" onchange="hwLoadImage(event)" style="display:none">
-      </label>
-      <button onclick="hwOpenCamera()" class="btn" id="hw-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(100,181,246,.1);color:#64b5f6;border:2px dashed rgba(100,181,246,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
-        <i class="fas fa-camera" style="font-size:1.4rem"></i>
-        تصوير السؤال
+    <div style="margin-bottom:12px">
+      <button onclick="openDirectVisionCamera('homework')" id="hw-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(100,181,246,.1));color:#64b5f6;border:1.5px solid rgba(33,150,243,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+        📷 فتح الكاميرا
       </button>
     </div>
     <div id="hw-camera-area" style="display:none;margin-bottom:12px;position:relative">
@@ -2735,23 +2708,10 @@ window.geminiSend = window.geminiSend || function() {};
         <div id="hw-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
           <span style="background:rgba(0,0,0,.7);color:#ffb74d;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">⏳ وجّه الكاميرا نحو السؤال...</span>
         </div>
-        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 4px 0 0"></div>
-        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:4px 0 0 0"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 0 4px 0"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:0 0 0 4px"></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="hwCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(33,150,243,.3),rgba(100,181,246,.2));color:#64b5f6;border:1.5px solid rgba(33,150,243,.5);padding:12px;font-size:.88rem;font-weight:800">
-          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط
-        </button>
-        <button onclick="hwStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
-          <i class="fas fa-stop"></i>
-        </button>
       </div>
     </div>
     <div id="hw-preview" style="display:none;margin-bottom:12px;text-align:center">
       <img id="hw-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(33,150,243,.4)">
-      <div style="margin-top:6px;font-size:.72rem;color:#64b5f6"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للحل</div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:6px">أو اكتب السؤال نصياً (اختياري)</label>
@@ -2780,16 +2740,10 @@ window.geminiSend = window.geminiSend || function() {};
       🖐 صوّر راحة يدك اليسرى بوضوح — تأكد الإضاءة كويسة والخطوط ظاهرة
     </div>
 
-    <!-- خيارات الإدخال -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,87,34,.1);color:#ff5722;border:2px dashed rgba(255,87,34,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="palm-upload-label">
-        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
-        رفع صورة الكف
-        <input type="file" accept="image/*" onchange="palmLoadImage(event)" style="display:none">
-      </label>
-      <button onclick="palmOpenCamera()" class="btn" id="palm-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,138,101,.1);color:#ff8a65;border:2px dashed rgba(255,138,101,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
-        <i class="fas fa-camera" style="font-size:1.4rem"></i>
-        تصوير كفك الآن
+    <!-- زر فتح الكاميرا -->
+    <div style="margin-bottom:12px">
+      <button onclick="openDirectVisionCamera('palm')" id="palm-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(255,87,34,.2),rgba(255,138,101,.1));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+        📷 فتح الكاميرا
       </button>
     </div>
 
@@ -2806,26 +2760,13 @@ window.geminiSend = window.geminiSend || function() {};
             <span style="font-size:2.5rem;opacity:.4">🖐</span>
           </div>
         </div>
-        <div style="position:absolute;top:10px;right:10px;width:28px;height:28px;border-top:2px solid #ff5722;border-right:2px solid #ff5722;border-radius:0 4px 0 0"></div>
-        <div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-top:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:4px 0 0 0"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-right:2px solid #ff5722;border-radius:0 0 4px 0"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:28px;height:28px;border-bottom:2px solid #ff5722;border-left:2px solid #ff5722;border-radius:0 0 0 4px"></div>
       </div>
       <div style="text-align:center;font-size:.7rem;color:#ff8a65;margin-top:6px">🖐 ضع كفك داخل الإطار — افتح يدك بشكل طبيعي</div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="palmCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(255,87,34,.35),rgba(255,138,101,.2));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:12px;font-size:.88rem;font-weight:800">
-          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط الصورة
-        </button>
-        <button onclick="palmStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
-          <i class="fas fa-stop"></i>
-        </button>
-      </div>
     </div>
 
     <!-- معاينة الصورة -->
     <div id="palm-preview" style="display:none;margin-bottom:12px;text-align:center">
       <img id="palm-img-preview" style="max-width:100%;max-height:280px;border-radius:12px;border:2px solid rgba(255,87,34,.4)">
-      <div style="margin-top:6px;font-size:.72rem;color:#ff8a65"><i class="fas fa-check-circle"></i> تم تحميل صورة الكف — جاهز للتحليل</div>
     </div>
 
     <!-- نوع التحليل -->
@@ -3727,19 +3668,9 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- أزرار التحكم -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <button onclick="bbOpenCamera()" class="btn" style="background:rgba(244,67,54,.15);color:#f44336;border:1.5px solid rgba(244,67,54,.4);padding:10px;font-size:.82rem">
-        <i class="fas fa-camera"></i> فتح الكاميرا
-      </button>
-      <button onclick="bbCaptureNow()" class="btn" id="bb-capture-btn" style="background:rgba(255,87,34,.15);color:#ff5722;border:1.5px solid rgba(255,87,34,.4);padding:10px;font-size:.82rem;display:none">
-        <i class="fas fa-crosshairs"></i> التقاط وتحليل
-      </button>
-      <label class="btn" style="background:rgba(200,150,12,.1);color:var(--gold2);border:1.5px solid rgba(200,150,12,.3);padding:10px;font-size:.82rem;cursor:pointer;text-align:center;margin:0" id="bb-upload-label">
-        <i class="fas fa-image"></i> رفع صورة المنتج
-        <input type="file" accept="image/*" id="bb-upload-input" style="display:none" onchange="bbLoadFromFile(event)">
-      </label>
-      <button onclick="bbStopCamera()" id="bb-stop-btn" class="btn" style="background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);padding:10px;font-size:.82rem;display:none">
-        <i class="fas fa-stop"></i> إيقاف الكاميرا
+    <div style="margin-bottom:10px">
+      <button onclick="openDirectVisionCamera('barcode-boycott')" id="bb-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(229,57,53,.1));color:#f44336;border:1.5px solid rgba(244,67,54,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+        📷 فتح الكاميرا
       </button>
     </div>
 
@@ -11509,7 +11440,7 @@ function fakeImageLoad(event) {
     var preview = document.getElementById('fi-preview');
     var img = document.getElementById('fi-img-preview');
     if (preview && img) { img.src = _fiImageData; preview.style.display = 'block'; }
-    document.getElementById('fi-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="fakeImageLoad(event)" style="display:none">';
+    /* upload label removed — DirectVisionManager handles camera only */
   };
   reader.readAsDataURL(file);
 }
@@ -11611,7 +11542,7 @@ function hwLoadImage(event) {
     _hwImageData = e.target.result;
     var preview = document.getElementById('hw-preview'); var img = document.getElementById('hw-img-preview');
     if (preview && img) { img.src = _hwImageData; preview.style.display = 'block'; }
-    document.getElementById('hw-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="hwLoadImage(event)" style="display:none">';
+    /* upload label removed — DirectVisionManager handles camera only */
   };
   reader.readAsDataURL(file);
 }
@@ -13258,7 +13189,7 @@ function palmLoadImage(event) {
     var preview = document.getElementById('palm-preview');
     var img = document.getElementById('palm-img-preview');
     if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
-    document.getElementById('palm-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="palmLoadImage(event)" style="display:none">';
+    /* upload label removed — DirectVisionManager handles camera only */
   };
   reader.readAsDataURL(file);
 }
@@ -13593,8 +13524,8 @@ user: window.currentUser
 
   <!-- أزرار التحكم -->
   <div style="padding:0 16px 12px;display:flex;gap:10px">
-    <button id="vitals-start-btn" onclick="vitalsStart()" style="flex:1;background:linear-gradient(135deg,#ec407a,#d81b60);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-      <i class="fas fa-play"></i> ابدأ الفحص
+    <button id="vitals-start-btn" onclick="openDirectVisionCamera('vitals')" style="flex:1;background:linear-gradient(135deg,#ec407a,#d81b60);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      📷 فتح الكاميرا
     </button>
     <button id="vitals-stop-btn" onclick="vitalsStop()" style="display:none;background:rgba(244,67,54,.15);border:1px solid rgba(244,67,54,.4);color:#ef5350;border-radius:14px;padding:13px 18px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer">
       <i class="fas fa-stop"></i> إيقاف
@@ -14656,6 +14587,550 @@ window._autoCamera={
 };
 
 console.log('[AutoCamera] ✅ v1.0 — كاميرا خلفية تلقائية لـ 9 أدوات');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DirectVisionManager — مدير الكاميرا الموحد + Puter Vision
+     بطاقات: food-scan, scanner, fake-image, homework, palm, barcode-boycott, vitals
+═══════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── إعدادات البطاقات ── */
+var CARD_CFG = {
+  'food-scan': {
+    videoId: 'fs-video', fallbackId: 'fs-fallback', resultId: 'fs-result',
+    camBtnId: 'fs-cam-btn', statusId: 'fs-live-status', statusTxtId: 'fs-live-status-text',
+    viewportId: 'fs-camera-viewport', toolKey: 'food-scan',
+    prompt: 'أنت خبير تغذية. انظر للصورة وتعرف على الطعام. اكتب:\n- اسم الطعام بالعربية\n- السعرات الحرارية التقريبية\n- البروتين والكارب والدهون بالجرام\n- نصيحة صحية قصيرة\nكن مختصراً ومباشراً. اللغة: عربية فقط.'
+  },
+  'scanner': {
+    videoId: 'pa-video-stream', fallbackId: 'pa-camera-fallback-msg', resultId: 'pa-scan-result',
+    camBtnId: 'pa-cam-btn', statusId: null, statusTxtId: null,
+    viewportId: 'pa-camera-viewport', toolKey: 'scanner',
+    prompt: null /* يتم تحديد البرومبت حسب الوضع الحالي */
+  },
+  'fake-image': {
+    videoId: 'fi-video', fallbackId: null, resultId: 'fi-result',
+    camBtnId: 'fi-cam-btn', statusId: 'fi-live-status', statusTxtId: null,
+    viewportId: null, toolKey: 'fake-image', areaId: 'fi-camera-area',
+    prompt: 'أنت محلل صور رقمي محترف متخصص في كشف التزوير والتعديل وتمييز صور الذكاء الاصطناعي.\n\nافحص هذه الصورة تحليلاً تقنياً دقيقاً وقدّم تقريراً مفصلاً:\n\n🔎 الحكم الرئيسي: هل الصورة حقيقية / مولودة بـ AI / معدّلة / فلاتر مكثفة؟\n📊 نسبة الثقة بنسبة مئوية.\n🔬 المؤشرات التقنية.\n📋 التقرير النهائي.\nاكتب بالعربية بأسلوب مهني.'
+  },
+  'homework': {
+    videoId: 'hw-video', fallbackId: null, resultId: 'hw-result',
+    camBtnId: 'hw-cam-btn', statusId: 'hw-live-status', statusTxtId: null,
+    viewportId: null, toolKey: 'homework', areaId: 'hw-camera-area',
+    prompt: 'أنت معلم ومدرس خبير في جميع المناهج الدراسية العربية.\nانظر للصورة واقرأ السؤال وقدّم:\n1. السؤال كما هو\n2. الإجابة النموذجية خطوة بخطوة\n3. الشرح المبسط\n4. القوانين أو المعلومات المهمة\nاللغة: عربية. إذا لم تجد سؤالاً اكتب: "وجّه الكاميرا نحو السؤال".'
+  },
+  'palm': {
+    videoId: 'palm-video', fallbackId: null, resultId: 'palm-result',
+    camBtnId: 'palm-cam-btn', statusId: 'palm-live-status', statusTxtId: null,
+    viewportId: null, toolKey: 'palm', areaId: 'palm-camera-area',
+    prompt: null /* يتم تحديد البرومبت حسب وضع الكف */
+  },
+  'barcode-boycott': {
+    videoId: 'bb-video', fallbackId: 'bb-fallback', resultId: 'bb-result',
+    camBtnId: 'bb-cam-btn', statusId: null, statusTxtId: null,
+    viewportId: 'bb-camera-viewport', toolKey: 'barcode-boycott',
+    prompt: 'أنت خبير في تحليل المنتجات والكشف عن المنتجات المقاطعة.\nانظر للصورة وتعرف على المنتج:\n1. اسم المنتج والعلامة التجارية\n2. هل هو من المنتجات المقاطعة؟ ولماذا؟\n3. البدائل المحلية المتاحة\n4. بلد المنشأ\nاللغة: عربية.'
+  },
+  'vitals': {
+    videoId: 'vitals-video', fallbackId: 'vitals-cam-placeholder', resultId: 'vitals-ai-text',
+    camBtnId: 'vitals-start-btn', statusId: null, statusTxtId: null,
+    viewportId: null, toolKey: 'vitals',
+    prompt: null /* vitals يستخدم rPPG وليس Vision مباشرة */
+  }
+};
+
+/* ── المدير الموحد ── */
+var _activeStream = null;
+var _activeCard = null;
+var _activeInterval = null;
+var _analyzing = false;
+var _vitalsIv = null;
+
+function _getPrompt(cardType) {
+  if (cardType === 'scanner') {
+    var mode = window._currentScanMode || 'product';
+    var prompts = {
+      product: 'احلل مكونات العلبة والمنتج بالتفصيل. أعطني: الاسم والمكونات والسعرات والقيم الغذائية والتحذيرات الصحية.',
+      food: 'انظر للصورة وتعرف على الطعام. اكتب اسم الطعام وسعراته الحرارية والبروتين والكارب والدهون والفوائد والنصائح.',
+      medicine: 'اقرأ معلومات الدواء بالتفصيل. أعطني: الاسم والمادة الفعالة والجرعة والاستخدامات والآثار الجانبية والتحذيرات.',
+      report: 'اقرأ التقرير الطبي بالتفصيل. اشرح كل قيمة وهل هي ضمن الطبيعي. اختم بـ: "هذا شرح توعوي فقط، استشر طبيبك."',
+      prescription: 'اقرأ الروشتة الطبية. لكل دواء: الاسم والجرعة وطريقة الأخذ والتحذيرات. اللغة: عربية.'
+    };
+    return prompts[mode] || prompts.product;
+  }
+  if (cardType === 'palm') {
+    var palmMode = window._palmMode || 'full';
+    var modePrompts = {
+      full: 'قدّم قراءة شاملة تشمل: الشخصية، العواطف، المسار المهني، الصحة، والتوقعات العامة.',
+      love: 'ركّز على الجانب العاطفي والعلاقات: خط القلب، الميل للحب، طبيعة العلاقات، الزواج.',
+      career: 'ركّز على المسار المهني والنجاح: خط القدر، الطموح، القدرات، الفرص المهنية.',
+      health: 'ركّز على جانب الصحة والطاقة: خط الحياة، الحيوية، نقاط القوة والضعف الجسدية.'
+    };
+    return 'أنت قارئ كف خبير. انظر لصورة الكف وحلّل ما تراه.\n\n' + (modePrompts[palmMode] || modePrompts.full) + '\n\nاتبع الهيكل:\n🖐 شكل الكف والأصابع:\n📏 الخطوط الرئيسية:\n✨ ملاحظات خاصة:\n🔮 القراءة الشاملة:\n\nاكتب بالعربية. ⚠️ هذه القراءة للترفيه فقط.';
+  }
+  var cfg = CARD_CFG[cardType];
+  return cfg ? cfg.prompt : 'صف ما تراه في الصورة بدقة.';
+}
+
+function _showStatus(cardType, msg) {
+  var cfg = CARD_CFG[cardType];
+  if (!cfg) return;
+  if (cfg.statusTxtId) {
+    var el = document.getElementById(cfg.statusTxtId);
+    if (el) el.textContent = msg;
+  }
+  if (cfg.statusId) {
+    var sEl = document.getElementById(cfg.statusId);
+    if (sEl) {
+      sEl.style.display = 'block';
+      var span = sEl.querySelector('span');
+      if (span && !cfg.statusTxtId) span.textContent = msg;
+    }
+  }
+}
+
+function _showThinking(cardType) {
+  var cfg = CARD_CFG[cardType];
+  if (!cfg || !cfg.resultId) return;
+  var rb = document.getElementById(cfg.resultId);
+  if (rb) {
+    rb.style.display = 'block';
+    rb.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🔍 جاري التحليل...</span></div>';
+  }
+}
+
+function _captureFrame(videoEl) {
+  if (!videoEl || !videoEl.videoWidth) return null;
+  var c = document.createElement('canvas');
+  c.width = videoEl.videoWidth;
+  c.height = videoEl.videoHeight;
+  c.getContext('2d').drawImage(videoEl, 0, 0);
+  return c.toDataURL('image/jpeg', 0.88);
+}
+
+function _visionAnalyze(imgData, prompt, onResult, onError) {
+  var p;
+  if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
+    p = window.TayyibatAI.vision(imgData, prompt);
+  } else if (typeof window._smartVisionAnalysis === 'function') {
+    p = window._smartVisionAnalysis(imgData, prompt);
+  } else if (typeof window._callClaudeAPIWithImage === 'function') {
+    p = window._callClaudeAPIWithImage(prompt, imgData).then(function(t) { return { text: t, source: 'api' }; });
+  } else {
+    if (onError) onError('AI not ready');
+    return;
+  }
+  p.then(function(r) {
+    var t = r && (r.text || r);
+    if (t && String(t).trim().length > 5) {
+      if (onResult) onResult(String(t).trim());
+    } else {
+      if (onError) onError('empty');
+    }
+  }).catch(function(e) { if (onError) onError(e); });
+}
+
+/* ══════════════════════════════════════
+   openDirectVisionCamera(cardType)
+═══════════════════════════════════════ */
+window.openDirectVisionCamera = function(cardType) {
+  var cfg = CARD_CFG[cardType];
+  if (!cfg) return;
+
+  /* منع فتح أكثر من كاميرا */
+  if (_activeStream) {
+    closeVisionCamera();
+  }
+
+  /* فحص الصلاحيات */
+  if (cfg.toolKey && cardType !== 'vitals') {
+    if (typeof canUseTool === 'function' && !canUseTool(cfg.toolKey)) {
+      if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal(cfg.toolKey);
+      return;
+    }
+  }
+
+  _activeCard = cardType;
+  _analyzing = false;
+
+  var videoEl = document.getElementById(cfg.videoId);
+  if (!videoEl) return;
+
+  /* إخفاء الفالباك */
+  if (cfg.fallbackId) {
+    var fb = document.getElementById(cfg.fallbackId);
+    if (fb) fb.style.display = 'none';
+  }
+
+  /* إظهار منطقة الكاميرا */
+  if (cfg.areaId) {
+    var ar = document.getElementById(cfg.areaId);
+    if (ar) ar.style.display = 'block';
+  }
+
+  /* تحديث زر الكاميرا */
+  var camBtn = document.getElementById(cfg.camBtnId);
+  if (camBtn) {
+    camBtn.textContent = '⏳ جاري تشغيل الكاميرا...';
+    camBtn.disabled = true;
+  }
+
+  _showStatus(cardType, '📷 جاري تشغيل الكاميرا...');
+
+  /* حالة الكاميرا الخلفية للمؤشرات الحيوية */
+  var constraints;
+  if (cardType === 'vitals') {
+    var vMode = (typeof _vitalsMode !== 'undefined') ? _vitalsMode : 'finger';
+    constraints = {
+      video: vMode === 'finger'
+        ? { facingMode: 'environment', width: 320, height: 240 }
+        : { facingMode: 'user', width: 320, height: 240 },
+      audio: false
+    };
+  } else {
+    constraints = {
+      video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    };
+  }
+
+  navigator.mediaDevices.getUserMedia(constraints)
+    .catch(function() {
+      /* fallback بدون exact */
+      return navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false
+      });
+    })
+    .then(function(stream) {
+      _activeStream = stream;
+      videoEl.srcObject = stream;
+      videoEl.style.display = 'block';
+
+      /* تفعيل الفلاش لوضع الإصبع */
+      if (cardType === 'vitals') {
+        var track = stream.getVideoTracks()[0];
+        var vMode2 = (typeof _vitalsMode !== 'undefined') ? _vitalsMode : 'finger';
+        if (vMode2 === 'finger' && track && track.applyConstraints) {
+          track.applyConstraints({ advanced: [{ torch: true }] }).catch(function(){});
+        }
+      }
+
+      if (camBtn) {
+        camBtn.textContent = '📷 فتح الكاميرا';
+        camBtn.disabled = false;
+      }
+
+      _showStatus(cardType, '✅ الكاميرا جاهزة — جاري التحليل...');
+
+      /* ═══ حالة خاصة: المؤشرات الحيوية ═══ */
+      if (cardType === 'vitals') {
+        if (typeof window.vitalsStart === 'function') {
+          /* تعيين التيار ل vitalsStart */
+          if (typeof _vitalsStream !== 'undefined') _vitalsStream = stream;
+          window.vitalsStart(true);
+        }
+        return;
+      }
+
+      /* ═══ تحليل تلقائي ═══ */
+      _showThinking(cardType);
+      if (cfg.toolKey && cardType !== 'vitals') {
+        if (typeof incToolUsage === 'function') incToolUsage(cfg.toolKey);
+      }
+
+      clearInterval(_activeInterval);
+      var scanDelay = (cardType === 'palm') ? 2500 : 1500;
+      var scanInterval = (cardType === 'food-scan') ? 4000 : 4500;
+
+      setTimeout(function() { _doAutoScan(cardType); }, scanDelay);
+      _activeInterval = setInterval(function() { _doAutoScan(cardType); }, scanInterval);
+
+    })
+    .catch(function(err) {
+      console.error('Camera error:', err);
+      _showStatus(cardType, '❌ لم يتم منح صلاحية الكاميرا');
+      if (camBtn) {
+        camBtn.textContent = '📷 فتح الكاميرا';
+        camBtn.disabled = false;
+      }
+      showToast('❌ لم يتم منح صلاحية الكاميرا');
+    });
+};
+
+/* ── التحليل التلقائي ── */
+function _doAutoScan(cardType) {
+  if (_analyzing || !_activeStream || _activeCard !== cardType) return;
+  _analyzing = true;
+
+  var cfg = CARD_CFG[cardType];
+  var videoEl = document.getElementById(cfg.videoId);
+  if (!videoEl) { _analyzing = false; return; }
+
+  _showStatus(cardType, '🔍 جاري التحليل...');
+
+  var img = _captureFrame(videoEl);
+  if (!img) { _analyzing = false; return; }
+
+  var prompt = _getPrompt(cardType);
+  _visionAnalyze(img, prompt, function(result) {
+    _analyzing = false;
+    clearInterval(_activeInterval);
+    _activeInterval = null;
+
+    _showStatus(cardType, '✅ تم التحليل');
+
+    /* عرض النتيجة في صندوق النتائج الحالي */
+    _renderResult(cardType, result);
+
+    /* إغلاق الكاميرا بعد ظهور النتيجة */
+    closeVisionCamera();
+
+    /* إظهار زر إعادة التحليل */
+    _showRestartBtn(cardType);
+
+  }, function() {
+    _analyzing = false;
+    _showStatus(cardType, '⏳ وجّه الكاميرا نحو الهدف...');
+  });
+}
+
+/* ── عرض النتيجة ── */
+function _renderResult(cardType, result) {
+  var cfg = CARD_CFG[cardType];
+  if (!cfg || !cfg.resultId) return;
+  var rb = document.getElementById(cfg.resultId);
+  if (!rb) return;
+
+  rb.style.display = 'block';
+
+  if (cardType === 'food-scan') {
+    /* محاولة عرض كـ JSON أولاً */
+    try {
+      var clean = result.replace(/```json|```/g, '').trim();
+      var data = JSON.parse(clean);
+      if (typeof renderFoodAnalysisResult === 'function') {
+        renderFoodAnalysisResult(data, rb);
+        return;
+      }
+    } catch(e) {}
+    /* عرض كنص عادي */
+    if (typeof fsParseAndDisplay === 'function') {
+      fsParseAndDisplay(result);
+    } else {
+      rb.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g, '<br>') + '</div>';
+    }
+  } else if (cardType === 'fake-image') {
+    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:20px;overflow:hidden">'
+      + '<div style="background:linear-gradient(135deg,rgba(255,152,0,.25),rgba(255,193,7,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">'
+      + '<span style="font-size:1.6rem">🔍</span>'
+      + '<div><div style="font-size:.92rem;font-weight:900;color:#ffc107">تقرير تحليل الصورة</div>'
+      + '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">كشف التزوير والذكاء الاصطناعي</div></div></div>'
+      + '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + result + '</div></div>';
+  } else if (cardType === 'homework') {
+    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">'
+      + '<div style="background:linear-gradient(135deg,rgba(33,150,243,.25),rgba(100,181,246,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">'
+      + '<span style="font-size:1.6rem">🧠</span>'
+      + '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>'
+      + '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">المناهج المصرية</div></div></div>'
+      + '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + result + '</div></div>';
+  } else if (cardType === 'palm') {
+    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">'
+      + '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">'
+      + '<span style="font-size:1.6rem">🖐</span>'
+      + '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف</div></div></div>'
+      + '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line">' + result + '</div></div>';
+  } else if (cardType === 'barcode-boycott') {
+    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(244,67,54,.35);border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">'
+      + '📦 <b style="color:#f44336">تحليل المنتج</b><br><br>' + result + '</div>';
+  } else if (cardType === 'scanner') {
+    var mode = window._currentScanMode || 'product';
+    var colors = { product: '#2ec951', food: '#d4a017', medicine: '#42a5f5', report: '#ce93d8', prescription: '#ffb74d' };
+    var icons = { product: '📦', food: '🍎', medicine: '💊', report: '🔬', prescription: '📋' };
+    var titles = { product: 'تحليل المنتج', food: 'تحليل الطعام', medicine: 'تحليل الدواء', report: 'تحليل التقرير', prescription: 'قراءة الروشتة' };
+    var c = colors[mode] || '#2ec951';
+    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid ' + c + '44;border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">'
+      + (icons[mode] || '🔍') + ' <b style="color:' + c + '">' + (titles[mode] || 'النتيجة') + '</b><br><br>' + result + '</div>';
+  } else {
+    rb.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g, '<br>') + '</div>';
+  }
+}
+
+/* ══════════════════════════════════════
+   closeVisionCamera()
+═══════════════════════════════════════ */
+window.closeVisionCamera = function() {
+  clearInterval(_activeInterval);
+  _activeInterval = null;
+  _analyzing = false;
+
+  if (_activeStream) {
+    /* تعطيل الفلاش أولاً */
+    try {
+      var tracks = _activeStream.getVideoTracks();
+      tracks.forEach(function(t) {
+        if (t.applyConstraints) t.applyConstraints({ advanced: [{ torch: false }] }).catch(function(){});
+        t.stop();
+      });
+    } catch(e) {}
+    _activeStream.getTracks().forEach(function(track) { track.stop(); });
+    _activeStream = null;
+  }
+
+  if (!_activeCard) return;
+  var cfg = CARD_CFG[_activeCard];
+  if (!cfg) { _activeCard = null; return; }
+
+  /* إخفاء الفيديو */
+  var videoEl = document.getElementById(cfg.videoId);
+  if (videoEl) {
+    videoEl.style.display = 'none';
+    videoEl.srcObject = null;
+  }
+
+  /* إظهار الفالباك */
+  if (cfg.fallbackId) {
+    var fb = document.getElementById(cfg.fallbackId);
+    if (fb) fb.style.display = '';
+  }
+
+  /* إخفاء منطقة الكاميرا */
+  if (cfg.areaId) {
+    var ar = document.getElementById(cfg.areaId);
+    if (ar) ar.style.display = 'none';
+  }
+
+  /* إخفاء المؤشرات */
+  if (cfg.statusId) {
+    var sEl = document.getElementById(cfg.statusId);
+    if (sEl) sEl.style.display = 'none';
+  }
+
+  /* استعادة زر الكاميرا */
+  var camBtn = document.getElementById(cfg.camBtnId);
+  if (camBtn) {
+    camBtn.textContent = '📷 فتح الكاميرا';
+    camBtn.disabled = false;
+    camBtn.style.display = '';
+  }
+
+  /* حالة خاصة: المؤشرات الحيوية */
+  if (_activeCard === 'vitals') {
+    var startBtn = document.getElementById('vitals-start-btn');
+    var stopBtn = document.getElementById('vitals-stop-btn');
+    var liveInd = document.getElementById('vitals-live-indicator');
+    var waveWrap = document.getElementById('vitals-wave-wrap');
+    if (startBtn) { startBtn.style.display = 'flex'; startBtn.textContent = '📷 فتح الكاميرا'; }
+    if (stopBtn) stopBtn.style.display = 'none';
+    if (liveInd) liveInd.style.display = 'none';
+    if (waveWrap) waveWrap.style.display = 'none';
+  }
+
+  _activeCard = null;
+};
+
+/* ══════════════════════════════════════
+   captureAndAnalyze(cardType)
+═══════════════════════════════════════ */
+window.captureAndAnalyze = function(cardType) {
+  if (!_activeStream || _activeCard !== cardType) return;
+  var cfg = CARD_CFG[cardType];
+  if (!cfg) return;
+  var videoEl = document.getElementById(cfg.videoId);
+  if (!videoEl) return;
+  var img = _captureFrame(videoEl);
+  if (!img) return;
+
+  _showThinking(cardType);
+  if (cfg.toolKey && typeof incToolUsage === 'function') incToolUsage(cfg.toolKey);
+
+  var prompt = _getPrompt(cardType);
+  _visionAnalyze(img, prompt, function(result) {
+    _renderResult(cardType, result);
+    closeVisionCamera();
+    _showRestartBtn(cardType);
+  }, function() {
+    showToast('❌ تعذر التحليل، حاول مرة أخرى');
+  });
+};
+
+/* ══════════════════════════════════════
+   restartVisionAnalysis(cardType)
+═══════════════════════════════════════ */
+window.restartVisionAnalysis = function(cardType) {
+  /* إزالة زر إعادة التحليل */
+  var oldRestart = document.getElementById('dvm-restart-' + cardType);
+  if (oldRestart) oldRestart.remove();
+
+  /* إعادة فتح الكاميرا */
+  openDirectVisionCamera(cardType);
+};
+
+/* ── إظهار زر إعادة التحليل ── */
+function _showRestartBtn(cardType) {
+  var cfg = CARD_CFG[cardType];
+  if (!cfg || !cfg.resultId) return;
+
+  /* إزالة زر سابق */
+  var oldBtn = document.getElementById('dvm-restart-' + cardType);
+  if (oldBtn) oldBtn.remove();
+
+  var rb = document.getElementById(cfg.resultId);
+  if (!rb) return;
+
+  var wrap = document.createElement('div');
+  wrap.id = 'dvm-restart-' + cardType;
+  wrap.style.cssText = 'margin-top:12px;';
+
+  var btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.style.cssText = 'width:100%;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(79,70,229,.1));color:var(--ai-purple);border:1.5px solid rgba(124,58,237,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px;cursor:pointer;font-family:Tajawal,sans-serif;';
+  btn.textContent = '🔄 إعادة التحليل';
+  btn.onclick = function() {
+    restartVisionAnalysis(cardType);
+  };
+
+  wrap.appendChild(btn);
+  rb.parentNode.insertBefore(wrap, rb.nextSibling);
+}
+
+/* ══════════════════════════════════════
+   window.DirectVisionManager
+═══════════════════════════════════════ */
+window.DirectVisionManager = {
+  open: function(cardType) { openDirectVisionCamera(cardType); },
+  capture: function(cardType) { captureAndAnalyze(cardType); },
+  close: function() { closeVisionCamera(); },
+  restart: function(cardType) { restartVisionAnalysis(cardType); },
+  isOpen: function() { return !!_activeStream; },
+  getActiveCard: function() { return _activeCard; },
+  stopAll: function() { closeVisionCamera(); }
+};
+
+/* ── Hook: إيقاف الكاميرا عند الرجوع ── */
+var _origGoPage2 = window.goPage;
+window.goPage = function(n) {
+  if (_activeStream) closeVisionCamera();
+  if (typeof _origGoPage2 === 'function') _origGoPage2(n);
+};
+
+/* ── Hook: وضع الماسح ── */
+var _origSetScanMode2 = window.setScanMode;
+window.setScanMode = function(mode) {
+  window._currentScanMode = mode;
+  if (typeof _origSetScanMode2 === 'function') _origSetScanMode2(mode);
+};
+
+/* ── حفظ الوضع الحالي للماسح ── */
+if (!window._currentScanMode) window._currentScanMode = 'product';
+
+console.log('[DirectVisionManager] ✅ v1.0 — مدير الكاميرا الموحد + Puter Vision');
+
 })();
 </script>
 
