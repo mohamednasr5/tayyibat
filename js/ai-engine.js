@@ -343,10 +343,36 @@ function _cfChat(messages) {
     ];
   }
 
-  // ① Cloudflare Worker Vision — معطّل: Worker النصي لا يدعم Vision (يقبل {prompt} فقط)
-  //    سيُستخدم _llm7Vision و_pollinationsVision بدلاً منه
+  // ① Cloudflare Worker Vision — يرسل الصورة Base64 مع البرومبت عبر CF Worker
   function _cfVision(imgUrl, prompt) {
-    return Promise.resolve(null);
+    var parsed = _parseDataUrl(imgUrl);
+    if (!parsed) return Promise.resolve(null);
+    // نرسل الصورة كـ base64 مع البرومبت للـ CF Worker
+    var fullPrompt = '[IMAGE_BASE64:' + parsed.mediaType + ']\n' + prompt;
+    return fetch(CFG.cfWorker, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: fullPrompt,
+        image: parsed.base64,
+        mediaType: parsed.mediaType
+      })
+    })
+    .then(function(resp) {
+      if (!resp.ok) throw new Error('HTTP_' + resp.status);
+      return resp.json();
+    })
+    .then(function(data) {
+      // استخراج النص من أي صيغة رد
+      var t = null;
+      if (data && data.result && data.result.response) {
+        t = typeof data.result.response === 'string' ? data.result.response : JSON.stringify(data.result.response);
+      } else {
+        t = extractText(data);
+      }
+      return isGoodText(t) ? { text: t.trim(), source: data.provider || 'CF-Worker-Vision' } : null;
+    })
+    .catch(function() { return null; });
   }
 
   // ② LLM7 Vision — gpt-4o يدعم Base64 data URLs
@@ -427,15 +453,17 @@ function _cfChat(messages) {
     var smallImg = imgDataUrl;
     try { smallImg = await _resizeImage(imgDataUrl, 800); } catch(e) {}
 
-    // ═══ الأولوية ١: إذا كانت الصورة Base64 (من الكاميرا) → Anthropic أولاً لأنه يدعمها بشكل أصلي ═══
+    // ═══ الأولوية ١: Cloudflare Worker Vision (يدعم الصور الآن) ═══
+    if (isBase64) {
+      var cfVisionResult = await withTimeout(_cfVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
+      if (cfVisionResult) return cfVisionResult;
+    }
+
+    // ═══ الأولوية ٢: إذا كانت الصورة Base64 → Anthropic مضمون للـ Base64 ═══
     if (isBase64) {
       var anthropicResult = await withTimeout(_anthropicVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
       if (anthropicResult) return anthropicResult;
     }
-
-    // ═══ الأولوية ٢: Cloudflare Worker ═══
-    var cfResult = await withTimeout(_cfVision(smallImg, prompt), CFG.FAST_TIMEOUT).catch(function() { return null; });
-    if (cfResult) return cfResult;
 
     // ═══ الأولوية ٣: LLM7 + Pollinations بالتوازي ═══
     var result = await withTimeout(
@@ -823,7 +851,8 @@ function _cfChat(messages) {
     currentStream: null,
     currentMode: null,
     frameCount: 0,
-    skipFrames: 12,
+    skipFrames: 15,
+    isAnalyzing: false,
 
     start: function(videoId, canvasId, mode) {
       var self = this;
@@ -874,18 +903,32 @@ function _cfChat(messages) {
           canvasEl.height = videoEl.videoHeight;
           ctx.drawImage(videoEl, 0, 0);
 
-          if (self.frameCount % self.skipFrames === 0) {
-            var base64 = canvasEl.toDataURL('image/jpeg', 0.6).split(',')[1];
+          // لا ترسل طلباً جديداً إذا يوجد طلب قيد المعالجة
+          if (self.frameCount % self.skipFrames === 0 && !self.isAnalyzing) {
+            self.isAnalyzing = true;
+
+            // أخذ صورة بجودة أفضل للتحليل
+            var base64 = canvasEl.toDataURL('image/jpeg', 0.75).split(',')[1];
             var prompt = self._getPromptByMode(mode);
+
+            // عرض مؤشر المعالجة
+            var statusEl = document.getElementById('live-analysis-status');
+            if (statusEl) {
+              statusEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#c8960c;font-size:0.85rem;">' +
+                '<div style="width:16px;height:16px;border:2px solid #c8960c;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>' +
+                'جارٍ تحليل الصورة...</div>';
+            }
 
             _universalVision('data:image/jpeg;base64,' + base64, prompt)
               .then(function(result) {
+                self.isAnalyzing = false;
                 if (result && result.text) {
                   self.stop();
                   self._showResults(result.text, mode);
                 }
               })
               .catch(function(e) {
+                self.isAnalyzing = false;
                 console.warn('خطأ في التحليل:', e);
               });
           }
@@ -898,43 +941,209 @@ function _cfChat(messages) {
     },
 
     _getPromptByMode: function(mode) {
+      var base = 'أجب بالعربية فقط. مهما كانت جودة الصورة أو الإضاءة، حاول استخراج أقصى قدر من المعلومات المرئية. ';
       var prompts = {
-        'product': 'احلل مكونات العلبة والمنتج بالتفصيل. أعطني: الاسم والمكونات والسعرات والقيم الغذائية والتحذيرات الصحية.',
-        'food': 'احلل الطعام في الصورة. أعطني: اسم الطعام والسعرات الحرارية والبروتين والكربوهيدرات والدهون والفوائد والنصائح.',
-        'medicine': 'اقرأ معلومات الدواء بالتفصيل. أعطني: الاسم والمادة الفعالة والجرعة والاستخدامات والآثار الجانبية والتحذيرات.',
-        'report': 'اقرأ التقرير الطبي. أعطني: التشخيص والنتائج المهمة والتوصيات والملاحظات الطبية.',
-        'prescription': 'اقرأ الروشتة الطبية. أعطني: الأدوية والجرعات والتكرار والمحاذير والملاحظات.'
+
+        'product': base + 'انظر لهذا المنتج أو العبوة. أعطني تحليلاً صحياً شاملاً بهذه الأقسام بالترتيب:\n' +
+          '## اسم المنتج\n[اكتب اسم المنتج أو العلامة التجارية]\n' +
+          '## المكونات الرئيسية\n[اذكر أهم المكونات]\n' +
+          '## القيم الغذائية\n[السعرات والبروتين والكربوهيدرات والدهون والسكر إذا ظهرت]\n' +
+          '## التحذيرات الصحية\n[أي مواد حافظة أو إضافات مشبوهة]\n' +
+          '## التقييم الصحي\n[هل هو منتج صحي أم لا وسبب ذلك]\n' +
+          '## التوصية\n[نصيحة سريعة للمستخدم]',
+
+        'food': base + 'انظر لهذا الطعام أو الوجبة. أعطني تحليلاً غذائياً بهذه الأقسام:\n' +
+          '## اسم الطعام\n[اكتب اسم الطعام أو الوجبة]\n' +
+          '## السعرات الحرارية\n[تقدير السعرات للوجبة كاملة]\n' +
+          '## القيم الغذائية\n[البروتين والكربوهيدرات والدهون والألياف]\n' +
+          '## الفوائد الصحية\n[ما الفائدة من هذا الطعام]\n' +
+          '## تحذيرات أو سلبيات\n[هل يجب تجنبه أو تقليله]\n' +
+          '## التوصية\n[هل يناسب نظام طيبات الصحي]',
+
+        'medicine': base + 'انظر لهذا الدواء أو العبوة الطبية. أعطني معلومات شاملة:\n' +
+          '## اسم الدواء\n[الاسم التجاري والمادة الفعالة]\n' +
+          '## الاستخدام\n[يُستخدم لعلاج ماذا]\n' +
+          '## الجرعة المعتادة\n[كيفية الاستخدام]\n' +
+          '## الآثار الجانبية\n[أهم الآثار الجانبية المعروفة]\n' +
+          '## التحذيرات\n[من لا يجب أن يأخذه]\n' +
+          '## ملاحظة\n[استشر طبيبك أو صيدلانيك دائماً]',
+
+        'report': base + 'انظر لهذا التقرير الطبي أو نتائج التحاليل. اقرأ كل الأرقام والقيم وأعطني:\n' +
+          '## ملخص التقرير\n[موضوع التقرير]\n' +
+          '## النتائج المهمة\n[أبرز القيم والنتائج]\n' +
+          '## القيم ضمن الطبيعي\n[ما هو طبيعي]\n' +
+          '## القيم خارج الطبيعي\n[ما يستحق الانتباه]\n' +
+          '## التوصيات\n[ماذا ينصح المريض بفعله]\n' +
+          '## تنبيه\n[هذا شرح توعوي فقط - استشر طبيبك]',
+
+        'prescription': base + 'انظر لهذه الروشتة الطبية. اقرأ كل الأدوية المكتوبة وأعطني:\n' +
+          '## الطبيب والتاريخ\n[اسم الطبيب والتاريخ إن ظهرا]\n' +
+          '## قائمة الأدوية\n[لكل دواء: الاسم + الجرعة + التكرار]\n' +
+          '## تعليمات مهمة\n[أي تعليمات خاصة]\n' +
+          '## تحذيرات التداخل\n[هل هناك أدوية قد تتعارض]\n' +
+          '## ملاحظة\n[التزم بالجرعات ولا تتوقف بدون استشارة طبيبك]'
       };
-      return prompts[mode] || 'احلل الصورة بالتفصيل';
+      return prompts[mode] || (base + 'احلل الصورة بالتفصيل واكتب النتائج على شكل أقسام واضحة.');
+    },
+
+    /* ═══════════════════════════════════════════════════
+       محوّل النتائج → بطاقات ملونة جميلة
+       يعمل مع أي صيغة رد من الذكاء الاصطناعي
+    ═══════════════════════════════════════════════════ */
+    _parseToSections: function(text) {
+      // تنظيف النص أولاً
+      var clean = text.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+
+      var sections = [];
+
+      // محاولة ١: استخراج أقسام ## أو # أو : أو —
+      var sectionRegex = /(?:^|\n)#{1,3}\s*([^\n]+)\n([\s\S]*?)(?=\n#{1,3}\s|$)/g;
+      var match;
+      while ((match = sectionRegex.exec(clean)) !== null) {
+        var title = match[1].trim();
+        var content = match[2].trim();
+        if (title && content) {
+          sections.push({ title: title, content: content });
+        }
+      }
+
+      // محاولة ٢: إذا لم تُجدِ → اقسم على الفقرات
+      if (sections.length < 2) {
+        sections = [];
+        // ابحث عن نمط "عنوان: محتوى" أو نقاط
+        var lines = clean.split('\n').filter(function(l) { return l.trim(); });
+        var current = null;
+        lines.forEach(function(line) {
+          var colonIdx = line.indexOf(':');
+          var isHeader = (colonIdx > 0 && colonIdx < 30 && line.length < 50) ||
+                         /^[\u0600-\u06FF\w\s]{2,25}[:\-–—]/.test(line);
+          if (isHeader && colonIdx > 0) {
+            if (current) sections.push(current);
+            current = { title: line.substring(0, colonIdx).trim(), content: line.substring(colonIdx + 1).trim() };
+          } else if (current) {
+            current.content += '\n' + line;
+          } else {
+            current = { title: 'النتيجة', content: line };
+          }
+        });
+        if (current) sections.push(current);
+      }
+
+      // محاولة ٣: إذا فشل كل شيء → فقرة واحدة
+      if (sections.length < 1) {
+        sections = [{ title: 'التحليل', content: clean }];
+      }
+
+      return sections;
+    },
+
+    _getCardTheme: function(title, index) {
+      // ألوان مناسبة لكل نوع من الأقسام
+      var t = title.toLowerCase();
+      if (t.includes('اسم') || t.includes('المنتج') || t.includes('الدواء') || t.includes('الطعام'))
+        return { bg: 'rgba(200,150,12,0.12)', border: '#c8960c', icon: '🏷️', badge: '#c8960c' };
+      if (t.includes('سعر') || t.includes('غذائ') || t.includes('قيم'))
+        return { bg: 'rgba(46,201,81,0.1)', border: '#2ec951', icon: '📊', badge: '#2ec951' };
+      if (t.includes('فائد') || t.includes('إيجاب'))
+        return { bg: 'rgba(0,201,167,0.1)', border: '#00c9a7', icon: '✅', badge: '#00c9a7' };
+      if (t.includes('تحذير') || t.includes('سلبي') || t.includes('خارج') || t.includes('خطر'))
+        return { bg: 'rgba(255,87,87,0.1)', border: '#ff5757', icon: '⚠️', badge: '#ff5757' };
+      if (t.includes('توصي') || t.includes('نصيح') || t.includes('ملاحظة') || t.includes('تنبيه'))
+        return { bg: 'rgba(100,149,237,0.1)', border: '#6495ed', icon: '💡', badge: '#6495ed' };
+      if (t.includes('جرعة') || t.includes('استخدام') || t.includes('تعليم'))
+        return { bg: 'rgba(255,165,0,0.1)', border: '#ffa500', icon: '💊', badge: '#ffa500' };
+      if (t.includes('مكون') || t.includes('مواد'))
+        return { bg: 'rgba(147,112,219,0.1)', border: '#9370db', icon: '🧪', badge: '#9370db' };
+      if (t.includes('طبيع') || t.includes('طبيعي'))
+        return { bg: 'rgba(46,201,81,0.08)', border: '#2ec951', icon: '✓', badge: '#2ec951' };
+      if (t.includes('تقييم') || t.includes('ملخص'))
+        return { bg: 'rgba(200,150,12,0.1)', border: '#c8960c', icon: '⭐', badge: '#c8960c' };
+      // ألوان افتراضية دورية
+      var defaults = [
+        { bg: 'rgba(200,150,12,0.08)',   border: '#c8960c', icon: '📋', badge: '#c8960c' },
+        { bg: 'rgba(46,201,81,0.08)',    border: '#2ec951', icon: '📌', badge: '#2ec951' },
+        { bg: 'rgba(0,201,167,0.08)',    border: '#00c9a7', icon: '📎', badge: '#00c9a7' },
+        { bg: 'rgba(100,149,237,0.08)', border: '#6495ed', icon: '📝', badge: '#6495ed' },
+        { bg: 'rgba(255,165,0,0.08)',   border: '#ffa500', icon: '📍', badge: '#ffa500' }
+      ];
+      return defaults[index % defaults.length];
     },
 
     _showResults: function(text, mode) {
       var resultEl = document.getElementById('pa-scan-result');
-      if (resultEl) {
-        var html = '<div style="' +
-          'background: linear-gradient(135deg, rgba(46,201,81,0.1) 0%, rgba(0,201,167,0.05) 100%);' +
-          'border: 2px solid #2ec951;' +
-          'border-radius: 12px;' +
-          'padding: 16px;' +
-          'margin: 12px 0;' +
-          'line-height: 1.8;' +
-          'color: #e0e0e0;' +
-          'font-size: 0.9rem;' +
+      if (!resultEl) return;
+
+      var modeLabels = {
+        'product': 'تحليل المنتج', 'food': 'تحليل الطعام',
+        'medicine': 'معلومات الدواء', 'report': 'تحليل التقرير', 'prescription': 'تحليل الروشتة'
+      };
+      var modeIcons = {
+        'product': '🛒', 'food': '🍽️', 'medicine': '💊', 'report': '🔬', 'prescription': '📋'
+      };
+
+      var sections = this._parseToSections(text);
+      var self = this;
+
+      var cardsHtml = sections.map(function(sec, i) {
+        var theme = self._getCardTheme(sec.title, i);
+        // تحويل المحتوى — دعم القوائم والنقاط
+        var contentHtml = sec.content
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\n[-•–*]\s+/g, '\n<span style="color:' + theme.badge + ';margin-left:4px;">◆</span> ')
+          .replace(/\n(\d+)\.\s+/g, '\n<span style="color:' + theme.badge + ';font-weight:700;margin-left:4px;">$1.</span> ')
+          .replace(/\n/g, '<br>');
+
+        return '<div style="' +
+          'background:' + theme.bg + ';' +
+          'border:1.5px solid ' + theme.border + ';' +
+          'border-radius:14px;' +
+          'padding:14px 16px;' +
+          'margin-bottom:10px;' +
+          'animation: slideInCard 0.4s ease forwards;' +
+          'animation-delay:' + (i * 0.08) + 's;' +
+          'opacity:0;' +
           '">' +
-          '<h3 style="color: #2ec951; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">' +
-          '<i class="fas fa-check-circle"></i> النتائج' +
-          '</h3>' +
-          '<div style="white-space: pre-wrap; word-wrap: break-word;">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>' +
-          '<button onclick="liveAnalysisEngine.restart()" style="' +
-          'width: 100%; margin-top: 12px; padding: 12px; ' +
-          'background: linear-gradient(135deg, #2ec951 0%, #27ae60 100%); ' +
-          'color: white; border: none; border-radius: 8px; ' +
-          'font-family: Tajawal, sans-serif; font-weight: 700; cursor: pointer;' +
-          '"><i class="fas fa-redo-alt" style="margin-left: 6px;"></i> اضغط لإعادة تفعيل الكاميرا والتحليل</button>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;border-bottom:1px solid ' + theme.border + '33;padding-bottom:8px;">' +
+          '<span style="font-size:1.1rem;">' + theme.icon + '</span>' +
+          '<span style="color:' + theme.badge + ';font-weight:700;font-size:0.88rem;letter-spacing:0.3px;">' +
+          sec.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') +
+          '</span>' +
+          '</div>' +
+          '<div style="color:#d4d4d4;font-size:0.87rem;line-height:1.7;white-space:pre-wrap;">' + contentHtml + '</div>' +
           '</div>';
-        resultEl.innerHTML = html;
-      }
-      document.getElementById('live-analysis-status').style.display = 'none';
+      }).join('');
+
+      var html = '<style>' +
+        '@keyframes slideInCard { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }' +
+        '@keyframes headerPop { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }' +
+        '</style>' +
+        '<div style="animation:headerPop 0.3s ease;">' +
+        '<div style="display:flex;align-items:center;gap:10px;' +
+          'background:linear-gradient(135deg,rgba(200,150,12,0.15),rgba(0,201,167,0.08));' +
+          'border:1.5px solid #c8960c55;border-radius:14px;padding:12px 16px;margin-bottom:14px;">' +
+        '<span style="font-size:1.4rem;">' + (modeIcons[mode] || '🔍') + '</span>' +
+        '<div>' +
+        '<div style="color:#c8960c;font-weight:800;font-size:0.95rem;">' + (modeLabels[mode] || 'نتائج التحليل') + '</div>' +
+        '<div style="color:#888;font-size:0.75rem;margin-top:2px;">تم التحليل بالذكاء الاصطناعي</div>' +
+        '</div>' +
+        '<div style="margin-right:auto;background:#2ec95122;border:1px solid #2ec95166;border-radius:20px;padding:3px 10px;font-size:0.72rem;color:#2ec951;">✓ مكتمل</div>' +
+        '</div>' +
+        cardsHtml +
+        '<button onclick="liveAnalysisEngine.restart()" style="' +
+        'width:100%;margin-top:4px;padding:13px;' +
+        'background:linear-gradient(135deg,#c8960c,#e6a800);' +
+        'color:#050e1f;border:none;border-radius:12px;' +
+        'font-family:Tajawal,sans-serif;font-weight:800;font-size:0.92rem;cursor:pointer;' +
+        'display:flex;align-items:center;justify-content:center;gap:8px;' +
+        'box-shadow:0 4px 15px rgba(200,150,12,0.3);' +
+        '">' +
+        '<i class="fas fa-camera" style="font-size:1rem;"></i>' +
+        'تحليل جديد بالكاميرا' +
+        '</button>' +
+        '</div>';
+
+      resultEl.innerHTML = html;
+      document.getElementById('live-analysis-status') && (document.getElementById('live-analysis-status').style.display = 'none');
     },
 
     stop: function() {
@@ -953,11 +1162,19 @@ function _cfChat(messages) {
     restart: function() {
       var resultEl = document.getElementById('pa-scan-result');
       if (resultEl) resultEl.innerHTML = '';
-      document.getElementById('live-analysis-status').style.display = 'block';
+      var statusEl = document.getElementById('live-analysis-status');
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#c8960c;font-size:0.85rem;">' +
+          '<div style="width:14px;height:14px;border:2px solid #c8960c;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>' +
+          'الكاميرا تعمل... وجّه نحو الشيء المراد تحليله</div>';
+      }
       this.frameCount = 0;
       this.isRunning = true;
+      this.isAnalyzing = false;
       
       var videoEl = document.getElementById('pa-video-stream');
+      if (videoEl) videoEl.style.display = 'block';
       var canvasEl = document.getElementById('pa-live-canvas');
       this._analyzeContinuously(videoEl, canvasEl, this.currentMode);
     }
