@@ -202,6 +202,10 @@
      */
     searchDrug: async function (name, limit) {
       limit = limit || 5;
+
+      // ① البحث في قاعدة البيانات المحلية أولاً
+      var localResults = DataService.searchLocalDrug ? DataService.searchLocalDrug(name) : [];
+
       var queries = [
         'openfda.generic_name:"' + name + '"',
         'openfda.brand_name:"' + name + '"',
@@ -218,7 +222,7 @@
           }
         } catch (e) {}
       }
-      return [];
+      return localResults;
     },
 
     /**
@@ -462,7 +466,331 @@
     }
   };
 
+    /* ──────────────────────────────────────────
+       11. قاعدة بيانات الأدوية الشائعة (مصر + خليج)
+           مع صور + معلومات + بدائل — مرجع للذكاء الاصطناعي
+    ────────────────────────────────────────── */
+    DRUGS_DB: {
+      /* ── مضادات حيوية ── */
+      'amoxicillin': {
+        name: 'Amoxicillin', arabic: 'أموكسيسيلين',
+        active: 'Amoxicillin trihydrate', category: 'مضاد حيوي — بيتا لاكتام',
+        image: 'https://www.drugs.com/images/pills/fio/00093-4155.JPG',
+        uses: 'التهابات الجهاز التنفسي، التهاب الأذن، التهاب البلعوم، عدوى المسالك البولية، التهاب الجيوب الأنفية',
+        dose: 'بالغ: 500 ملغ كل 8 ساعات | أطفال: 25-50 ملغ/كغ/يوم مقسمة',
+        sideEffects: 'إسهال، غثيان، طفح جلدي، حساسية (نادراً)',
+        contraindications: 'الحساسية من البنسلين',
+        price: 15, priceUnit: 'جنيه (شريط)',
+        alternatives: ['أوجمنتين', 'أزيثروميسين', 'سيبروفلوكساسين']
+      },
+      'augmentin': {
+        name: 'Augmentin', arabic: 'أوجمنتين',
+        active: 'Amoxicillin + Clavulanic acid', category: 'مضاد حيوي مركب',
+        image: 'https://www.drugs.com/images/pills/fio/00029-6090.JPG',
+        uses: 'التهابات الجيوب الأنفية، التهاب الأذن، التهابات الجلد، عدوى المسالك البولية المقاومة',
+        dose: 'بالغ: 1000 ملغ/12 ساعة أو 625 ملغ/8 ساعات',
+        sideEffects: 'إسهال، التهاب الكبد النادر، غثيان',
+        contraindications: 'حساسية البنسلين، أمراض الكبد',
+        price: 45, priceUnit: 'جنيه',
+        alternatives: ['أموكسيسيلين', 'سيفوروكسيم']
+      },
+      'azithromycin': {
+        name: 'Azithromycin', arabic: 'أزيثروميسين / زيثروماكس',
+        active: 'Azithromycin', category: 'مضاد حيوي — ماكروليد',
+        image: 'https://www.drugs.com/images/pills/fio/00069-3060.JPG',
+        uses: 'التهابات الجهاز التنفسي، الالتهاب الرئوي، التهاب البلعوم، الأمراض المنقولة جنسياً',
+        dose: 'بالغ: 500 ملغ اليوم الأول ثم 250 ملغ/يوم 4 أيام',
+        sideEffects: 'غثيان، آلام بطن، إسهال',
+        contraindications: 'حساسية الماكروليدات، اضطرابات القلب',
+        price: 35, priceUnit: 'جنيه',
+        alternatives: ['كلاريثروميسين', 'إريثروميسين']
+      },
+      'ciprofloxacin': {
+        name: 'Ciprofloxacin', arabic: 'سيبروفلوكساسين / سيبروسين',
+        active: 'Ciprofloxacin HCl', category: 'مضاد حيوي — فلوروكينولون',
+        image: 'https://www.drugs.com/images/pills/fio/00093-0811.JPG',
+        uses: 'عدوى المسالك البولية، الالتهاب الرئوي، التهابات الجلد والعظام، الإسهال البكتيري',
+        dose: 'بالغ: 500-750 ملغ مرتين يومياً',
+        sideEffects: 'غثيان، إسهال، ألم الأوتار، حساسية للضوء',
+        contraindications: 'القاصرون، الحوامل، حساسية الكينولونات',
+        price: 25, priceUnit: 'جنيه',
+        alternatives: ['ليفوفلوكساسين', 'نورفلوكساسين']
+      },
+
+      /* ── مسكنات ومضادات التهاب ── */
+      'paracetamol': {
+        name: 'Paracetamol / Panadol', arabic: 'باراسيتامول / بنادول',
+        active: 'Paracetamol (Acetaminophen)', category: 'مسكن / خافض حرارة',
+        image: 'https://www.drugs.com/images/pills/fio/00450-0433.JPG',
+        uses: 'تخفيف الألم الخفيف إلى المعتدل، خفض الحرارة، صداع، آلام العضلات',
+        dose: 'بالغ: 500-1000 ملغ كل 4-6 ساعات (حد أقصى 4 غرام/يوم)',
+        sideEffects: 'آمن بالجرعات المناسبة — الجرعات العالية تضر الكبد',
+        contraindications: 'أمراض الكبد الشديدة، تناول الكحول',
+        price: 5, priceUnit: 'جنيه',
+        alternatives: ['إيبوبروفين', 'أسبرين']
+      },
+      'ibuprofen': {
+        name: 'Ibuprofen / Brufen', arabic: 'إيبوبروفين / برفن',
+        active: 'Ibuprofen', category: 'مضاد التهاب لاستيرويدي (NSAID)',
+        image: 'https://www.drugs.com/images/pills/fio/00536-3273.JPG',
+        uses: 'التهاب المفاصل، آلام الدورة الشهرية، الصداع، الآلام العضلية، خفض الحرارة',
+        dose: 'بالغ: 400-800 ملغ كل 6-8 ساعات مع الطعام',
+        sideEffects: 'تهيج المعدة، قرحة، ارتفاع ضغط الدم',
+        contraindications: 'الحمل (الثلث الثالث)، القرحة، الكلى، القلب',
+        price: 12, priceUnit: 'جنيه',
+        alternatives: ['نابروكسين', 'ديكلوفيناك', 'باراسيتامول']
+      },
+      'diclofenac': {
+        name: 'Diclofenac / Voltaren', arabic: 'ديكلوفيناك / فولتارين',
+        active: 'Diclofenac sodium', category: 'مضاد التهاب لاستيرويدي (NSAID)',
+        image: 'https://www.drugs.com/images/pills/fio/00078-0413.JPG',
+        uses: 'التهاب المفاصل الروماتيزمي، آلام أسفل الظهر، الإصابات الرياضية، ألم ما بعد الجراحة',
+        dose: 'بالغ: 50 ملغ 2-3 مرات يومياً أو 75 ملغ مرتين',
+        sideEffects: 'تهيج المعدة، آلام بطن، ارتفاع ضغط الدم',
+        contraindications: 'القرحة، الحمل، الكلى، القلب',
+        price: 15, priceUnit: 'جنيه',
+        alternatives: ['إيبوبروفين', 'نابروكسين', 'ميلوكسيكام']
+      },
+
+      /* ── أدوية ضغط الدم ── */
+      'amlodipine': {
+        name: 'Amlodipine / Norvasc', arabic: 'أملوديبين / نورفاسك',
+        active: 'Amlodipine besylate', category: 'حاصر قنوات الكالسيوم',
+        image: 'https://www.drugs.com/images/pills/fio/00069-1520.JPG',
+        uses: 'ارتفاع ضغط الدم، الذبحة الصدرية، الوقاية من الجلطات',
+        dose: 'بالغ: 5-10 ملغ مرة واحدة يومياً',
+        sideEffects: 'تورم الكاحلين، صداع، دوخة، احمرار الوجه',
+        contraindications: 'الحساسية من ديهيدروبيريدين، الصدمة القلبية',
+        price: 25, priceUnit: 'جنيه',
+        alternatives: ['نيفيديبين', 'فيلوديبين']
+      },
+      'enalapril': {
+        name: 'Enalapril / Renitec', arabic: 'إنالابريل / ريناتك',
+        active: 'Enalapril maleate', category: 'مثبط ACE',
+        image: 'https://www.drugs.com/images/pills/fio/00006-0713.JPG',
+        uses: 'ارتفاع ضغط الدم، فشل القلب الاحتقاني، حماية الكلى في السكري',
+        dose: 'بالغ: 5-40 ملغ يومياً',
+        sideEffects: 'سعال جاف (شائع)، دوخة، ارتفاع البوتاسيوم',
+        contraindications: 'الحمل، تضيق الشريان الكلوي، أنجيوإديما',
+        price: 18, priceUnit: 'جنيه',
+        alternatives: ['ليسينوبريل', 'راميبريل', 'فالسارتان']
+      },
+      'losartan': {
+        name: 'Losartan / Cozaar', arabic: 'لوسارتان / كوزار',
+        active: 'Losartan potassium', category: 'حاصر مستقبلات الأنجيوتنسين (ARB)',
+        image: 'https://www.drugs.com/images/pills/fio/00006-0952.JPG',
+        uses: 'ارتفاع ضغط الدم، حماية الكلى في مرضى السكري، فشل القلب',
+        dose: 'بالغ: 50-100 ملغ مرة واحدة يومياً',
+        sideEffects: 'دوخة، ارتفاع البوتاسيوم — نادراً سعال (أقل من ACE)',
+        contraindications: 'الحمل، تضيق الشريان الكلوي',
+        price: 35, priceUnit: 'جنيه',
+        alternatives: ['فالسارتان', 'تيلميسارتان', 'إيربيسارتان']
+      },
+
+      /* ── أدوية السكري ── */
+      'metformin': {
+        name: 'Metformin / Glucophage', arabic: 'ميتفورمين / جلوكوفاج',
+        active: 'Metformin HCl', category: 'أدوية السكري — بيجوانيد',
+        image: 'https://www.drugs.com/images/pills/fio/00093-1048.JPG',
+        uses: 'السكري النوع الثاني، مقاومة الإنسولين، متلازمة المبيض المتعدد الكيسات',
+        dose: 'بالغ: 500-2550 ملغ/يوم مع الوجبات',
+        sideEffects: 'غثيان، إسهال، ألم بطن (تقل بالتدريج)، نقص فيتامين B12',
+        contraindications: 'الكلى (eGFR<30)، قصور القلب، الكبد، اليود للأشعة',
+        price: 15, priceUnit: 'جنيه',
+        alternatives: ['جليبنكلاميد', 'جليكلازيد', 'سيتاجليبتين']
+      },
+      'glibenclamide': {
+        name: 'Glibenclamide / Daonil', arabic: 'جليبنكلاميد / داونيل',
+        active: 'Glibenclamide', category: 'أدوية السكري — سلفونيل يوريا',
+        image: 'https://www.drugs.com/images/pills/fio/00039-0051.JPG',
+        uses: 'السكري النوع الثاني',
+        dose: 'بالغ: 2.5-20 ملغ يومياً مع الإفطار',
+        sideEffects: 'انخفاض السكر (هيبوجليسيميا)، زيادة الوزن',
+        contraindications: 'السكري النوع الأول، الحمل، الكلى الشديد',
+        price: 8, priceUnit: 'جنيه',
+        alternatives: ['جليكلازيد', 'جليميبيريد', 'ميتفورمين']
+      },
+
+      /* ── أدوية الكوليسترول ── */
+      'atorvastatin': {
+        name: 'Atorvastatin / Lipitor', arabic: 'أتورفاستاتين / ليبيتور',
+        active: 'Atorvastatin calcium', category: 'خافض الكوليسترول — ستاتين',
+        image: 'https://www.drugs.com/images/pills/fio/00071-0155.JPG',
+        uses: 'ارتفاع الكوليسترول، الوقاية من أمراض القلب والجلطات',
+        dose: 'بالغ: 10-80 ملغ مرة واحدة يومياً في أي وقت',
+        sideEffects: 'آلام العضلات، ارتفاع إنزيمات الكبد، ضعف العضلات',
+        contraindications: 'الحمل، الرضاعة، أمراض الكبد الحادة',
+        price: 40, priceUnit: 'جنيه',
+        alternatives: ['روزوفاستاتين', 'سيمفاستاتين', 'برافاستاتين']
+      },
+      'rosuvastatin': {
+        name: 'Rosuvastatin / Crestor', arabic: 'روزوفاستاتين / كريستور',
+        active: 'Rosuvastatin calcium', category: 'خافض الكوليسترول — ستاتين',
+        image: 'https://www.drugs.com/images/pills/fio/00310-0755.JPG',
+        uses: 'ارتفاع الكوليسترول، الوقاية القلبية الوعائية',
+        dose: 'بالغ: 5-40 ملغ يومياً',
+        sideEffects: 'آلام العضلات، ضعف العضلات النادر (رابدوميوليسيس)',
+        contraindications: 'الحمل، الكلى الشديد، التفاعل مع الدارونافير',
+        price: 55, priceUnit: 'جنيه',
+        alternatives: ['أتورفاستاتين', 'سيمفاستاتين']
+      },
+
+      /* ── أدوية المعدة ── */
+      'omeprazole': {
+        name: 'Omeprazole / Losec', arabic: 'أوميبرازول / لوسيك / أوميز',
+        active: 'Omeprazole', category: 'مثبط مضخة البروتون (PPI)',
+        image: 'https://www.drugs.com/images/pills/fio/00378-3273.JPG',
+        uses: 'حرقة المعدة، قرحة المعدة والاثني عشر، داء الارتداد المريئي، وقاية من تأثيرات NSAID',
+        dose: 'بالغ: 20-40 ملغ مرة واحدة يومياً قبل الوجبة',
+        sideEffects: 'صداع، إسهال، غثيان، نقص المغنيسيوم عند الاستخدام الطويل',
+        contraindications: 'التفاعل مع كلوبيدوجريل',
+        price: 20, priceUnit: 'جنيه',
+        alternatives: ['بانتوبرازول', 'إيزوميبرازول', 'رانيتيدين']
+      },
+      'pantoprazole': {
+        name: 'Pantoprazole / Controloc', arabic: 'بانتوبرازول / كونترولوك',
+        active: 'Pantoprazole sodium', category: 'مثبط مضخة البروتون (PPI)',
+        image: 'https://www.drugs.com/images/pills/fio/00008-0841.JPG',
+        uses: 'قرحة المعدة، داء الارتداد المريئي، حرقة المعدة',
+        dose: 'بالغ: 40 ملغ مرة واحدة يومياً',
+        sideEffects: 'صداع، إسهال، غثيان',
+        contraindications: 'الحساسية من البنزيميدازول',
+        price: 25, priceUnit: 'جنيه',
+        alternatives: ['أوميبرازول', 'لانسوبرازول']
+      },
+
+      /* ── مضادات الهيستامين ── */
+      'cetirizine': {
+        name: 'Cetirizine / Zyrtec', arabic: 'سيتريزين / زيرتيك / سيتاليرجي',
+        active: 'Cetirizine HCl', category: 'مضاد هيستامين الجيل الثاني',
+        image: 'https://www.drugs.com/images/pills/fio/00069-5551.JPG',
+        uses: 'الحساسية الموسمية، الرشح الأرجي، الشرى، حكة الجلد',
+        dose: 'بالغ: 10 ملغ مرة واحدة يومياً | أطفال 6-12 سنة: 5 ملغ',
+        sideEffects: 'نعاس خفيف، جفاف الفم',
+        contraindications: 'الكلى الشديد (يتطلب تعديل جرعة)',
+        price: 12, priceUnit: 'جنيه',
+        alternatives: ['لوراتادين', 'فيكسوفينادين', 'ديسلوراتادين']
+      },
+      'loratadine': {
+        name: 'Loratadine / Claritin', arabic: 'لوراتادين / كلاريتين',
+        active: 'Loratadine', category: 'مضاد هيستامين الجيل الثاني (لا يسبب نعاساً)',
+        image: 'https://www.drugs.com/images/pills/fio/00085-1221.JPG',
+        uses: 'الحساسية الموسمية، الرشح الأرجي، الشرى',
+        dose: 'بالغ: 10 ملغ مرة واحدة يومياً',
+        sideEffects: 'نادراً صداع أو جفاف فم — لا يسبب نعاساً',
+        contraindications: 'لا توجد موانع رئيسية',
+        price: 15, priceUnit: 'جنيه',
+        alternatives: ['سيتريزين', 'فيكسوفينادين']
+      },
+
+      /* ── أدوية الغدة الدرقية ── */
+      'levothyroxine': {
+        name: 'Levothyroxine / Euthyrox', arabic: 'ليفوثيروكسين / يوثيروكس',
+        active: 'Levothyroxine sodium', category: 'هرمون الغدة الدرقية',
+        image: 'https://www.drugs.com/images/pills/fio/00074-9296.JPG',
+        uses: 'قصور الغدة الدرقية، علاج وإدارة سرطان الغدة الدرقية',
+        dose: 'يختلف حسب وزن الجسم ومستوى TSH — يبدأ عادة 50 ميكروغرام',
+        sideEffects: 'عند زيادة الجرعة: تسرع القلب، رجفة، قلق، إنقاص وزن',
+        contraindications: 'احتشاء القلب الحديث، النشاط الدرقي الزائد',
+        price: 20, priceUnit: 'جنيه',
+        alternatives: ['لا يوجد بديل حقيقي — نفس الدواء أسماء مختلفة']
+      },
+
+      /* ── مضادات الاكتئاب والأعصاب ── */
+      'sertraline': {
+        name: 'Sertraline / Zoloft', arabic: 'سيرترالين / زولوفت',
+        active: 'Sertraline HCl', category: 'مثبط استرداد السيروتونين الانتقائي (SSRI)',
+        image: 'https://www.drugs.com/images/pills/fio/00049-4960.JPG',
+        uses: 'الاكتئاب، القلق، اضطراب ما بعد الصدمة، الوسواس القهري',
+        dose: 'بالغ: 50-200 ملغ/يوم',
+        sideEffects: 'غثيان، أرق أو نعاس، اضطرابات جنسية، صداع',
+        contraindications: 'التزامن مع مثبطات MAO، الحمل الأولى',
+        price: 50, priceUnit: 'جنيه',
+        alternatives: ['فلوكستين', 'إيسيتالوبرام', 'باروكستين']
+      },
+
+      /* ── مرخيات العضلات ── */
+      'methocarbamol': {
+        name: 'Methocarbamol / Robaxin', arabic: 'ميثوكاربامول / روباكسين',
+        active: 'Methocarbamol', category: 'مرخي عضلات',
+        image: 'https://www.drugs.com/images/pills/fio/00603-4477.JPG',
+        uses: 'تشنجات العضلات، آلام أسفل الظهر، الإصابات العضلية',
+        dose: 'بالغ: 750-1500 ملغ 4 مرات يومياً',
+        sideEffects: 'نعاس، دوخة، تغيير لون البول',
+        contraindications: 'الكلى الشديد (حقن فقط)',
+        price: 30, priceUnit: 'جنيه',
+        alternatives: ['سيكلوبنزابرين', 'تيزانيدين', 'باكلوفين']
+      },
+
+      /* ── فيتامينات شائعة ── */
+      'vitamin_d': {
+        name: 'Vitamin D3 / Devit', arabic: 'فيتامين د3 / ديفيت',
+        active: 'Cholecalciferol (D3)', category: 'فيتامين / مكمل غذائي',
+        image: 'https://www.drugs.com/images/pills/fio/00536-4086.JPG',
+        uses: 'نقص فيتامين د، صحة العظام، دعم المناعة، الوقاية من الكساح',
+        dose: 'نقص: 50,000 وحدة أسبوعياً لـ 8-12 أسبوع ثم 1500-2000 وحدة/يوم',
+        sideEffects: 'عند الجرعات العالية جداً: فرط كالسيوم الدم',
+        contraindications: 'فرط كالسيوم الدم، حصى الكلى المتكررة',
+        price: 25, priceUnit: 'جنيه',
+        alternatives: ['ديفيت-3', 'أوميغافيت', 'مكملات مركبة']
+      },
+      'iron': {
+        name: 'Ferrous Sulfate / Ferrofol', arabic: 'كبريتات الحديدوز / فيروفول',
+        active: 'Ferrous sulfate', category: 'مكمل حديد',
+        image: 'https://www.drugs.com/images/pills/fio/00536-1052.JPG',
+        uses: 'فقر الدم بسبب نقص الحديد، النساء الحوامل',
+        dose: 'علاج: 150-200 ملغ حديد عنصري يومياً | وقاية: 60 ملغ/يوم',
+        sideEffects: 'إمساك، غثيان، إسهال، تغيير لون البراز (أسود)',
+        contraindications: 'داء ترسب الأصبغة الدموية، فقر الدم اللاتنسجي',
+        price: 10, priceUnit: 'جنيه',
+        alternatives: ['فيروغلوبين', 'كومبيفر', 'فريرم']
+      }
+    },
+
+    /**
+     * بحث في قاعدة البيانات المحلية
+     */
+    searchLocalDrug: function(query) {
+      if (!query) return [];
+      var lq = query.toLowerCase();
+      var results = [];
+      Object.keys(DataService.DRUGS_DB).forEach(function(key) {
+        var d = DataService.DRUGS_DB[key];
+        if (key.toLowerCase().includes(lq)
+          || (d.name && d.name.toLowerCase().includes(lq))
+          || (d.arabic && d.arabic.includes(query))
+          || (d.active && d.active.toLowerCase().includes(lq))
+          || (d.uses && d.uses.includes(query))) {
+          results.push(d);
+        }
+      });
+      return results;
+    },
+
+    /**
+     * بناء سياق الدواء للذكاء الاصطناعي
+     */
+    buildDrugContext: function(query) {
+      var local = DataService.searchLocalDrug(query);
+      if (!local.length) return '';
+      var ctx = '\n[مرجع قاعدة بيانات الأدوية]:\n';
+      local.slice(0,3).forEach(function(d) {
+        ctx += '▸ ' + d.arabic + ' (' + d.name + ')\n';
+        ctx += '  المادة الفعالة: ' + d.active + '\n';
+        ctx += '  الاستخدامات: ' + d.uses + '\n';
+        ctx += '  الجرعة: ' + d.dose + '\n';
+        if (d.sideEffects) ctx += '  الآثار الجانبية: ' + d.sideEffects + '\n';
+        if (d.contraindications) ctx += '  موانع الاستخدام: ' + d.contraindications + '\n';
+        if (d.alternatives) ctx += '  البدائل: ' + d.alternatives.join('، ') + '\n';
+        if (d.price) ctx += '  السعر التقريبي: ' + d.price + ' ' + (d.priceUnit||'جنيه') + '\n';
+        ctx += '\n';
+      });
+      return ctx;
+    }
+  };
+
   /* تصدير */
+
   global.TayyibatData = DataService;
   console.log('[TayyibatData] ✅ خدمة البيانات المجانية جاهزة');
 
