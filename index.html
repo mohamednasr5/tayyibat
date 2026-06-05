@@ -6899,31 +6899,103 @@ async function showDrugAI(btn) {
   var uid  = btn.getAttribute('data-uid');
   var name = decodeURIComponent(btn.getAttribute('data-name'));
   var el   = document.getElementById(uid);
-  if (!el) return;
+  if (!el) { btn.style.display = ''; return; }
   el.style.display = 'block';
-  el.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div></div>';
+  el.innerHTML = '<div class="ai-thinking-wrap" style="padding:12px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><div style="color:var(--txt3);font-size:.78rem;margin-top:6px">جاري جلب المعلومات الدوائية...</div></div>';
+
+  var _drugPrompt = 'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
+    '\nاكتب بالعربية بهذا الشكل بالضبط بدون أي نص قبله أو بعده:\n**الاستخدامات:** اذكر 2-3 استخدامات رئيسية\n**الجرعة المعتادة:** اذكر الجرعة للبالغين\n**الآثار الجانبية:** اذكر أبرز الآثار الجانبية\n**تحذيرات:** اذكر أهم موانع الاستخدام';
+
+  var _drugResult = null;
+
   try {
-    var _drugPrompt = 'أنت صيدلاني متخصص. اكتب معلومات موجزة ومنظمة عن دواء: ' + name +
-      '\nاكتب بالعربية بهذا الشكل بالضبط:\n**الاستخدامات:** ...\n**الجرعة المعتادة:** ...\n**الآثار الجانبية:** ...\n**تحذيرات:** ...';
-    var _drugMsgs = [{role:'user', content:_drugPrompt}];
-    var _drugResult = null;
-    // 1. HuggingFace
-    if (!_drugResult) { try { var rd=await _tryLLM7(_drugMsgs,0); if(rd&&rd.text) _drugResult=rd.text; } catch(e){} }
-    // 2. Pollinations
-    if (!_drugResult) { try { var polD=await _tryPollinations(_drugMsgs,0); if(polD) _drugResult=polD.text; } catch(e){} }
-    // 3. Puter
-    if (!_drugResult) { try { var rd2=await _tryOpenRouterFree(_drugMsgs,0); if(rd2&&rd2.text) _drugResult=rd2.text; } catch(e){} }
-    var txt = _drugResult || '';
-    var out = '<div style="background:rgba(0,0,0,.22);border-radius:13px;padding:14px;font-size:.8rem;line-height:1.85;color:var(--txt)">';
-    txt.trim().split('\n').forEach(function(line){
-      var m=line.match(/^\*\*([^*]+)\*\*[:\s]*(.*)/);
-      if(m) out+='<div style="margin-bottom:8px"><span style="color:#26c6da;font-weight:800;font-size:.84rem">'+m[1]+':</span> <span style="color:#e8e8e8">'+m[2]+'</span></div>';
-      else if(line.trim()) out+='<div style="color:#b0bec5;margin-bottom:4px">'+line+'</div>';
-    });
-    el.innerHTML = out+'</div>';
-  } catch(e) {
-    el.innerHTML='<div style="color:var(--txt3);font-size:.78rem;padding:10px;text-align:center">تعذّر تحميل المعلومات الطبية.</div>';
+    // ① الأولوية: TayyibatAI.chat (CF Worker + fallbacks)
+    if (window.TayyibatAI && typeof window.TayyibatAI.chat === 'function') {
+      var r = await window.TayyibatAI.chat(_drugPrompt, 'أنت صيدلاني سريري خبير تجيب بالعربية فقط.');
+      if (r && r.text && r.text.trim().length > 10) _drugResult = r.text.trim();
+    }
+  } catch(e) {}
+
+  // ② fallback: _tryLLM7
+  if (!_drugResult) {
+    try {
+      var msgs = [{role:'user', content:_drugPrompt}];
+      var rd = await _tryLLM7(msgs, 0);
+      var t1 = rd && (rd.text || rd);
+      if (typeof t1 === 'string' && t1.trim().length > 10) _drugResult = t1.trim();
+    } catch(e) {}
   }
+
+  // ③ fallback: _tryPollinations
+  if (!_drugResult) {
+    try {
+      var msgs2 = [{role:'user', content:_drugPrompt}];
+      var polD = await _tryPollinations(msgs2, 0);
+      var t2 = polD && (polD.text || polD);
+      if (typeof t2 === 'string' && t2.trim().length > 10) _drugResult = t2.trim();
+    } catch(e) {}
+  }
+
+  // ④ fallback: _tryOpenRouterFree
+  if (!_drugResult) {
+    try {
+      var msgs3 = [{role:'user', content:_drugPrompt}];
+      var rd2 = await _tryOpenRouterFree(msgs3, 0);
+      var t3 = rd2 && (rd2.text || rd2);
+      if (typeof t3 === 'string' && t3.trim().length > 10) _drugResult = t3.trim();
+    } catch(e) {}
+  }
+
+  if (!_drugResult || _drugResult.trim().length < 5) {
+    el.innerHTML = '<div style="color:#ff7043;font-size:.78rem;padding:10px;text-align:center;border:1px solid rgba(255,112,67,.3);border-radius:10px;background:rgba(255,112,67,.08)">⚠️ تعذّر جلب المعلومات الآن. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.</div>' +
+      '<button onclick="this.parentNode.innerHTML=\'\';var b=document.querySelector(\'[data-uid=\\\'' + uid + '\\\']\');if(b){b.style.display=\'\'}" style="margin-top:8px;width:100%;padding:8px;background:rgba(33,150,243,.15);border:1px solid rgba(33,150,243,.4);border-radius:10px;color:#90caf9;font-size:.78rem;cursor:pointer;font-family:Tajawal,sans-serif">↩ إعادة المحاولة</button>';
+    btn.style.display = '';
+    return;
+  }
+
+  var txt = _drugResult;
+
+  // ── بناء البطاقات الملونة ──
+  var sections = [
+    { key: 'الاستخدامات',    color: '#26c6da', bg: 'rgba(0,188,212,.12)', border: 'rgba(0,188,212,.4)',  icon: '💚' },
+    { key: 'الجرعة المعتادة', color: '#66bb6a', bg: 'rgba(76,175,80,.12)', border: 'rgba(76,175,80,.4)',  icon: '💊' },
+    { key: 'الآثار الجانبية', color: '#ffa726', bg: 'rgba(255,167,38,.11)', border: 'rgba(255,167,38,.4)', icon: '⚠️' },
+    { key: 'تحذيرات',         color: '#ef5350', bg: 'rgba(239,83,80,.11)',  border: 'rgba(239,83,80,.4)',  icon: '🚫' }
+  ];
+
+  var out = '<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">';
+
+  sections.forEach(function(sec) {
+    // استخراج محتوى كل قسم بين العنوان والعنوان التالي
+    var re = new RegExp('\\*\\*' + sec.key + '\\*\\*[:\\s]*([\\s\\S]*?)(?=\\*\\*[^*]+\\*\\*|$)', 'i');
+    var m = txt.match(re);
+    if (!m) {
+      // جرب بدون **
+      var re2 = new RegExp(sec.key + '\\s*[:\\-]\\s*([^\\n]+)', 'i');
+      m = txt.match(re2);
+    }
+    var content = m ? m[1].trim().replace(/^\*+|\*+$/g, '').trim() : '';
+    if (!content) return;
+    out += '<div style="background:' + sec.bg + ';border:1.5px solid ' + sec.border + ';border-radius:12px;padding:10px 13px">' +
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">' +
+        '<span style="font-size:.9rem">' + sec.icon + '</span>' +
+        '<span style="font-size:.72rem;font-weight:900;color:' + sec.color + '">' + sec.key + '</span>' +
+      '</div>' +
+      '<div style="font-size:.82rem;color:#dde;line-height:1.8">' +
+        content.replace(/\n/g, '<br>').replace(/[-•]\s/g, '◆ ') +
+      '</div>' +
+    '</div>';
+  });
+
+  // إذا لم تُستخرج أي بطاقة (صيغة مختلفة) → اعرض النص كاملاً
+  if (out === '<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">') {
+    out += '<div style="background:rgba(0,0,0,.2);border-radius:12px;padding:13px;font-size:.8rem;line-height:1.85;color:#dde">' +
+      txt.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#26c6da">$1</strong>').replace(/\n/g,'<br>') +
+    '</div>';
+  }
+
+  out += '</div>';
+  el.innerHTML = out;
 }
 
 
