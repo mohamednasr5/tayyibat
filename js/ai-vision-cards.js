@@ -1231,6 +1231,123 @@
     captureFrame:   _capture
   };
 
+  /* ══════════════════════════════════════════
+     ⑩ PA-SCANNER — تحليل فوري مباشر
+     يتجاوز liveAnalysisEngine تماماً
+  ══════════════════════════════════════════ */
+  (function _patchPaScanner() {
+
+    /** التقط إطار وحلّله مباشرة عبر CF Worker */
+    async function _paAnalyze(videoEl, mode, resBox, statusEl) {
+      if (!videoEl || !resBox) return;
+
+      var imgData = _capture(videoEl, IMG_QUALITY);
+      if (!imgData) {
+        _loader(resBox, '⏳ الكاميرا تبدأ... انتظر لحظة');
+        resBox.style.display = 'block';
+        return;
+      }
+
+      _loader(resBox, _loaderMsgs[mode] || 'جاري التحليل الذكي...');
+      resBox.style.display = 'block';
+      if (statusEl) statusEl.style.display = 'none';
+
+      var prompt = PROMPTS[mode] || PROMPTS.product;
+      try {
+        var text = await _toWorker(imgData, prompt);
+        if (text && text.trim().length > 8) {
+          var retryFn = function () { _paAnalyze(videoEl, mode, resBox, statusEl); };
+          resBox.innerHTML = renderCards(text, mode, retryFn);
+        } else {
+          throw new Error('empty');
+        }
+      } catch (e) {
+        /* fallback → TayyibatAI.vision */
+        var fallbackDone = false;
+        if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
+          try {
+            var r2 = await window.TayyibatAI.vision(imgData, prompt);
+            var t2 = (r2 && r2.text) ? r2.text : (typeof r2 === 'string' ? r2 : null);
+            if (t2 && t2.length > 8) {
+              resBox.innerHTML = renderCards(t2, mode);
+              fallbackDone = true;
+            }
+          } catch (e2) {}
+        }
+        if (!fallbackDone) {
+          _error(resBox, function () { _paAnalyze(videoEl, mode, resBox, statusEl); });
+        }
+      }
+    }
+
+    /** انتظر حتى يصبح الفيديو جاهزاً ثم حلّل */
+    function _waitAndAnalyze(videoId, mode, resBoxId, statusId, maxWaitMs) {
+      maxWaitMs = maxWaitMs || 12000;
+      var startTs = Date.now();
+      var tid = setInterval(function () {
+        var video  = document.getElementById(videoId);
+        var resBox = document.getElementById(resBoxId);
+        var status = statusId ? document.getElementById(statusId) : null;
+        if (video && video.videoWidth > 0 && resBox) {
+          clearInterval(tid);
+          _paAnalyze(video, mode, resBox, status);
+        } else if (Date.now() - startTs > maxWaitMs) {
+          clearInterval(tid);
+        }
+      }, 400);
+    }
+
+    /* ── Override paAnalyzeManual (زر "تحليل بالذكاء الاصطناعي") ── */
+    window.paAnalyzeManual = function () {
+      var video  = document.getElementById('pa-video-stream');
+      var resBox = document.getElementById('pa-scan-result');
+      var status = document.getElementById('live-analysis-status');
+      var mode   = window._scanMode || window._paCurrentMode || _getPaMode() || 'product';
+
+      if (video && video.videoWidth > 0 && resBox) {
+        _paAnalyze(video, mode, resBox, status);
+      } else if (resBox) {
+        /* الكاميرا لم تفتح بعد — اعرض رسالة */
+        resBox.style.display = 'block';
+        _loader(resBox, '📷 افتح الكاميرا أولاً أو وجّهها نحو الشيء المراد تحليله...');
+        _waitAndAnalyze('pa-video-stream', mode, 'pa-scan-result', 'live-analysis-status', 10000);
+      }
+    };
+
+    /* ── Override liveAnalysisEngine.start لإضافة تحليل فوري ── */
+    var _laePatchDone = false;
+    function _patchLAE() {
+      if (_laePatchDone || !window.liveAnalysisEngine) return;
+      _laePatchDone = true;
+
+      var _origLAEStart = window.liveAnalysisEngine.start.bind(window.liveAnalysisEngine);
+      window.liveAnalysisEngine.start = function (videoId, canvasId, mode) {
+        _origLAEStart(videoId, canvasId, mode);
+        /* ابدأ تحليلاً فورياً موازياً عبر CF Worker */
+        _waitAndAnalyze(videoId, mode || 'product', 'pa-scan-result', 'live-analysis-status', 12000);
+      };
+
+      /* Override restart أيضاً */
+      var _origLAERestart = window.liveAnalysisEngine.restart.bind(window.liveAnalysisEngine);
+      window.liveAnalysisEngine.restart = function () {
+        _origLAERestart();
+        var mode = window.liveAnalysisEngine.currentMode || _getPaMode() || 'product';
+        _waitAndAnalyze('pa-video-stream', mode, 'pa-scan-result', 'live-analysis-status', 12000);
+      };
+    }
+
+    /* حاول patch فوراً ثم بعد DOM جاهز */
+    _patchLAE();
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(_patchLAE, 1000); });
+    setTimeout(_patchLAE, 1500);
+
+    /* اجعل _paAnalyze متاحاً عالمياً */
+    window._paDirectAnalyze = _paAnalyze;
+    window._paWaitAndAnalyze = _waitAndAnalyze;
+
+    console.log('[TVC2] ✅ PA-Scanner patch installed — paAnalyzeManual & liveAnalysisEngine overridden');
+  })();
+
   /* تثبيت الـ hooks بعد تحميل الصفحة كاملاً */
   function _ready(fn) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
