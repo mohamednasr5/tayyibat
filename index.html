@@ -14736,6 +14736,10 @@ console.log('TYPE', typeof data.result.response);
     source: 'CF-Worker'
   };
 }
+    return null;
+  })
+  .catch(function() { return null; });
+}
 
   // ② OVH Kepler — model واحد بدون انتظار
   function _keplerChat(messages, modelOverride) {
