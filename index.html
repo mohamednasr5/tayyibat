@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
@@ -2375,20 +2376,25 @@ window.geminiSend = window.geminiSend || function() {};
   </div>
 
   <div style="padding:12px 16px">
-    <div class="camera-view-wrap" id="pa-camera-viewport" style="cursor:pointer">
+    <div style="margin-bottom:10px">
+      <button onclick="_paUnifiedCameraOpen()" class="btn" id="dvm-btn-pa-unified" style="width:100%;background:linear-gradient(135deg,rgba(46,201,81,.2),rgba(0,201,167,.12));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:11px;font-size:.88rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">
+        📷 فتح الكاميرا
+      </button>
+    </div>
+    <div class="camera-view-wrap" id="pa-camera-viewport" onclick="(function(){ var ol=document.getElementById('tap-to-rescan'); if(ol){ ol.remove(); _startCameraAndScanNow(); } else if(paStreamRef){ captureSmartByMode(); } })()" style="cursor:pointer">
       <div class="scanner-laser-line" id="pa-laser" style="display:none"></div>
       <video id="pa-video-stream" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
       <div id="pa-camera-fallback-msg" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
         <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4"></i>
-        اختر وضعاً أعلاه ثم اضغط زر فتح الكاميرا
+        اختر وضعاً أعلاه لبدء الكاميرا
       </div>
     </div>
-    <div style="margin:10px 0">
-      <button onclick="openDirectVisionCamera('scanner')" id="pa-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
-        📷 فتح الكاميرا
-      </button>
-    </div>
-    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"></span></div>
+    <div id="dvm-area-scan-medicine" style="display:none;margin-bottom:8px"></div>
+    <div id="dvm-area-scan-prescription" style="display:none;margin-bottom:8px"></div>
+    <div id="dvm-area-scan-report" style="display:none;margin-bottom:8px"></div>
+    <div id="dvm-area-food-recognition" style="display:none;margin-bottom:8px"></div>
+    <div id="dvm-area-food-box" style="display:none;margin-bottom:8px"></div>
+    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"><i class="fas fa-hand-pointer" style="margin-left:5px"></i> اختر وضع المسح أعلاه لبدء الكاميرا تلقائياً</span></div>
     <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">
       <div style="flex:1;height:1px;background:var(--border)"></div>
       <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
@@ -2461,11 +2467,12 @@ window.geminiSend = window.geminiSend || function() {};
         اضغط لفتح الكاميرا وتصوير طعامك
       </div>
     </div>
-    <div style="margin:10px 0">
-      <button onclick="openDirectVisionCamera('food-scan')" id="fs-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+    <div style="display:flex;gap:8px;margin:10px 0">
+      <button onclick="openDirectVisionCamera('food-scan')" class="btn" id="dvm-btn-food-scan" style="flex:1;background:linear-gradient(135deg,rgba(46,201,81,.25),rgba(0,201,167,.15));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:10px;font-size:.82rem">
         📷 فتح الكاميرا
       </button>
     </div>
+    <div id="dvm-area-food-scan" style="display:none;margin-bottom:10px"></div>
     <div style="display:flex;align-items:center;gap:8px;margin:8px 0">
       <div style="flex:1;height:1px;background:var(--border)"></div>
       <span style="font-size:.7rem;color:var(--txt3)">أو أدخل اسم الطعام</span>
@@ -2662,21 +2669,15 @@ window.geminiSend = window.geminiSend || function() {};
       📸 صوّر أو ارفع أي صورة وهيكشف لك: هل هي حقيقية، مولودة بـ AI، أو معدّلة بفلاتر
     </div>
     <div style="margin-bottom:12px">
-      <button onclick="openDirectVisionCamera('fake-image')" id="fi-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(255,193,7,.1));color:#ffc107;border:1.5px solid rgba(255,152,0,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+      <button onclick="openDirectVisionCamera('fake-image')" class="btn" id="dvm-btn-fake-image" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,193,7,.1);color:#ffc107;border:2px dashed rgba(255,193,7,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+        <i class="fas fa-camera" style="font-size:1.4rem"></i>
         📷 فتح الكاميرا
       </button>
     </div>
-    <div id="fi-camera-area" style="display:none;margin-bottom:12px;position:relative">
-      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(255,152,0,.4)">
-        <video id="fi-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
-        <div id="fi-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
-          <span style="background:rgba(0,0,0,.7);color:#4fc3f7;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">🔍 تحليل مباشر نشط...</span>
-        </div>
-      </div>
-    </div>
-    <div id="fi-preview" style="display:none;margin-bottom:12px;text-align:center">
-      <img id="fi-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(255,152,0,.4)">
-    </div>
+    <div id="dvm-area-fake-image" style="display:none;margin-bottom:12px"></div>
+    <button onclick="fakeImageAnalyze()" class="btn" style="width:100%;background:linear-gradient(135deg,#e65100,#f57c00);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
+      <i class="fas fa-microscope"></i> حلّل الصورة
+    </button>
     <div id="fi-result"></div>
   </div>
 </div>
@@ -2697,21 +2698,12 @@ window.geminiSend = window.geminiSend || function() {};
       📚 صوّر السؤال أو اكتبه — هيجاوب عليك إجابة نموذجية زي كتاب الإجابات بالضبط
     </div>
     <div style="margin-bottom:12px">
-      <button onclick="openDirectVisionCamera('homework')" id="hw-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(100,181,246,.1));color:#64b5f6;border:1.5px solid rgba(33,150,243,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+      <button onclick="openDirectVisionCamera('homework')" class="btn" id="dvm-btn-homework" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(100,181,246,.1);color:#64b5f6;border:2px dashed rgba(100,181,246,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+        <i class="fas fa-camera" style="font-size:1.4rem"></i>
         📷 فتح الكاميرا
       </button>
     </div>
-    <div id="hw-camera-area" style="display:none;margin-bottom:12px;position:relative">
-      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(33,150,243,.4)">
-        <video id="hw-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
-        <div id="hw-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
-          <span style="background:rgba(0,0,0,.7);color:#ffb74d;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">⏳ وجّه الكاميرا نحو السؤال...</span>
-        </div>
-      </div>
-    </div>
-    <div id="hw-preview" style="display:none;margin-bottom:12px;text-align:center">
-      <img id="hw-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(33,150,243,.4)">
-    </div>
+    <div id="dvm-area-homework" style="display:none;margin-bottom:12px"></div>
     <div class="field" style="margin-bottom:12px">
       <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:6px">أو اكتب السؤال نصياً (اختياري)</label>
       <textarea id="hw-text-input" placeholder="مثال: احسب مساحة مثلث قاعدته 6 سم وارتفاعه 4 سم" rows="3" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
@@ -2739,34 +2731,14 @@ window.geminiSend = window.geminiSend || function() {};
       🖐 صوّر راحة يدك اليسرى بوضوح — تأكد الإضاءة كويسة والخطوط ظاهرة
     </div>
 
-    <!-- زر فتح الكاميرا -->
+    <!-- خيارات الإدخال -->
     <div style="margin-bottom:12px">
-      <button onclick="openDirectVisionCamera('palm')" id="palm-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(255,87,34,.2),rgba(255,138,101,.1));color:#ff8a65;border:1.5px solid rgba(255,87,34,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+      <button onclick="openDirectVisionCamera('palm')" class="btn" id="dvm-btn-palm" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,138,101,.1);color:#ff8a65;border:2px dashed rgba(255,138,101,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
+        <i class="fas fa-camera" style="font-size:1.4rem"></i>
         📷 فتح الكاميرا
       </button>
     </div>
-
-    <!-- منطقة الكاميرا -->
-    <div id="palm-camera-area" style="display:none;margin-bottom:12px;position:relative">
-      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(255,87,34,.4)">
-        <video id="palm-video" autoplay playsinline style="width:100%;max-height:300px;object-fit:cover;display:block"></video>
-        <div id="palm-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center;z-index:3">
-          <span style="background:rgba(0,0,0,.75);color:#ce93d8;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px">🔮 ضع كفك أمام الكاميرا...</span>
-        </div>
-        <!-- إطار توجيهي لوضع الكف -->
-        <div style="position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center">
-          <div style="width:65%;height:80%;border:2px dashed rgba(255,138,101,.7);border-radius:16px;display:flex;align-items:center;justify-content:center">
-            <span style="font-size:2.5rem;opacity:.4">🖐</span>
-          </div>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:.7rem;color:#ff8a65;margin-top:6px">🖐 ضع كفك داخل الإطار — افتح يدك بشكل طبيعي</div>
-    </div>
-
-    <!-- معاينة الصورة -->
-    <div id="palm-preview" style="display:none;margin-bottom:12px;text-align:center">
-      <img id="palm-img-preview" style="max-width:100%;max-height:280px;border-radius:12px;border:2px solid rgba(255,87,34,.4)">
-    </div>
+    <div id="dvm-area-palm" style="display:none;margin-bottom:12px"></div>
 
     <!-- نوع التحليل -->
     <div style="margin-bottom:12px">
@@ -3668,10 +3640,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- أزرار التحكم -->
     <div style="margin-bottom:10px">
-      <button onclick="openDirectVisionCamera('barcode-boycott')" id="bb-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(229,57,53,.1));color:#f44336;border:1.5px solid rgba(244,67,54,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px">
+      <button onclick="openDirectVisionCamera('barcode-boycott')" class="btn" id="dvm-btn-barcode-boycott" style="width:100%;background:rgba(244,67,54,.15);color:#f44336;border:1.5px solid rgba(244,67,54,.4);padding:10px;font-size:.82rem">
         📷 فتح الكاميرا
       </button>
     </div>
+    <div id="dvm-area-barcode-boycott" style="display:none;margin-bottom:10px"></div>
 
     <!-- حالة المسح -->
     <div id="bb-scan-status" style="text-align:center;padding:5px 0;font-size:.75rem;color:var(--txt3);min-height:20px;margin-bottom:8px"></div>
@@ -11439,7 +11412,7 @@ function fakeImageLoad(event) {
     var preview = document.getElementById('fi-preview');
     var img = document.getElementById('fi-img-preview');
     if (preview && img) { img.src = _fiImageData; preview.style.display = 'block'; }
-    /* upload label removed — DirectVisionManager handles camera only */
+    document.getElementById('fi-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="fakeImageLoad(event)" style="display:none">';
   };
   reader.readAsDataURL(file);
 }
@@ -11541,7 +11514,7 @@ function hwLoadImage(event) {
     _hwImageData = e.target.result;
     var preview = document.getElementById('hw-preview'); var img = document.getElementById('hw-img-preview');
     if (preview && img) { img.src = _hwImageData; preview.style.display = 'block'; }
-    /* upload label removed — DirectVisionManager handles camera only */
+    document.getElementById('hw-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="hwLoadImage(event)" style="display:none">';
   };
   reader.readAsDataURL(file);
 }
@@ -13188,7 +13161,7 @@ function palmLoadImage(event) {
     var preview = document.getElementById('palm-preview');
     var img = document.getElementById('palm-img-preview');
     if (preview && img) { img.src = _palmImageData; preview.style.display = 'block'; }
-    /* upload label removed — DirectVisionManager handles camera only */
+    document.getElementById('palm-upload-label').innerHTML = '<i class="fas fa-check-circle" style="font-size:1.4rem;color:#2ec951"></i><span style="margin-top:4px">تم الرفع ✓</span><input type="file" accept="image/*" onchange="palmLoadImage(event)" style="display:none">';
   };
   reader.readAsDataURL(file);
 }
@@ -13523,8 +13496,8 @@ user: window.currentUser
 
   <!-- أزرار التحكم -->
   <div style="padding:0 16px 12px;display:flex;gap:10px">
-    <button id="vitals-start-btn" onclick="openDirectVisionCamera('vitals')" style="flex:1;background:linear-gradient(135deg,#ec407a,#d81b60);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-      📷 فتح الكاميرا
+    <button id="vitals-start-btn" onclick="vitalsStart()" style="flex:1;background:linear-gradient(135deg,#ec407a,#d81b60);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <i class="fas fa-play"></i> ابدأ الفحص
     </button>
     <button id="vitals-stop-btn" onclick="vitalsStop()" style="display:none;background:rgba(244,67,54,.15);border:1px solid rgba(244,67,54,.4);color:#ef5350;border-radius:14px;padding:13px 18px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer">
       <i class="fas fa-stop"></i> إيقاف
@@ -14548,6 +14521,7 @@ window._autoCamLaunch = _autoCamLaunch;
 var _origSetScanMode = window.setScanMode;
 window.setScanMode = function(mode){
   clearInterval(_scanAutoIv); _scanAutoIv=null; _scanAutoAnalyzing=false;
+  window._currentScanMode = mode; // للاستخدام في DirectVisionManager
   if(typeof _origSetScanMode==='function') _origSetScanMode(mode);
   // لا تفتح الكاميرا تلقائياً — الكاميرا تُفتح فقط بالزر الذي يظهره setScanMode
   // لكن إذا كانت الكاميرا مفتوحة بالفعل، ابدأ التحليل التلقائي
@@ -14586,550 +14560,6 @@ window._autoCamera={
 };
 
 console.log('[AutoCamera] ✅ v1.0 — كاميرا خلفية تلقائية لـ 9 أدوات');
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     DirectVisionManager — مدير الكاميرا الموحد + Puter Vision
-     بطاقات: food-scan, scanner, fake-image, homework, palm, barcode-boycott, vitals
-═══════════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-'use strict';
-
-/* ── إعدادات البطاقات ── */
-var CARD_CFG = {
-  'food-scan': {
-    videoId: 'fs-video', fallbackId: 'fs-fallback', resultId: 'fs-result',
-    camBtnId: 'fs-cam-btn', statusId: 'fs-live-status', statusTxtId: 'fs-live-status-text',
-    viewportId: 'fs-camera-viewport', toolKey: 'food-scan',
-    prompt: 'أنت خبير تغذية. انظر للصورة وتعرف على الطعام. اكتب:\n- اسم الطعام بالعربية\n- السعرات الحرارية التقريبية\n- البروتين والكارب والدهون بالجرام\n- نصيحة صحية قصيرة\nكن مختصراً ومباشراً. اللغة: عربية فقط.'
-  },
-  'scanner': {
-    videoId: 'pa-video-stream', fallbackId: 'pa-camera-fallback-msg', resultId: 'pa-scan-result',
-    camBtnId: 'pa-cam-btn', statusId: null, statusTxtId: null,
-    viewportId: 'pa-camera-viewport', toolKey: 'scanner',
-    prompt: null /* يتم تحديد البرومبت حسب الوضع الحالي */
-  },
-  'fake-image': {
-    videoId: 'fi-video', fallbackId: null, resultId: 'fi-result',
-    camBtnId: 'fi-cam-btn', statusId: 'fi-live-status', statusTxtId: null,
-    viewportId: null, toolKey: 'fake-image', areaId: 'fi-camera-area',
-    prompt: 'أنت محلل صور رقمي محترف متخصص في كشف التزوير والتعديل وتمييز صور الذكاء الاصطناعي.\n\nافحص هذه الصورة تحليلاً تقنياً دقيقاً وقدّم تقريراً مفصلاً:\n\n🔎 الحكم الرئيسي: هل الصورة حقيقية / مولودة بـ AI / معدّلة / فلاتر مكثفة؟\n📊 نسبة الثقة بنسبة مئوية.\n🔬 المؤشرات التقنية.\n📋 التقرير النهائي.\nاكتب بالعربية بأسلوب مهني.'
-  },
-  'homework': {
-    videoId: 'hw-video', fallbackId: null, resultId: 'hw-result',
-    camBtnId: 'hw-cam-btn', statusId: 'hw-live-status', statusTxtId: null,
-    viewportId: null, toolKey: 'homework', areaId: 'hw-camera-area',
-    prompt: 'أنت معلم ومدرس خبير في جميع المناهج الدراسية العربية.\nانظر للصورة واقرأ السؤال وقدّم:\n1. السؤال كما هو\n2. الإجابة النموذجية خطوة بخطوة\n3. الشرح المبسط\n4. القوانين أو المعلومات المهمة\nاللغة: عربية. إذا لم تجد سؤالاً اكتب: "وجّه الكاميرا نحو السؤال".'
-  },
-  'palm': {
-    videoId: 'palm-video', fallbackId: null, resultId: 'palm-result',
-    camBtnId: 'palm-cam-btn', statusId: 'palm-live-status', statusTxtId: null,
-    viewportId: null, toolKey: 'palm', areaId: 'palm-camera-area',
-    prompt: null /* يتم تحديد البرومبت حسب وضع الكف */
-  },
-  'barcode-boycott': {
-    videoId: 'bb-video', fallbackId: 'bb-fallback', resultId: 'bb-result',
-    camBtnId: 'bb-cam-btn', statusId: null, statusTxtId: null,
-    viewportId: 'bb-camera-viewport', toolKey: 'barcode-boycott',
-    prompt: 'أنت خبير في تحليل المنتجات والكشف عن المنتجات المقاطعة.\nانظر للصورة وتعرف على المنتج:\n1. اسم المنتج والعلامة التجارية\n2. هل هو من المنتجات المقاطعة؟ ولماذا؟\n3. البدائل المحلية المتاحة\n4. بلد المنشأ\nاللغة: عربية.'
-  },
-  'vitals': {
-    videoId: 'vitals-video', fallbackId: 'vitals-cam-placeholder', resultId: 'vitals-ai-text',
-    camBtnId: 'vitals-start-btn', statusId: null, statusTxtId: null,
-    viewportId: null, toolKey: 'vitals',
-    prompt: null /* vitals يستخدم rPPG وليس Vision مباشرة */
-  }
-};
-
-/* ── المدير الموحد ── */
-var _activeStream = null;
-var _activeCard = null;
-var _activeInterval = null;
-var _analyzing = false;
-var _vitalsIv = null;
-
-function _getPrompt(cardType) {
-  if (cardType === 'scanner') {
-    var mode = window._currentScanMode || 'product';
-    var prompts = {
-      product: 'احلل مكونات العلبة والمنتج بالتفصيل. أعطني: الاسم والمكونات والسعرات والقيم الغذائية والتحذيرات الصحية.',
-      food: 'انظر للصورة وتعرف على الطعام. اكتب اسم الطعام وسعراته الحرارية والبروتين والكارب والدهون والفوائد والنصائح.',
-      medicine: 'اقرأ معلومات الدواء بالتفصيل. أعطني: الاسم والمادة الفعالة والجرعة والاستخدامات والآثار الجانبية والتحذيرات.',
-      report: 'اقرأ التقرير الطبي بالتفصيل. اشرح كل قيمة وهل هي ضمن الطبيعي. اختم بـ: "هذا شرح توعوي فقط، استشر طبيبك."',
-      prescription: 'اقرأ الروشتة الطبية. لكل دواء: الاسم والجرعة وطريقة الأخذ والتحذيرات. اللغة: عربية.'
-    };
-    return prompts[mode] || prompts.product;
-  }
-  if (cardType === 'palm') {
-    var palmMode = window._palmMode || 'full';
-    var modePrompts = {
-      full: 'قدّم قراءة شاملة تشمل: الشخصية، العواطف، المسار المهني، الصحة، والتوقعات العامة.',
-      love: 'ركّز على الجانب العاطفي والعلاقات: خط القلب، الميل للحب، طبيعة العلاقات، الزواج.',
-      career: 'ركّز على المسار المهني والنجاح: خط القدر، الطموح، القدرات، الفرص المهنية.',
-      health: 'ركّز على جانب الصحة والطاقة: خط الحياة، الحيوية، نقاط القوة والضعف الجسدية.'
-    };
-    return 'أنت قارئ كف خبير. انظر لصورة الكف وحلّل ما تراه.\n\n' + (modePrompts[palmMode] || modePrompts.full) + '\n\nاتبع الهيكل:\n🖐 شكل الكف والأصابع:\n📏 الخطوط الرئيسية:\n✨ ملاحظات خاصة:\n🔮 القراءة الشاملة:\n\nاكتب بالعربية. ⚠️ هذه القراءة للترفيه فقط.';
-  }
-  var cfg = CARD_CFG[cardType];
-  return cfg ? cfg.prompt : 'صف ما تراه في الصورة بدقة.';
-}
-
-function _showStatus(cardType, msg) {
-  var cfg = CARD_CFG[cardType];
-  if (!cfg) return;
-  if (cfg.statusTxtId) {
-    var el = document.getElementById(cfg.statusTxtId);
-    if (el) el.textContent = msg;
-  }
-  if (cfg.statusId) {
-    var sEl = document.getElementById(cfg.statusId);
-    if (sEl) {
-      sEl.style.display = 'block';
-      var span = sEl.querySelector('span');
-      if (span && !cfg.statusTxtId) span.textContent = msg;
-    }
-  }
-}
-
-function _showThinking(cardType) {
-  var cfg = CARD_CFG[cardType];
-  if (!cfg || !cfg.resultId) return;
-  var rb = document.getElementById(cfg.resultId);
-  if (rb) {
-    rb.style.display = 'block';
-    rb.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🔍 جاري التحليل...</span></div>';
-  }
-}
-
-function _captureFrame(videoEl) {
-  if (!videoEl || !videoEl.videoWidth) return null;
-  var c = document.createElement('canvas');
-  c.width = videoEl.videoWidth;
-  c.height = videoEl.videoHeight;
-  c.getContext('2d').drawImage(videoEl, 0, 0);
-  return c.toDataURL('image/jpeg', 0.88);
-}
-
-function _visionAnalyze(imgData, prompt, onResult, onError) {
-  var p;
-  if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
-    p = window.TayyibatAI.vision(imgData, prompt);
-  } else if (typeof window._smartVisionAnalysis === 'function') {
-    p = window._smartVisionAnalysis(imgData, prompt);
-  } else if (typeof window._callClaudeAPIWithImage === 'function') {
-    p = window._callClaudeAPIWithImage(prompt, imgData).then(function(t) { return { text: t, source: 'api' }; });
-  } else {
-    if (onError) onError('AI not ready');
-    return;
-  }
-  p.then(function(r) {
-    var t = r && (r.text || r);
-    if (t && String(t).trim().length > 5) {
-      if (onResult) onResult(String(t).trim());
-    } else {
-      if (onError) onError('empty');
-    }
-  }).catch(function(e) { if (onError) onError(e); });
-}
-
-/* ══════════════════════════════════════
-   openDirectVisionCamera(cardType)
-═══════════════════════════════════════ */
-window.openDirectVisionCamera = function(cardType) {
-  var cfg = CARD_CFG[cardType];
-  if (!cfg) return;
-
-  /* منع فتح أكثر من كاميرا */
-  if (_activeStream) {
-    closeVisionCamera();
-  }
-
-  /* فحص الصلاحيات */
-  if (cfg.toolKey && cardType !== 'vitals') {
-    if (typeof canUseTool === 'function' && !canUseTool(cfg.toolKey)) {
-      if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal(cfg.toolKey);
-      return;
-    }
-  }
-
-  _activeCard = cardType;
-  _analyzing = false;
-
-  var videoEl = document.getElementById(cfg.videoId);
-  if (!videoEl) return;
-
-  /* إخفاء الفالباك */
-  if (cfg.fallbackId) {
-    var fb = document.getElementById(cfg.fallbackId);
-    if (fb) fb.style.display = 'none';
-  }
-
-  /* إظهار منطقة الكاميرا */
-  if (cfg.areaId) {
-    var ar = document.getElementById(cfg.areaId);
-    if (ar) ar.style.display = 'block';
-  }
-
-  /* تحديث زر الكاميرا */
-  var camBtn = document.getElementById(cfg.camBtnId);
-  if (camBtn) {
-    camBtn.textContent = '⏳ جاري تشغيل الكاميرا...';
-    camBtn.disabled = true;
-  }
-
-  _showStatus(cardType, '📷 جاري تشغيل الكاميرا...');
-
-  /* حالة الكاميرا الخلفية للمؤشرات الحيوية */
-  var constraints;
-  if (cardType === 'vitals') {
-    var vMode = (typeof _vitalsMode !== 'undefined') ? _vitalsMode : 'finger';
-    constraints = {
-      video: vMode === 'finger'
-        ? { facingMode: 'environment', width: 320, height: 240 }
-        : { facingMode: 'user', width: 320, height: 240 },
-      audio: false
-    };
-  } else {
-    constraints = {
-      video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
-      audio: false
-    };
-  }
-
-  navigator.mediaDevices.getUserMedia(constraints)
-    .catch(function() {
-      /* fallback بدون exact */
-      return navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
-        audio: false
-      });
-    })
-    .then(function(stream) {
-      _activeStream = stream;
-      videoEl.srcObject = stream;
-      videoEl.style.display = 'block';
-
-      /* تفعيل الفلاش لوضع الإصبع */
-      if (cardType === 'vitals') {
-        var track = stream.getVideoTracks()[0];
-        var vMode2 = (typeof _vitalsMode !== 'undefined') ? _vitalsMode : 'finger';
-        if (vMode2 === 'finger' && track && track.applyConstraints) {
-          track.applyConstraints({ advanced: [{ torch: true }] }).catch(function(){});
-        }
-      }
-
-      if (camBtn) {
-        camBtn.textContent = '📷 فتح الكاميرا';
-        camBtn.disabled = false;
-      }
-
-      _showStatus(cardType, '✅ الكاميرا جاهزة — جاري التحليل...');
-
-      /* ═══ حالة خاصة: المؤشرات الحيوية ═══ */
-      if (cardType === 'vitals') {
-        if (typeof window.vitalsStart === 'function') {
-          /* تعيين التيار ل vitalsStart */
-          if (typeof _vitalsStream !== 'undefined') _vitalsStream = stream;
-          window.vitalsStart(true);
-        }
-        return;
-      }
-
-      /* ═══ تحليل تلقائي ═══ */
-      _showThinking(cardType);
-      if (cfg.toolKey && cardType !== 'vitals') {
-        if (typeof incToolUsage === 'function') incToolUsage(cfg.toolKey);
-      }
-
-      clearInterval(_activeInterval);
-      var scanDelay = (cardType === 'palm') ? 2500 : 1500;
-      var scanInterval = (cardType === 'food-scan') ? 4000 : 4500;
-
-      setTimeout(function() { _doAutoScan(cardType); }, scanDelay);
-      _activeInterval = setInterval(function() { _doAutoScan(cardType); }, scanInterval);
-
-    })
-    .catch(function(err) {
-      console.error('Camera error:', err);
-      _showStatus(cardType, '❌ لم يتم منح صلاحية الكاميرا');
-      if (camBtn) {
-        camBtn.textContent = '📷 فتح الكاميرا';
-        camBtn.disabled = false;
-      }
-      showToast('❌ لم يتم منح صلاحية الكاميرا');
-    });
-};
-
-/* ── التحليل التلقائي ── */
-function _doAutoScan(cardType) {
-  if (_analyzing || !_activeStream || _activeCard !== cardType) return;
-  _analyzing = true;
-
-  var cfg = CARD_CFG[cardType];
-  var videoEl = document.getElementById(cfg.videoId);
-  if (!videoEl) { _analyzing = false; return; }
-
-  _showStatus(cardType, '🔍 جاري التحليل...');
-
-  var img = _captureFrame(videoEl);
-  if (!img) { _analyzing = false; return; }
-
-  var prompt = _getPrompt(cardType);
-  _visionAnalyze(img, prompt, function(result) {
-    _analyzing = false;
-    clearInterval(_activeInterval);
-    _activeInterval = null;
-
-    _showStatus(cardType, '✅ تم التحليل');
-
-    /* عرض النتيجة في صندوق النتائج الحالي */
-    _renderResult(cardType, result);
-
-    /* إغلاق الكاميرا بعد ظهور النتيجة */
-    closeVisionCamera();
-
-    /* إظهار زر إعادة التحليل */
-    _showRestartBtn(cardType);
-
-  }, function() {
-    _analyzing = false;
-    _showStatus(cardType, '⏳ وجّه الكاميرا نحو الهدف...');
-  });
-}
-
-/* ── عرض النتيجة ── */
-function _renderResult(cardType, result) {
-  var cfg = CARD_CFG[cardType];
-  if (!cfg || !cfg.resultId) return;
-  var rb = document.getElementById(cfg.resultId);
-  if (!rb) return;
-
-  rb.style.display = 'block';
-
-  if (cardType === 'food-scan') {
-    /* محاولة عرض كـ JSON أولاً */
-    try {
-      var clean = result.replace(/```json|```/g, '').trim();
-      var data = JSON.parse(clean);
-      if (typeof renderFoodAnalysisResult === 'function') {
-        renderFoodAnalysisResult(data, rb);
-        return;
-      }
-    } catch(e) {}
-    /* عرض كنص عادي */
-    if (typeof fsParseAndDisplay === 'function') {
-      fsParseAndDisplay(result);
-    } else {
-      rb.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g, '<br>') + '</div>';
-    }
-  } else if (cardType === 'fake-image') {
-    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,152,0,.35);border-radius:20px;overflow:hidden">'
-      + '<div style="background:linear-gradient(135deg,rgba(255,152,0,.25),rgba(255,193,7,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">'
-      + '<span style="font-size:1.6rem">🔍</span>'
-      + '<div><div style="font-size:.92rem;font-weight:900;color:#ffc107">تقرير تحليل الصورة</div>'
-      + '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">كشف التزوير والذكاء الاصطناعي</div></div></div>'
-      + '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + result + '</div></div>';
-  } else if (cardType === 'homework') {
-    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">'
-      + '<div style="background:linear-gradient(135deg,rgba(33,150,243,.25),rgba(100,181,246,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">'
-      + '<span style="font-size:1.6rem">🧠</span>'
-      + '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>'
-      + '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">المناهج المصرية</div></div></div>'
-      + '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + result + '</div></div>';
-  } else if (cardType === 'palm') {
-    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:20px;overflow:hidden">'
-      + '<div style="background:linear-gradient(135deg,rgba(255,87,34,.25),rgba(255,138,101,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">'
-      + '<span style="font-size:1.6rem">🖐</span>'
-      + '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف</div></div></div>'
-      + '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line">' + result + '</div></div>';
-  } else if (cardType === 'barcode-boycott') {
-    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(244,67,54,.35);border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">'
-      + '📦 <b style="color:#f44336">تحليل المنتج</b><br><br>' + result + '</div>';
-  } else if (cardType === 'scanner') {
-    var mode = window._currentScanMode || 'product';
-    var colors = { product: '#2ec951', food: '#d4a017', medicine: '#42a5f5', report: '#ce93d8', prescription: '#ffb74d' };
-    var icons = { product: '📦', food: '🍎', medicine: '💊', report: '🔬', prescription: '📋' };
-    var titles = { product: 'تحليل المنتج', food: 'تحليل الطعام', medicine: 'تحليل الدواء', report: 'تحليل التقرير', prescription: 'قراءة الروشتة' };
-    var c = colors[mode] || '#2ec951';
-    rb.innerHTML = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid ' + c + '44;border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">'
-      + (icons[mode] || '🔍') + ' <b style="color:' + c + '">' + (titles[mode] || 'النتيجة') + '</b><br><br>' + result + '</div>';
-  } else {
-    rb.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g, '<br>') + '</div>';
-  }
-}
-
-/* ══════════════════════════════════════
-   closeVisionCamera()
-═══════════════════════════════════════ */
-window.closeVisionCamera = function() {
-  clearInterval(_activeInterval);
-  _activeInterval = null;
-  _analyzing = false;
-
-  if (_activeStream) {
-    /* تعطيل الفلاش أولاً */
-    try {
-      var tracks = _activeStream.getVideoTracks();
-      tracks.forEach(function(t) {
-        if (t.applyConstraints) t.applyConstraints({ advanced: [{ torch: false }] }).catch(function(){});
-        t.stop();
-      });
-    } catch(e) {}
-    _activeStream.getTracks().forEach(function(track) { track.stop(); });
-    _activeStream = null;
-  }
-
-  if (!_activeCard) return;
-  var cfg = CARD_CFG[_activeCard];
-  if (!cfg) { _activeCard = null; return; }
-
-  /* إخفاء الفيديو */
-  var videoEl = document.getElementById(cfg.videoId);
-  if (videoEl) {
-    videoEl.style.display = 'none';
-    videoEl.srcObject = null;
-  }
-
-  /* إظهار الفالباك */
-  if (cfg.fallbackId) {
-    var fb = document.getElementById(cfg.fallbackId);
-    if (fb) fb.style.display = '';
-  }
-
-  /* إخفاء منطقة الكاميرا */
-  if (cfg.areaId) {
-    var ar = document.getElementById(cfg.areaId);
-    if (ar) ar.style.display = 'none';
-  }
-
-  /* إخفاء المؤشرات */
-  if (cfg.statusId) {
-    var sEl = document.getElementById(cfg.statusId);
-    if (sEl) sEl.style.display = 'none';
-  }
-
-  /* استعادة زر الكاميرا */
-  var camBtn = document.getElementById(cfg.camBtnId);
-  if (camBtn) {
-    camBtn.textContent = '📷 فتح الكاميرا';
-    camBtn.disabled = false;
-    camBtn.style.display = '';
-  }
-
-  /* حالة خاصة: المؤشرات الحيوية */
-  if (_activeCard === 'vitals') {
-    var startBtn = document.getElementById('vitals-start-btn');
-    var stopBtn = document.getElementById('vitals-stop-btn');
-    var liveInd = document.getElementById('vitals-live-indicator');
-    var waveWrap = document.getElementById('vitals-wave-wrap');
-    if (startBtn) { startBtn.style.display = 'flex'; startBtn.textContent = '📷 فتح الكاميرا'; }
-    if (stopBtn) stopBtn.style.display = 'none';
-    if (liveInd) liveInd.style.display = 'none';
-    if (waveWrap) waveWrap.style.display = 'none';
-  }
-
-  _activeCard = null;
-};
-
-/* ══════════════════════════════════════
-   captureAndAnalyze(cardType)
-═══════════════════════════════════════ */
-window.captureAndAnalyze = function(cardType) {
-  if (!_activeStream || _activeCard !== cardType) return;
-  var cfg = CARD_CFG[cardType];
-  if (!cfg) return;
-  var videoEl = document.getElementById(cfg.videoId);
-  if (!videoEl) return;
-  var img = _captureFrame(videoEl);
-  if (!img) return;
-
-  _showThinking(cardType);
-  if (cfg.toolKey && typeof incToolUsage === 'function') incToolUsage(cfg.toolKey);
-
-  var prompt = _getPrompt(cardType);
-  _visionAnalyze(img, prompt, function(result) {
-    _renderResult(cardType, result);
-    closeVisionCamera();
-    _showRestartBtn(cardType);
-  }, function() {
-    showToast('❌ تعذر التحليل، حاول مرة أخرى');
-  });
-};
-
-/* ══════════════════════════════════════
-   restartVisionAnalysis(cardType)
-═══════════════════════════════════════ */
-window.restartVisionAnalysis = function(cardType) {
-  /* إزالة زر إعادة التحليل */
-  var oldRestart = document.getElementById('dvm-restart-' + cardType);
-  if (oldRestart) oldRestart.remove();
-
-  /* إعادة فتح الكاميرا */
-  openDirectVisionCamera(cardType);
-};
-
-/* ── إظهار زر إعادة التحليل ── */
-function _showRestartBtn(cardType) {
-  var cfg = CARD_CFG[cardType];
-  if (!cfg || !cfg.resultId) return;
-
-  /* إزالة زر سابق */
-  var oldBtn = document.getElementById('dvm-restart-' + cardType);
-  if (oldBtn) oldBtn.remove();
-
-  var rb = document.getElementById(cfg.resultId);
-  if (!rb) return;
-
-  var wrap = document.createElement('div');
-  wrap.id = 'dvm-restart-' + cardType;
-  wrap.style.cssText = 'margin-top:12px;';
-
-  var btn = document.createElement('button');
-  btn.className = 'btn';
-  btn.style.cssText = 'width:100%;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(79,70,229,.1));color:var(--ai-purple);border:1.5px solid rgba(124,58,237,.5);padding:12px;font-size:.92rem;font-weight:800;border-radius:14px;cursor:pointer;font-family:Tajawal,sans-serif;';
-  btn.textContent = '🔄 إعادة التحليل';
-  btn.onclick = function() {
-    restartVisionAnalysis(cardType);
-  };
-
-  wrap.appendChild(btn);
-  rb.parentNode.insertBefore(wrap, rb.nextSibling);
-}
-
-/* ══════════════════════════════════════
-   window.DirectVisionManager
-═══════════════════════════════════════ */
-window.DirectVisionManager = {
-  open: function(cardType) { openDirectVisionCamera(cardType); },
-  capture: function(cardType) { captureAndAnalyze(cardType); },
-  close: function() { closeVisionCamera(); },
-  restart: function(cardType) { restartVisionAnalysis(cardType); },
-  isOpen: function() { return !!_activeStream; },
-  getActiveCard: function() { return _activeCard; },
-  stopAll: function() { closeVisionCamera(); }
-};
-
-/* ── Hook: إيقاف الكاميرا عند الرجوع ── */
-var _origGoPage2 = window.goPage;
-window.goPage = function(n) {
-  if (_activeStream) closeVisionCamera();
-  if (typeof _origGoPage2 === 'function') _origGoPage2(n);
-};
-
-/* ── Hook: وضع الماسح ── */
-var _origSetScanMode2 = window.setScanMode;
-window.setScanMode = function(mode) {
-  window._currentScanMode = mode;
-  if (typeof _origSetScanMode2 === 'function') _origSetScanMode2(mode);
-};
-
-/* ── حفظ الوضع الحالي للماسح ── */
-if (!window._currentScanMode) window._currentScanMode = 'product';
-
-console.log('[DirectVisionManager] ✅ v1.0 — مدير الكاميرا الموحد + Puter Vision');
-
 })();
 </script>
 
@@ -15914,6 +15344,390 @@ function fetchNetDate(cb) {
         });
 }
 
+</script>
+
+<!-- ════════════════════════════════════════════════════════════
+     🎥 DirectVisionManager — مدير الكاميرا الموحد مع Puter Vision
+════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ──────────────────────────────────────────
+     إعدادات التحليل لكل بطاقة
+  ────────────────────────────────────────── */
+  var CARD_CONFIG = {
+    'food-scan': {
+      color: '#2ec951',
+      borderColor: 'rgba(46,201,81,.5)',
+      resultId: 'fs-result',
+      trialKey: 'food-scan',
+      prompt: 'انظر للصورة وتعرف على كل طعام موجود فيها. حلل القيم الغذائية لكل مكون ولمجموع الوجبة.\n\nأجب بـ JSON فقط:\n{"name_ar":"اسم الوجبة الكاملة بالعربي","serving":"الكمية التقديرية الكلية بالجرام","calories":0,"protein":0.0,"carbs":0.0,"fat":0.0,"fiber":0.0,"notes":"نصيحة غذائية مختصرة","items":[{"name":"اسم المكون","cal_per_100g":0,"protein_per_100g":0.0,"carbs_per_100g":0.0,"fat_per_100g":0.0,"estimated_grams":0}]}',
+      onResult: function(text) {
+        var resBox = document.getElementById('fs-result');
+        if (!resBox) return;
+        try {
+          var clean = text.replace(/```json|```/g,'').trim();
+          var data = JSON.parse(clean);
+          if (typeof renderFoodAnalysisResult === 'function') renderFoodAnalysisResult(data, resBox);
+          else resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + text + '</div>';
+        } catch(e) {
+          resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + text + '</div>';
+        }
+      }
+    },
+    'fake-image': {
+      color: '#ffc107',
+      borderColor: 'rgba(255,193,7,.5)',
+      resultId: 'fi-result',
+      trialKey: 'fake-image',
+      prompt: 'حلل هذه الصورة بعناية وحدد: هل هي صورة حقيقية، مولودة بالذكاء الاصطناعي، أم معدّلة؟ ابحث عن: تشوهات في الوجوه والأصابع، حواف غير طبيعية، إضاءة غير منطقية، نصوص مشوهة، خلفية مبهمة بشكل مفرط، تناسق غير طبيعي. قدم: 1) الحكم النهائي (حقيقية/AI/معدّلة) 2) مستوى الثقة (%) 3) المؤشرات التي لاحظتها. أجب بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('fi-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(255,152,0,.08),rgba(255,193,7,.04));border:1.5px solid rgba(255,152,0,.3);border-radius:16px;line-height:1.8;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'homework': {
+      color: '#64b5f6',
+      borderColor: 'rgba(33,150,243,.5)',
+      resultId: 'hw-result',
+      trialKey: 'homework',
+      prompt: 'انظر للصورة بعناية. إذا كانت تحتوي على سؤال أو واجب دراسي أو مسألة رياضية أو علمية، حلّها بالتفصيل خطوة بخطوة مع شرح كل خطوة. إذا كانت معادلة أو رياضيات، أظهر الحل الكامل. أجب بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('hw-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(33,150,243,.08),rgba(100,181,246,.04));border:1.5px solid rgba(33,150,243,.3);border-radius:16px;line-height:1.9;font-size:.88rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'palm': {
+      color: '#ff8a65',
+      borderColor: 'rgba(255,87,34,.5)',
+      resultId: 'palm-result',
+      trialKey: 'palm',
+      prompt: 'أنت قارئ كف متخصص ومحترف. انظر لصورة الكف بعناية وحلل: 1) خط القلب (العلاقات والعواطف) 2) خط الرأس (التفكير والذكاء) 3) خط الحياة (الصحة والحيوية والمسيرة) 4) خط المصير إن وجد 5) شكل الأصابع والراحة. قدم قراءة شخصية دقيقة ومفصلة بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('palm-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(255,87,34,.08),rgba(255,138,101,.04));border:1.5px solid rgba(255,87,34,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'barcode-boycott': {
+      color: '#f44336',
+      borderColor: 'rgba(244,67,54,.5)',
+      resultId: 'bb-result',
+      trialKey: 'barcode-boycott',
+      prompt: 'انظر للصورة. إذا وجدت باركود، اقرأه وحدد المنتج. إذا وجدت اسم منتج واضح، حدده. ثم حلل: هل هذا المنتج تابع لشركات داعمة للاحتلال الإسرائيلي؟ ابحث عن: كوكا كولا، بيبسي، ماكدونالدز، ستاربكس، نستله، بروكتر اند جامبل، جونسون، والت ديزني وغيرها. قدم: 1) اسم المنتج 2) الشركة 3) حكم المقاطعة 4) البدائل المحلية أو الحلال. أجب بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('bb-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(244,67,54,.08),rgba(229,57,53,.04));border:1.5px solid rgba(244,67,54,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'scan-medicine': {
+      color: '#2196f3',
+      borderColor: 'rgba(33,150,243,.5)',
+      resultId: 'pa-scan-result',
+      trialKey: 'scan-medicine',
+      prompt: 'هذه صورة علبة دواء. اقرأ بدقة: 1) اسم الدواء التجاري 2) المادة الفعالة والتركيز 3) الشركة المصنعة 4) دواعي الاستعمال 5) الجرعة وطريقة الأخذ 6) موانع الاستعمال 7) الآثار الجانبية المهمة. أجب بالعربية بشكل منظم.',
+      onResult: function(text) {
+        var resBox = document.getElementById('pa-scan-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(33,150,243,.08),rgba(0,188,212,.04));border:1.5px solid rgba(33,150,243,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'scan-prescription': {
+      color: '#ff8a50',
+      borderColor: 'rgba(255,111,0,.5)',
+      resultId: 'pa-scan-result',
+      trialKey: 'scan-prescription',
+      prompt: 'هذه صورة روشتة طبية. اقرأ بدقة جميع الأدوية والجرعات والتعليمات. لكل دواء قدم: الاسم، الجرعة، طريقة الأخذ، مدة العلاج. أجب بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('pa-scan-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(255,111,0,.08),rgba(255,138,101,.04));border:1.5px solid rgba(255,111,0,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'scan-report': {
+      color: '#ce93d8',
+      borderColor: 'rgba(156,39,176,.5)',
+      resultId: 'pa-scan-result',
+      trialKey: 'scan-report',
+      prompt: 'هذه صورة تقرير طبي أو تحاليل. اقرأ جميع القيم والأرقام بدقة ثم: 1) اشرح كل قيمة 2) هل هي ضمن المعدل الطبيعي؟ 3) ما يجب الانتباه إليه؟ أجب بالعربية. اختم بـ: "هذا شرح توعوي فقط، استشر طبيبك."',
+      onResult: function(text) {
+        var resBox = document.getElementById('pa-scan-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(156,39,176,.08),rgba(103,58,183,.04));border:1.5px solid rgba(156,39,176,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'food-recognition': {
+      color: '#ffb74d',
+      borderColor: 'rgba(255,152,0,.5)',
+      resultId: 'pa-scan-result',
+      trialKey: 'food-recognition',
+      prompt: 'تعرف على جميع الأطعمة في هذه الصورة. لكل طعام: 1) الاسم 2) الأصل 3) القيم الغذائية التقريبية 4) هل يناسب الحمية الصحية؟ أجب بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('pa-scan-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(255,152,0,.08),rgba(255,193,7,.04));border:1.5px solid rgba(255,152,0,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    },
+    'food-box': {
+      color: '#2ec951',
+      borderColor: 'rgba(46,201,81,.5)',
+      resultId: 'pa-scan-result',
+      trialKey: 'scanner',
+      prompt: 'هذه صورة علبة منتج غذائي. اقرأ قائمة المكونات بعناية ثم: 1) أدرج جميع المكونات 2) حدد المواد الحافظة والإضافات (E codes) 3) هل توجد مواد خطرة أو مسرطنة محتملة؟ 4) القيم الغذائية إن وجدت. أجب بالعربية.',
+      onResult: function(text) {
+        var resBox = document.getElementById('pa-scan-result');
+        if (!resBox) return;
+        resBox.innerHTML = '<div style="padding:14px;background:linear-gradient(145deg,rgba(46,201,81,.08),rgba(0,201,167,.04));border:1.5px solid rgba(46,201,81,.3);border-radius:16px;line-height:1.9;font-size:.85rem;color:var(--txt);white-space:pre-line">' + text + '</div>';
+      }
+    }
+  };
+
+  /* ──────────────────────────────────────────
+     حالة المدير
+  ────────────────────────────────────────── */
+  var _activeStream = null;
+  var _activeCardType = null;
+  var _activeVideoEl = null;
+  var _analyzing = false;
+
+  /* ──────────────────────────────────────────
+     إغلاق الكاميرا - دالة مشتركة
+  ────────────────────────────────────────── */
+  function closeVisionCamera() {
+    _analyzing = false;
+    if (_activeStream) {
+      try { _activeStream.getTracks().forEach(function(t){ t.stop(); }); } catch(e){}
+      _activeStream = null;
+    }
+    if (_activeVideoEl) {
+      try { _activeVideoEl.srcObject = null; } catch(e){}
+      _activeVideoEl = null;
+    }
+    _activeCardType = null;
+  }
+  window.closeVisionCamera = closeVisionCamera;
+
+  /* ──────────────────────────────────────────
+     التقاط صورة من الفيديو → dataURL
+  ────────────────────────────────────────── */
+  function _captureFrame(videoEl) {
+    try {
+      var canvas = document.createElement('canvas');
+      canvas.width  = videoEl.videoWidth  || 640;
+      canvas.height = videoEl.videoHeight || 480;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL('image/jpeg', 0.92);
+    } catch(e) { return null; }
+  }
+
+  /* ──────────────────────────────────────────
+     استدعاء Puter Vision
+  ────────────────────────────────────────── */
+  async function _puterVision(dataUrl, prompt) {
+    // أولاً: Puter Vision إذا متاح
+    try {
+      if (window.puter && puter.ai && typeof puter.ai.vision === 'function') {
+        var resp = await puter.ai.vision({ image: dataUrl, prompt: prompt });
+        if (resp && resp.text) return resp.text;
+      }
+    } catch(e) {}
+    // ثانياً: Anthropic API Vision عبر TayyibatAI
+    try {
+      if (window.TayyibatAI && typeof TayyibatAI.vision === 'function') {
+        var r = await TayyibatAI.vision(dataUrl, prompt);
+        if (r && r.text) return r.text;
+      }
+    } catch(e) {}
+    // ثالثاً: _smartVisionAnalysis
+    try {
+      if (typeof window._smartVisionAnalysis === 'function') {
+        var r2 = await window._smartVisionAnalysis(dataUrl, prompt);
+        if (r2 && r2.text) return r2.text;
+      }
+    } catch(e) {}
+    // رابعاً: _callClaudeAPIWithImage
+    try {
+      if (typeof window._callClaudeAPIWithImage === 'function') {
+        var t = await window._callClaudeAPIWithImage(prompt, dataUrl);
+        if (t) return t;
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  /* ──────────────────────────────────────────
+     التقاط وتحليل
+  ────────────────────────────────────────── */
+  async function captureAndAnalyze(cardType) {
+    if (_analyzing) return;
+    var cfg = CARD_CONFIG[cardType];
+    if (!cfg || !_activeVideoEl || !_activeStream) return;
+
+    _analyzing = true;
+
+    var areaEl = document.getElementById('dvm-area-' + cardType);
+    var btnEl  = document.getElementById('dvm-btn-' + cardType);
+
+    // عرض حالة التحليل
+    if (areaEl) {
+      areaEl.style.display = 'block';
+      areaEl.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center;border:1.5px solid ' + cfg.borderColor + ';border-radius:14px;background:rgba(0,0,0,.3)"><div class="ai-dots"><span></span><span></span><span></span></div><span style="font-size:.82rem;margin-right:8px">جاري التحليل بالذكاء الاصطناعي...</span></div>';
+    }
+
+    // التقاط الإطار
+    var dataUrl = _captureFrame(_activeVideoEl);
+
+    if (!dataUrl) {
+      if (areaEl) areaEl.innerHTML = '<div style="padding:12px;color:#ef5350;font-size:.82rem">تعذر التقاط الصورة. حاول مرة أخرى.</div>';
+      _analyzing = false;
+      return;
+    }
+
+    // إيقاف الكاميرا فوراً بعد الالتقاط
+    closeVisionCamera();
+
+    // تحليل عبر Puter Vision
+    var result = null;
+    try {
+      result = await _puterVision(dataUrl, cfg.prompt);
+    } catch(e) {}
+
+    _analyzing = false;
+
+    // إخفاء منطقة الكاميرا
+    if (areaEl) areaEl.style.display = 'none';
+
+    if (result) {
+      // عرض النتيجة
+      try { cfg.onResult(result); } catch(e) {}
+      if (typeof incToolUsage === 'function') try { incToolUsage(cfg.trialKey); } catch(e2) {}
+    } else {
+      var resBox = document.getElementById(cfg.resultId);
+      if (resBox) resBox.innerHTML = '<div style="padding:12px;color:#ff9800;font-size:.85rem">تعذر التحليل. تأكد من الإضاءة وأعد المحاولة.</div>';
+    }
+
+    // إظهار زر إعادة التحليل
+    if (btnEl) {
+      btnEl.innerHTML = '🔄 إعادة التحليل';
+      btnEl.onclick = function() { restartVisionAnalysis(cardType); };
+    }
+  }
+  window.captureAndAnalyze = captureAndAnalyze;
+
+  /* ──────────────────────────────────────────
+     فتح الكاميرا المباشرة
+  ────────────────────────────────────────── */
+  function openDirectVisionCamera(cardType) {
+    var cfg = CARD_CONFIG[cardType];
+    if (!cfg) return;
+
+    // فحص الاشتراك
+    if (typeof canUseTool === 'function' && !canUseTool(cfg.trialKey)) {
+      if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal(cfg.trialKey);
+      return;
+    }
+
+    // منع تعدد الكاميرات
+    if (_activeStream) closeVisionCamera();
+
+    var areaEl = document.getElementById('dvm-area-' + cardType);
+    var btnEl  = document.getElementById('dvm-btn-' + cardType);
+
+    // إنشاء منطقة الكاميرا
+    if (areaEl) {
+      areaEl.style.display = 'block';
+      areaEl.innerHTML =
+        '<div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid ' + cfg.borderColor + ';background:#000">' +
+          '<video id="dvm-video-' + cardType + '" autoplay playsinline muted style="width:100%;max-height:280px;object-fit:cover;display:block"></video>' +
+          '<div style="position:absolute;inset:0;pointer-events:none;border:2px dashed rgba(255,255,255,.2);border-radius:12px;margin:12px"></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:8px">' +
+          '<button onclick="captureAndAnalyze(\'' + cardType + '\')" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(46,201,81,.3),rgba(0,201,167,.2));color:#2ec951;border:1.5px solid rgba(46,201,81,.5);padding:12px;font-size:.88rem;font-weight:800"><i class="fas fa-camera" style="margin-left:6px"></i> التقاط وتحليل</button>' +
+          '<button onclick="closeVisionCamera();this.closest(\'[id^=dvm-area]\').style.display=\'none\';" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem"><i class="fas fa-stop"></i></button>' +
+        '</div>';
+    }
+
+    // تشغيل الكاميرا الخلفية
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      if (areaEl) areaEl.innerHTML = '<div style="padding:14px;color:#ef5350;font-size:.82rem">الكاميرا غير متاحة على هذا الجهاز.</div>';
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }
+    }).then(function(stream) {
+      _activeStream  = stream;
+      _activeCardType = cardType;
+      var videoEl = document.getElementById('dvm-video-' + cardType);
+      if (videoEl) {
+        videoEl.srcObject = stream;
+        _activeVideoEl = videoEl;
+      } else {
+        closeVisionCamera();
+      }
+      if (btnEl) {
+        btnEl.innerHTML = '<i class="fas fa-stop-circle" style="margin-left:6px"></i> إيقاف الكاميرا';
+        btnEl.onclick = function() {
+          closeVisionCamera();
+          if (areaEl) areaEl.style.display = 'none';
+          btnEl.innerHTML = '📷 فتح الكاميرا';
+          btnEl.onclick = function() { openDirectVisionCamera(cardType); };
+        };
+      }
+    }).catch(function(err) {
+      console.warn('[DVM] Camera error:', err);
+      if (areaEl) areaEl.innerHTML = '<div style="padding:14px;color:#ef5350;font-size:.82rem">تعذر فتح الكاميرا. تأكد من منح الصلاحية وأعد المحاولة.</div>';
+    });
+  }
+  window.openDirectVisionCamera = openDirectVisionCamera;
+
+  /* ──────────────────────────────────────────
+     إعادة التحليل
+  ────────────────────────────────────────── */
+  function restartVisionAnalysis(cardType) {
+    var btnEl = document.getElementById('dvm-btn-' + cardType);
+    if (btnEl) {
+      btnEl.innerHTML = '📷 فتح الكاميرا';
+      btnEl.onclick = function() { openDirectVisionCamera(cardType); };
+    }
+    openDirectVisionCamera(cardType);
+  }
+  window.restartVisionAnalysis = restartVisionAnalysis;
+
+  /* ──────────────────────────────────────────
+     دالة PA الموحدة (مكونات العلبة / دواء / تقرير / روشتة / طعام)
+  ────────────────────────────────────────── */
+  window._paUnifiedCameraOpen = function() {
+    // تحديد الوضع الحالي من PA page
+    var mode = window._currentScanMode || 'food-box';
+    var cardType;
+    if (mode === 'medicine') cardType = 'scan-medicine';
+    else if (mode === 'prescription') cardType = 'scan-prescription';
+    else if (mode === 'report') cardType = 'scan-report';
+    else if (mode === 'food') cardType = 'food-recognition';
+    else cardType = 'food-box'; // product / default
+    openDirectVisionCamera(cardType);
+  };
+
+  /* ──────────────────────────────────────────
+     مدير موحد عام على window
+  ────────────────────────────────────────── */
+  window.DirectVisionManager = {
+    open:    openDirectVisionCamera,
+    capture: captureAndAnalyze,
+    close:   closeVisionCamera,
+    restart: restartVisionAnalysis,
+    getStream: function() { return _activeStream; }
+  };
+
+  console.log('[DirectVisionManager] ✅ مدير الكاميرا الموحد جاهز');
+
+})();
 </script>
 </body>
 </html>
