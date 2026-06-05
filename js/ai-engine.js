@@ -919,7 +919,43 @@ function _cfChat(messages) {
                 'جارٍ تحليل الصورة...</div>';
             }
 
-            _universalVision('data:image/jpeg;base64,' + base64, prompt)
+            /* ── إرسال مباشر للـ CF Worker بدون شروط ── */
+            var imgDataUrl = 'data:image/jpeg;base64,' + base64;
+            var _sendToWorker = function (imgUrl, workerPrompt) {
+              var b64 = imgUrl, mt = 'image/jpeg';
+              if (imgUrl && imgUrl.startsWith('data:')) {
+                var parts = imgUrl.split(',');
+                b64 = parts[1] || imgUrl;
+                var mm = parts[0].match(/data:([^;]+)/);
+                if (mm) mt = mm[1];
+              }
+              return fetch(CFG.cfWorker, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: workerPrompt, image: b64, mediaType: mt })
+              })
+              .then(function (r) { if (!r.ok) throw new Error('HTTP_' + r.status); return r.json(); })
+              .then(function (data) {
+                if (data.choices && data.choices[0]) {
+                  var msg = data.choices[0].message || data.choices[0];
+                  var t = msg.content || msg.text || null;
+                  if (t && t.trim().length > 5) return { text: t.trim(), source: data.provider || 'CF-Worker' };
+                }
+                if (data.result && data.result.response) {
+                  var resp = data.result.response;
+                  var t2 = typeof resp === 'string' ? resp : JSON.stringify(resp);
+                  if (t2.trim().length > 5) return { text: t2.trim(), source: 'CF-Worker' };
+                }
+                return null;
+              })
+              .catch(function () { return null; });
+            };
+
+            _sendToWorker(imgDataUrl, prompt)
+              .then(function (cfResult) {
+                if (cfResult && cfResult.text) return cfResult;
+                return _universalVision(imgDataUrl, prompt);
+              })
               .then(function(result) {
                 self.isAnalyzing = false;
                 if (result && result.text) {
