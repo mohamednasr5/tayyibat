@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
@@ -2375,22 +2376,31 @@ window.geminiSend = window.geminiSend || function() {};
   </div>
 
   <div style="padding:12px 16px">
-    <div class="camera-view-wrap" id="pa-camera-viewport" style="cursor:pointer;position:relative">
+    <div class="camera-view-wrap" id="pa-camera-viewport" onclick="(function(){ var ol=document.getElementById('tap-to-rescan'); if(ol){ ol.remove(); _startCameraAndScanNow(); } else if(paStreamRef){ captureSmartByMode(); } })()" style="cursor:pointer">
       <div class="scanner-laser-line" id="pa-laser" style="display:none"></div>
       <video id="pa-video-stream" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
-      <canvas id="pa-live-canvas" style="display:none;width:100%;height:100%"></canvas>
       <div id="pa-camera-fallback-msg" style="padding:70px 20px;color:var(--txt3);font-size:.82rem;text-align:center">
         <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4"></i>
         اختر وضعاً أعلاه لبدء الكاميرا
       </div>
     </div>
-    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px">
-      <span id="camera-status-text"><i class="fas fa-hand-pointer" style="margin-left:5px"></i> اختر وضع المسح أعلاه لبدء الكاميرا تلقائياً</span>
-      <div id="live-analysis-status" style="margin-top:8px;padding:8px;background:rgba(46,201,81,0.1);border-radius:8px;display:none;color:#2ec951;font-size:0.8rem;font-weight:700">
-        <i class="fas fa-spinner fa-spin" style="margin-left:6px"></i> جاري التحليل الحي...
-      </div>
+    <div id="camera-auto-status" style="text-align:center;padding:6px 0;font-size:.78rem;color:var(--txt3);min-height:22px"><span id="camera-status-text"><i class="fas fa-hand-pointer" style="margin-left:5px"></i> اختر وضع المسح أعلاه لبدء الكاميرا تلقائياً</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:.7rem;color:var(--txt3)">او ادخل يدويا</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
-    <!-- تم إزالة المدخل اليدوي - التحليل حي مباشر فقط -->
+    <div class="field" id="pa-manual-field">
+      <label id="pa-manual-label">المكونات أو اسم الطعام</label>
+      <input type="text" id="pa-manual-ingredients"
+        placeholder="مثال: دقيق قمح، سكر... أو: تفاحة، خبز، دجاج..."
+        onkeydown="if(event.key==='Enter') analyzeIngredientsTextDirect()">
+    </div>
+    <div style="display:flex;justify-content:center;margin-bottom:4px">
+      <button class="btn" style="background:linear-gradient(135deg,var(--ai-purple),#4f46e5);color:#fff;width:auto;padding:12px 32px;border-radius:14px;display:flex;align-items:center;gap:8px;font-size:.9rem" onclick="analyzeSmartByModeWithTrial()">
+        <i class="fas fa-robot"></i> تحليل بالذكاء الاصطناعي
+      </button>
+    </div>
     <div id="pa-scan-result" style="text-align:right"></div>
 
     <!-- زر الرجوع للرئيسية -->
@@ -5652,19 +5662,10 @@ function startPremiumCameraScanner(onReady) {
   var video    = document.getElementById('pa-video-stream');
   var fallback = document.getElementById('pa-camera-fallback-msg');
   var laser    = document.getElementById('pa-laser');
-  
   if (video && video.srcObject && video.style.display !== 'none') {
     if (typeof onReady === 'function') onReady();
     return;
   }
-
-  // بدء التحليل الحي المباشر
-  if (typeof liveAnalysisEngine !== 'undefined') {
-    liveAnalysisEngine.start('pa-video-stream', 'pa-live-canvas', _scanMode);
-    if (typeof onReady === 'function') onReady();
-    return;
-  }
-
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width:{ideal:1280}, height:{ideal:720} } })
     .then(function(stream) {
@@ -6235,30 +6236,19 @@ async function _liveVisionAnalyze(videoEl, prompt, onResult, onError) {
   var imgData = canvas.toDataURL('image/jpeg', 0.85);
   var result = null;
 
-  // ① Puter Vision أولاً — فوري ومجاني للكاميرا
-  if (!result) {
-    try {
-      var pr = await _puterVisionAnalyze(imgData, prompt);
-      if (pr && pr.text && pr.text.trim().length > 5) {
-        console.log('[_liveVisionAnalyze] ✅ Puter Vision نجح');
-        result = pr.text.trim();
-      }
-    } catch(e) {}
-  }
-
-  // ② Cloudflare Worker ثانياً (احتياط)
+  // Cloudflare Worker أولاً (الأكثر موثوقية)
   if (!result) {
     try { var cfR = await _tryCloudflareWorkerVision(imgData, prompt); if (cfR && cfR.text) result = cfR.text; } catch(e) {}
   }
-  // ③ LLM7 Vision ثالثاً (GPT-4o, Claude, Gemini)
+  // LLM7 Vision ثانياً (GPT-4o, Claude, Gemini)
   if (!result) {
     try { var r = await _tryLLM7Vision(imgData, prompt, 0); if (r && r.text) result = r.text; } catch(e) {}
   }
-  // ④ Pollinations Vision رابعاً
+  // Pollinations Vision ثالثاً
   if (!result) {
     try { var r2 = await _tryPollinationsVision(imgData, prompt, 0); if (r2 && r2.text) result = r2.text; } catch(e) {}
   }
-  // ⑤ _smartVisionAnalysis كاحتياطي أخير
+  // _smartVisionAnalysis كاحتياطي
   if (!result) {
     try { var r3 = await _smartVisionAnalysis(imgData, prompt); if (r3 && r3.source !== 'fallback') result = r3.text; } catch(e) {}
   }
@@ -9018,232 +9008,46 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <!-- AI Providers: LLM7.io + OVH Kepler + Pollinations + OpenRouter -->
-<!-- Puter SDK — للتحليل البصري الفوري عبر الكاميرا -->
 <script>
-/* تحميل Puter SDK بشكل غير متزامن — لا يؤثر على سرعة التحميل */
-(function(){
-  var s = document.createElement('script');
-  s.src = 'https://js.puter.com/v2/';
-  s.async = true;
-  s.defer = true;
-  s.onload = function() {
-    console.log('[Puter SDK] ✅ تم التحميل — Vision جاهز');
-    window._puterSDKLoaded = true;
-  };
-  s.onerror = function() { console.warn('[Puter SDK] تعذّر التحميل — سيتم استخدام Fallback'); };
-  document.head.appendChild(s);
-})();
-</script>
-<script>
-/* ══════════════════════════════════════════════════════════════
-   🔮 Puter Vision — التحليل الفوري للكاميرا
-   يستخدم puter.ai.chat مع Base64 للتحليل البصري المباشر
-   كل أزرار الكاميرا ترسل إلى هذه الدالة أولاً
-══════════════════════════════════════════════════════════════ */
-window._puterVisionReady = false;
-window._puterSDKLoaded   = false;
-
-/* تحميل Puter SDK مرة واحدة */
-function _loadPuterSDK() {
-  return new Promise(function(resolve) {
-    if (window._puterSDKLoaded && window.puter && window.puter.ai) { resolve(true); return; }
-    if (document.querySelector('script[src*="puter.com"]')) {
-      var wait = setInterval(function() {
-        if (window.puter && window.puter.ai) { clearInterval(wait); window._puterSDKLoaded=true; resolve(true); }
-      }, 200);
-      setTimeout(function(){ clearInterval(wait); resolve(false); }, 8000);
-      return;
-    }
-    var s = document.createElement('script');
-    s.src = 'https://js.puter.com/v2/';
-    s.async = true;
-    s.onload = function() {
-      var wait = setInterval(function() {
-        if (window.puter && window.puter.ai) { clearInterval(wait); window._puterSDKLoaded=true; resolve(true); }
-      }, 200);
-      setTimeout(function(){ clearInterval(wait); resolve(false); }, 6000);
-    };
-    s.onerror = function() { resolve(false); };
-    document.head.appendChild(s);
-  });
-}
-
-/* ✅ دالة Puter Vision الأساسية — ترسل الصورة Base64 مباشرة */
-async function _puterVisionAnalyze(imgDataUrl, prompt) {
-  try {
-    var ok = await _loadPuterSDK();
-    if (!ok || !window.puter || !window.puter.ai) return null;
-
-    /* استخراج Base64 وإرساله مع الـ prompt */
-    var parsed = null;
-    if (imgDataUrl && imgDataUrl.startsWith('data:')) {
-      var parts = imgDataUrl.split(',');
-      var header = parts[0]; // data:image/jpeg;base64
-      var b64    = parts[1];
-      var mtype  = (header.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
-      parsed = { mediaType: mtype, base64: b64, dataUrl: imgDataUrl };
-    }
-
-    var response = null;
-
-    /* ① محاولة puter.ai.vision إذا متوفرة (أحدث API) */
-    if (typeof window.puter.ai.vision === 'function') {
-      try {
-        var vr = await window.puter.ai.vision(parsed ? parsed.dataUrl : imgDataUrl, prompt);
-        var vt = vr && (vr.text || vr.message || (vr.message && vr.message.content) || vr);
-        if (vt && String(vt).trim().length > 5) response = String(vt).trim();
-      } catch(e) {}
-    }
-
-    /* ② محاولة puter.ai.chat مع صورة (OpenAI-compatible) */
-    if (!response && typeof window.puter.ai.chat === 'function') {
-      try {
-        var messages = [{
-          role: 'user',
-          content: parsed
-            ? [
-                { type: 'text', text: prompt },
-                { type: 'image_url', image_url: { url: parsed.dataUrl } }
-              ]
-            : prompt
-        }];
-        var cr = await window.puter.ai.chat(messages, { model: 'gpt-4o' });
-        var ct = cr && (cr.text || (cr.message && cr.message.content) || cr);
-        if (ct && String(ct).trim().length > 5) response = String(ct).trim();
-      } catch(e) {}
-    }
-
-    if (response) {
-      console.log('[Puter Vision] ✅ نجح التحليل');
-      return { text: response, source: 'Puter-Vision' };
-    }
-    return null;
-  } catch(e) {
-    console.warn('[Puter Vision] ❌', e);
-    return null;
-  }
-}
-
-/* ══════════════════════════════════════════════════════
-   🎥 visionRaceWithPuter — كاميرا: Puter أولاً ← fallback
-   يُستخدم بدلاً من visionRace لكل أزرار الكاميرا فقط
-══════════════════════════════════════════════════════ */
-async function visionRaceCamera(imgData, prompt, onResult, onError) {
-  /* ① Puter Vision أولاً (فوري وبدون تكلفة) */
-  try {
-    var pr = await _puterVisionAnalyze(imgData, prompt);
-    if (pr && pr.text && pr.text.trim().length > 5) {
-      if (onResult) onResult(pr.text.trim());
-      return;
-    }
-  } catch(e) {}
-
-  /* ② Fallback إلى محركات TayyibatAI العادية */
-  visionRace(imgData, prompt, onResult, onError);
-}
-
-/* ══════════════════════════════════════════════
-   Puter stub للنصوص فقط (chat بدون صورة)
-   يُعيد توجيه puter.ai.chat() النصي إلى LLM7 + Pollinations
-══════════════════════════════════════════════ */
-(function() {
-  /* نحفظ أي puter حقيقي قُحّم من SDK */
-  var _realPuter = window.puter || null;
-
-  window.puter = {
-    ai: {
-      vision: async function(imgUrl, prompt) {
-        if (_realPuter && _realPuter.ai && typeof _realPuter.ai.vision === 'function') {
-          try { return await _realPuter.ai.vision(imgUrl, prompt); } catch(e) {}
-        }
-        /* fallback عبر TayyibatAI */
-        if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
-          return await window.TayyibatAI.vision(imgUrl, prompt || 'صف هذه الصورة.');
-        }
-        return null;
-      },
-      chat: async function(msgs, opts) {
-        /* إذا احتوت الرسالة على صورة → vision */
-        var hasImage = false;
-        var imgUrl = null, promptTxt = '';
-        if (Array.isArray(msgs)) {
-          msgs.forEach(function(m) {
-            if (Array.isArray(m.content)) {
-              m.content.forEach(function(c) {
-                if (c.type === 'image_url' && c.image_url) { hasImage=true; imgUrl=c.image_url.url; }
-                if (c.type === 'text') promptTxt += c.text + ' ';
-              });
-            } else if (typeof m.content === 'string') {
-              promptTxt += m.content + ' ';
-            }
-          });
-        } else { promptTxt = String(msgs); }
-
-        if (hasImage && imgUrl) {
-          if (_realPuter && _realPuter.ai && typeof _realPuter.ai.vision === 'function') {
-            try {
-              var vr = await _realPuter.ai.vision(imgUrl, promptTxt.trim());
-              var vt = vr && (vr.text || vr.message || vr);
-              if (vt && String(vt).trim().length > 5) return { message: { content: String(vt).trim() } };
-            } catch(e) {}
-          }
-          if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
-            var vr2 = await window.TayyibatAI.vision(imgUrl, promptTxt.trim());
-            var vt2 = vr2 && vr2.text;
-            if (vt2) return { message: { content: vt2 } };
-          }
-        }
-
-        /* نص فقط — LLM7 أولاً */
-        var messages = Array.isArray(msgs) ? msgs : [{role:'user', content: String(msgs)}];
-
-        if (_realPuter && _realPuter.ai && typeof _realPuter.ai.chat === 'function') {
-          try {
-            var rr = await _realPuter.ai.chat(messages, opts);
-            if (rr) return rr;
-          } catch(e) {}
-        }
-
-        if (typeof _universalAICall === 'function') {
-          try {
-            var res = await _universalAICall(messages);
-            if (res && res.text) return { message: { content: res.text } };
-          } catch(e) {}
-        }
+// puter stub — يُعيد توجيه puter.ai.chat() إلى LLM7 + Pollinations
+window.puter = {
+  ai: {
+    chat: async function(msgs, opts) {
+      var messages = Array.isArray(msgs) ? msgs : [{role:'user', content: String(msgs)}];
+      if (typeof _universalAICall === 'function') {
         try {
-          var resp = await fetch('https://api.llm7.io/v1/chat/completions', {
-            method: 'POST', headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ model: 'gpt-4o-mini', messages: messages, max_tokens: 1000 })
-          });
-          if (resp.ok) {
-            var data = await resp.json();
-            var text = data&&data.choices&&data.choices[0]&&data.choices[0].message ? data.choices[0].message.content : null;
-            if (text) return { message: { content: text } };
-          }
+          var res = await _universalAICall(messages);
+          if (res && res.text) return { message: { content: res.text } };
         } catch(e) {}
-        try {
-          var resp2 = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST', headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ model: 'openai', messages: messages, max_tokens: 1000 })
-          });
-          if (resp2.ok) {
-            var data2 = await resp2.json();
-            var text2 = data2&&data2.choices&&data2.choices[0]&&data2.choices[0].message ? data2.choices[0].message.content : null;
-            if (text2) return { message: { content: text2 } };
-          }
-        } catch(e) {}
-        throw new Error('all providers failed');
       }
+      // Direct LLM7 fallback
+      try {
+        var resp = await fetch('https://api.llm7.io/v1/chat/completions', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ model: 'gpt-4o-mini', messages: messages, max_tokens: 1000 })
+        });
+        if (resp.ok) {
+          var data = await resp.json();
+          var text = data&&data.choices&&data.choices[0]&&data.choices[0].message ? data.choices[0].message.content : null;
+          if (text) return { message: { content: text } };
+        }
+      } catch(e) {}
+      // Pollinations fallback
+      try {
+        var resp2 = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ model: 'openai', messages: messages, max_tokens: 1000 })
+        });
+        if (resp2.ok) {
+          var data2 = await resp2.json();
+          var text2 = data2&&data2.choices&&data2.choices[0]&&data2.choices[0].message ? data2.choices[0].message.content : null;
+          if (text2) return { message: { content: text2 } };
+        }
+      } catch(e) {}
+      throw new Error('all providers failed');
     }
-  };
-
-  /* عندما يُحمّل Puter SDK الحقيقي، نحدّث المرجع */
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      if (window.puter && window.puter._isReal) _realPuter = window.puter;
-    }, 3000);
-  });
-})();
+  }
+};
 </script>
 <script>
 (function () {
@@ -11247,9 +11051,6 @@ function fsOpenLiveCamera() {
     document.getElementById('fs-live-status') && (document.getElementById('fs-live-status').style.display='none');
     return;
   }
-  /* تحميل Puter SDK مسبقاً للتحليل الفوري */
-  if (typeof _loadPuterSDK === 'function') _loadPuterSDK();
-
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}})
   .then(function(stream){
     _fsStream = stream; video.srcObject = stream; video.style.display='block';
@@ -11258,13 +11059,13 @@ function fsOpenLiveCamera() {
     // عرض مؤشر التحليل المباشر
     var statusEl = document.getElementById('fs-live-status');
     if(statusEl) statusEl.style.display='block';
-    // 🚀 تحليل فوري بمجرد فتح الكاميرا (Puter Vision أولاً)
+    // تحليل مباشر كل 3 ثوانٍ
     var analyzing = false;
-    var statusText = document.getElementById('fs-live-status-text');
-    function doAnalyze() {
+    _fsLiveInterval = setInterval(function(){
       if(analyzing || !_fsStream) return;
       analyzing = true;
-      if(statusText) statusText.textContent = '🔮 Puter Vision يحلل...';
+      var statusText = document.getElementById('fs-live-status-text');
+      if(statusText) statusText.textContent = '🔍 جاري التحليل...';
       var prompt = 'انظر للصورة واكتشف الطعام أمامك. اكتب اسم الطعام وسعراته الحرارية التقريبية والبروتين والكارب والدهون. كن مختصراً ودقيقاً. اللغة: عربية.';
       _liveVisionAnalyze(video, prompt, function(result){
         analyzing = false;
@@ -11273,18 +11074,11 @@ function fsOpenLiveCamera() {
         incToolUsage('food-scan');
         // تحليل النتيجة
         fsParseAndDisplay(result);
-        // تحليل دوري كل 5 ثوانٍ بعد أول نتيجة
-        clearInterval(_fsLiveInterval);
-        _fsLiveInterval = setInterval(doAnalyze, 5000);
       }, function(){
         analyzing = false;
-        if(statusText) statusText.textContent = '⏳ وجّه الكاميرا نحو الطعام...';
+        if(statusText) statusText.textContent = '⏳ في انتظار الصورة...';
       });
-    }
-    // 🚀 تشغيل فوري بعد 800ms من فتح الكاميرا
-    setTimeout(doAnalyze, 800);
-    // ثم كل 4 ثوانٍ
-    _fsLiveInterval = setInterval(doAnalyze, 4000);
+    }, 3000);
   }).catch(function(){ showToast('❌ لم يتم منح صلاحية الكاميرا'); });
 }
 function fsCameraCapture() { fsOpenLiveCamera(); }
@@ -14466,7 +14260,6 @@ function setStatusText(id, html){
   var el=document.getElementById(id); if(el) el.innerHTML=html;
 }
 
-/* visionRace الأصلية — للصور المرفوعة فقط (لم تتغير) */
 function visionRace(imgData, prompt, onResult, onError){
   var p;
   if(window.TayyibatAI && typeof window.TayyibatAI.vision==='function'){
@@ -14504,13 +14297,10 @@ function _autoCamFoodScan(){
   if(fallback) fallback.style.display='none';
   if(statusEl) statusEl.style.display='block';
   if(statusTxt) statusTxt.textContent='📷 جاري تشغيل الكاميرا...';
-  /* تحميل Puter SDK مسبقاً */
-  if (typeof _loadPuterSDK === 'function') _loadPuterSDK();
   openBackCamera(video, _fsRef, function(){
-    if(statusTxt) statusTxt.textContent='🔮 Puter Vision جاهز — جاري التحليل الفوري...';
+    if(statusTxt) statusTxt.textContent='🍽️ جاري التعرف على الطعام...';
     clearInterval(_fsIv);
-    /* 🚀 تحليل فوري بعد 800ms فقط */
-    setTimeout(function(){ _fsScan(video,statusTxt); }, 800);
+    setTimeout(function(){ _fsScan(video,statusTxt); }, 1500);
     _fsIv=setInterval(function(){ _fsScan(video,statusTxt); }, 4000);
   }, function(){ if(statusTxt) statusTxt.textContent='❌ لم يتم منح صلاحية الكاميرا'; });
 }
@@ -14518,10 +14308,10 @@ function _autoCamFoodScan(){
 function _fsScan(video, statusTxt){
   if(_fsAnalyzing||!_fsRef.stream) return;
   _fsAnalyzing=true;
-  if(statusTxt) statusTxt.textContent='🔮 Puter Vision يحلل الطعام...';
+  if(statusTxt) statusTxt.textContent='🔍 جاري التحليل...';
   var img=captureFrame(video); if(!img){_fsAnalyzing=false;return;}
   var prompt='أنت خبير تغذية. انظر للصورة وتعرف على الطعام. اكتب:\n- اسم الطعام بالعربية\n- السعرات الحرارية التقريبية\n- البروتين والكارب والدهون بالجرام\n- نصيحة صحية قصيرة\nكن مختصراً ومباشراً. اللغة: عربية فقط.';
-  visionRaceCamera(img, prompt, function(result){
+  visionRace(img, prompt, function(result){
     _fsAnalyzing=false;
     if(statusTxt) statusTxt.textContent='✅ تم التعرف';
     clearInterval(_fsIv);
@@ -14571,7 +14361,7 @@ function _fiScan(video, statusEl){
   var s=statusEl&&statusEl.querySelector('span'); if(s) s.textContent='🔬 جاري التحليل...';
   var img=captureFrame(video); if(!img){_fiAnalyzing=false;return;}
   var prompt='أنت خبير في الجنايات الرقمية وكشف التزوير.\nحلّل هذه الصورة:\n1. هل هي حقيقية أم مزيفة أم مولودة بـ AI؟\n2. نسبة الثقة بأنها حقيقية (0-100%)\n3. أبرز المؤشرات التقنية\n4. الحكم النهائي\nكن مختصراً ومباشراً. اللغة: عربية.';
-  visionRaceCamera(img, prompt, function(result){
+  visionRace(img, prompt, function(result){
     _fiAnalyzing=false;
     if(s) s.textContent='✅ تم التحليل';
     clearInterval(_fiIv);
@@ -14616,7 +14406,7 @@ function _hwScan(video, statusEl){
   var grade=document.getElementById('hw-grade')?document.getElementById('hw-grade').value:'';
   var subject=document.getElementById('hw-subject')?document.getElementById('hw-subject').value:'';
   var prompt='أنت مدرس خبير بالمناهج المصرية. انظر للصورة.'+(grade?' الصف: '+grade+'.':'')+(subject?' المادة: '+subject+'.':'')+'\nاقرأ السؤال وقدّم:\n1. السؤال كما هو\n2. الإجابة النموذجية خطوة بخطوة\n3. الشرح المبسط\nاللغة: عربية. إذا لم تجد سؤالاً اكتب: "وجّه الكاميرا نحو السؤال".';
-  visionRaceCamera(img, prompt, function(result){
+  visionRace(img, prompt, function(result){
     _hwAutoAnalyzing=false; clearInterval(_hwIv);
     if(s) s.textContent='✅ تم الحل';
     var rb=document.getElementById('hw-result');
@@ -14654,7 +14444,7 @@ function _autoCamPalm(){
       var mode=window._palmMode||'full';
       var modeP={full:'قدّم قراءة شاملة: الشخصية، العواطف، المسار المهني، الصحة.',love:'ركّز على الجانب العاطفي وخط القلب والعلاقات.',career:'ركّز على المسار المهني وخط القدر والطموح.',health:'ركّز على الصحة وخط الحياة والحيوية.'};
       var prompt='أنت قارئ كف خبير. انظر لهذه الصورة وحلّل راحة اليد.\n\n'+(modeP[mode]||modeP.full)+'\n\nاتبع هذا الهيكل:\n🖐 شكل الكف والأصابع:\n📏 الخطوط الرئيسية (الحياة، القلب، الرأس، القدر):\n✨ ملاحظات خاصة:\n🔮 القراءة الشاملة:\n\nاكتب بالعربية الواضحة. اختم بـ: "هذه القراءة للترفيه والاستئناس فقط."';
-      visionRaceCamera(img, prompt, function(result){
+      visionRace(img, prompt, function(result){
         _palmAutoAnalyzing=false; if(s) s.textContent='✅ تمت القراءة';
         var rb=document.getElementById('palm-result')||document.getElementById('palm-reading-result');
         if(rb){rb.style.display='block';rb.innerHTML='<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(255,87,34,.35);border-radius:16px;padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">🖐 <b style="color:#ff8a65">قراءة الكف</b><br><br>'+result+'</div>';}
@@ -14664,7 +14454,7 @@ function _autoCamPalm(){
           if(!_palmAutoRef.stream||_palmAutoAnalyzing) return;
           _palmAutoAnalyzing=true;
           var img2=captureFrame(video); if(!img2){_palmAutoAnalyzing=false;return;}
-          visionRaceCamera(img2,prompt,function(r){_palmAutoAnalyzing=false;if(s)s.textContent='✅ تمت القراءة';var rb2=document.getElementById('palm-result')||document.getElementById('palm-reading-result');if(rb2){rb2.style.display='block';rb2.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt);white-space:pre-line">'+r+'</div>';}},function(){_palmAutoAnalyzing=false;});
+          visionRace(img2,prompt,function(r){_palmAutoAnalyzing=false;if(s)s.textContent='✅ تمت القراءة';var rb2=document.getElementById('palm-result')||document.getElementById('palm-reading-result');if(rb2){rb2.style.display='block';rb2.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt);white-space:pre-line">'+r+'</div>';}},function(){_palmAutoAnalyzing=false;});
         },3000);
       });
     },2500);
@@ -14711,7 +14501,7 @@ function _startScannerAutoLoop(mode){
     var s=video&&video.srcObject; if(!s) return;
     _scanAutoAnalyzing=true;
     var img=captureFrame(video); if(!img){_scanAutoAnalyzing=false;return;}
-    visionRaceCamera(img, prompt, function(result){
+    visionRace(img, prompt, function(result){
       _scanAutoAnalyzing=false; clearInterval(_scanAutoIv);
       if(resBox){
         var c=colors[mode]||'#2ec951';
