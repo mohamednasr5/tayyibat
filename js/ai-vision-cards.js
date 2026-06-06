@@ -110,6 +110,9 @@ function _capture(videoEl, quality) {
     var ctrl = new AbortController();
     var tid = setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS);
     try {
+      console.log("BASE64 LENGTH:", base64.length);
+  console.log("MEDIA TYPE:", mediaType);
+  console.log("BASE64 START:", base64.substring(0,50));
       var resp = await fetch(CF_WORKER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
