@@ -66,16 +66,37 @@
 
   /* ══════════════════════════════════════════
      ③ دوال مساعدة
-  ══════════════════════════════════════════ */
+ /** التقط إطار من فيديو → base64 data URL */
+function _capture(videoEl, quality) {
 
-  /** التقط إطار من فيديو → base64 data URL */
-  function _capture(videoEl, quality) {
-    if (!videoEl || !videoEl.videoWidth) return null;
-    var c = document.createElement('canvas');
-    c.width = videoEl.videoWidth; c.height = videoEl.videoHeight;
-    c.getContext('2d').drawImage(videoEl, 0, 0);
-    return c.toDataURL('image/jpeg', quality || IMG_QUALITY);
+  if (!videoEl || !videoEl.videoWidth) {
+    console.log("NO VIDEO");
+    return null;
   }
+
+  console.log(
+    "VIDEO SIZE:",
+    videoEl.videoWidth,
+    "x",
+    videoEl.videoHeight
+  );
+
+  var c = document.createElement('canvas');
+
+  c.width = videoEl.videoWidth;
+  c.height = videoEl.videoHeight;
+
+  c.getContext('2d').drawImage(videoEl, 0, 0);
+
+  const img = c.toDataURL(
+    'image/jpeg',
+    quality || IMG_QUALITY
+  );
+
+  console.log("BASE64 SIZE:", img.length);
+
+  return img;
+}
 
   /** أرسل صورة + برومبت مباشرة للـ CF Worker → نص الرد */
   async function _toWorker(imgDataUrl, prompt) {
