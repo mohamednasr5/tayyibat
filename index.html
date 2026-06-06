@@ -11383,14 +11383,24 @@ function diAnalyze() {
   var prompt = 'افحص التداخلات الدوائية بين:\n' + _diDrugs.map(function(d,i){ return (i+1)+'. '+d; }).join('\n') + '\n\nأجب بـ JSON فقط:\n{"interactions":[{"drug1":"دواء1","drug2":"دواء2","severity":"خطير/تحذير/آمن نسبياً","description":"آلية التداخل وتأثيره السريري","recommendation":"ما يجب فعله"}],"summary":"ملخص سريري شامل للمريض","overall_risk":"مستوى الخطر الكلي: مرتفع/متوسط/منخفض"}';
   var msgs = [{role:'system',content:diSysPrompt},{role:'user',content:prompt}];
   var handled = false;
+  function extractJSON(raw) {
+    if (!raw) return null;
+    var s = raw.replace(/```json|```/g, '').trim();
+    try { return JSON.parse(s); } catch(e) {}
+    var start = s.indexOf('{');
+    var end = s.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      try { return JSON.parse(s.slice(start, end + 1)); } catch(e2) {}
+    }
+    return null;
+  }
   function onResult(res) {
     if (handled) return; handled = true;
-    try {
-      var clean = res.replace(/```json|```/g,'').trim();
-      var data = JSON.parse(clean);
+    var data = extractJSON(res);
+    if (data && (data.interactions || data.summary)) {
       renderDiResult(data, resBox);
-    } catch(e) {
-      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+    } else {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem;color:var(--txt2)">' + (res||'لا توجد نتيجة') + '</div>';
     }
   }
   function onFail() {
@@ -11399,8 +11409,6 @@ function diAnalyze() {
   }
   if (typeof universalChat === 'function') {
     universalChat(msgs).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
-  } else if (typeof smartChat === 'function') {
-    smartChat(diSysPrompt, prompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
   } else if (typeof window.TayyibatAI !== 'undefined' && window.TayyibatAI.chat) {
     window.TayyibatAI.chat(prompt, diSysPrompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
   } else {
@@ -11464,14 +11472,26 @@ function daSearch() {
     '}';
   var msgs = [{role:'system',content:sysPrompt},{role:'user',content:prompt}];
   var handled = false;
+  function extractJSON(raw) {
+    if (!raw) return null;
+    var s = raw.replace(/```json|```/g, '').trim();
+    // محاولة مباشرة أولاً
+    try { return JSON.parse(s); } catch(e) {}
+    // استخراج أول { ... } 
+    var start = s.indexOf('{');
+    var end = s.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      try { return JSON.parse(s.slice(start, end + 1)); } catch(e2) {}
+    }
+    return null;
+  }
   function onResult(res) {
     if (handled) return; handled = true;
-    try {
-      var clean = res.replace(/```json|```/g,'').trim();
-      var data = JSON.parse(clean);
+    var data = extractJSON(res);
+    if (data && (data.drug_name || data.alternatives)) {
       renderDaResult(data, resBox);
-    } catch(e) {
-      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem">' + res + '</div>';
+    } else {
+      resBox.innerHTML = '<div style="padding:14px;background:rgba(255,255,255,.04);border-radius:14px;line-height:1.8;font-size:.85rem;color:var(--txt2)">' + (res||'لا توجد نتيجة') + '</div>';
     }
   }
   function onFail() {
@@ -11480,8 +11500,6 @@ function daSearch() {
   }
   if (typeof universalChat === 'function') {
     universalChat(msgs).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
-  } else if (typeof smartChat === 'function') {
-    smartChat(sysPrompt, prompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
   } else if (typeof window.TayyibatAI !== 'undefined' && window.TayyibatAI.chat) {
     window.TayyibatAI.chat(prompt, sysPrompt).then(function(r){ r && r.text ? onResult(r.text) : onFail(); }).catch(onFail);
   } else {
