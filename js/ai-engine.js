@@ -231,6 +231,28 @@
 
   /* ══════════════════════════════════ واجهة عامة للاستخدام من باقي السكربتات ══════════════════════════════════ */
 
+  /* ══════ universalChat — دالة عامة لإرسال messages array مباشرةً للـ Worker ══════ */
+  /**
+   * universalChat(messages)
+   * messages: [{role:'system',content:'...'},{role:'user',content:'...'}]
+   * returns: {text, source, raw} أو null
+   */
+  async function universalChat(messages) {
+    if (!Array.isArray(messages) || !messages.length) {
+      return { text: 'الرجاء إدخال نص للاستعلام.', source: 'local', raw: null };
+    }
+    var cfResult = await withTimeout(_cfChat(messages), FAST_TIMEOUT).catch(function () { return null; });
+    if (cfResult) return cfResult;
+    return {
+      text: 'تعذر الاتصال بخادم الذكاء الاصطناعي الآن، حاول مرة أخرى لاحقاً.',
+      source: 'CF-Worker-fail',
+      raw: null,
+    };
+  }
+
+  // تصدير universalChat كدالة عامة
+  global.universalChat = universalChat;
+
   // API عام: TayyibatAI.chat
   global.TayyibatAI = {
     /**
