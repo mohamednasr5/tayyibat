@@ -98,48 +98,94 @@ function _capture(videoEl, quality) {
   return img;
 }
 
-  /** أرسل صورة + برومبت مباشرة للـ CF Worker → نص الرد */
-  async function _toWorker(imgDataUrl, prompt) {
-    var base64 = imgDataUrl, mediaType = 'image/jpeg';
-    if (imgDataUrl && imgDataUrl.startsWith('data:')) {
-      var p = imgDataUrl.split(',');
-      base64 = p[1] || imgDataUrl;
-      var m = p[0].match(/data:([^;]+)/);
-      if (m) mediaType = m[1];
-    }
-    var ctrl = new AbortController();
-    var tid = setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS);
-    try {
-      console.log("BASE64 LENGTH:", base64.length);
-  console.log("MEDIA TYPE:", mediaType);
-  console.log("BASE64 START:", base64.substring(0,50));
-      var resp = await fetch(CF_WORKER, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: ctrl.signal,
-        body: JSON.stringify({ prompt: prompt, image: base64, mediaType: mediaType })
-      });
-      clearTimeout(tid);
-      if (!resp.ok) return null;
-      var data = await resp.json();
-      /* استخراج النص من أي صيغة رد ممكنة */
-      if (data.choices && data.choices[0]) {
-        var msg = data.choices[0].message || data.choices[0];
-        var t = msg.content || msg.text || null;
-        if (t && t.trim().length > 5) return t.trim();
-      }
-      if (data.result && data.result.response) {
-        var r = data.result.response;
-        return (typeof r === 'string' ? r : JSON.stringify(r)).trim();
-      }
-      if (typeof data === 'string' && data.trim().length > 5) return data.trim();
-      if (data.response && typeof data.response === 'string') return data.response.trim();
-      return null;
-    } catch (e) {
-      clearTimeout(tid);
-      return null;
-    }
+ /** أرسل صورة + برومبت مباشرة للـ CF Worker → نص الرد */
+async function _toWorker(imgDataUrl, prompt) {
+  var base64 = imgDataUrl,
+    mediaType = "image/jpeg";
+
+  // لو Data URL → قص الهيدر وأرسل base64 فقط + نوع الملف
+  if (imgDataUrl && imgDataUrl.startsWith("data:")) {
+    var p = imgDataUrl.split(",");
+    base64 = p[1] || imgDataUrl;
+    var m = p[0].match(/data:([^;]+)/);
+    if (m) mediaType = m[1];
   }
+
+  var ctrl = new AbortController();
+  var tid = setTimeout(function () {
+    ctrl.abort();
+  }, TIMEOUT_MS);
+
+  try {
+    console.log("BASE64 LENGTH:", base64.length);
+    console.log("MEDIA TYPE:", mediaType);
+    console.log("BASE64 START:", base64.substring(0, 50));
+
+    var resp = await fetch(CF_WORKER, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: ctrl.signal,
+      body: JSON.stringify({
+        prompt: prompt,
+        image: base64, // worker يتوقع base64 raw
+        mediaType: mediaType,
+      }),
+    });
+
+    clearTimeout(tid);
+    if (!resp.ok) {
+      // حاول قراءة body حتى في حالة الخطأ
+      var errJson = null;
+      try {
+        errJson = await resp.json();
+      } catch (e) {}
+      if (errJson && errJson.response) return errJson.response;
+      if (errJson && errJson.error)
+        return "خطأ من خادم الرؤية: " + errJson.error;
+      return null;
+    }
+
+    var data = await resp.json();
+    console.log("WORKER RAW:", data);
+
+    // 1) ردود OpenRouter/z.ai: choices
+    if (data.choices && data.choices[0]) {
+      var msg = data.choices[0].message || data.choices[0];
+      var t = msg.content || msg.text || null;
+      if (t && t.trim().length > 5) return t.trim();
+    }
+
+    // 2) رد Cloudflare Vision الموحّد: result string
+    if (data.result) {
+      var r = data.result;
+      if (typeof r === "string" && r.trim().length > 5) return r.trim();
+      if (r.response && typeof r.response === "string")
+        return r.response.trim();
+      if (r.text && typeof r.text === "string") return r.text.trim();
+    }
+
+    // 3) fallback عام: response نصّي
+    if (data.response && typeof data.response === "string") {
+      if (data.response.trim().length > 3) return data.response.trim();
+    }
+
+    // 4) لو worker رجع string مباشرة
+    if (typeof data === "string" && data.trim().length > 5) {
+      return data.trim();
+    }
+
+    // 5) لو هناك error نصّي
+    if (data.error && typeof data.error === "string") {
+      return "خطأ من خادم الرؤية: " + data.error;
+    }
+
+    return null;
+  } catch (e) {
+    clearTimeout(tid);
+    console.log("VISION _toWorker error:", e);
+    return null;
+  }
+}
 
   /** مؤشر تحميل */
   function _loader(box, msg) {
