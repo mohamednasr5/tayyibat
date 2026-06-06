@@ -11442,20 +11442,22 @@ function daSearch() {
   incToolUsage('drug-alt');
   var resBox = document.getElementById('da-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري البحث عن البدائل...</span></div>';
-  var sysPrompt = 'أنت صيدلاني سريري خبير في مصر. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP فقط. كل عنصر في alternatives يجب أن يحتوي على حقل "name" وهو اسم دواء تجاري حقيقي متوفر في مصر (لا تكتب بديل 1 أو بديل 2 أو أسماء عامة).';
+  var sysPrompt = 'أنت صيدلاني سريري خبير في السوق المصري. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP. كل بديل يجب أن يكون دواءً تجارياً حقيقياً مسجّلاً ومتاحاً في الصيدليات المصرية مع ذكر شركة الإنتاج والشكل الصيدلاني والتركيز بدقة.';
   var prompt = 'الدواء: "' + drug + '"\n\n' +
     'أجب بهذا JSON الحرفي فقط (لا شيء قبله ولا بعده):\n' +
     '{' +
-      '"drug_name":"اسم الدواء التجاري في مصر",' +
+      '"drug_name":"الاسم التجاري الكامل للدواء في مصر",' +
       '"active_ingredient":"المادة الفعالة بالعربي",' +
-      '"active_ingredient_en":"Active Ingredient En",' +
-      '"drug_class":"تصنيف الدواء",' +
+      '"active_ingredient_en":"Active Ingredient in English",' +
+      '"drug_class":"تصنيف الدواء الدوائي",' +
       '"main_use":"الاستخدام الرئيسي",' +
-      '"price_range":"نطاق تقريبي لسعر الدواء بالجنيه المصري EGP",' +
+      '"dosage_form":"الشكل الصيدلاني (أقراص/شراب/حقن/مرهم/...)",' +
+      '"price_range":"نطاق سعر الدواء الأصلي بالجنيه المصري EGP",' +
       '"alternatives":[' +
-         '{"name":"اسم بديل حقيقي متوفر في مصر","active":"مادته الفعالة","price":"سعره التقريبي بالجنيه المصري EGP","notes":"ملاحظة الفرق"},' +
-         '{"name":"اسم بديل حقيقي آخر في مصر","active":"مادته الفعالة","price":"سعره التقريبي","notes":"متى يُفضّل"},' +
-         '{"name":"بديل ثالث حقيقي في مصر","active":"مادته الفعالة","price":"سعره التقريبي","notes":"معلومة إضافية"}' +
+         '{"name":"اسم تجاري حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"},' +
+         '{"name":"بديل ثاني حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"},' +
+         '{"name":"بديل ثالث حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"},' +
+         '{"name":"بديل رابع حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"}' +
       '],' +
       '"warnings":"أهم التحذيرات والتفاعلات الدوائية",' +
       '"note":"استشر الطبيب أو الصيدلاني قبل تغيير الدواء"' +
@@ -11490,51 +11492,74 @@ function daSearch() {
 
 
 function renderDaResult(data, resBox) {
-  // دالة تنظيف القيم — تتجاهل "undefined" و null والقيم الفارغة
   function safeVal(v) {
     if (!v || v === 'undefined' || v === 'null' || String(v).trim() === '') return '';
     return String(v).trim();
   }
-
-  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(156,39,176,.35);border-radius:20px;overflow:hidden;margin-bottom:12px">';
-  html += '<div style="background:linear-gradient(135deg,rgba(156,39,176,.25),rgba(103,58,183,.15));padding:12px 14px">';
-  html += '<div style="font-size:1rem;font-weight:900;color:#ce93d8">💊 ' + (safeVal(data.drug_name) || 'الدواء') + '</div>';
+  // بطاقة الدواء الأصلي
+  var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(156,39,176,.45);border-radius:20px;overflow:hidden;margin-bottom:14px">';
+  html += '<div style="background:linear-gradient(135deg,rgba(156,39,176,.3),rgba(103,58,183,.2));padding:13px 15px;display:flex;align-items:center;gap:10px">';
+  html += '<div style="width:42px;height:42px;border-radius:12px;background:rgba(156,39,176,.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem">💊</div>';
+  html += '<div><div style="font-size:1rem;font-weight:900;color:#ce93d8">' + (safeVal(data.drug_name) || 'الدواء') + '</div>';
   var activeLine = [safeVal(data.active_ingredient), safeVal(data.active_ingredient_en)].filter(Boolean).join(' — ');
   if (activeLine) html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:2px">' + activeLine + '</div>';
-  html += '</div>';
+  html += '</div></div>';
   html += '<div style="padding:12px 14px">';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
-  [['🏷️ التصنيف',data.drug_class],['💊 الاستخدام',data.main_use],['💰 السعر التقريبي',data.price_range]].forEach(function(r) {
-    var v = safeVal(r[1]);
-    if (v) html += '<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:8px 10px"><div style="font-size:.65rem;color:var(--txt3)">' + r[0] + '</div><div style="font-size:.8rem;color:var(--txt);font-weight:700;margin-top:2px">' + v + '</div></div>';
+  // شبكة المعلومات
+  var infoItems = [
+    ['🏷️','التصنيف',data.drug_class,'rgba(156,39,176,.15)','#ce93d8'],
+    ['🩺','الاستخدام',data.main_use,'rgba(33,150,243,.12)','#64b5f6'],
+    ['💉','الشكل',data.dosage_form,'rgba(0,150,136,.12)','#80cbc4'],
+    ['💰','السعر',data.price_range,'rgba(76,175,80,.12)','#a5d6a7']
+  ];
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">';
+  infoItems.forEach(function(r) {
+    var v = safeVal(r[2]);
+    if (v) html += '<div style="background:' + r[3] + ';border-radius:10px;padding:8px 10px"><div style="font-size:.62rem;color:' + r[4] + ';font-weight:700">' + r[0] + ' ' + r[1] + '</div><div style="font-size:.78rem;color:var(--txt);font-weight:700;margin-top:3px;line-height:1.4">' + v + '</div></div>';
   });
   html += '</div>';
+  // البدائل
   if (data.alternatives && data.alternatives.length > 0) {
-    // فلترة البدائل الصالحة فقط (لها اسم حقيقي)
+    var altColors = [
+      {bg:'rgba(33,150,243,.1)',border:'rgba(33,150,243,.35)',title:'#64b5f6',badge:'rgba(33,150,243,.2)'},
+      {bg:'rgba(0,150,136,.08)',border:'rgba(0,150,136,.3)',title:'#80cbc4',badge:'rgba(0,150,136,.15)'},
+      {bg:'rgba(255,152,0,.08)',border:'rgba(255,152,0,.3)',title:'#ffcc80',badge:'rgba(255,152,0,.15)'},
+      {bg:'rgba(233,30,99,.08)',border:'rgba(233,30,99,.25)',title:'#f48fb1',badge:'rgba(233,30,99,.12)'}
+    ];
     var validAlts = data.alternatives.filter(function(alt) {
-      var n = safeVal(alt.name || alt.drug_name || alt.brand_name || alt.trade_name || alt['اسم'] || '');
-      return n.length > 0;
+      return safeVal(alt.name || alt.drug_name || '').length > 0;
     });
     if (validAlts.length > 0) {
-      html += '<div style="font-size:.82rem;font-weight:800;color:#ce93d8;margin-bottom:10px">🔄 البدائل المتاحة (' + validAlts.length + '):</div>';
-      validAlts.forEach(function(alt) {
-        var altName   = safeVal(alt.name || alt.drug_name || alt.brand_name || alt.trade_name || alt['اسم'] || '');
-        var altActive = safeVal(alt.active || alt.active_ingredient || alt.active_ingredient_ar || alt['المادة_الفعالة'] || '');
-        var altPrice  = safeVal(alt.price || alt.price_range || alt['السعر'] || '');
-        var altNotes  = safeVal(alt.notes || alt.note || alt['ملاحظة'] || '');
-        html += '<div style="background:rgba(156,39,176,.08);border:1px solid rgba(156,39,176,.2);border-radius:12px;padding:10px 12px;margin-bottom:8px">';
-        html += '<div style="font-size:.85rem;font-weight:800;color:#e1bee7">💊 ' + altName + '</div>';
-        if (altActive) html += '<div style="font-size:.72rem;color:#b39ddb;margin-top:3px">المادة الفعالة: ' + altActive + '</div>';
-        if (altPrice) html += '<div style="font-size:.72rem;color:#a5d6a7;margin-top:2px">💰 ' + altPrice + '</div>';
-        if (altNotes) html += '<div style="font-size:.7rem;color:var(--txt3);margin-top:4px">📝 ' + altNotes + '</div>';
+      html += '<div style="font-size:.82rem;font-weight:800;color:#ce93d8;margin-bottom:10px;display:flex;align-items:center;gap:6px">🔄 البدائل المتاحة <span style="background:rgba(156,39,176,.25);color:#ce93d8;border-radius:20px;padding:1px 10px;font-size:.75rem">' + validAlts.length + '</span></div>';
+      validAlts.forEach(function(alt, idx) {
+        var c = altColors[idx % altColors.length];
+        var altName    = safeVal(alt.name || alt.drug_name || '');
+        var altActive  = safeVal(alt.active || alt.active_ingredient || '');
+        var altCompany = safeVal(alt.company || alt.manufacturer || '');
+        var altForm    = safeVal(alt.dosage_form || alt.form || '');
+        var altStr     = safeVal(alt.strength || alt.dose || '');
+        var altPrice   = safeVal(alt.price || alt.price_range || '');
+        var altNotes   = safeVal(alt.notes || alt.note || '');
+        html += '<div style="background:' + c.bg + ';border:1.5px solid ' + c.border + ';border-radius:14px;padding:11px 13px;margin-bottom:9px">';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">';
+        html += '<div style="font-size:.88rem;font-weight:900;color:' + c.title + '">💊 ' + altName + '</div>';
+        if (altPrice) html += '<div style="font-size:.72rem;background:rgba(76,175,80,.15);color:#a5d6a7;border:1px solid rgba(76,175,80,.3);border-radius:20px;padding:2px 8px;font-weight:700">' + altPrice + '</div>';
+        html += '</div>';
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">';
+        if (altActive)  html += '<div style="font-size:.68rem;color:var(--txt2)"><span style="color:' + c.title + ';font-weight:700">المادة: </span>' + altActive + '</div>';
+        if (altCompany) html += '<div style="font-size:.68rem;color:var(--txt2)"><span style="color:' + c.title + ';font-weight:700">الشركة: </span>' + altCompany + '</div>';
+        if (altForm)    html += '<div style="font-size:.68rem;color:var(--txt2)"><span style="color:' + c.title + ';font-weight:700">الشكل: </span>' + altForm + '</div>';
+        if (altStr)     html += '<div style="font-size:.68rem;color:var(--txt2)"><span style="color:' + c.title + ';font-weight:700">التركيز: </span>' + altStr + '</div>';
+        html += '</div>';
+        if (altNotes) html += '<div style="font-size:.7rem;color:var(--txt3);background:rgba(255,255,255,.04);border-radius:8px;padding:5px 8px;margin-top:6px">📝 ' + altNotes + '</div>';
         html += '</div>';
       });
     }
   }
   var warnings = safeVal(data.warnings);
   var note = safeVal(data.note);
-  if (warnings) html += '<div style="background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.75rem;color:#ef9a9a;line-height:1.6;margin-top:4px">⚠️ ' + warnings + '</div>';
-  if (note) html += '<div style="font-size:.72rem;color:var(--txt3);text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">📋 ' + note + '</div>';
+  if (warnings) html += '<div style="background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:10px;padding:10px;font-size:.75rem;color:#ef9a9a;line-height:1.7;margin-top:4px"><div style="font-weight:800;margin-bottom:4px">⚠️ تحذيرات هامة</div>' + warnings + '</div>';
+  if (note) html += '<div style="font-size:.72rem;color:var(--txt3);text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)">📋 ' + note + '</div>';
   html += '</div></div>';
   resBox.innerHTML = html;
 }
