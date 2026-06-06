@@ -106,92 +106,46 @@
 
   // ① Cloudflare Worker chat
 function _cfChat(messages) {
-
   console.log('USING CLOUDFLARE AI');
 
   var prompt = messages
-    .map(function(m) {
-      return m.role + ': ' + m.content;
-    })
+    .map(function(m) { return m.role + ': ' + m.content; })
     .join('\n');
 
   return fetch(CFG.cfWorker, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      prompt: prompt
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: prompt })
   })
   .then(function(resp) {
-
     if (!resp.ok) {
       throw new Error('HTTP_' + resp.status);
     }
-
     return resp.json();
-
   })
- .then(function(data) {
+  .then(function(data) {
+    console.log('CF RESPONSE:', data);
 
-  console.log('CF RESPONSE:', data);
+    var responseText = '';
 
-  var responseText = '';
-
-  if (
-    data &&
-    data.result &&
-    data.result.response
-  ) {
-
-    console.log('CF SUCCESS');
-
-    if (typeof data.result.response === 'string') {
-
-      responseText = data.result.response;
-
-    } else if (Array.isArray(data.result.response)) {
-
-      responseText = data.result.response
-        .map(function(item) {
-          return item.text || item.content || '';
-        })
-        .join(' ');
-
-    } else {
-
-      responseText = JSON.stringify(data.result.response);
-
+    if (data && data.result && data.result.response) {
+      console.log('CF SUCCESS');
+      // ...
+      return { text: String(responseText).trim(), source: data.provider || 'CF-Worker' };
     }
 
-    return {
-      text: String(responseText).trim(),
-      source: data.provider || 'CF-Worker'
-    };
-  }
+    var t = extractText(data);
+    if (isGoodText(t)) {
+      return { text: String(t).trim(), source: data.provider || 'CF-Worker' };
+    }
 
-  var t = extractText(data);
-
-  if (isGoodText(t)) {
-    return {
-      text: String(t).trim(),
-      source: data.provider || 'CF-Worker'
-    };
-  }
-
-  console.log('CF EMPTY RESPONSE');
-
-  return null;
-
-})
-.catch(function(err) {
-
-  console.error('Cloudflare Error:', err);
-
-  return null;
-
-});
+    console.log('CF EMPTY RESPONSE');
+    return null;
+  })
+  .catch(function(err) {
+    console.error('Cloudflare Error:', err);
+    return null;
+  });
 }
   // ② OVH Kepler — model واحد بدون انتظار
   function _keplerChat(messages, modelOverride) {
