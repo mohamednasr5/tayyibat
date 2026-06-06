@@ -75,63 +75,30 @@
 
         var responseText = null;
 
-        // 1) لو Worker رجع result كسلسلة JSON (حالة بدائل الأدوية)
+        // 1) لو Worker رجع result كسلسلة — نرجعها كما هي (JSON أو نص)
         if (data && typeof data.result === 'string') {
+          // نمسح الـ markdown backticks لو وُجدت
+          var rawResult = data.result.replace(/```json|```/g, '').trim();
+          // نحاول نتحقق إنها JSON صالح — لكن نرجعها دائماً كـ string
+          // حتى تستطيع onResult/renderDaResult تعمل parse بنفسها
           try {
-            var parsed = JSON.parse(data.result);
-
-            // لو نتيجة بدائل أدوية
-            if (
-              parsed.drug_name ||
-              parsed.active_ingredient ||
-              parsed.alternatives
-            ) {
-              responseText =
-                'اسم الدواء: ' +
-                (parsed.drug_name || 'غير معروف') +
-                '\n' +
-                'المادة الفعالة: ' +
-                (parsed.active_ingredient || 'غير معروفة');
-
-              if (Array.isArray(parsed.alternatives) && parsed.alternatives.length) {
-                responseText +=
-                  '\nالبدائل المتاحة في مصر:\n' +
-                  parsed.alternatives
-                    .map(function (a, i) {
-                      var line =
-                        (i + 1) +
-                        '- ' +
-                        (a.name || 'بديل') +
-                        (a.dose ? ' — ' + a.dose : '');
-                      if (a.company) line += ' — ' + a.company;
-                      if (a.country) line += ' [' + a.country + ']';
-                      return line;
-                    })
-                    .join('\n');
-              }
-
-              if (parsed.note) {
-                responseText += '\n\nملاحظة: ' + parsed.note;
-              }
-            } else if (parsed.text) {
-              responseText = parsed.text;
-            } else {
-              responseText = JSON.stringify(parsed);
-            }
+            var _test = JSON.parse(rawResult);
+            // JSON صالح — نرجعه كـ string مباشرة بدون تحويل
+            responseText = rawResult;
           } catch (e) {
-            // ليست JSON، استخدمها كما هي
-            responseText = data.result;
+            // نص عادي — نستخدمه كما هو
+            responseText = rawResult;
           }
         }
 
         // 2) لو result ككائن
         if (!responseText && data && typeof data.result === 'object') {
           var r = data.result;
-          if (r.response && typeof r.response === 'string') {
-            responseText = r.response;
-          } else if (r.text && typeof r.text === 'string') {
-            responseText = r.text;
+          var rText = (r.response || r.text || '');
+          if (typeof rText === 'string' && rText.trim()) {
+            responseText = rText.replace(/```json|```/g, '').trim();
           } else {
+            // نرجع الـ object كـ JSON string ليتعامل معه المستقبِل
             responseText = JSON.stringify(r);
           }
         }
