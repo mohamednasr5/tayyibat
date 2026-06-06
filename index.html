@@ -3254,7 +3254,7 @@ function obgynIncUsage() {
       window.__firebaseRef &&
       window.__firebaseDB
     ) {
-      var uid = window.getSafeUid();
+      var uid = window.window.getSafeUid();
       window.__firebaseSet(
         window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/obgyn-ai'),
         newVal
@@ -3462,7 +3462,7 @@ function ptBuildBleedingDays(periodLen) {
 async function ptApplySmartAverage() {
   try {
     if (!window.__firebaseReady || !window.currentUser || !window.__firebaseGet || !window.__firebaseRef || !window.__firebaseDB) return;
-    var uid = getSafeUid();
+    var uid = window.getSafeUid();
     var snap = await window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/periodCycles'));
     if (!snap || !snap.exists()) return;
     var cycles = [];
@@ -3601,7 +3601,7 @@ async function ptSaveCycle() {
     var notes = (document.getElementById('pt-notes') || {}).value || '';
 
     // بناء كائن البيانات
-    var uid = getSafeUid();
+    var uid = window.getSafeUid();
     var cycleId = 'cycle_' + lastDate.replace(/-/g,'');
     var cycleData = {
       lastDate:       lastDate,
@@ -4520,7 +4520,7 @@ async function dbSaveUser(u, d) {
     try {
       // استخدم Firebase UID الحقيقي إذا كان المستخدم مصادقاً
       var fbAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
-      var fbKey = fbAuth ? window.__getSafeUid() : u;
+      var fbKey = fbAuth ? window.__window.getSafeUid() : u;
       await window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + fbKey), d);
     } catch(e) {}
   }
@@ -10185,7 +10185,7 @@ chatBox.innerHTML +=
 
   /* ─── مفتاح التخزين مرتبط بالمستخدم الحالي ─── */
   function _stateKey() {
-    var u = (window.currentUser && firebaseAuth && firebaseAuth.currentUser && getSafeUid()) ? getSafeUid() : 'guest';
+    var u = (window.currentUser && firebaseAuth && firebaseAuth.currentUser && window.getSafeUid()) ? window.getSafeUid() : 'guest';
     return 'tayyibat_daily_reward_v3_' + u;
   }
 
@@ -10366,7 +10366,7 @@ chatBox.innerHTML +=
 
       /* حفظ في Firebase */
       if (typeof dbSaveUser === 'function' && window.currentUser) {
-        try { dbSaveUser(getSafeUid(), window.currentUser); } catch(e) {}
+        try { dbSaveUser(window.getSafeUid(), window.currentUser); } catch(e) {}
       }
 
       /* تحديث العداد التنازلي إن كان مفتوحاً */
@@ -10908,7 +10908,7 @@ function incToolUsage(toolKey) {
   try {
     var hasFirebaseAuth = window.__firebaseAuth && window.__firebaseAuth.currentUser;
     if (hasFirebaseAuth && window.__firebaseReady && window.currentUser && window.__firebaseSet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = window.__getSafeUid();
+      var uid = window.__window.getSafeUid();
       window.__firebaseSet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialUsage/' + toolKey), newVal).catch(function(){});
     }
   } catch(e) {}
@@ -13503,7 +13503,7 @@ setTimeout(function(){
 function checkAdminTrialReset() {
   try {
     if (window.__firebaseReady && window.currentUser && window.__firebaseGet && window.__firebaseRef && window.__firebaseDB) {
-      var uid = getSafeUid();
+      var uid = window.getSafeUid();
       window.__firebaseGet(window.__firebaseRef(window.__firebaseDB, 'users/' + uid + '/trialReset')).then(function(snap) {
         if (!snap || !snap.exists()) return;
         var adminReset = snap.val();
@@ -13556,7 +13556,7 @@ setTimeout(checkAdminTrialReset, 3000);
         // ── تفعيل / إلغاء تفعيل PRO ──
         case 'SET_PRO':
           if (window.currentUser) {
-            localStorage.setItem('tayyibat_pro_' + (getSafeUid() || 'user'), JSON.stringify({
+            localStorage.setItem('tayyibat_pro_' + (window.getSafeUid() || 'user'), JSON.stringify({
               active: !!cmd.active,
               expiresAt: cmd.expiresAt || 0,
               lifetime: !!cmd.lifetime
@@ -13624,8 +13624,8 @@ user: window.currentUser
       username:
         (firebaseAuth &&
          firebaseAuth.currentUser &&
-         getSafeUid())
-          ? getSafeUid()
+         window.getSafeUid())
+          ? window.getSafeUid()
           : window.currentUser.username,
       nameAr: window.currentUser.nameAr
     }
@@ -14256,6 +14256,24 @@ user: window.currentUser
      🌿 جسر التوافق — يربط الكود القديم بالمحرك الجديد
      يُشغَّل بعد تحميل كل شيء
 ════════════════════════════════════════════════════ -->
+     <script>
+  window.getSafeUid = function () {
+    try {
+      if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+        return window.firebaseAuth.currentUser.uid;
+      }
+      if (window.currentUser && window.currentUser.uid) {
+        return window.currentUser.uid;
+      }
+      if (window.currentUser && window.currentUser.username) {
+        return window.currentUser.username;
+      }
+    } catch (e) {
+      console.warn('getSafeUid error:', e);
+    }
+    return 'guest';
+  };
+</script>
 <script>
 (function() {
   /* انتظر تحميل TayyibatAI ثم اربط الدوال القديمة */
