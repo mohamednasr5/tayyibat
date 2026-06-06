@@ -11379,18 +11379,45 @@ function diAnalyze() {
   incToolUsage('drug-interaction');
   var resBox = document.getElementById('di-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري فحص التداخلات الدوائية...</span></div>';
-  var diSysPrompt = 'أنت صيدلاني سريري خبير في مصر متخصص في التفاعلات الدوائية. الأسعار دائماً بالجنيه المصري EGP.\nأجب فقط بـ JSON صالح بدون أي نص خارجه أو markdown.\nصنّف الخطورة: خطير (قد يُهدد الحياة) / تحذير (يحتاج متابعة) / آمن نسبياً (تفاعل بسيط).\nإذا لم يوجد تفاعل، اجعل interactions مصفوفة فارغة وsummary يوضح ذلك.';
-  var prompt = 'افحص التداخلات الدوائية بين:\n' + _diDrugs.map(function(d,i){ return (i+1)+'. '+d; }).join('\n') + '\n\nأجب بـ JSON فقط:\n{"interactions":[{"drug1":"دواء1","drug2":"دواء2","severity":"خطير/تحذير/آمن نسبياً","description":"آلية التداخل وتأثيره السريري","recommendation":"ما يجب فعله"}],"summary":"ملخص سريري شامل للمريض","overall_risk":"مستوى الخطر الكلي: مرتفع/متوسط/منخفض"}';
+  var diSysPrompt = 'صيدلاني مصري متخصص في التفاعلات الدوائية. أجب بـ JSON فقط بلا markdown.';
+  var prompt = 'تفاعلات بين: ' + _diDrugs.join(' + ') + '\nJSON فقط:\n' +
+    '{"interactions":[{"drug1":"","drug2":"","severity":"خطير/تحذير/آمن نسبياً","description":"","recommendation":""}],' +
+    '"summary":"","overall_risk":"مرتفع/متوسط/منخفض"}';
   var msgs = [{role:'system',content:diSysPrompt},{role:'user',content:prompt}];
   var handled = false;
   function extractJSON(raw) {
     if (!raw) return null;
     var s = raw.replace(/```json|```/g, '').trim();
+    // محاولة مباشرة
     try { return JSON.parse(s); } catch(e) {}
+    // استخراج من أول { لآخر }
     var start = s.indexOf('{');
     var end = s.lastIndexOf('}');
     if (start !== -1 && end > start) {
       try { return JSON.parse(s.slice(start, end + 1)); } catch(e2) {}
+    }
+    // JSON مقطوع — نحاول نرمّمه
+    if (start !== -1) {
+      var partial = s.slice(start);
+      // نغلّق كل الـ strings المفتوحة والمصفوفات والكائنات
+      var repaired = partial;
+      // نحذف آخر key ناقص (مقطوع في النص)
+      repaired = repaired.replace(/,?\s*"[^"]*$/, '');
+      repaired = repaired.replace(/,?\s*"[^"]*":\s*"[^"]*$/, '');
+      // نغلّق المصفوفات المفتوحة
+      var opens = (repaired.match(/\[/g)||[]).length - (repaired.match(/\]/g)||[]).length;
+      for (var i = 0; i < opens; i++) repaired += ']';
+      // نغلّق الكائنات المفتوحة
+      var openB = (repaired.match(/\{/g)||[]).length - (repaired.match(/\}/g)||[]).length;
+      for (var j = 0; j < openB; j++) repaired += '}';
+      try { return JSON.parse(repaired); } catch(e3) {}
+      // محاولة أشد — نحذف آخر عنصر ناقص في مصفوفة
+      repaired = partial.replace(/,?\s*\{[^}]*$/, '');
+      opens = (repaired.match(/\[/g)||[]).length - (repaired.match(/\]/g)||[]).length;
+      for (var k = 0; k < opens; k++) repaired += ']';
+      openB = (repaired.match(/\{/g)||[]).length - (repaired.match(/\}/g)||[]).length;
+      for (var l = 0; l < openB; l++) repaired += '}';
+      try { return JSON.parse(repaired); } catch(e4) {}
     }
     return null;
   }
@@ -11450,38 +11477,43 @@ function daSearch() {
   incToolUsage('drug-alt');
   var resBox = document.getElementById('da-result');
   resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">جاري البحث عن البدائل...</span></div>';
-  var sysPrompt = 'أنت صيدلاني سريري خبير في السوق المصري. أجب فقط بـ JSON نقي صالح — لا markdown، لا ```، لا نص خارج الـ JSON أبداً. جميع الأسعار بالجنيه المصري EGP. كل بديل يجب أن يكون دواءً تجارياً حقيقياً مسجّلاً ومتاحاً في الصيدليات المصرية مع ذكر شركة الإنتاج والشكل الصيدلاني والتركيز بدقة.';
-  var prompt = 'الدواء: "' + drug + '"\n\n' +
-    'أجب بهذا JSON الحرفي فقط (لا شيء قبله ولا بعده):\n' +
-    '{' +
-      '"drug_name":"الاسم التجاري الكامل للدواء في مصر",' +
-      '"active_ingredient":"المادة الفعالة بالعربي",' +
-      '"active_ingredient_en":"Active Ingredient in English",' +
-      '"drug_class":"تصنيف الدواء الدوائي",' +
-      '"main_use":"الاستخدام الرئيسي",' +
-      '"dosage_form":"الشكل الصيدلاني (أقراص/شراب/حقن/مرهم/...)",' +
-      '"price_range":"نطاق سعر الدواء الأصلي بالجنيه المصري EGP",' +
-      '"alternatives":[' +
-         '{"name":"اسم تجاري حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"},' +
-         '{"name":"بديل ثاني حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"},' +
-         '{"name":"بديل ثالث حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"},' +
-         '{"name":"بديل رابع حقيقي في مصر","active":"المادة الفعالة","company":"شركة الإنتاج","dosage_form":"الشكل الصيدلاني","strength":"التركيز والجرعة","price":"السعر بالجنيه EGP","notes":"مميزاته وفرقه"}' +
-      '],' +
-      '"warnings":"أهم التحذيرات والتفاعلات الدوائية",' +
-      '"note":"استشر الطبيب أو الصيدلاني قبل تغيير الدواء"' +
-    '}';
+  var sysPrompt = 'صيدلاني مصري خبير. أجب بـ JSON فقط بلا markdown.';
+  var prompt = 'بدائل دواء: ' + drug + '\nJSON فقط:\n' +
+    '{"drug_name":"","active_ingredient":"","active_ingredient_en":"","drug_class":"","main_use":"","dosage_form":"","price_range":"EGP",' +
+    '"alternatives":[' +
+    '{"name":"","active":"","company":"","dosage_form":"","strength":"","price":"EGP","notes":""},' +
+    '{"name":"","active":"","company":"","dosage_form":"","strength":"","price":"EGP","notes":""},' +
+    '{"name":"","active":"","company":"","dosage_form":"","strength":"","price":"EGP","notes":""},' +
+    '{"name":"","active":"","company":"","dosage_form":"","strength":"","price":"EGP","notes":""}],' +
+    '"warnings":"","note":""}';
   var msgs = [{role:'system',content:sysPrompt},{role:'user',content:prompt}];
   var handled = false;
   function extractJSON(raw) {
     if (!raw) return null;
     var s = raw.replace(/```json|```/g, '').trim();
-    // محاولة مباشرة أولاً
     try { return JSON.parse(s); } catch(e) {}
-    // استخراج أول { ... } 
     var start = s.indexOf('{');
     var end = s.lastIndexOf('}');
     if (start !== -1 && end > start) {
       try { return JSON.parse(s.slice(start, end + 1)); } catch(e2) {}
+    }
+    // JSON مقطوع — نرمّمه
+    if (start !== -1) {
+      var partial = s.slice(start);
+      var repaired = partial;
+      repaired = repaired.replace(/,?\s*"[^"]*$/, '');
+      repaired = repaired.replace(/,?\s*"[^"]*":\s*"[^"]*$/, '');
+      var opens = (repaired.match(/\[/g)||[]).length - (repaired.match(/\]/g)||[]).length;
+      for (var i = 0; i < opens; i++) repaired += ']';
+      var openB = (repaired.match(/\{/g)||[]).length - (repaired.match(/\}/g)||[]).length;
+      for (var j = 0; j < openB; j++) repaired += '}';
+      try { return JSON.parse(repaired); } catch(e3) {}
+      repaired = partial.replace(/,?\s*\{[^}]*$/, '');
+      opens = (repaired.match(/\[/g)||[]).length - (repaired.match(/\]/g)||[]).length;
+      for (var k = 0; k < opens; k++) repaired += ']';
+      openB = (repaired.match(/\{/g)||[]).length - (repaired.match(/\}/g)||[]).length;
+      for (var l = 0; l < openB; l++) repaired += '}';
+      try { return JSON.parse(repaired); } catch(e4) {}
     }
     return null;
   }
