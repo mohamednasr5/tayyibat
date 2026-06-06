@@ -98,7 +98,7 @@ function _capture(videoEl, quality) {
   return img;
 }
 
- /** أرسل صورة + برومبت مباشرة للـ CF Worker → نص الرد */
+/** أرسل صورة + برومبت مباشرة للـ CF Worker → نص الرد */
 async function _toWorker(imgDataUrl, prompt) {
   var base64 = imgDataUrl,
     mediaType = "image/jpeg";
@@ -123,7 +123,9 @@ async function _toWorker(imgDataUrl, prompt) {
 
     var resp = await fetch(CF_WORKER, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       signal: ctrl.signal,
       body: JSON.stringify({
         prompt: prompt,
@@ -133,35 +135,56 @@ async function _toWorker(imgDataUrl, prompt) {
     });
 
     clearTimeout(tid);
+
     if (!resp.ok) {
       // حاول قراءة body حتى في حالة الخطأ
       var errJson = null;
       try {
         errJson = await resp.json();
       } catch (e) {}
+
       if (errJson && errJson.response) return errJson.response;
       if (errJson && errJson.error)
         return "خطأ من خادم الرؤية: " + errJson.error;
+
       return null;
     }
 
     var data = await resp.json();
     console.log("WORKER RAW:", data);
 
-    // 1) ردود OpenRouter/z.ai: choices
+    // 1) ردود OpenRouter/z.ai: choices (لو استخدمتهم مستقبلاً)
     if (data.choices && data.choices[0]) {
       var msg = data.choices[0].message || data.choices[0];
       var t = msg.content || msg.text || null;
       if (t && t.trim().length > 5) return t.trim();
     }
 
-    // 2) رد Cloudflare Vision الموحّد: result string
+    // 2) رد Cloudflare Vision الموحّد: result
     if (data.result) {
       var r = data.result;
-      if (typeof r === "string" && r.trim().length > 5) return r.trim();
-      if (r.response && typeof r.response === "string")
-        return r.response.trim();
-      if (r.text && typeof r.text === "string") return r.text.trim();
+
+      // لو result = JSON string (مثلاً بدائل أدوية)
+      if (typeof r === "string") {
+        try {
+          var parsed = JSON.parse(r);
+          // لو فيه text داخل الـ JSON
+          if (parsed.text) return parsed.text.toString().trim();
+          // fallback: حوّله لنص منسّق
+          return JSON.stringify(parsed, null, 2);
+        } catch (e) {
+          // ليست JSON، استخدمها كما هي
+          if (r.trim().length > 5) return r.trim();
+        }
+      }
+
+      // لو result ككائن
+      if (typeof r === "object") {
+        if (r.text && typeof r.text === "string") return r.text.trim();
+        if (r.response && typeof r.response === "string")
+          return r.response.trim();
+        return JSON.stringify(r);
+      }
     }
 
     // 3) fallback عام: response نصّي
