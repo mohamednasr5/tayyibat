@@ -18,10 +18,78 @@
      ① الإعدادات
   ══════════════════════════════════════════ */
   var CF_WORKER  = 'https://taybat-ai.studegy8.workers.dev';
-  var TIMEOUT_MS = 22000;   // 22 ثانية للرؤية
-  var LIVE_DELAY = 2000;    // انتظر 2 ثانية قبل أول تحليل تلقائي
-  var LIVE_INTERVAL = 4000; // كرر كل 4 ثوانٍ حتى تنجح
+  var TIMEOUT_MS = 25000;   // 25 ثانية للرؤية
+  var LIVE_DELAY = 2000;
+  var LIVE_INTERVAL = 4000;
   var IMG_QUALITY = 0.88;
+
+  /* ── Fallback Vision: LLM7 + Pollinations إذا فشل CF Worker ── */
+  async function _tryVisionFallback(imgDataUrl, prompt) {
+    // 1. استخدم TayyibatAI.vision إذا كان متاحاً (من ai-engine.js)
+    if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
+      try {
+        var r = await window.TayyibatAI.vision(imgDataUrl, prompt);
+        if (r && r.text && r.text.length > 5) return r.text;
+      } catch(e) {}
+    }
+    // 2. LLM7 مباشرة
+    try {
+      var llm7Models = ['gpt-4o', 'gpt-4.1', 'claude-3-5-sonnet-20241022', 'gemini-1.5-pro'];
+      for (var i = 0; i < llm7Models.length; i++) {
+        try {
+          var imgUrl = imgDataUrl.startsWith('data:') ? imgDataUrl : 'data:image/jpeg;base64,' + imgDataUrl;
+          var tp = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('T')); }, 18000); });
+          var resp = await Promise.race([
+            fetch('https://api.llm7.io/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: llm7Models[i],
+                messages: [{ role:'user', content:[{type:'text',text:prompt},{type:'image_url',image_url:{url:imgUrl}}] }],
+                max_tokens: 1500, temperature: 0.3
+              })
+            }), tp
+          ]);
+          if (!resp.ok) continue;
+          var data = await resp.json();
+          if (data.choices && data.choices[0]) {
+            var msg = data.choices[0].message || data.choices[0];
+            var text = msg.content || msg.text || '';
+            if (text && text.trim().length > 5) return text.trim();
+          }
+        } catch(e2) { continue; }
+      }
+    } catch(e) {}
+    // 3. Pollinations مباشرة
+    try {
+      var polModels = ['openai', 'openai-large', 'gemini'];
+      for (var j = 0; j < polModels.length; j++) {
+        try {
+          var imgUrl2 = imgDataUrl.startsWith('data:') ? imgDataUrl : 'data:image/jpeg;base64,' + imgDataUrl;
+          var tp2 = new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('T')); }, 18000); });
+          var resp2 = await Promise.race([
+            fetch('https://text.pollinations.ai/openai', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: polModels[j],
+                messages: [{ role:'user', content:[{type:'text',text:prompt},{type:'image_url',image_url:{url:imgUrl2}}] }],
+                max_tokens: 1500, temperature: 0.3, private: true
+              })
+            }), tp2
+          ]);
+          if (!resp2.ok) continue;
+          var data2 = await resp2.json();
+          if (data2.choices && data2.choices[0]) {
+            var msg2 = data2.choices[0].message || data2.choices[0];
+            var text2 = msg2.content || msg2.text || '';
+            if (text2 && text2.trim().length > 5) return text2.trim();
+          }
+        } catch(e3) { continue; }
+      }
+    } catch(e) {}
+    return null;
+  }
 
   /* ══════════════════════════════════════════
      ② أنماط CSS المشتركة
@@ -206,8 +274,21 @@ async function _toWorker(imgDataUrl, prompt) {
   } catch (e) {
     clearTimeout(tid);
     console.log("VISION _toWorker error:", e);
+    // Fallback: جرّب LLM7 + Pollinations
+    try {
+      var fbText = await _tryVisionFallback(imgDataUrl, prompt);
+      if (fbText && fbText.length > 5) { console.log("[Vision Fallback] LLM7/Pollinations"); return fbText; }
+    } catch(fe) {}
     return null;
   }
+}
+
+/* Wrapper: CF Worker أولاً ثم Fallback تلقائي */
+async function _toWorkerWithFallback(imgDataUrl, prompt) {
+  var result = await _toWorker(imgDataUrl, prompt);
+  if (result && result.length > 5) return result;
+  console.log("[Vision] CF Worker فشل، جرب Fallback LLM7/Pollinations...");
+  return await _tryVisionFallback(imgDataUrl, prompt);
 }
 
   /** مؤشر تحميل */
@@ -847,7 +928,7 @@ async function _toWorker(imgDataUrl, prompt) {
     resultBox.style.display = 'block';
 
     try {
-      var text = await _toWorker(imgData, prompt);
+      var text = await _toWorkerWithFallback(imgData, prompt);
       if (!text || text.trim().length < 8) throw new Error('empty');
 
       var retryFn = function () {
@@ -955,7 +1036,7 @@ async function _toWorker(imgDataUrl, prompt) {
       if (!resBox) { if (_origFsAnalyze) return _origFsAnalyze(imgDataUrl); return; }
       _loader(resBox, _loaderMsg('food'));
       try {
-        var text = await _toWorker(imgDataUrl, PROMPTS.food);
+        var text = await _toWorkerWithFallback(imgDataUrl, PROMPTS.food);
         if (!text) throw new Error();
         try {
           var data = JSON.parse(text.replace(/```json|```/g,'').trim());
@@ -1015,7 +1096,7 @@ async function _toWorker(imgDataUrl, prompt) {
       var smartPrompt = PROMPTS[mode] || prompt;
 
       try {
-        var text = await _toWorker(imgData, smartPrompt);
+        var text = await _toWorkerWithFallback(imgData, smartPrompt);
         if (text && text.trim().length > 8) {
           var resBox = document.getElementById('pa-scan-result');
           if (resBox) resBox.innerHTML = renderCards(text, mode);
@@ -1050,7 +1131,7 @@ async function _toWorker(imgDataUrl, prompt) {
     window._callClaudeAPIWithImage = async function (prompt, imgDataUrl) {
       if (!imgDataUrl) { if (_origCallImg) return _origCallImg(prompt, imgDataUrl); return null; }
       try {
-        var text = await _toWorker(imgDataUrl, prompt);
+        var text = await _toWorkerWithFallback(imgDataUrl, prompt);
         if (text && text.trim().length > 8) return text;
       } catch(e) {}
       if (_origCallImg) return _origCallImg(prompt, imgDataUrl);
@@ -1129,7 +1210,7 @@ async function _toWorker(imgDataUrl, prompt) {
       _loader(resBox, _loaderMsg('fake_image'));
       resBox.style.display = 'block';
       try {
-        var text = await _toWorker(window._fiImageData, PROMPTS.fake_image);
+        var text = await _toWorkerWithFallback(window._fiImageData, PROMPTS.fake_image);
         if (!text) throw new Error();
         resBox.innerHTML = renderCards(text, 'fake_image');
       } catch(e) {
@@ -1160,7 +1241,7 @@ async function _toWorker(imgDataUrl, prompt) {
           var extra   = (grade ? 'الصف: ' + grade + '. ' : '') + (subject ? 'المادة: ' + subject + '. ' : '');
           var prompt  = (extra ? extra + '\n\n' : '') + PROMPTS.homework;
           var imgData = _capture(video, IMG_QUALITY);
-          _toWorker(imgData, prompt).then(function (text) {
+          _toWorkerWithFallback(imgData, prompt).then(function (text) {
             if (text && text.length > 8) {
               resBox.innerHTML = renderCards(text, 'homework');
             } else {
@@ -1189,7 +1270,7 @@ async function _toWorker(imgDataUrl, prompt) {
       var prompt = (gradeInfo ? gradeInfo + '\n\n' : '') + PROMPTS.homework + (textInput ? '\n\nالسؤال: ' + textInput : '');
 
       var apiCall = window._hwImageData
-        ? _toWorker(window._hwImageData, prompt)
+        ? _toWorkerWithFallback(window._hwImageData, prompt)
         : (window._callClaudeAPI ? window._callClaudeAPI(prompt, null).then(function(r){return r;}) : Promise.reject());
 
       apiCall.then(function (text) {
@@ -1221,7 +1302,7 @@ async function _toWorker(imgDataUrl, prompt) {
           var modeMap = { full:'قراءة شاملة', love:'ركّز على الجانب العاطفي والعلاقات', career:'ركّز على المسار المهني', health:'ركّز على جانب الصحة والحيوية' };
           var palmPrompt = PROMPTS.palm + (window._palmMode && window._palmMode !== 'full' ? '\n\n' + (modeMap[window._palmMode] || '') : '');
           var imgData = _capture(video, IMG_QUALITY);
-          _toWorker(imgData, palmPrompt).then(function (text) {
+          _toWorkerWithFallback(imgData, palmPrompt).then(function (text) {
             if (text && text.length > 8) {
               resBox.innerHTML = renderCards(text, 'palm') +
                 '<div class="tvc2-disc">🔮 هذه القراءة للترفيه والاستئناس فقط</div>';
@@ -1247,7 +1328,7 @@ async function _toWorker(imgDataUrl, prompt) {
       var modeMap2 = { full:'قراءة شاملة', love:'العواطف والحب', career:'المسار المهني', health:'الصحة والحيوية' };
       var modeExtra = window._palmMode && window._palmMode !== 'full' ? '\n\nركّز على: ' + (modeMap2[window._palmMode] || '') : '';
       try {
-        var text = await _toWorker(window._palmImageData, PROMPTS.palm + modeExtra);
+        var text = await _toWorkerWithFallback(window._palmImageData, PROMPTS.palm + modeExtra);
         if (!text) throw new Error();
         resBox.innerHTML = renderCards(text, 'palm') +
           '<div class="tvc2-disc">🔮 هذه القراءة للترفيه والاستئناس فقط</div>';
@@ -1315,7 +1396,7 @@ async function _toWorker(imgDataUrl, prompt) {
   ══════════════════════════════════════════ */
   window.TayyibatVisionCards2 = {
     version:        '2.0',
-    sendToWorker:   _toWorker,
+    sendToWorker: _toWorkerWithFallback,
     analyzeLiveNow: analyzeLiveNow,
     startLiveLoop:  startLiveLoop,
     renderCards:    renderCards,
@@ -1347,7 +1428,7 @@ async function _toWorker(imgDataUrl, prompt) {
 
       var prompt = PROMPTS[mode] || PROMPTS.product;
       try {
-        var text = await _toWorker(imgData, prompt);
+        var text = await _toWorkerWithFallback(imgData, prompt);
         if (text && text.trim().length > 8) {
           var retryFn = function () { _paAnalyze(videoEl, mode, resBox, statusEl); };
           resBox.innerHTML = renderCards(text, mode, retryFn);
