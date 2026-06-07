@@ -75,8 +75,8 @@
     'Qwen/Qwen2-VL-72B-Instruct'
   ];
 
-  var TEXT_TIMEOUT = 15000;
-  var VISION_TIMEOUT = 25000;
+  var TEXT_TIMEOUT = 45000;  // رُفع لمنع قطع الإجابات
+  var VISION_TIMEOUT = 60000;  // رُفع لمنع قطع إجابات الرؤية
   var _orLastCall = 0;
 
   /* ══════════════════════════════════ HELPERS ══════════════════════════════════ */
@@ -178,7 +178,7 @@
         body: JSON.stringify({
           model: model,
           messages: messages,
-          max_tokens: 1500,
+          max_tokens: 4096,
           temperature: 0.7
         })
       }), TEXT_TIMEOUT);
@@ -217,7 +217,7 @@
               { type: 'image_url', image_url: imgContent }
             ]
           }],
-          max_tokens: 1500,
+          max_tokens: 4096,
           temperature: 0.3
         })
       }), VISION_TIMEOUT);
@@ -246,7 +246,7 @@
           model: model,
           messages: messages,
           temperature: 0.7,
-          max_tokens: 1500,
+          max_tokens: 4096,
           private: true
         })
       }), TEXT_TIMEOUT);
@@ -286,7 +286,7 @@
             ]
           }],
           temperature: 0.3,
-          max_tokens: 1500,
+          max_tokens: 4096,
           private: true
         })
       }), VISION_TIMEOUT);
@@ -356,7 +356,7 @@
         body: JSON.stringify({
           model: model,
           messages: messages,
-          max_tokens: 1200,
+          max_tokens: 4096,
           temperature: 0.7
         })
       }), TEXT_TIMEOUT);
@@ -390,7 +390,7 @@
         body: JSON.stringify({
           model: 'llama-3.1-70b-versatile',
           messages: messages,
-          max_tokens: 1500,
+          max_tokens: 4096,
           temperature: 0.7
         })
       }), TEXT_TIMEOUT);
