@@ -14868,6 +14868,368 @@ console.log('[AutoCamera] ✅ v1.0 — كاميرا خلفية تلقائية ل
 <!-- ═══ محرك الذكاء الاصطناعي — ملفات خارجية ═══ -->
 <script src="js/ai-engine.js"></script>
 <script src="js/ai-vision-cards.js"></script>
+
+<!-- ═══ طيبات — جسر API الموحد v6.0 — يربط كل الأدوات بالمزودين المجانيين ═══ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ── انتظر تحميل TayyibatAI ثم شغّل الجسر ── */
+  function initBridge() {
+    if (!window.TayyibatAI || !window._universalAICall) {
+      setTimeout(initBridge, 200);
+      return;
+    }
+    if (window.__tayyibatBridgeV6) return;
+    window.__tayyibatBridgeV6 = true;
+
+    /* ══ 1. ربط الدوال الأساسية ══ */
+    window._callClaudeAPI = async function(prompt, systemPrompt) {
+      var messages = [];
+      if (systemPrompt) messages.push({ role:'system', content: systemPrompt });
+      messages.push({ role:'user', content: prompt });
+      var res = await window._universalAICall(messages);
+      if (res && res.text) return res.text;
+      throw new Error('AI_FAILED');
+    };
+
+    window._callClaudeAPIWithImage = async function(prompt, imgDataUrl) {
+      if (!imgDataUrl) return await window._callClaudeAPI(prompt, null);
+      var res = await window._universalAICall([], { imageDataUrl: imgDataUrl, promptText: prompt });
+      if (res && res.text) return res.text;
+      return await window._callClaudeAPI(prompt + '\n(تعذر تحميل الصورة، قدم تحليلاً عاماً)', null);
+    };
+
+    window._smartVisionAnalysis = async function(imgDataUrl, prompt) {
+      return await window.TayyibatAI.vision(imgDataUrl, prompt);
+    };
+
+    /* ══ 2. ربط أداة تفسير الأحلام ══ */
+    var _origDreamInterpret = window.dreamInterpret;
+    window.dreamInterpret = function() {
+      var dreamInput = document.getElementById('dream-input');
+      if (!dreamInput || !dreamInput.value.trim()) {
+        if (typeof showToast === 'function') showToast('اكتب حلمك الأول ✍️');
+        return;
+      }
+      if (typeof canUseTool === 'function' && !canUseTool('dream')) {
+        if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal('dream');
+        return;
+      }
+      if (typeof incToolUsage === 'function') incToolUsage('dream');
+
+      var dreamText = dreamInput.value.trim();
+      var resBox = document.getElementById('dream-result');
+      if (!resBox) return;
+
+      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🌙 بيتفسر حلمك...</span></div>';
+
+      var gender = window._dreamGender === 'male' ? 'ذكر' : window._dreamGender === 'female' ? 'أنثى' : '';
+      var ref = (document.getElementById('dream-ref') || {}).value || 'ابن سيرين';
+      var ageGroup = (document.getElementById('dream-age') || {}).value || '';
+
+      var prompt = 'أنت شيخ وعالم متخصص في تفسير الرؤى بمنهج ' + ref + '.\n\nحلم صاحب الحلم:\n"' + dreamText + '"\n';
+      if (gender) prompt += '\nالجنس: ' + gender;
+      if (ageGroup) prompt += '\nالفئة العمرية: ' + ageGroup;
+      prompt += '\n\nفسّر الحلم:\n**أولاً — الحكم على الرؤيا:**\n**ثانياً — تفسير الرموز:**\n**ثالثاً — المعنى الكلي:**\n**رابعاً — التوجيه العملي:**';
+
+      window.TayyibatAI.chat(prompt, 'أنت شيخ متخصص في تفسير الأحلام والرؤى الإسلامية.').then(function(res) {
+        var text = res && res.text ? res.text : 'تعذر التفسير، حاول مجدداً.';
+        var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(103,58,183,.35);border-radius:20px;overflow:hidden">';
+        html += '<div style="background:linear-gradient(135deg,rgba(103,58,183,.25),rgba(156,95,250,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+        html += '<span style="font-size:1.6rem">🌙</span>';
+        html += '<div><div style="font-size:.92rem;font-weight:900;color:#ce93d8">تفسير الحلم</div>';
+        html += '<div style="font-size:.68rem;color:#b39ddb;margin-top:2px">بمنهج ' + ref + ' · ' + (res && res.source ? res.source : 'AI') + '</div></div>';
+        html += '</div>';
+        html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + text + '</div>';
+        html += '<div style="padding:10px 14px 14px;background:rgba(103,58,183,.08);border-top:1px solid rgba(103,58,183,.2)">';
+        html += '<div style="font-size:.72rem;color:#b39ddb">✨ التفسير للاسترشاد — والرؤيا الصالحة من الله والحلم من الشيطان.</div>';
+        html += '</div></div>';
+        resBox.innerHTML = html;
+      }).catch(function() {
+        resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التفسير، حاول مجدداً.</div>';
+      });
+    };
+
+    /* ══ 3. ربط تحليل الأعراض ══ */
+    var _origAnalyzeSymptoms = window.analyzeSymptoms;
+    window.analyzeSymptoms = function() {
+      var symInput = document.getElementById('sym-symptoms');
+      if (!symInput || !symInput.value.trim()) {
+        if (typeof showToast === 'function') showToast('اكتب أعراضك أولاً');
+        return;
+      }
+      if (typeof canUseTool === 'function' && !canUseTool('symptoms')) {
+        if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal('symptoms');
+        return;
+      }
+      if (typeof incToolUsage === 'function') incToolUsage('symptoms');
+
+      var symptoms = symInput.value.trim();
+      var age = (document.getElementById('sym-age') || {}).value || '';
+      var gender = (document.getElementById('sym-gender') || {}).value || '';
+      var duration = (document.getElementById('sym-duration') || {}).value || '';
+
+      var resBox = document.getElementById('sym-result');
+      if (!resBox) return;
+      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>🩺 جاري التشخيص الذكي...</span></div>';
+
+      var prompt = 'أنت طبيب سريري خبير. حلل الأعراض التالية:\n';
+      prompt += 'الأعراض: ' + symptoms + '\n';
+      if (age) prompt += 'العمر: ' + age + '\n';
+      if (gender) prompt += 'الجنس: ' + gender + '\n';
+      if (duration) prompt += 'مدة الأعراض: ' + duration + '\n';
+      prompt += '\nقدم:\n1. 🎯 الاحتمالات التشخيصية (مرتبة من الأكثر احتمالاً)\n2. ⚠️ علامات التحذير التي تستوجب الطوارئ\n3. 💊 التوصيات الأولية\n4. 🏥 متى تزور الطبيب\n\n⚠️ هذا للمعلومات فقط — استشر طبيبك.';
+
+      window.TayyibatAI.chat(prompt, 'أنت طبيب سريري عربي متخصص. أجب بالعربية بشكل منظم ومفيد.').then(function(res) {
+        var text = res && res.text ? res.text : 'تعذر التحليل.';
+        var src = res && res.source ? res.source : 'AI';
+        var html = '<div style="background:rgba(255,152,0,.07);border:2px solid rgba(255,152,0,.3);border-radius:16px;overflow:hidden">';
+        html += '<div style="background:rgba(255,152,0,.12);padding:11px 14px;display:flex;align-items:center;gap:8px">';
+        html += '<span style="font-size:1.4rem">🩺</span>';
+        html += '<div><div style="font-size:.9rem;font-weight:900;color:#ffa726">تحليل الأعراض</div>';
+        html += '<div style="font-size:.65rem;color:#ffb74d;margin-top:1px">' + src + ' · للمعلومات فقط</div></div></div>';
+        html += '<div style="padding:14px;font-size:.84rem;line-height:1.9;white-space:pre-line">' + text + '</div>';
+        html += '</div>';
+        resBox.innerHTML = html;
+      }).catch(function() {
+        resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر التحليل، حاول مجدداً.</div>';
+      });
+    };
+
+    /* ══ 4. ربط تفاعلات الأدوية ══ */
+    var _origCheckInteraction = window.checkDrugInteraction || window.checkInteraction;
+    window.checkDrugInteraction = window.checkInteraction = function() {
+      var drug1El = document.getElementById('drug1') || document.getElementById('inter-drug1');
+      var drug2El = document.getElementById('drug2') || document.getElementById('inter-drug2');
+      var extraDrugsEl = document.getElementById('inter-drugs-extra');
+
+      var drugs = [];
+      if (drug1El && drug1El.value.trim()) drugs.push(drug1El.value.trim());
+      if (drug2El && drug2El.value.trim()) drugs.push(drug2El.value.trim());
+      if (extraDrugsEl && extraDrugsEl.value.trim()) {
+        extraDrugsEl.value.split(/[،,\n]+/).forEach(function(d) {
+          var t = d.trim();
+          if (t) drugs.push(t);
+        });
+      }
+
+      if (drugs.length < 2) {
+        if (typeof showToast === 'function') showToast('أدخل دواءين على الأقل');
+        return;
+      }
+      if (typeof canUseTool === 'function' && !canUseTool('interaction')) {
+        if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal('interaction');
+        return;
+      }
+      if (typeof incToolUsage === 'function') incToolUsage('interaction');
+
+      var resBox = document.getElementById('interaction-result') || document.getElementById('inter-result');
+      if (!resBox) return;
+      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>💊 جاري فحص التفاعلات...</span></div>';
+
+      var prompt = 'أنت صيدلي سريري خبير متخصص في التفاعلات الدوائية.\n';
+      prompt += 'حلل التفاعلات بين الأدوية التالية: ' + drugs.join('، ') + '\n\n';
+      prompt += 'اذكر:\n⚠️ التفاعلات الخطيرة (خطر عالٍ)\n⚡ التفاعلات المتوسطة\n💡 التفاعلات البسيطة\n✅ هل يمكن استخدامها معاً؟\n🔄 البدائل الآمنة إن وجدت\n\n⚠️ للمعلومات فقط — استشر صيدلانيك.';
+
+      window.TayyibatAI.drugInteractions(drugs).then(function(res) {
+        var text = res && res.text ? res.text : 'تعذر الفحص.';
+        var src = res && res.source ? res.source : 'AI';
+
+        // تلوين حسب الخطورة
+        var bgColor = text.includes('خطير') || text.includes('تجنب') ? 'rgba(229,57,53,.07)' : 'rgba(33,150,243,.07)';
+        var borderColor = text.includes('خطير') || text.includes('تجنب') ? 'rgba(229,57,53,.3)' : 'rgba(33,150,243,.3)';
+        var titleColor = text.includes('خطير') || text.includes('تجنب') ? '#ef5350' : '#42a5f5';
+        var emoji = text.includes('خطير') || text.includes('تجنب') ? '🚨' : '💊';
+
+        var html = '<div style="background:' + bgColor + ';border:2px solid ' + borderColor + ';border-radius:16px;overflow:hidden">';
+        html += '<div style="background:' + bgColor + ';padding:11px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid ' + borderColor + '">';
+        html += '<span style="font-size:1.4rem">' + emoji + '</span>';
+        html += '<div><div style="font-size:.9rem;font-weight:900;color:' + titleColor + '">نتيجة فحص التفاعلات</div>';
+        html += '<div style="font-size:.65rem;color:var(--txt2)">' + drugs.join(' + ') + ' · ' + src + '</div></div></div>';
+        html += '<div style="padding:14px;font-size:.84rem;line-height:1.9;white-space:pre-line">' + text + '</div></div>';
+        resBox.innerHTML = html;
+      }).catch(function() {
+        resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر الفحص، حاول مجدداً.</div>';
+      });
+    };
+
+    /* ══ 5. ربط بدائل الأدوية ══ */
+    var _origDrugAlt = window.searchDrugAlternatives || window.findDrugAlternatives;
+    window.searchDrugAlternatives = window.findDrugAlternatives = function(drugName) {
+      var nameEl = document.getElementById('da-name') || document.getElementById('drug-alt-input');
+      var name = drugName || (nameEl && nameEl.value.trim()) || '';
+      if (!name) {
+        if (typeof showToast === 'function') showToast('اكتب اسم الدواء أولاً');
+        return;
+      }
+      if (typeof canUseTool === 'function' && !canUseTool('drug-alt')) {
+        if (typeof showTrialExpiredModal === 'function') showTrialExpiredModal('drug-alt');
+        return;
+      }
+      if (typeof incToolUsage === 'function') incToolUsage('drug-alt');
+
+      var resBox = document.getElementById('da-result') || document.getElementById('drug-alt-result');
+      if (!resBox) return;
+      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>💊 جاري البحث عن بدائل...</span></div>';
+
+      window.TayyibatAI.drugAlternatives(name).then(function(res) {
+        if (!res || !res.text) {
+          resBox.innerHTML = '<div style="padding:14px;color:#ff9800">لم يتم العثور على بدائل.</div>';
+          return;
+        }
+
+        // محاولة parse JSON
+        var data = null;
+        try {
+          var clean = res.text.replace(/```json|```/g, '').trim();
+          if (clean.startsWith('{')) data = JSON.parse(clean);
+        } catch(e) {}
+
+        if (data && data.alternatives) {
+          var html = '<div style="background:rgba(171,71,188,.07);border:2px solid rgba(171,71,188,.3);border-radius:16px;overflow:hidden">';
+          html += '<div style="background:rgba(171,71,188,.12);padding:11px 14px;display:flex;align-items:center;gap:8px">';
+          html += '<span style="font-size:1.4rem">💊</span>';
+          html += '<div><div style="font-size:.9rem;font-weight:900;color:#ce93d8">بدائل ' + (data.drug_name || name) + '</div>';
+          html += '<div style="font-size:.65rem;color:var(--txt2)">' + (data.active_ingredient || '') + ' · ' + res.source + '</div></div></div>';
+          html += '<div style="padding:12px">';
+          data.alternatives.forEach(function(alt, i) {
+            html += '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(171,71,188,.2);border-radius:12px;padding:10px 12px;margin-bottom:8px">';
+            html += '<div style="font-weight:800;color:#ce93d8;margin-bottom:4px">' + (i+1) + '. ' + (alt.name || '') + '</div>';
+            if (alt.dose) html += '<div style="font-size:.75rem;color:var(--txt2)">📋 الجرعة: ' + alt.dose + '</div>';
+            if (alt.company) html += '<div style="font-size:.75rem;color:var(--txt2)">🏭 الشركة: ' + alt.company + '</div>';
+            if (alt.country) html += '<div style="font-size:.75rem;color:var(--txt2)">🌍 ' + alt.country + '</div>';
+            html += '</div>';
+          });
+          if (data.note) html += '<div style="font-size:.73rem;color:#ffb74d;padding:8px;background:rgba(255,152,0,.08);border-radius:10px">⚠️ ' + data.note + '</div>';
+          html += '</div></div>';
+          resBox.innerHTML = html;
+        } else {
+          // نص عادي
+          var html2 = '<div style="background:rgba(171,71,188,.07);border:2px solid rgba(171,71,188,.3);border-radius:16px;padding:14px">';
+          html2 += '<div style="font-size:.9rem;font-weight:900;color:#ce93d8;margin-bottom:8px">💊 بدائل ' + name + '</div>';
+          html2 += '<div style="font-size:.84rem;line-height:1.9;white-space:pre-line">' + res.text + '</div></div>';
+          resBox.innerHTML = html2;
+        }
+      }).catch(function() {
+        resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر البحث، حاول مجدداً.</div>';
+      });
+    };
+
+    /* ══ 6. ربط البرج الفلكي ══ */
+    window._getHoroscopeToday = function(sign) {
+      var resBox = document.getElementById('horoscope-result') || document.getElementById('zod-result');
+      if (!resBox) return;
+      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>⭐ جاري استشراف توقعاتك...</span></div>';
+
+      window.TayyibatAI.horoscope(sign).then(function(res) {
+        var text = res && res.text ? res.text : 'تعذر جلب التوقعات.';
+        var src = res && res.source ? res.source : 'AI';
+        var html = '<div style="background:rgba(100,181,246,.07);border:2px solid rgba(100,181,246,.3);border-radius:16px;overflow:hidden">';
+        html += '<div style="background:rgba(100,181,246,.12);padding:11px 14px;display:flex;align-items:center;gap:8px">';
+        html += '<span style="font-size:1.4rem">⭐</span>';
+        html += '<div><div style="font-size:.9rem;font-weight:900;color:#90caf9">توقعات برج ' + sign + '</div>';
+        html += '<div style="font-size:.65rem;color:var(--txt2)">' + src + ' · ⚠️ للترفيه فقط</div></div></div>';
+        html += '<div style="padding:14px;font-size:.84rem;line-height:1.9;white-space:pre-line">' + text + '</div></div>';
+        resBox.innerHTML = html;
+      }).catch(function() {});
+    };
+
+    /* ══ 7. ربط المقاطعة ══ */
+    window._checkBoycottAI = function(product) {
+      var resBox = document.getElementById('boycott-ai-result') || document.getElementById('bct-result');
+      if (!resBox) return;
+      resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>🔍 جاري التحقق من المنتج...</span></div>';
+
+      window.TayyibatAI.boycottCheck(product).then(function(res) {
+        var text = res && res.text ? res.text : 'تعذر التحقق.';
+        var src = res && res.source ? res.source : 'AI';
+        var isBct = text.includes('مقاطعة') || text.includes('BDS');
+        var bg = isBct ? 'rgba(229,57,53,.07)' : 'rgba(46,201,81,.07)';
+        var border = isBct ? 'rgba(229,57,53,.3)' : 'rgba(46,201,81,.3)';
+        var clr = isBct ? '#ef5350' : '#2ec951';
+        var emoji = isBct ? '🚫' : '✅';
+
+        var html = '<div style="background:' + bg + ';border:2px solid ' + border + ';border-radius:16px;overflow:hidden">';
+        html += '<div style="padding:11px 14px;display:flex;align-items:center;gap:8px;background:' + bg + '">';
+        html += '<span style="font-size:1.4rem">' + emoji + '</span>';
+        html += '<div><div style="font-size:.9rem;font-weight:900;color:' + clr + '">نتيجة فحص المقاطعة</div>';
+        html += '<div style="font-size:.65rem;color:var(--txt2)">' + product + ' · ' + src + '</div></div></div>';
+        html += '<div style="padding:14px;font-size:.84rem;line-height:1.9;white-space:pre-line">' + text + '</div></div>';
+        resBox.innerHTML = html;
+      }).catch(function() {});
+    };
+
+    /* ══ 8. ربط طبيبك الخاص (OBGYN + عام) ══ */
+    // OBGYN Doctor
+    var _origObgynSend = window.obgynSend;
+    if (typeof window.obgynSend === 'function' || true) {
+      window.obgynSend = function() {
+        var input = document.getElementById('obgyn-input') || document.getElementById('pt-ai-input');
+        if (!input || !input.value.trim()) {
+          if (typeof showToast === 'function') showToast('اكتبي سؤالك أولاً');
+          return;
+        }
+        var question = input.value.trim();
+        var resBox = document.getElementById('obgyn-result') || document.getElementById('pt-ai-result');
+        if (!resBox) return;
+
+        resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>💕 د. طيبات تفكر...</span></div>';
+        input.value = '';
+
+        var sys = 'أنتِ د. طيبات، طبيبة متخصصة في أمراض النساء والتوليد. تتحدثين بالعربية بأسلوب دافئ. ابدئي بـ "حبيبتي". ⚠️ للمعلومات فقط.';
+        window.TayyibatAI.chat(question, sys).then(function(res) {
+          var text = res && res.text ? res.text : 'تعذر الرد.';
+          var html = '<div style="background:rgba(233,30,99,.07);border:2px solid rgba(233,30,99,.25);border-radius:14px;padding:13px">';
+          html += '<div style="font-size:.78rem;font-weight:800;color:#f48fb1;margin-bottom:7px">🩺 د. طيبات</div>';
+          html += '<div style="font-size:.84rem;line-height:1.9;white-space:pre-line">' + text + '</div></div>';
+          resBox.innerHTML = html;
+        }).catch(function() {
+          resBox.innerHTML = '<div style="padding:12px;color:#ff9800">تعذر الرد، حاولي مجدداً.</div>';
+        });
+      };
+
+      window.obgynQuickAsk = function(question) {
+        var input = document.getElementById('obgyn-input') || document.getElementById('pt-ai-input');
+        if (input) { input.value = question; window.obgynSend(); }
+      };
+    }
+
+    /* ══ 9. تحديث شريط الحالة ══ */
+    var statusDot = document.getElementById('gemini-dot');
+    var statusTxt = document.getElementById('gemini-status-txt');
+    if (statusDot) statusDot.className = 'gemini-status-dot ready';
+    if (statusTxt) statusTxt.textContent = 'AI جاهز — LLM7 + Pollinations + Kepler';
+
+    /* ══ 10. تحديث شارة المزودين ══ */
+    var heroBadge = document.querySelector('.ai-hero-badge');
+    if (heroBadge) heroBadge.innerHTML = '<i class="fas fa-brain"></i> LLM7 + Pollinations + CF-Worker + Kepler';
+
+    var modelBadges = document.querySelectorAll('.ai-model-badge');
+    modelBadges.forEach(function(b) {
+      b.textContent = 'LLM7 + Pollinations + CF-Worker';
+    });
+
+    console.log('[طيبات Bridge v6.0] ✅ كل الأدوات مربوطة بـ 6 مزودين مجانيين');
+    if (typeof showToast === 'function') {
+      setTimeout(function() {
+        // لا نظهر toast — فقط console
+      }, 1000);
+    }
+  }
+
+  // شغّل الجسر فور اكتمال الصفحة
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBridge);
+  } else {
+    initBridge();
+  }
+  // احتياطي إضافي
+  setTimeout(initBridge, 500);
+  setTimeout(initBridge, 1500);
+
+})();
+</script>
 <script>
 // ===== Daily Reward: مزامنة الوقت من الإنترنت مع fallback =====
 var netDate = null;
