@@ -266,7 +266,8 @@
   import { getDatabase, ref, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
   import {
     getAuth, GoogleAuthProvider,
-    signInWithPopup, signOut, onAuthStateChanged
+    signInWithPopup, signInWithRedirect, getRedirectResult,
+    signOut, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -300,11 +301,21 @@
     window.__firebaseOnValue = onValue;
     window.firebaseRemove    = remove;
     window.__firebaseRemove  = remove;
-    window.googleProvider    = googleProvider;
-    window.fbSignInWithPopup = signInWithPopup;
-    window.fbSignOut         = signOut;
-    window.firebaseReady     = true;
-    window.__firebaseReady   = true;
+    window.googleProvider      = googleProvider;
+    window.fbSignInWithPopup   = signInWithPopup;
+    window.fbSignInWithRedirect = signInWithRedirect;
+    window.fbGetRedirectResult  = getRedirectResult;
+    window.fbSignOut            = signOut;
+    window.firebaseReady        = true;
+    window.__firebaseReady      = true;
+
+    // تحقق من نتيجة Redirect login (للمتصفحات التي تحجب Popup)
+    try {
+      const redirectResult = await getRedirectResult(auth);
+      if (redirectResult && redirectResult.user) {
+        await handleGoogleUserData(redirectResult.user);
+      }
+    } catch(re) { console.warn('[Firebase Redirect]', re.code); }
 
     try {
       const cfgSnap = await Promise.race([
@@ -2422,7 +2433,22 @@ window.geminiSend = window.geminiSend || function() {};
             style="flex:1;height:44px;border:1.5px solid rgba(33,150,243,.4);border-radius:10px;padding:0 12px;font-size:.88rem;background:rgba(0,0,0,.25);color:var(--txt);font-family:Tajawal,sans-serif;outline:none"
             oninput="drugSearchDebounce(this.value)"
             onkeydown="if(event.key==='Enter') drugSearchByName(this.value)">
-          
+          <button onclick="drugCamToggle()" id="drug-cam-btn" title="مسح اسم الدواء بالكاميرا"
+            style="width:44px;height:44px;border-radius:10px;border:1.5px solid rgba(33,150,243,.5);background:rgba(33,150,243,.15);color:#64b5f6;font-size:1.2rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .2s">
+            <i class="fas fa-camera"></i>
+          </button>
+        </div>
+        <!-- ── مربع الكاميرا المصغّر لمسح اسم الدواء ── -->
+        <div id="drug-cam-area" style="display:none;margin-bottom:10px;position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(33,150,243,.4)">
+          <video id="drug-cam-video" autoplay playsinline style="width:100%;display:block;max-height:200px;object-fit:cover"></video>
+          <!-- إطار التركيز -->
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;height:50%;border:2px dashed rgba(33,150,243,.8);border-radius:10px;pointer-events:none"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.75));padding:8px;display:flex;align-items:center;justify-content:space-between">
+            <span id="drug-cam-status" style="font-size:.7rem;color:#90caf9">📷 وجّه على اسم الدواء...</span>
+            <button onclick="drugCamCapture()" style="padding:5px 12px;background:#2196f3;color:#fff;border:none;border-radius:8px;font-family:Tajawal,sans-serif;font-size:.75rem;font-weight:700;cursor:pointer">
+              <i class="fas fa-crosshairs"></i> التقط
+            </button>
+          </div>
         </div>
         <div id="drug-db-status" style="font-size:.72rem;color:var(--txt3);text-align:center;margin-bottom:4px;min-height:16px"></div>
         <div id="drug-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto"></div>
@@ -2773,10 +2799,63 @@ window.geminiSend = window.geminiSend || function() {};
       </div>
     </div>
 
-    <!-- ═══ كتابة السؤال ═══ -->
+    <!-- ═══ كتابة السؤال أو مسحه بالكاميرا ═══ -->
     <div class="field" id="hw-question-wrap" style="margin-bottom:12px;display:none">
-      <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:6px">✏️ اكتب سؤالك هنا</label>
-      <textarea id="hw-text-input" placeholder="اكتب السؤال بالتفصيل..." rows="4" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
+      <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:8px">📋 اختر طريقة إدخال السؤال</label>
+
+      <!-- أزرار اختيار الطريقة -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <button onclick="hwInputMode('text')" id="hw-mode-text" class="btn" style="padding:12px 8px;font-size:.82rem;border:2px solid rgba(33,150,243,.5);background:rgba(33,150,243,.18);color:#64b5f6;border-radius:14px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:5px">
+          <i class="fas fa-keyboard" style="font-size:1.3rem"></i>
+          <span>اكتب السؤال</span>
+        </button>
+        <button onclick="hwInputMode('camera')" id="hw-mode-camera" class="btn" style="padding:12px 8px;font-size:.82rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:14px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:5px">
+          <i class="fas fa-camera" style="font-size:1.3rem"></i>
+          <span>امسح بالكاميرا</span>
+        </button>
+      </div>
+
+      <!-- حقل الكتابة -->
+      <div id="hw-text-wrap">
+        <textarea id="hw-text-input" placeholder="اكتب السؤال بالتفصيل..." rows="4" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
+      </div>
+
+      <!-- قسم المسح بالكاميرا -->
+      <div id="hw-camera-scan-wrap" style="display:none">
+        <!-- زر فتح الكاميرا -->
+        <button onclick="hwScanOpenCamera()" id="hw-scan-cam-btn" class="btn" style="width:100%;background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(100,181,246,.1));border:2px solid rgba(33,150,243,.5);color:#64b5f6;padding:14px;border-radius:14px;font-size:.9rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+          <i class="fas fa-camera" style="font-size:1.2rem"></i>
+          <span>افتح الكاميرا وامسح السؤال</span>
+        </button>
+
+        <!-- منطقة الكاميرا للمسح -->
+        <div id="hw-scan-camera-area" style="display:none;border-radius:16px;overflow:hidden;margin-bottom:10px;position:relative;border:2px solid rgba(33,150,243,.4)">
+          <video id="hw-scan-video" autoplay playsinline style="width:100%;display:block;border-radius:14px"></video>
+          <div style="position:absolute;top:0;left:0;right:0;bottom:0;border:3px solid rgba(33,150,243,.6);border-radius:14px;pointer-events:none"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:12px;text-align:center">
+            <span style="font-size:.75rem;color:#90caf9">📷 وجّه الكاميرا نحو السؤال — الإضاءة مهمة</span>
+          </div>
+        </div>
+
+        <!-- زر التقاط الصورة -->
+        <button onclick="hwScanCapture()" id="hw-scan-capture-btn" class="btn" style="width:100%;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;padding:13px;border-radius:14px;font-size:.9rem;font-weight:800;display:none;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+          <i class="fas fa-crosshairs" style="font-size:1.1rem"></i>
+          <span>التقط الصورة</span>
+        </button>
+
+        <!-- معاينة الصورة الملتقطة -->
+        <div id="hw-scan-preview" style="display:none;margin-bottom:10px">
+          <img id="hw-scan-img" src="" style="width:100%;border-radius:14px;border:2px solid rgba(33,150,243,.4)">
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onclick="hwScanRetake()" class="btn" style="flex:1;padding:10px;background:rgba(255,152,0,.15);border:1.5px solid rgba(255,152,0,.4);color:#ffa726;border-radius:12px;font-size:.82rem;font-weight:700">
+              <i class="fas fa-redo"></i> إعادة التصوير
+            </button>
+            <button onclick="hwScanSolve()" class="btn" style="flex:2;padding:10px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border-radius:12px;font-size:.85rem;font-weight:800">
+              <i class="fas fa-graduation-cap"></i> حلّ السؤال مباشرة
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <button onclick="hwSolve()" class="btn" id="hw-solve-btn" style="width:100%;background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem;display:none">
@@ -7205,6 +7284,126 @@ async function drugSearchByCamera() {
   }
 }
 
+/* ══ كاميرا مسح الأدوية المصغّرة ══ */
+var _drugCamStream = null;
+var _drugCamAnalyzing = false;
+var _drugCamInterval = null;
+
+function drugCamToggle() {
+  var area = document.getElementById('drug-cam-area');
+  var btn  = document.getElementById('drug-cam-btn');
+  if (_drugCamStream) {
+    drugCamStop();
+  } else {
+    drugCamStart();
+  }
+}
+
+function drugCamStart() {
+  var video  = document.getElementById('drug-cam-video');
+  var area   = document.getElementById('drug-cam-area');
+  var btn    = document.getElementById('drug-cam-btn');
+  var status = document.getElementById('drug-cam-status');
+  if (!video || !area) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (typeof showToast === 'function') showToast('الكاميرا غير مدعومة على هذا الجهاز');
+    return;
+  }
+  // جرب الكاميرا الخلفية أولاً ثم أي كاميرا
+  var camConstraints = [
+    { video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 } } },
+    { video: { facingMode: 'environment', width: { ideal: 1280 } } },
+    { video: true }
+  ];
+  function tryCamera(idx) {
+    if (idx >= camConstraints.length) {
+      if (typeof showToast === 'function') showToast('❌ تعذر فتح الكاميرا. تحقق من الأذونات في إعدادات المتصفح');
+      return;
+    }
+    navigator.mediaDevices.getUserMedia(camConstraints[idx])
+      .then(function(stream) {
+        _drugCamStream = stream;
+        video.srcObject = stream;
+        if (area) area.style.display = 'block';
+        if (btn)  { btn.style.background = 'rgba(244,67,54,.2)'; btn.style.borderColor = 'rgba(244,67,54,.5)'; btn.style.color = '#ef5350'; btn.innerHTML = '<i class="fas fa-stop-circle"></i>'; }
+        if (status) status.textContent = '📷 وجّه على اسم الدواء...';
+        // تحليل تلقائي كل 2.5 ثانية
+        clearInterval(_drugCamInterval);
+        _drugCamInterval = setInterval(function() { _drugCamAutoRead(); }, 2500);
+      })
+      .catch(function(err) {
+        console.warn('[DrugCam] attempt', idx, err.name, err.message);
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          if (typeof showToast === 'function') showToast('❌ لم يتم منح إذن الكاميرا. افتح إعدادات المتصفح واسمح بالكاميرا');
+        } else {
+          tryCamera(idx + 1);
+        }
+      });
+  }
+  tryCamera(0);
+}
+
+function drugCamStop() {
+  clearInterval(_drugCamInterval); _drugCamInterval = null;
+  _drugCamAnalyzing = false;
+  if (_drugCamStream) { _drugCamStream.getTracks().forEach(function(t) { t.stop(); }); _drugCamStream = null; }
+  var video  = document.getElementById('drug-cam-video');
+  var area   = document.getElementById('drug-cam-area');
+  var btn    = document.getElementById('drug-cam-btn');
+  if (video) { video.srcObject = null; }
+  if (area)  { area.style.display = 'none'; }
+  if (btn)   { btn.style.background = 'rgba(33,150,243,.15)'; btn.style.borderColor = 'rgba(33,150,243,.5)'; btn.style.color = '#64b5f6'; btn.innerHTML = '<i class="fas fa-camera"></i>'; }
+}
+
+function drugCamCapture() {
+  _drugCamAutoRead(true);
+}
+
+async function _drugCamAutoRead(isManual) {
+  if (_drugCamAnalyzing && !isManual) return;
+  var video  = document.getElementById('drug-cam-video');
+  var status = document.getElementById('drug-cam-status');
+  if (!video || !_drugCamStream || !video.videoWidth) return;
+  _drugCamAnalyzing = true;
+  if (status) status.textContent = '🔍 جاري قراءة الاسم...';
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var imgData = canvas.toDataURL('image/jpeg', 0.88);
+  var prompt = 'انظر لهذه الصورة وأخرج اسم الدواء فقط (الاسم التجاري أو العلمي بالعربية أو الإنجليزية). لا تكتب أي شرح أو جمل — فقط الاسم وحده على سطر واحد. إذا لم تجد دواءً واضحاً اكتب: لا يوجد';
+  try {
+    var result = null;
+    if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
+      var r = await window.TayyibatAI.vision(imgData, prompt);
+      result = r && r.text ? r.text.trim() : null;
+    } else if (typeof window._callClaudeAPIWithImage === 'function') {
+      result = (await window._callClaudeAPIWithImage(prompt, imgData)).trim();
+    } else if (typeof window._smartVisionAnalysis === 'function') {
+      var r2 = await window._smartVisionAnalysis(imgData, prompt);
+      result = r2 && r2.text ? r2.text.trim() : null;
+    }
+    if (result && result.length > 1 && !result.includes('لا يوجد') && !result.includes('لا أرى')) {
+      var drugName = result.split('
+')[0].replace(/[*_#"’‘]/g, '').trim();
+      if (drugName.length > 1) {
+        var inp = document.getElementById('drug-name-search-input');
+        if (inp) { inp.value = drugName; }
+        if (status) status.textContent = '✅ تم قراءة: ' + drugName;
+        drugCamStop();
+        await drugSearchByName(drugName);
+        _drugCamAnalyzing = false;
+        return;
+      }
+    }
+    if (status) status.textContent = isManual ? '⚠️ لم يُقرأ الاسم — أعد المحاولة' : '📷 وجّه على اسم الدواء...';
+  } catch(e) {
+    if (status) status.textContent = '⚠️ خطأ في القراءة';
+    console.warn('[DrugCam]', e);
+  }
+  _drugCamAnalyzing = false;
+}
+
 // Pre-load DB when entering medicine mode — shows progress
 var _drugDBPreloaded = false;
 function _preloadDrugDB() {
@@ -10616,20 +10815,42 @@ async function doGoogleLogin() {
   if (btn2) { btn2.disabled = true; btn2.innerHTML = spinner; }
   try {
     if (!window.fbSignInWithPopup || !window.googleProvider || !window.firebaseAuth) {
-      showAuthError('login', '⚠️ انتظر ثانية ثم أعد المحاولة');
-      if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
-      if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
+      // Firebase لم يُحمَّل بعد، انتظر قليلاً
+      setTimeout(function() {
+        if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
+        if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
+        showAuthError('login', '⚠️ جاري التحميل — أعد المحاولة بعد ثانيتين');
+      }, 2000);
       return;
     }
-    var result = await window.fbSignInWithPopup(window.firebaseAuth, window.googleProvider);
-    await handleGoogleUserData(result.user);
+    // حاول Popup أولاً
+    try {
+      var result = await window.fbSignInWithPopup(window.firebaseAuth, window.googleProvider);
+      await handleGoogleUserData(result.user);
+    } catch(popupErr) {
+      console.warn('[Google] Popup failed:', popupErr.code);
+      var popupBlocked = popupErr.code === 'auth/popup-blocked'
+                      || popupErr.code === 'auth/popup-cancelled'
+                      || popupErr.code === 'auth/cancelled-popup-request';
+      if (popupBlocked && window.fbSignInWithRedirect) {
+        // المتصفح حجب الـ popup — استخدم Redirect بدلاً منه
+        showAuthError('login', '⏳ يتم إعادة التوجيه لصفحة جوجل...');
+        await window.fbSignInWithRedirect(window.firebaseAuth, window.googleProvider);
+        return; // الصفحة ستُعاد تحميلها، getRedirectResult سيتعامل مع النتيجة
+      }
+      if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/user-cancelled') {
+        showAuthError('login', 'تم إغلاق نافذة تسجيل الدخول');
+      } else if (popupErr.code === 'auth/unauthorized-domain') {
+        showAuthError('login', '⚠️ النطاق غير مسموح به في Firebase Console');
+      } else {
+        showAuthError('login', 'فشل تسجيل الدخول بجوجل — حاول مرة أخرى');
+      }
+      if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
+      if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
+    }
   } catch(e) {
     console.error('Google login error:', e);
-    var msg = e.code === 'auth/popup-closed-by-user'  ? 'تم إغلاق نافذة تسجيل الدخول'
-            : e.code === 'auth/popup-blocked'          ? '⚠️ المتصفح حجب النافذة — اسمح بالنوافذ المنبثقة'
-            : e.code === 'auth/unauthorized-domain'    ? '⚠️ النطاق غير مسموح به في Firebase Console'
-            : 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى';
-    showAuthError('login', msg);
+    showAuthError('login', 'فشل تسجيل الدخول بجوجل، حاول مرة أخرى');
     if (btn)  { btn.disabled  = false; btn.innerHTML  = orig1; }
     if (btn2) { btn2.disabled = false; btn2.innerHTML = orig2; }
   }
@@ -11953,6 +12174,146 @@ function fakeImageAnalyze() {
 ════════════════════════════════════════════════════════════ */
 var _hwImageData = null;
 var _hwStream = null;
+var _hwScanStream = null;
+
+/* ── وضع إدخال السؤال: كتابة أو كاميرا ── */
+function hwInputMode(mode) {
+  var textWrap = document.getElementById('hw-text-wrap');
+  var camWrap = document.getElementById('hw-camera-scan-wrap');
+  var btnText = document.getElementById('hw-mode-text');
+  var btnCam = document.getElementById('hw-mode-camera');
+  if (mode === 'camera') {
+    if (textWrap) textWrap.style.display = 'none';
+    if (camWrap) camWrap.style.display = 'block';
+    if (btnText) { btnText.style.border='2px solid rgba(33,150,243,.3)'; btnText.style.background='rgba(33,150,243,.06)'; btnText.style.color='var(--txt2)'; }
+    if (btnCam)  { btnCam.style.border='2px solid rgba(33,150,243,.5)';  btnCam.style.background='rgba(33,150,243,.18)'; btnCam.style.color='#64b5f6'; }
+  } else {
+    if (textWrap) textWrap.style.display = 'block';
+    if (camWrap) camWrap.style.display = 'none';
+    hwScanStopCamera();
+    if (btnText) { btnText.style.border='2px solid rgba(33,150,243,.5)'; btnText.style.background='rgba(33,150,243,.18)'; btnText.style.color='#64b5f6'; }
+    if (btnCam)  { btnCam.style.border='2px solid rgba(33,150,243,.3)';  btnCam.style.background='rgba(33,150,243,.06)'; btnCam.style.color='var(--txt2)'; }
+  }
+}
+
+/* ── فتح/إغلاق الكاميرا للمسح ── */
+function hwScanOpenCamera() {
+  var area = document.getElementById('hw-scan-camera-area');
+  var video = document.getElementById('hw-scan-video');
+  var capBtn = document.getElementById('hw-scan-capture-btn');
+  var prevDiv = document.getElementById('hw-scan-preview');
+  var openBtn = document.getElementById('hw-scan-cam-btn');
+  if (_hwScanStream) {
+    hwScanStopCamera();
+    return;
+  }
+  if (!navigator.mediaDevices) { if(typeof showToast==='function') showToast('الكاميرا غير مدعومة'); return; }
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:960} } })
+  .then(function(stream) {
+    _hwScanStream = stream;
+    video.srcObject = stream;
+    if (area) area.style.display = 'block';
+    if (capBtn) { capBtn.style.display = 'flex'; }
+    if (prevDiv) prevDiv.style.display = 'none';
+    if (openBtn) openBtn.innerHTML = '<i class="fas fa-stop-circle" style="font-size:1.2rem"></i><span>إيقاف الكاميرا</span>';
+  }).catch(function() {
+    if(typeof showToast==='function') showToast('❌ لم يتم منح صلاحية الكاميرا');
+  });
+}
+
+function hwScanStopCamera() {
+  if (_hwScanStream) { _hwScanStream.getTracks().forEach(function(t){t.stop()}); _hwScanStream = null; }
+  var area = document.getElementById('hw-scan-camera-area');
+  var capBtn = document.getElementById('hw-scan-capture-btn');
+  var openBtn = document.getElementById('hw-scan-cam-btn');
+  if (area) area.style.display = 'none';
+  if (capBtn) capBtn.style.display = 'none';
+  if (openBtn) openBtn.innerHTML = '<i class="fas fa-camera" style="font-size:1.2rem"></i><span>افتح الكاميرا وامسح السؤال</span>';
+}
+
+/* ── التقاط صورة السؤال ── */
+function hwScanCapture() {
+  var video = document.getElementById('hw-scan-video');
+  if (!video || !_hwScanStream) { if(typeof showToast==='function') showToast('الكاميرا غير مفعلة'); return; }
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 960;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  _hwImageData = canvas.toDataURL('image/jpeg', 0.92);
+  hwScanStopCamera();
+  var img = document.getElementById('hw-scan-img');
+  var prev = document.getElementById('hw-scan-preview');
+  var capBtn = document.getElementById('hw-scan-capture-btn');
+  if (img) img.src = _hwImageData;
+  if (prev) prev.style.display = 'block';
+  if (capBtn) capBtn.style.display = 'none';
+  if(typeof showToast==='function') showToast('✅ تم التقاط السؤال — اضغط حلّ');
+}
+
+/* ── إعادة التصوير ── */
+function hwScanRetake() {
+  _hwImageData = null;
+  var prev = document.getElementById('hw-scan-preview');
+  if (prev) prev.style.display = 'none';
+  hwScanOpenCamera();
+}
+
+/* ── حل السؤال مباشرة من الصورة الممسوحة ── */
+function hwScanSolve() {
+  if (!_hwImageData) { if(typeof showToast==='function') showToast('صوّر السؤال أولاً'); return; }
+  if (!_hwStage) { if(typeof showToast==='function') showToast('اختر المرحلة الدراسية أولاً'); return; }
+  if (!_hwGrade) { if(typeof showToast==='function') showToast('اختر الصف الدراسي أولاً'); return; }
+  if (!_hwSubject) { if(typeof showToast==='function') showToast('اختر المادة أولاً'); return; }
+  if (!_hwTerm) { if(typeof showToast==='function') showToast('اختر الترم أولاً'); return; }
+  if (typeof canUseTool==='function' && !canUseTool('homework')) { if(typeof showTrialExpiredModal==='function') showTrialExpiredModal('homework'); return; }
+  if (typeof incToolUsage==='function') incToolUsage('homework');
+  var resBox = document.getElementById('hw-result');
+  if (!resBox) return;
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🧠 بيحل السؤال بناءً على المنهج...</span></div>';
+  var stageNames = { primary: 'الابتدائية', middle: 'الإعدادية', secondary: 'الثانوية العامة' };
+  var stageName = stageNames[_hwStage] || _hwStage;
+  var trackInfo = (_hwStage === 'secondary' && _hwTrack) ? ' — الشعبة ' + _hwTrack : '';
+  var prompt =
+    'أنت مدرس محترف متخصص في المرحلة ' + stageName + ' في مادة ' + _hwSubject +
+    ' للصف ' + _hwGrade + trackInfo + ' في الترم ' + _hwTerm + ' في مصر.
+' +
+    'افحص هذه الصورة بدقة واقرأ السؤال أو المسألة المكتوبة فيها.
+' +
+    'أعطِ الإجابة النموذجية الكاملة التي إذا كتبها الطالب حصل على الدرجة النهائية.
+' +
+    'اكتب بالكامل دون اختصار:
+' +
+    '📖 السؤال كما قرأته:
+' +
+    '✅ الإجابة النموذجية الكاملة (خطوة بخطوة):
+' +
+    '📚 القوانين والمعلومات المرتبطة من المنهج:
+' +
+    '⭐ نصيحة للمذاكرة:';
+  var apiCall;
+  if (typeof window._callClaudeAPIWithImage === 'function') {
+    apiCall = window._callClaudeAPIWithImage(prompt, _hwImageData);
+  } else if (window.TayyibatAI && typeof window.TayyibatAI.vision === 'function') {
+    apiCall = window.TayyibatAI.vision(_hwImageData, prompt, 'homework').then(function(r){ return r && r.text ? r.text : Promise.reject(); });
+  } else {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر الاتصال، حاول مرة أخرى.</div>';
+    return;
+  }
+  apiCall.then(function(res) {
+    var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">';
+    html += '<div style="background:linear-gradient(135deg,rgba(33,150,243,.25),rgba(100,181,246,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:1.6rem">🧠</span>';
+    html += '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>';
+    html += '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">' + _hwGrade + ' — ' + _hwSubject + ' — الترم ' + _hwTerm + '</div></div>';
+    html += '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
+    html += '</div>';
+    resBox.innerHTML = html;
+    resBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }).catch(function() {
+    resBox.innerHTML = '<div style="padding:14px;color:#ff9800">تعذر قراءة الصورة، تأكد من وضوح الإضاءة وحاول مرة أخرى.</div>';
+  });
+}
 
 function hwLoadImage(event) {
   var file = event.target.files[0];
@@ -14603,18 +14964,44 @@ user: window.currentUser
 function openBackCamera(videoEl, streamRef, onReady, onError) {
   if (!videoEl) { if(onError) onError('no video el'); return; }
   if (streamRef.stream) { streamRef.stream.getTracks().forEach(function(t){t.stop();}); streamRef.stream=null; }
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { if(onError) onError('no API'); return; }
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:960}}})
-    .catch(function(){ return navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}}); })
-    .then(function(stream){
-      streamRef.stream = stream;
-      videoEl.srcObject = stream;
-      videoEl.style.display = 'block';
-      var fired = false;
-      function fire(){ if(!fired){ fired=true; if(onReady) onReady(stream); } }
-      videoEl.onloadedmetadata = fire;
-      setTimeout(fire, 900);
-    }).catch(function(e){ if(onError) onError(e); });
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    // محاولة عبر HTTP قديم (Android WebView قديم)
+    if (typeof window.stream !== 'undefined') { if(onError) onError('no mediaDevices API'); return; }
+    if(onError) onError('no mediaDevices API');
+    return;
+  }
+  // قائمة محاولات مرتبة: خلفية exact → خلفية → أي كاميرا
+  var attempts = [
+    { video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } } },
+    { video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } },
+    { video: { width: { ideal: 1280 }, height: { ideal: 960 } } },
+    { video: true }
+  ];
+  function tryNext(idx) {
+    if (idx >= attempts.length) {
+      if(onError) onError(new Error('camera_all_failed'));
+      return;
+    }
+    navigator.mediaDevices.getUserMedia(attempts[idx])
+      .then(function(stream) {
+        streamRef.stream = stream;
+        videoEl.srcObject = stream;
+        videoEl.style.display = 'block';
+        var fired = false;
+        function fire(){ if(!fired){ fired=true; if(onReady) onReady(stream); } }
+        videoEl.onloadedmetadata = fire;
+        setTimeout(fire, 900);
+      })
+      .catch(function(e) {
+        if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+          // المستخدم رفض الإذن — لا فائدة من المحاولة مجدداً
+          if(onError) onError(e);
+        } else {
+          tryNext(idx + 1);
+        }
+      });
+  }
+  tryNext(0);
 }
 
 function captureFrame(videoEl, q){
@@ -14678,7 +15065,17 @@ function _autoCamFoodScan(){
     clearInterval(_fsIv);
     setTimeout(function(){ _fsScan(video,statusTxt); }, 1500);
     _fsIv=setInterval(function(){ _fsScan(video,statusTxt); }, 4000);
-  }, function(){ if(statusTxt) statusTxt.textContent='❌ لم يتم منح صلاحية الكاميرا'; });
+  }, function(err) {
+    var errName = err && err.name ? err.name : String(err);
+    if (errName === 'NotAllowedError' || errName === 'PermissionDeniedError' || errName.includes('camera_all_failed')) {
+      if(statusTxt) statusTxt.innerHTML = '❌ لا يوجد إذن للكاميرا<br><small style="font-size:.7rem;color:#ffa726">افتح إعدادات المتصفح ← الموقع ← اسمح بالكاميرا ثم أعد تحميل الصفحة</small>';
+    } else if (errName === 'NotFoundError' || errName === 'DevicesNotFoundError') {
+      if(statusTxt) statusTxt.textContent = '❌ لا توجد كاميرا على هذا الجهاز';
+    } else {
+      if(statusTxt) statusTxt.textContent = '❌ تعذر فتح الكاميرا — حاول مرة أخرى';
+    }
+    if(fallback) fallback.style.display = 'block';
+  });
 }
 
 function _fsScan(video, statusTxt){
