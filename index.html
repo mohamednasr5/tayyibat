@@ -5140,6 +5140,7 @@ function startApkDownloadAnim(e) {
   var totalCount = 0;
   var stepIdx = 0;
   var progressInterval, starsCreated = false;
+  var loaderInited = false;
 
   function toAr(n) {
     return n.toString().replace(/\d/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'[d]; });
@@ -5204,6 +5205,8 @@ function startApkDownloadAnim(e) {
   }
 
   function initLoader() {
+    if (loaderInited) return;
+    loaderInited = true;
     // توليد نجوم خلفية
     var starsWrap = document.getElementById('ldr-stars');
     if (starsWrap && !starsCreated) {
@@ -5247,8 +5250,9 @@ function startApkDownloadAnim(e) {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initLoader);
   } else {
-    setTimeout(initLoader, 50);
+    initLoader();
   }
+  setTimeout(function(){ if(!loaderInited) initLoader(); }, 300);
 })();/* ══════════ Loader ══════════ */
 function hideLoader() {
   var l = document.getElementById('loader');
@@ -5262,66 +5266,7 @@ function hideLoader() {
   }, 520);
 }
 
-/* ══════════ Auto Login ══════════ */
-async function autoLogin() {
-  var s = getSession();
-  if (!s) { hideLoader(); return; }
-
-  // انتظر Firebase حتى 4 ثوانٍ
-  await new Promise(function(resolve) {
-    if (window.__firebaseReady && window.__firebaseGet) { resolve(); return; }
-    var waited = 0;
-    var check = setInterval(function() {
-      waited += 200;
-      if (window.__firebaseReady && window.__firebaseGet) { clearInterval(check); resolve(); }
-      else if (waited >= 4000) { clearInterval(check); resolve(); }
-    }, 200);
-  });
-
-  if (!window.__firebaseReady || !window.__firebaseGet) { hideLoader(); return; }
-
-  try {
-    var snap = await Promise.race([
-      window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)),
-      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('AUTO_TIMEOUT')); }, 4000); })
-    ]);
-    if (snap.exists()) {
-      var data = snap.val();
-      if (data.loginMethod === 'google' && window.firebaseAuth) {
-        var done = await Promise.race([
-          new Promise(function(resolve) {
-            var unsub = window.firebaseAuth.onAuthStateChanged(async function(user) {
-              unsub();
-              if (user && user.uid === s) {
-                try { await handleGoogleUserData(user); resolve(true); }
-                catch(e) { resolve(false); }
-              } else { resolve(false); }
-            });
-          }),
-          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 3000); })
-        ]);
-        if (done) return;
-        hideLoader(); return;
-      }
-    }
-    // دخول عادي username/password
-    var u = await dbGetUser(s);
-    if (u) {
-      currentUser = Object.assign({}, u, { username: s });
-      if (currentUser.pro && currentUser.pro.active === true) {
-        if (currentUser.pro.expiresAt && Date.now() < currentUser.pro.expiresAt) {
-          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
-        } else if (!currentUser.pro.expiresAt) {
-          window.isProUser = true; updateTrialBadges(); updatePremiumTabBadges();
-        } else {
-          currentUser.pro.active = false; window.isProUser = false;
-        }
-      } else { window.isProUser = false; }
-      bootApp(); setTimeout(refreshGiftFab, 700); return;
-    }
-  } catch(e) { console.warn('[autoLogin-1]', e.message); hideLoader(); return; }
-  hideLoader();
-}
+/* autoLogin — defined below */
 
 /* ══════════ Auth UI ══════════ */
 function switchAuthTab(t) {
@@ -7404,8 +7349,7 @@ async function _drugCamAutoRead(isManual) {
       result = r2 && r2.text ? r2.text.trim() : null;
     }
     if (result && result.length > 1 && !result.includes('لا يوجد') && !result.includes('لا أرى')) {
-      var drugName = result.split('
-')[0].replace(/[*_#"’‘]/g, '').trim();
+      var drugName = result.split('\n')[0].replace(/[*_#"'']/g, '').trim();
       if (drugName.length > 1) {
         var inp = document.getElementById('drug-name-search-input');
         if (inp) { inp.value = drugName; }
@@ -9498,7 +9442,7 @@ window.addEventListener('appinstalled', function() {
 window.addEventListener('DOMContentLoaded', function() {
   adaptBannerForPlatform();
   startQuotesAnimation();
-  var safetyTimeout = setTimeout(function() { hideLoader(); }, 6000); // محدود لـ 6 ثوانٍ كحد أقصى
+  var safetyTimeout = setTimeout(function() { hideLoader(); }, 8000); // 8 ثوانٍ كحد أقصى
   autoLogin().then(function() { clearTimeout(safetyTimeout); }).catch(function() { clearTimeout(safetyTimeout); hideLoader(); });
 });
 </script>
@@ -12314,20 +12258,13 @@ function hwScanSolve() {
   var trackInfo = (_hwStage === 'secondary' && _hwTrack) ? ' — الشعبة ' + _hwTrack : '';
   var prompt =
     'أنت مدرس محترف متخصص في المرحلة ' + stageName + ' في مادة ' + _hwSubject +
-    ' للصف ' + _hwGrade + trackInfo + ' في الترم ' + _hwTerm + ' في مصر.
-' +
-    'افحص هذه الصورة بدقة واقرأ السؤال أو المسألة المكتوبة فيها.
-' +
-    'أعطِ الإجابة النموذجية الكاملة التي إذا كتبها الطالب حصل على الدرجة النهائية.
-' +
-    'اكتب بالكامل دون اختصار:
-' +
-    '📖 السؤال كما قرأته:
-' +
-    '✅ الإجابة النموذجية الكاملة (خطوة بخطوة):
-' +
-    '📚 القوانين والمعلومات المرتبطة من المنهج:
-' +
+    ' للصف ' + _hwGrade + trackInfo + ' في الترم ' + _hwTerm + ' في مصر.\n' +
+    'افحص هذه الصورة بدقة واقرأ السؤال أو المسألة المكتوبة فيها.\n' +
+    'أعطِ الإجابة النموذجية الكاملة التي إذا كتبها الطالب حصل على الدرجة النهائية.\n' +
+    'اكتب بالكامل دون اختصار:\n' +
+    '📖 السؤال كما قرأته:\n' +
+    '✅ الإجابة النموذجية الكاملة (خطوة بخطوة):\n' +
+    '📚 القوانين والمعلومات المرتبطة من المنهج:\n' +
     '⭐ نصيحة للمذاكرة:';
   var apiCall;
   if (typeof window._callClaudeAPIWithImage === 'function') {
