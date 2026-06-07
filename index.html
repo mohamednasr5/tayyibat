@@ -2715,53 +2715,216 @@ window.geminiSend = window.geminiSend || function() {};
       <i class="fas fa-chalkboard-teacher"></i> مدرّسك الذكي — كل المناهج المصرية
     </div>
     <div style="background:rgba(33,150,243,.08);border:1.5px solid rgba(33,150,243,.3);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.75rem;color:#90caf9;line-height:1.6">
-      📚 صوّر السؤال أو اكتبه — هيجاوب عليك إجابة نموذجية زي كتاب الإجابات بالضبط
+      📚 اختر مرحلتك ومادتك وصفك وترمك — ثم اكتب سؤالك وهيجاوبك إجابة نموذجية كاملة
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <label class="btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(33,150,243,.1);color:#2196f3;border:2px dashed rgba(33,150,243,.5);padding:16px;font-size:.82rem;cursor:pointer;text-align:center;border-radius:14px;margin:0" id="hw-upload-label">
-        <i class="fas fa-cloud-upload-alt" style="font-size:1.4rem"></i>
-        رفع صورة السؤال
-        <input type="file" accept="image/*" onchange="hwLoadImage(event)" style="display:none">
-      </label>
-      <button onclick="hwOpenCamera()" class="btn" id="hw-camera-btn" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(100,181,246,.1);color:#64b5f6;border:2px dashed rgba(100,181,246,.5);padding:16px;font-size:.82rem;cursor:pointer;border-radius:14px">
-        <i class="fas fa-camera" style="font-size:1.4rem"></i>
-        تصوير السؤال
-      </button>
-    </div>
-    <div id="hw-camera-area" style="display:none;margin-bottom:12px;position:relative">
-      <div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(33,150,243,.4)">
-        <video id="hw-video" autoplay playsinline style="width:100%;max-height:260px;object-fit:cover;display:block"></video>
-        <div id="hw-live-status" style="display:none;position:absolute;bottom:8px;left:0;right:0;text-align:center">
-          <span style="background:rgba(0,0,0,.7);color:#ffb74d;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px">⏳ وجّه الكاميرا نحو السؤال...</span>
-        </div>
-        <div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 4px 0 0"></div>
-        <div style="position:absolute;top:10px;left:10px;width:30px;height:30px;border-top:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:4px 0 0 0"></div>
-        <div style="position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-right:2px solid #2196f3;border-radius:0 0 4px 0"></div>
-        <div style="position:absolute;bottom:10px;left:10px;width:30px;height:30px;border-bottom:2px solid #2196f3;border-left:2px solid #2196f3;border-radius:0 0 0 4px"></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="hwCapture()" class="btn" style="flex:1;background:linear-gradient(135deg,rgba(33,150,243,.3),rgba(100,181,246,.2));color:#64b5f6;border:1.5px solid rgba(33,150,243,.5);padding:12px;font-size:.88rem;font-weight:800">
-          <i class="fas fa-circle" style="color:#f44336;margin-left:6px"></i> التقاط
+
+    <!-- ═══ اختيار المرحلة ═══ -->
+    <div class="field" style="margin-bottom:10px">
+      <label style="color:#64b5f6;font-weight:800;font-size:.82rem;display:block;margin-bottom:6px">🏫 المرحلة الدراسية</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="hw-stage-btns">
+        <button onclick="hwSetStage('primary')" id="hw-stage-primary" class="btn" style="padding:10px 6px;font-size:.76rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">
+          🏫 ابتدائية
         </button>
-        <button onclick="hwStopCamera()" class="btn" style="width:auto;padding:0 14px;background:rgba(255,255,255,.06);color:var(--txt3);border:1.5px solid var(--border);border-radius:12px;font-size:.82rem">
-          <i class="fas fa-stop"></i>
+        <button onclick="hwSetStage('middle')" id="hw-stage-middle" class="btn" style="padding:10px 6px;font-size:.76rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">
+          🏫 إعدادية
+        </button>
+        <button onclick="hwSetStage('secondary')" id="hw-stage-secondary" class="btn" style="padding:10px 6px;font-size:.76rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">
+          🎓 ثانوية
         </button>
       </div>
     </div>
-    <div id="hw-preview" style="display:none;margin-bottom:12px;text-align:center">
-      <img id="hw-img-preview" style="max-width:100%;max-height:250px;border-radius:12px;border:2px solid rgba(33,150,243,.4)">
-      <div style="margin-top:6px;font-size:.72rem;color:#64b5f6"><i class="fas fa-check-circle"></i> تم تحميل الصورة — جاهز للحل</div>
+
+    <!-- ═══ اختيار الصف ═══ -->
+    <div class="field" id="hw-grade-wrap" style="margin-bottom:10px;display:none">
+      <label style="color:#64b5f6;font-weight:800;font-size:.82rem;display:block;margin-bottom:6px">📋 الصف الدراسي</label>
+      <select id="hw-grade-select" onchange="hwOnGradeChange()" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:11px 12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem">
+        <option value="">— اختر الصف —</option>
+      </select>
     </div>
-    <div class="field" style="margin-bottom:12px">
-      <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:6px">أو اكتب السؤال نصياً (اختياري)</label>
-      <textarea id="hw-text-input" placeholder="مثال: احسب مساحة مثلث قاعدته 6 سم وارتفاعه 4 سم" rows="3" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
+
+    <!-- ═══ اختيار الشعبة (ثانوي فقط) ═══ -->
+    <div class="field" id="hw-track-wrap" style="margin-bottom:10px;display:none">
+      <label style="color:#64b5f6;font-weight:800;font-size:.82rem;display:block;margin-bottom:6px">📐 الشعبة</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="hw-track-btns">
+        <button onclick="hwSetTrack('علمي علوم')" id="hw-track-sci" class="btn" style="padding:10px 6px;font-size:.73rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">🔬 علمي علوم</button>
+        <button onclick="hwSetTrack('علمي رياضة')" id="hw-track-math" class="btn" style="padding:10px 6px;font-size:.73rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">📐 علمي رياضة</button>
+        <button onclick="hwSetTrack('أدبي')" id="hw-track-lit" class="btn" style="padding:10px 6px;font-size:.73rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">📖 أدبي</button>
+      </div>
     </div>
-    <button onclick="hwSolve()" class="btn" style="width:100%;background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem">
-      <i class="fas fa-graduation-cap"></i> حلّ السؤال
+
+    <!-- ═══ اختيار المادة ═══ -->
+    <div class="field" id="hw-subject-wrap" style="margin-bottom:10px;display:none">
+      <label style="color:#64b5f6;font-weight:800;font-size:.82rem;display:block;margin-bottom:6px">📚 المادة</label>
+      <select id="hw-subject-select" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:11px 12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem">
+        <option value="">— اختر المادة —</option>
+      </select>
+    </div>
+
+    <!-- ═══ اختيار الترم ═══ -->
+    <div class="field" id="hw-term-wrap" style="margin-bottom:10px;display:none">
+      <label style="color:#64b5f6;font-weight:800;font-size:.82rem;display:block;margin-bottom:6px">📅 الترم</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="hwSetTerm('الأول')" id="hw-term-1" class="btn" style="padding:12px;font-size:.84rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">
+          📘 الترم الأول
+        </button>
+        <button onclick="hwSetTerm('الثاني')" id="hw-term-2" class="btn" style="padding:12px;font-size:.84rem;border:2px solid rgba(33,150,243,.3);background:rgba(33,150,243,.06);color:var(--txt2);border-radius:12px;font-weight:700">
+          📗 الترم الثاني
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ كتابة السؤال ═══ -->
+    <div class="field" id="hw-question-wrap" style="margin-bottom:12px;display:none">
+      <label style="color:#2196f3;font-weight:800;display:block;margin-bottom:6px">✏️ اكتب سؤالك هنا</label>
+      <textarea id="hw-text-input" placeholder="اكتب السؤال بالتفصيل..." rows="4" style="width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(33,150,243,.4);border-radius:12px;padding:12px;color:var(--txt);font-family:Tajawal,sans-serif;font-size:.88rem;resize:vertical;line-height:1.7"></textarea>
+    </div>
+
+    <button onclick="hwSolve()" class="btn" id="hw-solve-btn" style="width:100%;background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;padding:14px;border-radius:14px;margin-bottom:14px;font-size:.95rem;display:none">
+      <i class="fas fa-graduation-cap"></i> حلّ السؤال واحصل على الإجابة النموذجية
     </button>
     <div id="hw-result"></div>
   </div>
 </div>
+
+<script>
+/* ═══════════════════════════════════════════
+   حل الواجبات — منطق الاختيارات
+═══════════════════════════════════════════ */
+var _hwStage = '';
+var _hwGrade = '';
+var _hwTrack = '';
+var _hwSubject = '';
+var _hwTerm = '';
+var _hwImageData = null; // للتوافق مع الكود القديم
+
+var _hwSubjects = {
+  primary: {
+    common: ['اللغة العربية','اللغة الإنجليزية','الرياضيات','العلوم','التربية الدينية','تكنولوجيا المعلومات والاتصالات ICT','المهارات المهنية','التربية الفنية','التربية الموسيقية','القيم واحترام الآخر','التربية الرياضية'],
+    from4: ['الدراسات الاجتماعية']
+  },
+  middle: ['اللغة العربية','اللغة الإنجليزية','الرياضيات','العلوم','الدراسات الاجتماعية','التربية الدينية','تكنولوجيا المعلومات والاتصالات','التربية الفنية','التربية الموسيقية','التربية الرياضية','القيم واحترام الآخر'],
+  secondary: {
+    common: ['اللغة العربية','اللغة الإنجليزية الأولى','اللغة الأجنبية الثانية','التربية الدينية','التربية الوطنية','الحاسب الآلي'],
+    'علمي علوم': ['الرياضيات','الأحياء','الكيمياء','الفيزياء','الجغرافيا','التاريخ','علم النفس والاجتماع','الفلسفة والمنطق'],
+    'علمي رياضة': ['الرياضيات البحتة','الرياضيات التطبيقية','الفيزياء','الكيمياء','الجغرافيا','التاريخ','علم النفس والاجتماع','الفلسفة والمنطق'],
+    'أدبي': ['التاريخ','الجغرافيا','علم النفس والاجتماع','الفلسفة والمنطق','الرياضيات','الأحياء','الكيمياء','الفيزياء']
+  }
+};
+
+function hwSetStage(stage) {
+  _hwStage = stage; _hwGrade = ''; _hwTrack = ''; _hwSubject = ''; _hwTerm = '';
+  // تلوين الزر المختار
+  ['primary','middle','secondary'].forEach(function(s) {
+    var btn = document.getElementById('hw-stage-'+s);
+    if (!btn) return;
+    if (s === stage) {
+      btn.style.borderColor = 'rgba(33,150,243,.8)';
+      btn.style.background = 'rgba(33,150,243,.2)';
+      btn.style.color = '#64b5f6';
+    } else {
+      btn.style.borderColor = 'rgba(33,150,243,.3)';
+      btn.style.background = 'rgba(33,150,243,.06)';
+      btn.style.color = 'var(--txt2)';
+    }
+  });
+  // إعادة ضبط
+  document.getElementById('hw-track-wrap').style.display = 'none';
+  document.getElementById('hw-subject-wrap').style.display = 'none';
+  document.getElementById('hw-term-wrap').style.display = 'none';
+  document.getElementById('hw-question-wrap').style.display = 'none';
+  document.getElementById('hw-solve-btn').style.display = 'none';
+  document.getElementById('hw-result').innerHTML = '';
+  // إعداد قائمة الصفوف
+  var grades = [];
+  if (stage === 'primary') grades = ['الصف الأول الابتدائي','الصف الثاني الابتدائي','الصف الثالث الابتدائي','الصف الرابع الابتدائي','الصف الخامس الابتدائي','الصف السادس الابتدائي'];
+  else if (stage === 'middle') grades = ['الصف الأول الإعدادي','الصف الثاني الإعدادي','الصف الثالث الإعدادي'];
+  else grades = ['الصف الأول الثانوي','الصف الثاني الثانوي','الصف الثالث الثانوي'];
+  var sel = document.getElementById('hw-grade-select');
+  sel.innerHTML = '<option value="">— اختر الصف —</option>';
+  grades.forEach(function(g){ sel.innerHTML += '<option value="'+g+'">'+g+'</option>'; });
+  document.getElementById('hw-grade-wrap').style.display = 'block';
+}
+
+function hwOnGradeChange() {
+  _hwGrade = document.getElementById('hw-grade-select').value;
+  _hwTrack = ''; _hwSubject = ''; _hwTerm = '';
+  document.getElementById('hw-subject-wrap').style.display = 'none';
+  document.getElementById('hw-term-wrap').style.display = 'none';
+  document.getElementById('hw-question-wrap').style.display = 'none';
+  document.getElementById('hw-solve-btn').style.display = 'none';
+  document.getElementById('hw-result').innerHTML = '';
+  if (!_hwGrade) return;
+  if (_hwStage === 'secondary') {
+    // إظهار اختيار الشعبة
+    ['sci','math','lit'].forEach(function(t){
+      var btn = document.getElementById('hw-track-'+t);
+      if(btn){ btn.style.borderColor='rgba(33,150,243,.3)'; btn.style.background='rgba(33,150,243,.06)'; btn.style.color='var(--txt2)'; }
+    });
+    document.getElementById('hw-track-wrap').style.display = 'block';
+  } else {
+    document.getElementById('hw-track-wrap').style.display = 'none';
+    hwFillSubjects();
+  }
+}
+
+function hwSetTrack(track) {
+  _hwTrack = track; _hwSubject = ''; _hwTerm = '';
+  var map = {'علمي علوم':'sci','علمي رياضة':'math','أدبي':'lit'};
+  ['sci','math','lit'].forEach(function(t){
+    var btn = document.getElementById('hw-track-'+t);
+    if(!btn) return;
+    if (map[track] === t) { btn.style.borderColor='rgba(33,150,243,.8)'; btn.style.background='rgba(33,150,243,.2)'; btn.style.color='#64b5f6'; }
+    else { btn.style.borderColor='rgba(33,150,243,.3)'; btn.style.background='rgba(33,150,243,.06)'; btn.style.color='var(--txt2)'; }
+  });
+  hwFillSubjects();
+}
+
+function hwFillSubjects() {
+  var subjects = [];
+  if (_hwStage === 'primary') {
+    subjects = _hwSubjects.primary.common.slice();
+    var gradeNum = parseInt((_hwGrade||'').replace(/[^0-9]/g,''));
+    if (gradeNum >= 4) subjects = subjects.concat(_hwSubjects.primary.from4);
+  } else if (_hwStage === 'middle') {
+    subjects = _hwSubjects.middle.slice();
+  } else {
+    subjects = _hwSubjects.secondary.common.slice();
+    if (_hwTrack && _hwSubjects.secondary[_hwTrack]) subjects = subjects.concat(_hwSubjects.secondary[_hwTrack]);
+  }
+  var sel = document.getElementById('hw-subject-select');
+  sel.innerHTML = '<option value="">— اختر المادة —</option>';
+  subjects.forEach(function(s){ sel.innerHTML += '<option value="'+s+'">'+s+'</option>'; });
+  document.getElementById('hw-subject-wrap').style.display = 'block';
+  document.getElementById('hw-term-wrap').style.display = 'none';
+  document.getElementById('hw-question-wrap').style.display = 'none';
+  document.getElementById('hw-solve-btn').style.display = 'none';
+  sel.onchange = function() {
+    _hwSubject = sel.value;
+    if (!_hwSubject) return;
+    _hwTerm = '';
+    ['1','2'].forEach(function(n){
+      var btn = document.getElementById('hw-term-'+n);
+      if(btn){ btn.style.borderColor='rgba(33,150,243,.3)'; btn.style.background='rgba(33,150,243,.06)'; btn.style.color='var(--txt2)'; }
+    });
+    document.getElementById('hw-term-wrap').style.display = 'block';
+    document.getElementById('hw-question-wrap').style.display = 'none';
+    document.getElementById('hw-solve-btn').style.display = 'none';
+  };
+}
+
+function hwSetTerm(term) {
+  _hwTerm = term;
+  ['1','2'].forEach(function(n){
+    var btn = document.getElementById('hw-term-'+n);
+    if(!btn) return;
+    var isSelected = (n === '1' && term === 'الأول') || (n === '2' && term === 'الثاني');
+    if (isSelected) { btn.style.borderColor='rgba(33,150,243,.8)'; btn.style.background='rgba(33,150,243,.2)'; btn.style.color='#64b5f6'; }
+    else { btn.style.borderColor='rgba(33,150,243,.3)'; btn.style.background='rgba(33,150,243,.06)'; btn.style.color='var(--txt2)'; }
+  });
+  document.getElementById('hw-question-wrap').style.display = 'block';
+  document.getElementById('hw-solve-btn').style.display = 'block';
+}
+</script>
 
 <!-- ════════════════════════════════════════════
      🖐 صفحة قراءة الكف
@@ -11875,23 +12038,30 @@ function hwCapture() {
 
 function hwSolve() {
   var textInput = document.getElementById('hw-text-input') ? document.getElementById('hw-text-input').value.trim() : '';
-  if (!_hwImageData && !textInput) { showToast('صوّر السؤال أو اكتبه أولاً 📚'); return; }
+  if (!textInput) { showToast('اكتب السؤال أولاً ✏️'); return; }
+  if (!_hwStage) { showToast('اختر المرحلة الدراسية أولاً'); return; }
+  if (!_hwGrade) { showToast('اختر الصف الدراسي أولاً'); return; }
+  if (!_hwSubject) { showToast('اختر المادة أولاً'); return; }
+  if (!_hwTerm) { showToast('اختر الترم أولاً'); return; }
   if (!canUseTool('homework')) { showTrialExpiredModal('homework'); return; }
   incToolUsage('homework');
   var resBox = document.getElementById('hw-result');
-  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🧠 بيحل السؤال...</span></div>';
-  var systemPrompt = 'أنت معلم ومدرس خبير في جميع المناهج الدراسية العربية (المصرية والخليجية والسورية واللبنانية).\nأسلوبك: واضح، منظم، خطوة بخطوة، مناسب لمستوى الطالب.\nإذا كان السؤال من صورة واستطعت قراءته، اكتبه أولاً ثم أجب.\nإذا لم تستطع قراءة الصورة بوضوح، اطلب إعادة التصوير بشكل مرتب.';
-  var grade = document.getElementById('hw-grade') ? document.getElementById('hw-grade').value : '';
-  var subject = document.getElementById('hw-subject') ? document.getElementById('hw-subject').value : '';
-  var gradeInfo = (grade ? 'الصف: ' + grade + '.' : '') + (subject ? ' المادة: ' + subject + '.' : '');
-  var prompt = (gradeInfo ? gradeInfo + '\n\n' : '') + 'السؤال الدراسي:\n' + (textInput ? textInput + '\n' : '(من الصورة المرفقة)') + '\n\nالمطلوب:\n1️⃣ السؤال كما هو\n2️⃣ الإجابة النموذجية الكاملة خطوة بخطوة\n3️⃣ الشرح المبسط\n4️⃣ القوانين أو المعلومات المهمة المرتبطة بالسؤال (إن وجدت)';
-  var apiCall = _hwImageData ? _callClaudeAPIWithImage(prompt, _hwImageData) : _callClaudeAPI(prompt, systemPrompt);
-  apiCall.then(function(res) {
+  resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:16px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span style="margin-right:8px;font-size:.85rem">🧠 بيحل السؤال بناءً على المنهج...</span></div>';
+
+  var stageNames = { primary: 'الابتدائية', middle: 'الإعدادية', secondary: 'الثانوية العامة' };
+  var stageName = stageNames[_hwStage] || _hwStage;
+  var trackInfo = (_hwStage === 'secondary' && _hwTrack) ? ' — الشعبة ' + _hwTrack : '';
+
+  var systemPrompt = 'أنت مدرس محترف ومتخصص في المرحلة ' + stageName + ' في مادة ' + _hwSubject + ' للصف ' + _hwGrade + trackInfo + ' في الترم ' + _hwTerm + '.\nراجع الكتاب المدرسي لهذه المادة والصف والترم في مصر جيداً.\nأعطِ نموذج الإجابة الاحترافي الذي إذا كتبه الطالب حصل على الدرجة النهائية.\nلا تخرج من خارج الكتاب أو المنهج.\nركّز فقط في المرحلة والصف والمادة والترم في مصر.\nرتّب الإجابة بوضوح مع ذكر النقاط الأساسية التي يبحث عنها المُصحِّح.';
+
+  var prompt = 'المرحلة: ' + stageName + trackInfo + '\nالصف: ' + _hwGrade + '\nالمادة: ' + _hwSubject + '\nالترم: ' + _hwTerm + '\n\nالسؤال:\n' + textInput + '\n\nالمطلوب:\n1️⃣ الإجابة النموذجية الكاملة كما هي في الكتاب المدرسي المصري خطوة بخطوة\n2️⃣ النقاط الرئيسية التي يبحث عنها المُصحِّح\n3️⃣ أي قوانين أو معلومات أساسية مرتبطة بالسؤال من المنهج';
+
+  _callClaudeAPI(prompt, systemPrompt).then(function(res) {
     var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">';
     html += '<div style="background:linear-gradient(135deg,rgba(33,150,243,.25),rgba(100,181,246,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
     html += '<span style="font-size:1.6rem">🧠</span>';
     html += '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>';
-    html += '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">المناهج المصرية</div></div>';
+    html += '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">' + _hwGrade + ' — ' + _hwSubject + ' — الترم ' + _hwTerm + '</div></div>';
     html += '</div>';
     html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
     html += '</div>';
