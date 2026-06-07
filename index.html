@@ -309,13 +309,20 @@
     window.firebaseReady        = true;
     window.__firebaseReady      = true;
 
-    // تحقق من نتيجة Redirect login (للمتصفحات التي تحجب Popup)
-    try {
-      const redirectResult = await getRedirectResult(auth);
+    // تحقق من نتيجة Redirect login — بدون await حتى لا يعطّل التحميل
+    getRedirectResult(auth).then(function(redirectResult) {
       if (redirectResult && redirectResult.user) {
-        await handleGoogleUserData(redirectResult.user);
+        // handleGoogleUserData قد لا تكون جاهزة بعد — انتظر قليلاً
+        var tryHandle = function(attempts) {
+          if (typeof window.handleGoogleUserData === 'function') {
+            window.handleGoogleUserData(redirectResult.user);
+          } else if (attempts > 0) {
+            setTimeout(function(){ tryHandle(attempts - 1); }, 500);
+          }
+        };
+        setTimeout(function(){ tryHandle(10); }, 800);
       }
-    } catch(re) { console.warn('[Firebase Redirect]', re.code); }
+    }).catch(function(re) { console.warn('[Firebase Redirect]', re && re.code); });
 
     try {
       const cfgSnap = await Promise.race([
@@ -5259,11 +5266,24 @@ function hideLoader() {
 async function autoLogin() {
   var s = getSession();
   if (!s) { hideLoader(); return; }
+
+  // انتظر Firebase حتى 4 ثوانٍ
+  await new Promise(function(resolve) {
+    if (window.__firebaseReady && window.__firebaseGet) { resolve(); return; }
+    var waited = 0;
+    var check = setInterval(function() {
+      waited += 200;
+      if (window.__firebaseReady && window.__firebaseGet) { clearInterval(check); resolve(); }
+      else if (waited >= 4000) { clearInterval(check); resolve(); }
+    }, 200);
+  });
+
+  if (!window.__firebaseReady || !window.__firebaseGet) { hideLoader(); return; }
+
   try {
-    // تحقق هل المستخدم سجّل بجوجل - مع timeout 5s
     var snap = await Promise.race([
       window.__firebaseGet(window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)),
-      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('AUTO_TIMEOUT')); }, 5000); })
+      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('AUTO_TIMEOUT')); }, 4000); })
     ]);
     if (snap.exists()) {
       var data = snap.val();
@@ -5278,7 +5298,7 @@ async function autoLogin() {
               } else { resolve(false); }
             });
           }),
-          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
+          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 3000); })
         ]);
         if (done) return;
         hideLoader(); return;
@@ -5299,7 +5319,7 @@ async function autoLogin() {
       } else { window.isProUser = false; }
       bootApp(); setTimeout(refreshGiftFab, 700); return;
     }
-  } catch(e) { hideLoader(); return; }
+  } catch(e) { console.warn('[autoLogin-1]', e.message); hideLoader(); return; }
   hideLoader();
 }
 
@@ -9478,7 +9498,7 @@ window.addEventListener('appinstalled', function() {
 window.addEventListener('DOMContentLoaded', function() {
   adaptBannerForPlatform();
   startQuotesAnimation();
-  var safetyTimeout = setTimeout(function() { hideLoader(); }, 8000);
+  var safetyTimeout = setTimeout(function() { hideLoader(); }, 6000); // محدود لـ 6 ثوانٍ كحد أقصى
   autoLogin().then(function() { clearTimeout(safetyTimeout); }).catch(function() { clearTimeout(safetyTimeout); hideLoader(); });
 });
 </script>
@@ -10858,6 +10878,7 @@ async function doGoogleLogin() {
 
 /* ─── Handle Google User Data ──────────────────────── */
 async function handleGoogleUserData(googleUser) {
+  window.handleGoogleUserData = handleGoogleUserData; // اجعلها متاحة globally
   var uid = googleUser.uid;
   var snap = await window.__firebaseGet(
     window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + uid)
@@ -11134,14 +11155,32 @@ function doLogout() {
   showToast('👋 تم تسجيل الخروج');
 }
 
-/* ─── autoLogin with Google support ───────────────── */
+/* ─── autoLogin with Google support (fixed — ينتظر Firebase أولاً) ───────────────── */
 async function autoLogin() {
   var s = getSession();
   if (!s) { hideLoader(); return; }
+
+  // انتظر Firebase حتى 4 ثوانٍ قبل المتابعة
+  await new Promise(function(resolve) {
+    if (window.__firebaseReady && window.__firebaseGet) { resolve(); return; }
+    var waited = 0;
+    var check = setInterval(function() {
+      waited += 200;
+      if (window.__firebaseReady && window.__firebaseGet) { clearInterval(check); resolve(); }
+      else if (waited >= 4000) { clearInterval(check); resolve(); }
+    }, 200);
+  });
+
+  // إذا Firebase غير جاهز نهائياً — ارجع لصفحة التسجيل فوراً
+  if (!window.__firebaseReady || !window.__firebaseGet) { hideLoader(); return; }
+
   try {
-    var snap = await window.__firebaseGet(
-      window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
-    );
+    var snap = await Promise.race([
+      window.__firebaseGet(
+        window.__firebaseChild(window.__firebaseRef(window.__firebaseDB), 'users/' + s)
+      ),
+      new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('TIMEOUT')); }, 4000); })
+    ]);
     if (snap.exists()) {
       var data = snap.val();
       if (data.loginMethod === 'google' && window.firebaseAuth) {
@@ -11155,7 +11194,7 @@ async function autoLogin() {
               } else { resolve(false); }
             });
           }),
-          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 2000); })
+          new Promise(function(resolve) { setTimeout(function(){ resolve(false); }, 3000); })
         ]);
         if (done) return;
         hideLoader(); return;
@@ -11171,7 +11210,7 @@ async function autoLogin() {
       } else { window.isProUser = false; }
       bootApp(); setTimeout(refreshGiftFab, 700); return;
     }
-  } catch(e) {}
+  } catch(e) { console.warn('[autoLogin]', e.message); }
   hideLoader();
 }
 </script>
