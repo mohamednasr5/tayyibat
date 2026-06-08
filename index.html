@@ -12445,18 +12445,25 @@ function hwSolve() {
   var stageName = stageNames[_hwStage] || _hwStage;
   var trackInfo = (_hwStage === 'secondary' && _hwTrack) ? ' — الشعبة ' + _hwTrack : '';
 
-  var systemPrompt = 'أنت مدرس محترف ومتخصص في المرحلة ' + stageName + ' في مادة ' + _hwSubject + ' للصف ' + _hwGrade + trackInfo + ' في الترم ' + _hwTerm + '.\nراجع الكتاب المدرسي لهذه المادة والصف والترم في مصر جيداً.\nأعطِ نموذج الإجابة الاحترافي الذي إذا كتبه الطالب حصل على الدرجة النهائية.\nلا تخرج من خارج الكتاب أو المنهج.\nركّز فقط في المرحلة والصف والمادة والترم في مصر.\nرتّب الإجابة بوضوح مع ذكر النقاط الأساسية التي يبحث عنها المُصحِّح.';
+  var systemPrompt = 'أنت مدرس محترف ومتخصص في المرحلة ' + stageName + ' في مادة ' + _hwSubject + ' للصف ' + _hwGrade + trackInfo + ' في الترم ' + _hwTerm + '.\nراجع الكتاب المدرسي لهذه المادة والصف والترم في مصر جيداً.\nأعطِ نموذج الإجابة الاحترافي الذي إذا كتبه الطالب حصل على الدرجة النهائية.\nلا تخرج من خارج الكتاب أو المنهج.\nركّز فقط في المرحلة والصف والمادة والترم في مصر.\nرتّب الإجابة بوضوح مع ذكر النقاط الأساسية التي يبحث عنها المُصحِّح.\nاكتب إجابتك بالكامل دون اختصار أو قطع — الإجابة الناقصة تضر الطالب.';
 
-  var prompt = 'المرحلة: ' + stageName + trackInfo + '\nالصف: ' + _hwGrade + '\nالمادة: ' + _hwSubject + '\nالترم: ' + _hwTerm + '\n\nالسؤال:\n' + textInput + '\n\nالمطلوب:\n1️⃣ الإجابة النموذجية الكاملة كما هي في الكتاب المدرسي المصري خطوة بخطوة\n2️⃣ النقاط الرئيسية التي يبحث عنها المُصحِّح\n3️⃣ أي قوانين أو معلومات أساسية مرتبطة بالسؤال من المنهج';
+  var prompt = 'المرحلة: ' + stageName + trackInfo + '\nالصف: ' + _hwGrade + '\nالمادة: ' + _hwSubject + '\nالترم: ' + _hwTerm + '\n\nالسؤال:\n' + textInput + '\n\nالمطلوب (اكتب كل قسم بالكامل):\n\n📝 السؤال كما هو:\n[أعِد كتابة السؤال بوضوح]\n\n✅ الإجابة النموذجية الكاملة:\n[الإجابة خطوة بخطوة كما هي في الكتاب المدرسي المصري — لا تختصر]\n\n🔍 النتيجة / الخلاصة:\n[الجواب النهائي أو الاستنتاج]\n\n💡 الشرح المبسط:\n[شرح كامل بأسلوب سهل للطالب — لا تترك الشرح ناقصاً]';
 
   _callClaudeAPI(prompt, systemPrompt).then(function(res) {
+    // تحويل sections إلى HTML منسق
+    var formatted = res
+      .replace(/📝 السؤال كما هو:/g, '<div style="margin-top:12px"><div style="font-size:.78rem;font-weight:900;color:#64b5f6;margin-bottom:6px;display:flex;align-items:center;gap:5px">📝 <span>السؤال كما هو</span></div>')
+      .replace(/✅ الإجابة النموذجية الكاملة:/g, '<div style="margin-top:14px"><div style="font-size:.78rem;font-weight:900;color:#4caf50;margin-bottom:6px;display:flex;align-items:center;gap:5px">✅ <span>الإجابة النموذجية</span></div>')
+      .replace(/🔍 النتيجة \/ الخلاصة:/g, '<div style="margin-top:14px"><div style="font-size:.78rem;font-weight:900;color:#ff9800;margin-bottom:6px;display:flex;align-items:center;gap:5px">🔍 <span>النتيجة</span></div>')
+      .replace(/💡 الشرح المبسط:/g, '<div style="margin-top:14px"><div style="font-size:.78rem;font-weight:900;color:#e040fb;margin-bottom:6px;display:flex;align-items:center;gap:5px">💡 <span>الشرح المبسط</span></div>');
+    // إضافة div لكل section إذا لم يتم التحويل
     var html = '<div style="background:linear-gradient(145deg,rgba(13,27,42,.97),rgba(8,18,38,.99));border:2px solid rgba(33,150,243,.35);border-radius:20px;overflow:hidden">';
     html += '<div style="background:linear-gradient(135deg,rgba(33,150,243,.25),rgba(100,181,246,.15));padding:12px 14px;display:flex;align-items:center;gap:10px">';
     html += '<span style="font-size:1.6rem">🧠</span>';
     html += '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>';
     html += '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">' + _hwGrade + ' — ' + _hwSubject + ' — الترم ' + _hwTerm + '</div></div>';
     html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + formatted + '</div>';
     html += '</div>';
     resBox.innerHTML = html;
   }).catch(function() {
@@ -15210,7 +15217,7 @@ function _hwScan(video, statusEl){
   var img=captureFrame(video); if(!img){_hwAutoAnalyzing=false;return;}
   var grade=document.getElementById('hw-grade')?document.getElementById('hw-grade').value:'';
   var subject=document.getElementById('hw-subject')?document.getElementById('hw-subject').value:'';
-  var prompt='أنت مدرس خبير بالمناهج المصرية. انظر للصورة.'+(grade?' الصف: '+grade+'.':'')+(subject?' المادة: '+subject+'.':'')+'\nاقرأ السؤال وقدّم:\n1. السؤال كما هو\n2. الإجابة النموذجية خطوة بخطوة\n3. الشرح المبسط\nاللغة: عربية. إذا لم تجد سؤالاً اكتب: "وجّه الكاميرا نحو السؤال".';
+  var prompt='أنت مدرس خبير بالمناهج المصرية. انظر للصورة.'+(grade?' الصف: '+grade+'.':'')+(subject?' المادة: '+subject+'.':'')+'\nاقرأ السؤال وأعطِ إجابة كاملة:\n\n📝 السؤال كما هو:\n[أعِد كتابة السؤال]\n\n✅ الإجابة النموذجية الكاملة:\n[الإجابة خطوة بخطوة — لا تختصر أبداً]\n\n🔍 النتيجة:\n[الخلاصة]\n\n💡 الشرح المبسط:\n[شرح كامل ومبسط للطالب — اكمل الشرح حتى النهاية]\n\nاللغة: عربية. إذا لم تجد سؤالاً اكتب: "وجّه الكاميرا نحو السؤال".';
   visionRace(img, prompt, function(result){
     _hwAutoAnalyzing=false; clearInterval(_hwIv);
     if(s) s.textContent='✅ تم الحل';
