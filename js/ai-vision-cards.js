@@ -511,12 +511,41 @@ async function _toWorkerWithFallback(imgDataUrl, prompt) {
     var th = THEMES[mode] || THEMES.general;
     var label = MODE_LABELS[mode] || 'النتيجة';
 
+    /* ─── تنظيف JSON المدفون في نص تفسيري ─── */
+    var cleanedRaw = rawText;
+    // 1. استخراج من code block ```json ... ```
+    var cbMatch = cleanedRaw.match(/```json\s*([\s\S]*?)```/);
+    if (cbMatch) {
+      cleanedRaw = cbMatch[1].trim();
+    } else {
+      // 2. ابحث عن أول { وتتبع العمق لاستخراج JSON النقي
+      var jsonStart = cleanedRaw.search(/\{/);
+      if (jsonStart > 0) {
+        var depth = 0, jsonEnd = -1;
+        for (var ci = jsonStart; ci < cleanedRaw.length; ci++) {
+          if (cleanedRaw[ci] === '{') depth++;
+          else if (cleanedRaw[ci] === '}') {
+            depth--;
+            if (depth === 0) { jsonEnd = ci + 1; break; }
+          }
+        }
+        if (jsonEnd > 0) cleanedRaw = cleanedRaw.slice(jsonStart, jsonEnd);
+      }
+    }
+    cleanedRaw = cleanedRaw.replace(/```json|```/g, '').trim();
+
     /* حاول تحليل JSON أولاً */
     var json = null;
     try {
-      var clean = rawText.replace(/```json|```/g, '').trim();
+      var clean = cleanedRaw;
       if (clean.startsWith('{') || clean.startsWith('[')) json = JSON.parse(clean);
-    } catch (e) {}
+    } catch (e) {
+      // محاولة ثانية بالنص الأصلي كاملاً
+      try {
+        var clean2 = rawText.replace(/```json|```/g, '').trim();
+        if (clean2.startsWith('{') || clean2.startsWith('[')) json = JSON.parse(clean2);
+      } catch(e2) {}
+    }
 
     var cardsHtml = '';
 
