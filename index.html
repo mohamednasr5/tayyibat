@@ -1517,8 +1517,21 @@ window._callClaudeAPIWithImage = window._callClaudeAPIWithImage || function(p, i
   if (window.TayyibatAI) return window.TayyibatAI.vision(img, p).then(function(r){return r.text||r;});
   return Promise.resolve('جاري تحميل الذكاء الاصطناعي...');
 };
-window.geminiQuick = window.geminiQuick || function(msg) {
-  setTimeout(function() { if (window.geminiQuick && window.geminiQuick !== arguments.callee) window.geminiQuick(msg); }, 500);
+window._pendingGeminiQuick = null;
+window.geminiQuick = function(msg) {
+  // إذا كانت _doSend جاهزة استخدمها مباشرة
+  if (typeof window._doSend === 'function') { window._doSend(msg); return; }
+  // وإلا انتظر تحميل الشات
+  window._pendingGeminiQuick = msg;
+  var tries = 0;
+  var chk = setInterval(function() {
+    tries++;
+    if (typeof window._doSend === 'function') {
+      clearInterval(chk);
+      window._doSend(msg);
+      window._pendingGeminiQuick = null;
+    } else if (tries > 30) { clearInterval(chk); }
+  }, 200);
 };
 window.geminiSend = window.geminiSend || function() {};
 </script>
@@ -3576,11 +3589,13 @@ async function obgynSend() {
 
   var OBGYN_SYSTEM = 'أنتِ د. طيبات، طبيبة متخصصة في أمراض النساء والتوليد وصحة المرأة. تتحدثين بالعربية فقط بأسلوب دافئ وطبي احترافي. تخصصاتكِ: الدورة الشهرية، الإفرازات، الحمل، تكيس المبايض، الخصوبة، سن اليأس. ابدئي دائماً بـ "حبيبتي" وأجيبي بتعاطف.';
 
-  // بناء رسائل السياق
-  var ctxMsgs = [{ role: 'user', content: OBGYN_SYSTEM + '\n\n' + q }];
-  if (_obgynMsgs.length > 2) {
-    ctxMsgs = _obgynMsgs.slice(-6).map(function(m){ return {role:m.role, content:m.content}; });
-    ctxMsgs[0].content = OBGYN_SYSTEM + '\n\n' + ctxMsgs[0].content;
+  // بناء رسائل السياق مع system role صحيح
+  var histMsgs = _obgynMsgs.slice(-6);
+  var ctxMsgs = [{ role: 'system', content: OBGYN_SYSTEM }];
+  if (histMsgs.length > 0) {
+    histMsgs.forEach(function(m) { ctxMsgs.push({ role: m.role, content: m.content }); });
+  } else {
+    ctxMsgs.push({ role: 'user', content: q });
   }
 
   var txt = null;
@@ -3588,39 +3603,44 @@ async function obgynSend() {
   // Universal AI call — fallback chain (scope-safe)
   async function _callObgynAI(msgs) {
     var res = null;
-    // 1. universalAICall من ai-engine.js
-    if (!res && typeof window.universalAICall === 'function') {
-      try { var r1 = await window.universalAICall(msgs); if (r1 && r1.text) res = r1.text; } catch(e) {}
+    // 1. universalAICall من ai-engine.js — الأولوية الأولى
+    if (!res && typeof window._universalAICall === 'function') {
+      try {
+        var r1 = await window._universalAICall(msgs);
+        if (r1 && r1.text && r1.text.length > 10) res = r1.text;
+      } catch(e) { console.warn('[obgyn] universalAICall error:', e.message); }
     }
-    // 2. TayyibatAI.chat
+    // 2. TayyibatAI.periodDoctor
+    if (!res && window.TayyibatAI && typeof window.TayyibatAI.periodDoctor === 'function') {
+      try {
+        var uMsgPD = msgs.filter(function(m){ return m.role==='user'; }).pop();
+        var r2PD = await window.TayyibatAI.periodDoctor(uMsgPD ? uMsgPD.content : q);
+        if (r2PD && r2PD.text && r2PD.text.length > 10) res = r2PD.text;
+      } catch(e) {}
+    }
+    // 3. TayyibatAI.chat
     if (!res && window.TayyibatAI && typeof window.TayyibatAI.chat === 'function') {
       try {
         var uMsg = msgs.filter(function(m){return m.role==='user';}).pop();
         var r2 = await window.TayyibatAI.chat(uMsg ? uMsg.content : '', OBGYN_SYSTEM);
-        if (r2 && r2.text) res = r2.text;
+        if (r2 && r2.text && r2.text.length > 10) res = r2.text;
         else if (typeof r2 === 'string' && r2.length > 5) res = r2;
       } catch(e) {}
     }
-    // 3. callClaudeAPI
+    // 4. callClaudeAPI
     if (!res && typeof window.callClaudeAPI === 'function') {
       try {
         var uMsg2 = msgs.filter(function(m){return m.role==='user';}).pop();
         var r3 = await window.callClaudeAPI(uMsg2 ? uMsg2.content : '', OBGYN_SYSTEM);
-        if (r3) res = r3;
+        if (r3 && r3.length > 10) res = r3;
       } catch(e) {}
-    }
-    // 4. tryLLM7 direct
-    if (!res && typeof window.tryLLM7 === 'function') {
-      try { var r4 = await window.tryLLM7(msgs, 0); if (r4 && r4.text) res = r4.text; } catch(e) {}
     }
     return res;
   }
 
   try {
-    var sysMsg = { role: 'system', content: OBGYN_SYSTEM };
-    var msgs2 = [sysMsg].concat(ctxMsgs);
-    txt = await _callObgynAI(msgs2);
-  } catch(e) {}
+    txt = await _callObgynAI(ctxMsgs);
+  } catch(e) { console.error('[obgyn error]', e); }
 
   if (thinkDiv) thinkDiv.remove();
 
@@ -6538,11 +6558,15 @@ async function _liveVisionAnalyze(videoEl, prompt, onResult, onError) {
 async function _aiAsk(prompt, onResult, onError) {
   var result = null;
   var msgs = [{role:'user', content: prompt}];
-  // LLM7 أولاً
+  // استخدام المحرك الموحد أولاً
+  if (!result && typeof window._universalAICall === 'function') {
+    try { var r0=await window._universalAICall(msgs); if(r0&&r0.text&&r0.text.length>10) result=r0.text; } catch(e) {}
+  }
+  // LLM7 ثانياً
   if (!result) { try { var r=await _tryLLM7(msgs,0); if(r&&r.text) result=r.text; } catch(e) {} }
-  // Pollinations ثانياً
+  // Pollinations ثالثاً
   if (!result) { try { var r=await _tryPollinations(msgs,0); if(r&&r.text) result=r.text; } catch(e) {} }
-  // OpenRouter ثالثاً
+  // OpenRouter رابعاً
   if (!result) { try { var r=await _tryOpenRouterFree(msgs,0); if(r&&r.text) result=r.text; } catch(e) {} }
   if (result) { if(onResult) onResult(result); return result; }
   else { if(onError) onError('تعذّر الحصول على إجابة'); return null; }
@@ -9845,6 +9869,9 @@ chatBox.innerHTML +=
     inp.style.height = '';
     _doSend(msg);
   };
+
+  // تصدير _doSend للنافذة لكي يستخدمها الـ placeholder
+  window._doSend = _doSend;
 
   window.geminiQuick = function(msg) {
     _doSend(msg);
@@ -15733,37 +15760,15 @@ console.log('[AutoCamera] ✅ v1.0 — كاميرا خلفية تلقائية ل
     };
 
     /* ══ 8. ربط طبيبك الخاص (OBGYN + عام) ══ */
-    // OBGYN Doctor
-    var _origObgynSend = window.obgynSend;
-    if (typeof window.obgynSend === 'function' || true) {
-      window.obgynSend = function() {
-        var input = document.getElementById('obgyn-input') || document.getElementById('pt-ai-input');
-        if (!input || !input.value.trim()) {
-          if (typeof showToast === 'function') showToast('اكتبي سؤالك أولاً');
-          return;
-        }
-        var question = input.value.trim();
-        var resBox = document.getElementById('obgyn-result') || document.getElementById('pt-ai-result');
-        if (!resBox) return;
-
-        resBox.innerHTML = '<div class="ai-thinking-wrap" style="padding:14px;text-align:center"><div class="ai-dots"><span></span><span></span><span></span></div><span>💕 د. طيبات تفكر...</span></div>';
-        input.value = '';
-
-        var sys = 'أنتِ د. طيبات، طبيبة متخصصة في أمراض النساء والتوليد. تتحدثين بالعربية بأسلوب دافئ. ابدئي بـ "حبيبتي". ⚠️ للمعلومات فقط.';
-        window.TayyibatAI.chat(question, sys).then(function(res) {
-          var text = res && res.text ? res.text : 'تعذر الرد.';
-          var html = '<div style="background:rgba(233,30,99,.07);border:2px solid rgba(233,30,99,.25);border-radius:14px;padding:13px">';
-          html += '<div style="font-size:.78rem;font-weight:800;color:#f48fb1;margin-bottom:7px">🩺 د. طيبات</div>';
-          html += '<div style="font-size:.84rem;line-height:1.9;white-space:pre-line">' + text + '</div></div>';
-          resBox.innerHTML = html;
-        }).catch(function() {
-          resBox.innerHTML = '<div style="padding:12px;color:#ff9800">تعذر الرد، حاولي مجدداً.</div>';
-        });
-      };
-
+    // لا نُعيد تعريف obgynSend لأن الدالة الأصلية تعمل بشكل صحيح مع obgyn-chat-wrap
+    // فقط نضمن أن obgynQuickAsk تعمل
+    if (typeof window.obgynQuickAsk !== 'function') {
       window.obgynQuickAsk = function(question) {
-        var input = document.getElementById('obgyn-input') || document.getElementById('pt-ai-input');
-        if (input) { input.value = question; window.obgynSend(); }
+        var input = document.getElementById('obgyn-input');
+        if (input) {
+          input.value = question;
+          if (typeof window.obgynSend === 'function') window.obgynSend();
+        }
       };
     }
 
@@ -15832,7 +15837,7 @@ function fetchNetDate(cb) {
 </script>
 
 <!-- ═══════════════════════════════════════════════════
-     🎤 VOICE INPUT PATCH — زر الميكروفون لكل حقل نص
+     🎤 VOICE INPUT PATCH — ذكي بالعربية والمصرية مع تصحيح AI
      ═══════════════════════════════════════════════════ -->
 <style>
 .voice-input-row {
@@ -15851,9 +15856,9 @@ function fetchNetDate(cb) {
   height: 40px !important;
   min-width: 40px !important;
   border-radius: 12px !important;
-  border: 1.5px solid rgba(233,30,99,.35) !important;
-  background: rgba(233,30,99,.1) !important;
-  color: #f48fb1 !important;
+  border: 1.5px solid rgba(200,150,12,.4) !important;
+  background: rgba(200,150,12,.1) !important;
+  color: #c8960c !important;
   font-size: 16px !important;
   cursor: pointer !important;
   display: flex !important;
@@ -15864,38 +15869,157 @@ function fetchNetDate(cb) {
   align-self: flex-end !important;
   padding: 0 !important;
   margin-bottom: 1px;
+  position: relative;
 }
 .voice-btn:hover {
-  background: rgba(233,30,99,.25) !important;
+  background: rgba(200,150,12,.25) !important;
   color: #fff !important;
   transform: scale(1.08) !important;
 }
 .voice-btn.mic-listening {
-  background: linear-gradient(135deg,#e91e63,#f06292) !important;
+  background: linear-gradient(135deg,#c8960c,#f0c040) !important;
   color: #fff !important;
-  border-color: #e91e63 !important;
+  border-color: #c8960c !important;
   animation: micPulse .7s ease-in-out infinite !important;
 }
+.voice-btn.mic-processing {
+  background: linear-gradient(135deg,#7c3aed,#a855f7) !important;
+  color: #fff !important;
+  border-color: #7c3aed !important;
+  animation: micPulse .5s ease-in-out infinite !important;
+}
 @keyframes micPulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(233,30,99,.5); }
-  50%      { box-shadow: 0 0 0 8px rgba(233,30,99,0); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(200,150,12,.6); }
+  50%      { box-shadow: 0 0 0 9px rgba(200,150,12,0); }
+}
+/* Interim text tooltip */
+.voice-interim-tooltip {
+  position: absolute;
+  bottom: 48px;
+  right: 0;
+  background: rgba(13,31,60,.97);
+  border: 1px solid rgba(200,150,12,.5);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: .72rem;
+  color: #f0c040;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 9999;
+  pointer-events: none;
+  font-family: Tajawal, sans-serif;
+  direction: rtl;
 }
 </style>
 
 <script>
-/* ═══════════════════════════════════════════
-   🎤 VOICE INPUT — إدخال صوتي لكل حقل نص
-   ═══════════════════════════════════════════ */
-(function initVoiceInput() {
+/* ═══════════════════════════════════════════════════════════
+   🎤 SMART VOICE INPUT v3 — عربي/مصري ذكي
+   • يمسح النص القديم عند الضغط ويبدأ الجديد
+   • يصحح الكلمات العامية تلقائياً بعد الانتهاء
+   • يبحث/يرسل تلقائياً بعد التصحيح
+   • يعمل على كل الأدوات
+   ═══════════════════════════════════════════════════════════ */
+(function initSmartVoice() {
   'use strict';
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var _activeRec = null;
-  var _activeBtn = null;
+  var _activeRec  = null;
+  var _activeBtn  = null;
+  var _activeEl   = null;
+
+  /* ── خريطة تصحيح الكلمات المصرية الشائعة ── */
+  var EGY_CORRECTIONS = {
+    'عندي':'عندي','عندى':'عندي','عايز':'أريد','عايزة':'أريد',
+    'مش':'ليس','مش عارف':'لا أعرف','بتاعي':'الخاص بي',
+    'ايه':'ما','إيه':'ما','ايه ده':'ما هذا','فين':'أين',
+    'إزيك':'كيف حالك','ازيك':'كيف حالك','كويس':'جيد','كويسة':'جيدة',
+    'تمام':'حسنًا','اوك':'حسنًا','اوكي':'حسنًا',
+    'بقى':'إذن','يعني':'أي أن','يعنى':'أي أن',
+    'دلوقتي':'الآن','دلوقت':'الآن','هسة':'الآن',
+    'زيادة':'أكثر','قوي':'جداً','جداً جداً':'جداً',
+    'معرفش':'لا أعرف','ملقيتش':'لم أجد',
+    'هيجي':'سيأتي','هتروح':'ستذهب','هياخد':'سيأخذ',
+    'بره':'خارج','جوه':'داخل','فوق':'أعلى','تحت':'أسفل',
+    'اكتر':'أكثر','اقل':'أقل','احسن':'أحسن','أحسن':'أفضل',
+    'بكرة':'غداً','امبارح':'أمس','النهارده':'اليوم',
+    'شوية':'قليلاً','كتير':'كثيراً','خالص':'جداً',
+    'مضيش':'لم أذهب','ماجيش':'لم يأت',
+    'دوّار':'دوخة','وجع':'ألم','بيوجعني':'يؤلمني',
+    'تقيل':'ثقيل','صداع':'صداع','حمى':'حمّى',
+    'إسهال':'إسهال','اسهال':'إسهال','ضغط':'ضغط الدم',
+    'سكر':'سكر الدم','كوليسترول':'الكوليسترول'
+  };
+
+  function correctEgyptianDialect(text) {
+    if (!text) return text;
+    var words = text.split(' ');
+    var corrected = words.map(function(w) {
+      return EGY_CORRECTIONS[w] || w;
+    });
+    return corrected.join(' ');
+  }
+
+  /* ── تحديد الإجراء المناسب بعد الإدخال الصوتي ── */
+  var TOOL_TRIGGERS = {
+    'obgyn-input':        function() { if (typeof window.obgynSend === 'function') window.obgynSend(); },
+    'gemini-input':       function() { if (typeof window.geminiSend === 'function') window.geminiSend(); },
+    'sym-symptoms':       function() { var b = document.getElementById('sym-analyze-btn') || document.querySelector('[onclick*="symAnalyze"]'); if (b) b.click(); },
+    'drug-search-input':  function() { var b = document.getElementById('da-search-btn') || document.querySelector('[onclick*="daSearch"]'); if (b) b.click(); },
+    'di-drugs-input':     function() { var b = document.getElementById('di-analyze-btn') || document.querySelector('[onclick*="diAnalyze"]'); if (b) b.click(); },
+    'hw-text-input':      function() { var b = document.querySelector('[onclick*="hwSolve"]'); if (b) b.click(); },
+    'bb-text-input':      function() { var b = document.querySelector('[onclick*="bbCheck"]'); if (b) b.click(); },
+    'dream-input':        function() { var b = document.querySelector('[onclick*="dreamAnalyze"]'); if (b) b.click(); },
+    'chat-input':         function() { if (typeof window.geminiSend === 'function') window.geminiSend(); },
+    'ai-input':           function() { if (typeof window.geminiSend === 'function') window.geminiSend(); }
+  };
+
+  /* ── تصحيح AI للكلمات بعد الإدخال ── */
+  async function aiCorrectText(rawText) {
+    if (!rawText || rawText.length < 4) return rawText;
+    // أولاً: تصحيح بسيط بالقاموس
+    var basic = correctEgyptianDialect(rawText);
+    // ثانياً: إذا كانت هناك كلمات غير مفهومة، استخدم AI
+    if (typeof window._universalAICall === 'function') {
+      try {
+        var res = await Promise.race([
+          window._universalAICall([{
+            role: 'user',
+            content: 'صحّح النص العربي التالي المُدخل بالميكروفون، حافظ على المعنى الأصلي وحوّله من عامية مصرية إلى فصحى واضحة بدون أي تعليق أو شرح، فقط أعد النص المُصحح:\n"' + rawText + '"'
+          }]),
+          new Promise(function(_, r) { setTimeout(function() { r(new Error('timeout')); }, 4000); })
+        ]);
+        if (res && res.text && res.text.length > 2 && res.text.length < rawText.length * 3) {
+          return res.text.trim().replace(/^["'"']|["'"']$/g,'');
+        }
+      } catch(e) {}
+    }
+    return basic;
+  }
 
   function stopCurrent() {
     if (_activeRec) { try { _activeRec.stop(); } catch(e){} _activeRec = null; }
-    if (_activeBtn) { _activeBtn.classList.remove('mic-listening'); _activeBtn.textContent = '🎤'; _activeBtn = null; }
+    if (_activeBtn) {
+      _activeBtn.classList.remove('mic-listening','mic-processing');
+      _activeBtn.innerHTML = '🎤';
+      // إزالة tooltip
+      var tt = _activeBtn.querySelector('.voice-interim-tooltip');
+      if (tt) tt.remove();
+      _activeBtn = null;
+    }
+    _activeEl = null;
+  }
+
+  function setTooltip(btn, text) {
+    var tt = btn.querySelector('.voice-interim-tooltip');
+    if (!tt) {
+      tt = document.createElement('div');
+      tt.className = 'voice-interim-tooltip';
+      btn.appendChild(tt);
+    }
+    tt.textContent = text;
   }
 
   function startVoice(el, btn) {
@@ -15908,30 +16032,92 @@ function fetchNetDate(cb) {
     stopCurrent();
 
     var rec = new SR();
-    rec.lang = 'ar-SA';
+    // دعم اللهجة المصرية (ar-EG أفضل من ar-SA)
+    rec.lang = 'ar-EG';
     rec.continuous = false;
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+
+    var finalTranscript = '';
 
     rec.onstart = function() {
-      _activeRec = rec; _activeBtn = btn;
+      _activeRec = rec; _activeBtn = btn; _activeEl = el;
       btn.classList.add('mic-listening');
-      btn.textContent = '⏹';
+      btn.innerHTML = '⏹';
+      // مسح النص الحالي لكتابة الجديد
+      el.value = '';
+      if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; }
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+      setTooltip(btn, '🎤 استمع...');
     };
+
     rec.onresult = function(e) {
-      var t = Array.from(e.results).map(function(r){ return r[0].transcript; }).join(' ');
-      if (el.tagName === 'TEXTAREA' || el.type === 'text' || el.type === 'search') {
-        el.value = el.value ? el.value + ' ' + t : t;
-        el.dispatchEvent(new Event('input', {bubbles:true}));
+      var interim = '';
+      finalTranscript = '';
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          // اختار أفضل بديل
+          finalTranscript += e.results[i][0].transcript;
+        } else {
+          interim += e.results[i][0].transcript;
+        }
+      }
+      // عرض الـ interim في tooltip
+      if (interim) setTooltip(btn, interim);
+      // كتابة الـ final مؤقتاً
+      if (finalTranscript) {
+        el.value = finalTranscript;
         if (el.tagName === 'TEXTAREA') { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+        el.dispatchEvent(new Event('input', {bubbles:true}));
       }
     };
+
     rec.onerror = function(ev) {
       console.warn('Voice error:', ev.error);
       if (ev.error === 'not-allowed') alert('يرجى السماح بالوصول للميكروفون في إعدادات المتصفح');
       stopCurrent();
     };
-    rec.onend = function() { stopCurrent(); };
+
+    rec.onend = function() {
+      if (!finalTranscript) { stopCurrent(); return; }
+
+      // مرحلة المعالجة: تصحيح الكلمات
+      btn.classList.remove('mic-listening');
+      btn.classList.add('mic-processing');
+      btn.innerHTML = '✨';
+      setTooltip(btn, 'جاري التصحيح...');
+
+      aiCorrectText(finalTranscript).then(function(corrected) {
+        var capturedEl = _activeEl || el;
+        if (capturedEl) {
+          capturedEl.value = corrected;
+          if (capturedEl.tagName === 'TEXTAREA') { capturedEl.style.height='auto'; capturedEl.style.height=capturedEl.scrollHeight+'px'; }
+          capturedEl.dispatchEvent(new Event('input', {bubbles:true}));
+          capturedEl.focus();
+        }
+
+        // إزالة tooltip + إيقاف الزر
+        stopCurrent();
+
+        // تشغيل الأداة تلقائياً بعد 300ms
+        var elId = capturedEl ? capturedEl.id : '';
+        if (elId && TOOL_TRIGGERS[elId]) {
+          setTimeout(function() {
+            if (TOOL_TRIGGERS[elId]) TOOL_TRIGGERS[elId]();
+          }, 350);
+        } else {
+          // محاولة بحث عام: Enter event
+          setTimeout(function() {
+            if (capturedEl) {
+              capturedEl.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
+            }
+          }, 350);
+        }
+      }).catch(function() {
+        stopCurrent();
+      });
+    };
+
     try { rec.start(); } catch(e) { stopCurrent(); }
   }
 
@@ -15939,8 +16125,8 @@ function fetchNetDate(cb) {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'voice-btn';
-    btn.textContent = '🎤';
-    btn.title = 'إدخال صوتي بالعربية';
+    btn.innerHTML = '🎤';
+    btn.title = 'إدخال صوتي بالعربية والمصرية — يمسح النص ويبدأ جديد';
     btn.setAttribute('aria-label', 'إدخال صوتي');
     btn.addEventListener('click', function(e) {
       e.preventDefault(); e.stopPropagation();
@@ -15951,15 +16137,20 @@ function fetchNetDate(cb) {
 
   function wrapWithVoice(el) {
     if (!el || el.dataset.voiceDone) return;
-    // تجاهل: hidden, readonly, type=number, type=date, type=checkbox
     if (el.type === 'number' || el.type === 'date' || el.type === 'checkbox' || el.type === 'radio') return;
     if (el.readOnly || el.disabled) return;
     el.dataset.voiceDone = '1';
 
     var btn = makeBtn(el);
     var parent = el.parentNode;
+    if (!parent) return;
 
-    // إنشاء wrapper flex
+    // إذا كان الأب هو voice-input-row بالفعل — أضف الزر فقط
+    if (parent.classList && parent.classList.contains('voice-input-row')) {
+      parent.appendChild(btn);
+      return;
+    }
+
     var row = document.createElement('div');
     row.className = 'voice-input-row';
     parent.insertBefore(row, el);
@@ -15967,38 +16158,38 @@ function fetchNetDate(cb) {
     row.appendChild(btn);
   }
 
-  // IDs المستهدفة
+  // IDs المستهدفة — شاملة كل الأدوات
   var TARGET_IDS = [
     'obgyn-input',
-    'sym-symptoms', 'sym-chronic',
-    'pt-extra-symptoms', 'pt-notes',
+    'gemini-input',
+    'sym-symptoms','sym-chronic',
+    'pt-extra-symptoms','pt-notes',
     'pa-manual-ingredients',
     'hw-text-input',
     'drug-search-input',
-    'chat-input', 'ai-input', 'message-input', 'user-input',
-    'bb-text-input', 'search-input'
+    'di-drugs-input',
+    'chat-input','ai-input','message-input','user-input',
+    'bb-text-input','search-input',
+    'dream-input','horoscope-input',
+    'boycott-input','da-search'
   ];
 
   function applyAll() {
-    // بالـ IDs
     TARGET_IDS.forEach(function(id) {
       var el = document.getElementById(id);
       if (el) wrapWithVoice(el);
     });
-    // كل textarea مرئي
     document.querySelectorAll('textarea:not([data-voice-done])').forEach(function(ta) {
-      if (ta.offsetParent !== null) wrapWithVoice(ta);
+      if (ta.offsetParent !== null && !ta.readOnly) wrapWithVoice(ta);
     });
-    // كل input[type=text] مرئي بداخل الصفحات النشطة
     document.querySelectorAll('input[type="text"]:not([data-voice-done])').forEach(function(inp) {
       if (inp.offsetParent !== null && !inp.readOnly) wrapWithVoice(inp);
     });
   }
 
-  // تطبيق أولي بعد تحميل الصفحة
-  setTimeout(applyAll, 1000);
+  setTimeout(applyAll, 800);
+  setTimeout(applyAll, 2000);
 
-  // مراقبة DOM للعناصر الديناميكية
   var obs = new MutationObserver(function(muts) {
     var added = false;
     muts.forEach(function(m) { if (m.addedNodes.length) added = true; });
@@ -16006,7 +16197,8 @@ function fetchNetDate(cb) {
   });
   obs.observe(document.body, { childList: true, subtree: true });
 
-  console.log('✅ Voice Input initialized');
+  console.log('✅ Smart Voice Input v3 initialized — عربي/مصري ذكي');
+  window._voiceInputReady = true;
 })();
 </script>
 
