@@ -3585,12 +3585,41 @@ async function obgynSend() {
 
   var txt = null;
 
-  // Universal AI call (handles rate limits, retries, all providers)
+  // Universal AI call — fallback chain (scope-safe)
+  async function _callObgynAI(msgs) {
+    var res = null;
+    // 1. universalAICall من ai-engine.js
+    if (!res && typeof window.universalAICall === 'function') {
+      try { var r1 = await window.universalAICall(msgs); if (r1 && r1.text) res = r1.text; } catch(e) {}
+    }
+    // 2. TayyibatAI.chat
+    if (!res && window.TayyibatAI && typeof window.TayyibatAI.chat === 'function') {
+      try {
+        var uMsg = msgs.filter(function(m){return m.role==='user';}).pop();
+        var r2 = await window.TayyibatAI.chat(uMsg ? uMsg.content : '', OBGYN_SYSTEM);
+        if (r2 && r2.text) res = r2.text;
+        else if (typeof r2 === 'string' && r2.length > 5) res = r2;
+      } catch(e) {}
+    }
+    // 3. callClaudeAPI
+    if (!res && typeof window.callClaudeAPI === 'function') {
+      try {
+        var uMsg2 = msgs.filter(function(m){return m.role==='user';}).pop();
+        var r3 = await window.callClaudeAPI(uMsg2 ? uMsg2.content : '', OBGYN_SYSTEM);
+        if (r3) res = r3;
+      } catch(e) {}
+    }
+    // 4. tryLLM7 direct
+    if (!res && typeof window.tryLLM7 === 'function') {
+      try { var r4 = await window.tryLLM7(msgs, 0); if (r4 && r4.text) res = r4.text; } catch(e) {}
+    }
+    return res;
+  }
+
   try {
     var sysMsg = { role: 'system', content: OBGYN_SYSTEM };
     var msgs2 = [sysMsg].concat(ctxMsgs);
-    var uRes = await _universalAICall(msgs2);
-    if (uRes && uRes.text) txt = uRes.text;
+    txt = await _callObgynAI(msgs2);
   } catch(e) {}
 
   if (thinkDiv) thinkDiv.remove();
@@ -15801,5 +15830,185 @@ function fetchNetDate(cb) {
 }
 
 </script>
+
+<!-- ═══════════════════════════════════════════════════
+     🎤 VOICE INPUT PATCH — زر الميكروفون لكل حقل نص
+     ═══════════════════════════════════════════════════ -->
+<style>
+.voice-input-row {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
+  width: 100%;
+}
+.voice-input-row > textarea,
+.voice-input-row > input {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+.voice-btn {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(233,30,99,.35) !important;
+  background: rgba(233,30,99,.1) !important;
+  color: #f48fb1 !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all .2s !important;
+  flex-shrink: 0 !important;
+  align-self: flex-end !important;
+  padding: 0 !important;
+  margin-bottom: 1px;
+}
+.voice-btn:hover {
+  background: rgba(233,30,99,.25) !important;
+  color: #fff !important;
+  transform: scale(1.08) !important;
+}
+.voice-btn.mic-listening {
+  background: linear-gradient(135deg,#e91e63,#f06292) !important;
+  color: #fff !important;
+  border-color: #e91e63 !important;
+  animation: micPulse .7s ease-in-out infinite !important;
+}
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(233,30,99,.5); }
+  50%      { box-shadow: 0 0 0 8px rgba(233,30,99,0); }
+}
+</style>
+
+<script>
+/* ═══════════════════════════════════════════
+   🎤 VOICE INPUT — إدخال صوتي لكل حقل نص
+   ═══════════════════════════════════════════ */
+(function initVoiceInput() {
+  'use strict';
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var _activeRec = null;
+  var _activeBtn = null;
+
+  function stopCurrent() {
+    if (_activeRec) { try { _activeRec.stop(); } catch(e){} _activeRec = null; }
+    if (_activeBtn) { _activeBtn.classList.remove('mic-listening'); _activeBtn.textContent = '🎤'; _activeBtn = null; }
+  }
+
+  function startVoice(el, btn) {
+    if (!SR) {
+      alert('متصفحك لا يدعم الإدخال الصوتي. استخدم Chrome أو Edge.');
+      return;
+    }
+    // toggle off
+    if (_activeBtn === btn) { stopCurrent(); return; }
+    stopCurrent();
+
+    var rec = new SR();
+    rec.lang = 'ar-SA';
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = function() {
+      _activeRec = rec; _activeBtn = btn;
+      btn.classList.add('mic-listening');
+      btn.textContent = '⏹';
+    };
+    rec.onresult = function(e) {
+      var t = Array.from(e.results).map(function(r){ return r[0].transcript; }).join(' ');
+      if (el.tagName === 'TEXTAREA' || el.type === 'text' || el.type === 'search') {
+        el.value = el.value ? el.value + ' ' + t : t;
+        el.dispatchEvent(new Event('input', {bubbles:true}));
+        if (el.tagName === 'TEXTAREA') { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+      }
+    };
+    rec.onerror = function(ev) {
+      console.warn('Voice error:', ev.error);
+      if (ev.error === 'not-allowed') alert('يرجى السماح بالوصول للميكروفون في إعدادات المتصفح');
+      stopCurrent();
+    };
+    rec.onend = function() { stopCurrent(); };
+    try { rec.start(); } catch(e) { stopCurrent(); }
+  }
+
+  function makeBtn(el) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'voice-btn';
+    btn.textContent = '🎤';
+    btn.title = 'إدخال صوتي بالعربية';
+    btn.setAttribute('aria-label', 'إدخال صوتي');
+    btn.addEventListener('click', function(e) {
+      e.preventDefault(); e.stopPropagation();
+      startVoice(el, btn);
+    });
+    return btn;
+  }
+
+  function wrapWithVoice(el) {
+    if (!el || el.dataset.voiceDone) return;
+    // تجاهل: hidden, readonly, type=number, type=date, type=checkbox
+    if (el.type === 'number' || el.type === 'date' || el.type === 'checkbox' || el.type === 'radio') return;
+    if (el.readOnly || el.disabled) return;
+    el.dataset.voiceDone = '1';
+
+    var btn = makeBtn(el);
+    var parent = el.parentNode;
+
+    // إنشاء wrapper flex
+    var row = document.createElement('div');
+    row.className = 'voice-input-row';
+    parent.insertBefore(row, el);
+    row.appendChild(el);
+    row.appendChild(btn);
+  }
+
+  // IDs المستهدفة
+  var TARGET_IDS = [
+    'obgyn-input',
+    'sym-symptoms', 'sym-chronic',
+    'pt-extra-symptoms', 'pt-notes',
+    'pa-manual-ingredients',
+    'hw-text-input',
+    'drug-search-input',
+    'chat-input', 'ai-input', 'message-input', 'user-input',
+    'bb-text-input', 'search-input'
+  ];
+
+  function applyAll() {
+    // بالـ IDs
+    TARGET_IDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) wrapWithVoice(el);
+    });
+    // كل textarea مرئي
+    document.querySelectorAll('textarea:not([data-voice-done])').forEach(function(ta) {
+      if (ta.offsetParent !== null) wrapWithVoice(ta);
+    });
+    // كل input[type=text] مرئي بداخل الصفحات النشطة
+    document.querySelectorAll('input[type="text"]:not([data-voice-done])').forEach(function(inp) {
+      if (inp.offsetParent !== null && !inp.readOnly) wrapWithVoice(inp);
+    });
+  }
+
+  // تطبيق أولي بعد تحميل الصفحة
+  setTimeout(applyAll, 1000);
+
+  // مراقبة DOM للعناصر الديناميكية
+  var obs = new MutationObserver(function(muts) {
+    var added = false;
+    muts.forEach(function(m) { if (m.addedNodes.length) added = true; });
+    if (added) setTimeout(applyAll, 400);
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
+
+  console.log('✅ Voice Input initialized');
+})();
+</script>
+
 </body>
 </html>
