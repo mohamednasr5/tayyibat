@@ -774,6 +774,10 @@
     return await global._callClaudeAPI(prompt + '\n(تعذر تحميل الصورة، قدم تحليلاً عاماً)', null);
   };
 
+  // تصدير universalAICall للنافذة ليكون متاحاً من أي script scope
+  global.universalAICall = _universalAICall;
+  global.smartVisionAnalysis = function(imgDataUrl, promptText) { return _smartVision(imgDataUrl, promptText, 'general'); };
+
   console.log('[طيبات AI v6.0] ✅ محرك الذكاء الاصطناعي الموحد — 6 مزودين مجانيين');
 
 })(window);
