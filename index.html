@@ -16496,7 +16496,7 @@ function fetchNetDate(cb) {
 ══════════════════════════════════════════════════════════ -->
 <script>
 /* ══ ثوابت وحالة ══ */
-var QR_BASE            = 'quran/source';
+var QR_BASE            = 'https://raw.githubusercontent.com/mohamednasr5/tayyibat/main/quran/source';
 var QR_SURAH_LIST      = [];
 var QR_CURRENT_SURAH   = null;
 var QR_CURRENT_DATA    = {};   // { verse:{}, tajweed:{}, tafsir:{}, en:{} }
@@ -16819,6 +16819,19 @@ function qsEnsureLoaded(cb) {
 
   QS_LOAD_PROMISE = loadList.then(function(){
     var all = [], done = 0, total = 114;
+    // Show progress in loading area
+    var loadingEl = document.getElementById('qs-loading');
+    function updateProgress() {
+      if (!loadingEl) return;
+      var pct = Math.round((done / total) * 100);
+      loadingEl.innerHTML =
+        '<div class="search-wave-loader"><span></span><span></span><span></span><span></span><span></span></div>' +
+        '<div style="margin:10px 16px 0;background:rgba(255,255,255,.08);border-radius:20px;height:6px;overflow:hidden;">' +
+          '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:20px;transition:width .3s;"></div>' +
+        '</div>' +
+        '<div style="color:var(--txt3);font-size:.78rem;margin-top:6px;text-align:center;">جاري تحميل القرآن… ' + done + ' / ' + total + ' سورة</div>';
+    }
+    updateProgress();
     return new Promise(function(resolve){
       for (var i = 1; i <= total; i++) {
         (function(n){
@@ -16828,10 +16841,19 @@ function qsEnsureLoaded(cb) {
               if (!data || !data.verse) return;
               var info = QR_SURAH_LIST[n-1];
               Object.keys(data.verse).forEach(function(key){
-                all.push({ surahNum:n, surahNameAr: info ? info.titleAr : '', surahIdx: data.index,
-                           verseKey:key, verseNum:key.replace('verse_',''), text:data.verse[key] });
+                var vtxt = data.verse[key];
+                all.push({
+                  surahNum:n,
+                  surahNameAr: info ? info.titleAr : '',
+                  surahIdx: data.index,
+                  verseKey:key,
+                  verseNum:key.replace('verse_',''),
+                  text:vtxt,
+                  norm1: qsNorm(vtxt),
+                  norm2: qsNormText(vtxt)
+                });
               });
-            }).catch(function(){}).finally(function(){ done++; if (done===total){ QS_ALL_VERSES=all; resolve(); } });
+            }).catch(function(){}).finally(function(){ done++; updateProgress(); if (done===total){ QS_ALL_VERSES=all; resolve(); } });
         })(i);
       }
     });
@@ -16854,7 +16876,7 @@ function qsDoSearch(q) {
   function processChunk() {
     var end = Math.min(idx + chunkSize, allVerses.length);
     for (var i = idx; i < end; i++) {
-      if (qsNorm(allVerses[i].text).indexOf(qn) !== -1) res.push(allVerses[i]);
+      if (allVerses[i].norm1.indexOf(qn) !== -1 || allVerses[i].norm2.indexOf(qn) !== -1) res.push(allVerses[i]);
     }
     idx = end;
 
@@ -16885,8 +16907,20 @@ function qsDoSearch(q) {
 }
 
 function qsNorm(s) {
-  return s.replace(/[\u064B-\u065F\u0610-\u061A\u06D6-\u06DC]/g,'')
-          .replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
+  // Remove all Arabic diacritics + BOM + Tatweel
+  var v1 = s.replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06DC\uFEFF\u0640]/g,'')
+             .replace(/\u0671/g,'ا').replace(/[أإآ]/g,'ا')
+             .replace(/ة/g,'ه').replace(/ى/g,'ي');
+  return v1;
+}
+
+// Normalize Quran verse text for indexing (expands superscript alef U+0670 -> ا)
+function qsNormText(s) {
+  var v2 = s.replace(/\u0670/g,'ا')
+             .replace(/[\u064B-\u065F\u0610-\u061A\u06D6-\u06DC\uFEFF\u0640]/g,'')
+             .replace(/\u0671/g,'ا').replace(/[أإآ]/g,'ا')
+             .replace(/ة/g,'ه').replace(/ى/g,'ي');
+  return v2;
 }
 
 function qsHighlight(text, q) {
