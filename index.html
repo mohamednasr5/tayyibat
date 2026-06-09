@@ -16028,6 +16028,40 @@ function fetchNetDate(cb) {
   font-family: Tajawal, sans-serif;
   direction: rtl;
 }
+
+/* === Search Wave Loader & Card Animation === */
+.search-wave-loader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  height: 40px;
+  padding-top: 8px;
+}
+.search-wave-loader span {
+  display: inline-block;
+  width: 6px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #fbbf24, #f59e0b);
+  animation: waveBar 1s ease-in-out infinite;
+}
+.search-wave-loader.hs-wave span {
+  background: linear-gradient(180deg, #a78bfa, #7c3aed);
+}
+.search-wave-loader span:nth-child(1) { animation-delay: 0s;    height: 20px; }
+.search-wave-loader span:nth-child(2) { animation-delay: 0.1s;  height: 30px; }
+.search-wave-loader span:nth-child(3) { animation-delay: 0.2s;  height: 38px; }
+.search-wave-loader span:nth-child(4) { animation-delay: 0.3s;  height: 30px; }
+.search-wave-loader span:nth-child(5) { animation-delay: 0.4s;  height: 20px; }
+@keyframes waveBar {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50%       { transform: scaleY(1);   opacity: 1;   }
+}
+@keyframes searchCardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
 </style>
 
 <script>
@@ -16764,12 +16798,13 @@ function qsQuick(w) { document.getElementById('qs-input').value = w; qsSearch();
 
 function qsSearch() {
   var q = (document.getElementById('qs-input').value || '').trim();
-  if (q.length < 2) { showToast('اكتب على الأقل حرفين للبحث'); return; }
+  if (q.length < 1) { showToast('اكتب على الأقل حرفاً واحداً للبحث'); return; }
   document.getElementById('qs-results').innerHTML     = '';
   document.getElementById('qs-results-info').style.display = 'none';
   document.getElementById('qs-empty').style.display        = 'none';
   document.getElementById('qs-no-results').style.display   = 'none';
   document.getElementById('qs-loading').style.display      = 'block';
+  document.getElementById('qs-loading').innerHTML = '<div class="search-wave-loader"><span></span><span></span><span></span><span></span><span></span></div><div style="color:var(--txt3);font-size:.8rem;margin-top:10px;text-align:center;">جاري البحث في القرآن الكريم…</div>';
 
   qsEnsureLoaded(function(){ qsDoSearch(q); });
 }
@@ -16808,25 +16843,45 @@ function qsDoSearch(q) {
   document.getElementById('qs-loading').style.display = 'none';
   if (!QS_ALL_VERSES || !QS_ALL_VERSES.length) { document.getElementById('qs-no-results').style.display = 'block'; return; }
   var qn  = qsNorm(q);
-  var res = QS_ALL_VERSES.filter(function(v){ return qsNorm(v.text).indexOf(qn) !== -1; });
-  if (!res.length) { document.getElementById('qs-no-results').style.display = 'block'; return; }
-  document.getElementById('qs-results-count').textContent = 'وُجد ' + res.length + ' نتيجة' + (res.length > 200 ? ' — يُعرض أول ٢٠٠' : '');
-  document.getElementById('qs-results-info').style.display = 'block';
-  var html = '';
-  res.slice(0, 200).forEach(function(v){
-    var pi = v.surahIdx.toString().padStart(3,'0');
-    var pv = parseInt(v.verseNum).toString().padStart(3,'0');
-    html += '<div style="background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid rgba(251,191,36,.2);border-radius:14px;padding:14px;margin-bottom:10px;">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;">';
-    html += '<div style="font-size:.73rem;font-weight:800;color:#fbbf24;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);padding:3px 10px;border-radius:20px;white-space:nowrap;">سورة ' + v.surahNameAr + ' — آية ' + v.verseNum + '</div>';
-    html += '<div style="display:flex;gap:5px;flex-shrink:0;">';
-    html += '<button onclick="qsPlay(\'' + pi + '\',\'' + pv + '\')" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:5px 8px;color:#10b981;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-play"></i></button>';
-    html += '<button onclick="qsGoTo(' + v.surahNum + ')" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:5px 8px;color:#fbbf24;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-book-open"></i></button>';
-    html += '</div></div>';
-    html += '<div style="font-size:1.05rem;line-height:2.1;direction:rtl;text-align:right;font-family:\'Amiri\',\'Tajawal\',serif;">' + qsHighlight(v.text, q) + '</div>';
-    html += '</div>';
-  });
-  document.getElementById('qs-results').innerHTML = html;
+  // Non-blocking filter using setTimeout chunking
+  var allVerses = QS_ALL_VERSES;
+  var res = [];
+  var chunkSize = 500;
+  var idx = 0;
+  var container = document.getElementById('qs-results');
+  var firstBatchRendered = false;
+
+  function processChunk() {
+    var end = Math.min(idx + chunkSize, allVerses.length);
+    for (var i = idx; i < end; i++) {
+      if (qsNorm(allVerses[i].text).indexOf(qn) !== -1) res.push(allVerses[i]);
+    }
+    idx = end;
+
+    // Render first 20 results instantly as soon as we have them
+    if (!firstBatchRendered && res.length >= 1) {
+      firstBatchRendered = true;
+      document.getElementById('qs-results-count').textContent = 'جاري البحث… وُجد ' + res.length + ' حتى الآن';
+      document.getElementById('qs-results-info').style.display = 'block';
+      container.innerHTML = qsBuildResultsHTML(res.slice(0, 20), q);
+    }
+
+    if (idx < allVerses.length) {
+      setTimeout(processChunk, 0);
+    } else {
+      // Done — render final results
+      if (!res.length) {
+        document.getElementById('qs-no-results').style.display = 'block';
+        container.innerHTML = '';
+        return;
+      }
+      document.getElementById('qs-results-count').textContent = 'وُجد ' + res.length + ' نتيجة' + (res.length > 200 ? ' — يُعرض أول ٢٠٠' : '');
+      document.getElementById('qs-results-info').style.display = 'block';
+      container.innerHTML = '';
+      qsRenderProgressive(res.slice(0, 200), q, container, 0, 20);
+    }
+  }
+  setTimeout(processChunk, 0);
 }
 
 function qsNorm(s) {
@@ -17220,7 +17275,7 @@ function hsQuick(w) { document.getElementById('hs-input').value = w; hsSearch();
 
 function hsSearch() {
   var q = (document.getElementById('hs-input').value || '').trim();
-  if (q.length < 2) { showToast('اكتب على الأقل حرفين للبحث'); return; }
+  if (q.length < 1) { showToast('اكتب على الأقل حرفاً واحداً للبحث'); return; }
   HS_LAST_QUERY = q;
   HS_RESULTS    = [];
 
@@ -17230,6 +17285,7 @@ function hsSearch() {
   document.getElementById('hs-no-results').style.display      = 'none';
   document.getElementById('hs-ai-panel').style.display        = 'none';
   document.getElementById('hs-loading').style.display         = 'block';
+  document.getElementById('hs-loading').innerHTML = '<div class="search-wave-loader hs-wave"><span></span><span></span><span></span><span></span><span></span></div><div style="color:var(--txt3);font-size:.8rem;margin-top:10px;text-align:center;">جاري البحث في كتب الحديث…</div>';
 
   var bookFilter = document.getElementById('hs-book-filter').value;
   var toLoad = bookFilter === 'all' ? HS_BOOKS_LIST : HS_BOOKS_LIST.filter(function(b){ return b.key === bookFilter; });
@@ -17256,26 +17312,102 @@ function hsEnsureLoaded(books, cb) {
 function hsDoSearch(q, books) {
   document.getElementById('hs-loading').style.display = 'none';
   var qn  = hsNorm(q);
-  var res = [];
+  var allItems = [];
   books.forEach(function(b){
     var bd = HS_ALL_HADITHS[b.key];
     if (!bd) return;
     bd.hadiths.forEach(function(h){
-      if (hsNorm(h.arabic).indexOf(qn) !== -1) {
-        res.push({ h:h, bookLabel:bd.label, bookKey:b.key });
-      }
+      allItems.push({ h:h, bookLabel:bd.label, bookKey:b.key });
     });
   });
-  HS_RESULTS = res;
-  if (!res.length) { document.getElementById('hs-no-results').style.display = 'block'; return; }
-  document.getElementById('hs-results-count').textContent = 'وُجد ' + res.length + ' نتيجة' + (res.length > 100 ? ' — يُعرض أول ١٠٠' : '');
-  document.getElementById('hs-results-info').style.display = 'block';
+
+  var res = [];
+  var idx = 0;
+  var chunkSize = 300;
   var container = document.getElementById('hs-results');
-  container.innerHTML = '';
-  res.slice(0, 100).forEach(function(item){
-    container.appendChild(hsBuildCard(item.h, item.bookLabel, q));
-  });
+  var firstBatchRendered = false;
+
+  function processChunk() {
+    var end = Math.min(idx + chunkSize, allItems.length);
+    for (var i = idx; i < end; i++) {
+      if (hsNorm(allItems[i].h.arabic).indexOf(qn) !== -1) res.push(allItems[i]);
+    }
+    idx = end;
+
+    if (!firstBatchRendered && res.length >= 1) {
+      firstBatchRendered = true;
+      document.getElementById('hs-results-count').textContent = 'جاري البحث… وُجد ' + res.length + ' حتى الآن';
+      document.getElementById('hs-results-info').style.display = 'block';
+      container.innerHTML = '';
+      res.slice(0, 10).forEach(function(item){ container.appendChild(hsBuildCard(item.h, item.bookLabel, q)); });
+    }
+
+    if (idx < allItems.length) {
+      setTimeout(processChunk, 0);
+    } else {
+      HS_RESULTS = res;
+      if (!res.length) { document.getElementById('hs-no-results').style.display = 'block'; container.innerHTML = ''; return; }
+      document.getElementById('hs-results-count').textContent = 'وُجد ' + res.length + ' نتيجة' + (res.length > 100 ? ' — يُعرض أول ١٠٠' : '');
+      document.getElementById('hs-results-info').style.display = 'block';
+      container.innerHTML = '';
+      hsRenderProgressive(res.slice(0, 100), q, container, 0, 15);
+    }
+  }
+  setTimeout(processChunk, 0);
 }
+
+function qsBuildResultsHTML(items, q) {
+  var html = '';
+  items.forEach(function(v){
+    var pi = v.surahIdx.toString().padStart(3,'0');
+    var pv = parseInt(v.verseNum).toString().padStart(3,'0');
+    html += '<div class="qs-result-card" style="background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid rgba(251,191,36,.2);border-radius:14px;padding:14px;margin-bottom:10px;animation:searchCardIn .3s ease both;">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;">';
+    html += '<div style="font-size:.73rem;font-weight:800;color:#fbbf24;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);padding:3px 10px;border-radius:20px;white-space:nowrap;">سورة ' + v.surahNameAr + ' — آية ' + v.verseNum + '</div>';
+    html += '<div style="display:flex;gap:5px;flex-shrink:0;">';
+    html += '<button onclick="qsPlay(\'' + pi + '\',\'' + pv + '\')" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:5px 8px;color:#10b981;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-play"></i></button>';
+    html += '<button onclick="qsGoTo(' + v.surahNum + ')" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:5px 8px;color:#fbbf24;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-book-open"></i></button>';
+    html += '</div></div>';
+    html += '<div style="font-size:1.05rem;line-height:2.1;direction:rtl;text-align:right;font-family:\'Amiri\',\'Tajawal\',serif;">' + qsHighlight(v.text, q) + '</div>';
+    html += '</div>';
+  });
+  return html;
+}
+
+function qsRenderProgressive(items, q, container, start, batchSize) {
+  var end = Math.min(start + batchSize, items.length);
+  var frag = document.createDocumentFragment();
+  for (var i = start; i < end; i++) {
+    var v = items[i];
+    var pi = v.surahIdx.toString().padStart(3,'0');
+    var pv = parseInt(v.verseNum).toString().padStart(3,'0');
+    var card = document.createElement('div');
+    card.className = 'qs-result-card';
+    card.style.cssText = 'background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid rgba(251,191,36,.2);border-radius:14px;padding:14px;margin-bottom:10px;animation:searchCardIn .35s ease both;animation-delay:' + ((i - start) * 0.04) + 's;';
+    card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;"><div style="font-size:.73rem;font-weight:800;color:#fbbf24;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);padding:3px 10px;border-radius:20px;white-space:nowrap;">سورة ' + v.surahNameAr + ' — آية ' + v.verseNum + '</div><div style="display:flex;gap:5px;flex-shrink:0;"><button onclick="qsPlay(\'' + pi + '\',\'' + pv + '\')" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:5px 8px;color:#10b981;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-play"></i></button><button onclick="qsGoTo(' + v.surahNum + ')" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:5px 8px;color:#fbbf24;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-book-open"></i></button></div></div><div style="font-size:1.05rem;line-height:2.1;direction:rtl;text-align:right;font-family:\'Amiri\',\'Tajawal\',serif;">' + qsHighlight(v.text, q) + '</div>';
+    frag.appendChild(card);
+  }
+  container.appendChild(frag);
+  if (end < items.length) {
+    setTimeout(function(){ qsRenderProgressive(items, q, container, end, batchSize); }, 16);
+  }
+}
+
+function hsRenderProgressive(items, q, container, start, batchSize) {
+  var end = Math.min(start + batchSize, items.length);
+  var frag = document.createDocumentFragment();
+  for (var i = start; i < end; i++) {
+    var card = hsBuildCard(items[i].h, items[i].bookLabel, q);
+    card.style.animation = 'searchCardIn .35s ease both';
+    card.style.animationDelay = ((i - start) * 0.04) + 's';
+    frag.appendChild(card);
+  }
+  container.appendChild(frag);
+  if (end < items.length) {
+    setTimeout(function(){ hsRenderProgressive(items, q, container, end, batchSize); }, 16);
+  }
+}
+
 
 function hsBuildCard(h, bookLabel, q) {
   var card = document.createElement('div');
