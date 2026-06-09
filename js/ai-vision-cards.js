@@ -94,6 +94,94 @@
   /* ══════════════════════════════════════════
      ② أنماط CSS المشتركة
   ══════════════════════════════════════════ */
+
+  /* ══════════════════════════════════════════
+     🔊 نظام القراءة الصوتية العربية
+  ══════════════════════════════════════════ */
+  var _ttsVoice = (function() {
+    try { return localStorage.getItem('tvc2-tts-voice') || 'female'; } catch(e) { return 'female'; }
+  })();
+  var _ttsSpeaking = false;
+
+  function _ttsSetVoice(v) {
+    _ttsVoice = v;
+    try { localStorage.setItem('tvc2-tts-voice', v); } catch(e) {}
+  }
+
+  function _ttsExtractText(htmlStr) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = htmlStr;
+    tmp.querySelectorAll('.tvc2-tts-bar, .tvc2-tts-bar *').forEach(function(n){ n.remove(); });
+    var raw = (tmp.textContent || tmp.innerText || '');
+    return raw.replace(/\s+/g, ' ').trim();
+  }
+
+  function _ttsBestVoice(gender) {
+    var voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    var ar = voices.filter(function(v){ return v.lang && v.lang.startsWith('ar'); });
+    if (!ar.length) return null;
+    var maleKw   = /male|man|ذكر|رجل|محمد|أحمد|خالد|ali|hassan/i;
+    var femaleKw = /female|woman|أنثى|امرأة|فاطم|هند|سارة|nora|layla/i;
+    if (gender === 'male') {
+      return ar.find(function(v){ return maleKw.test(v.name) && !femaleKw.test(v.name); }) || ar[0];
+    } else {
+      return ar.find(function(v){ return femaleKw.test(v.name); })
+          || ar.find(function(v){ return !maleKw.test(v.name); })
+          || ar[0];
+    }
+  }
+
+  function _ttsSpeak(text, btnEl) {
+    if (!window.speechSynthesis) { alert('المتصفح لا يدعم القراءة الصوتية'); return; }
+    if (_ttsSpeaking) {
+      window.speechSynthesis.cancel();
+      _ttsSpeaking = false;
+      document.querySelectorAll('.tvc2-tts-play').forEach(function(b){
+        b.textContent = '▶ استمع'; b.classList.remove('tvc2-tts-active');
+      });
+      return;
+    }
+    var utt = new SpeechSynthesisUtterance(text);
+    utt.lang  = 'ar-SA';
+    utt.rate  = 0.9;
+    utt.pitch = (_ttsVoice === 'female') ? 1.2 : 0.82;
+    function _doSpeak() {
+      var voice = _ttsBestVoice(_ttsVoice);
+      if (voice) utt.voice = voice;
+      _ttsSpeaking = true;
+      if (btnEl) { btnEl.textContent = '⏹ إيقاف'; btnEl.classList.add('tvc2-tts-active'); }
+      utt.onend = utt.onerror = function() {
+        _ttsSpeaking = false;
+        if (btnEl) { btnEl.textContent = '▶ استمع'; btnEl.classList.remove('tvc2-tts-active'); }
+      };
+      window.speechSynthesis.speak(utt);
+    }
+    if (window.speechSynthesis.getVoices().length) { _doSpeak(); }
+    else { window.speechSynthesis.addEventListener('voiceschanged', function h(){ window.speechSynthesis.removeEventListener('voiceschanged',h); _doSpeak(); }); }
+  }
+
+  function _ttsBuildBar(text) {
+    var enc = text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+    return '<div class="tvc2-tts-bar">' +
+      '<span class="tvc2-tts-label">🔊 استمع للنص:</span>' +
+      '<div class="tvc2-tts-btns">' +
+        '<button class="tvc2-tts-vbtn' + (_ttsVoice==='female'?' tvc2-tts-vact':'') + '" onclick="window._tvcTTSSetVoice(\'female\',this)">👩 امرأة</button>' +
+        '<button class="tvc2-tts-vbtn' + (_ttsVoice==='male'?' tvc2-tts-vact':'') + '" onclick="window._tvcTTSSetVoice(\'male\',this)">👨 رجل</button>' +
+        '<button class="tvc2-tts-play" onclick="window._tvcTTSPlay(this,\'' + enc + '\')">▶ استمع</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  window._tvcTTSSetVoice = function(v, btnEl) {
+    _ttsSetVoice(v);
+    document.querySelectorAll('.tvc2-tts-vbtn').forEach(function(b){ b.classList.remove('tvc2-tts-vact'); });
+    if (btnEl) btnEl.classList.add('tvc2-tts-vact');
+    if (_ttsSpeaking) { window.speechSynthesis.cancel(); _ttsSpeaking = false; }
+  };
+  window._tvcTTSPlay = function(btnEl, text) {
+    _ttsSpeak(text, btnEl);
+  };
+
   function _injectStyles() {
     if (document.getElementById('tvc2-styles')) return;
     var s = document.createElement('style');
@@ -127,7 +215,15 @@
       '.tvc2-dots span:nth-child(3){animation-delay:.3s}',
       '.tvc2-status{display:flex;align-items:center;gap:7px;font-size:.8rem;color:rgba(255,255,255,.65)}',
       '.tvc2-spin{width:14px;height:14px;border:2px solid #c8960c;border-top-color:transparent;border-radius:50%;animation:tvc2-spin .7s linear infinite;flex-shrink:0}',
-      '.tvc2-retry{width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#c8960c,#e6a800);color:#050e1f;border:none;border-radius:12px;font-family:Tajawal,sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 3px 12px rgba(200,150,12,.3)}'
+      '.tvc2-retry{width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#c8960c,#e6a800);color:#050e1f;border:none;border-radius:12px;font-family:Tajawal,sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 3px 12px rgba(200,150,12,.3)}',
+      /* ── TTS Bar styles ── */
+      '.tvc2-tts-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;padding:9px 13px;background:rgba(200,150,12,.08);border:1.5px solid rgba(200,150,12,.25);border-radius:12px}',
+      '.tvc2-tts-label{font-size:.75rem;font-weight:800;color:#c8960c;flex-shrink:0}',
+      '.tvc2-tts-btns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}',
+      '.tvc2-tts-vbtn{padding:5px 12px;border-radius:20px;border:1.5px solid rgba(200,150,12,.4);background:transparent;color:rgba(255,255,255,.6);font-family:Tajawal,sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .2s}',
+      '.tvc2-tts-vbtn.tvc2-tts-vact{background:rgba(200,150,12,.2);border-color:#c8960c;color:#c8960c}',
+      '.tvc2-tts-play{padding:6px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#c8960c,#e6a800);color:#050e1f;font-family:Tajawal,sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;white-space:nowrap}',
+      '.tvc2-tts-play.tvc2-tts-active{background:linear-gradient(135deg,#ef5350,#e53935);color:#fff}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -569,10 +665,19 @@ async function _toWorkerWithFallback(imgDataUrl, prompt) {
       '</div>';
 
     var retryBtn = retryFn ?
-      '<button class="tvc2-retry" style="margin-top:6px" onclick="(' + retryFn.toString() + ')()">' +
-      '<i class="fas fa-camera"></i> تحليل جديد بالكاميرا</button>' : '';
+      '<button class="tvc2-retry" style="margin-top:6px" onclick="(' + retryFn.toString() + ')()"><i class="fas fa-camera"></i> تحليل جديد بالكاميرا</button>' : '';
 
-    return '<div class="tvc2-wrap">' + headerHtml + cardsHtml + retryBtn + '</div>';
+    /* ── شريط القراءة الصوتية ── */
+    var _ttsRawText = rawText
+      .replace(/```json|```/g, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/[{}"\[\]]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .substring(0, 3000);
+    var ttsBar = _ttsBuildBar(_ttsRawText);
+
+    return '<div class="tvc2-wrap">' + headerHtml + cardsHtml + ttsBar + retryBtn + '</div>';
   }
 
   /* ── بطاقات الطعام من JSON ── */
@@ -869,12 +974,10 @@ async function _toWorkerWithFallback(imgDataUrl, prompt) {
       /* حاول تحويل محتوى "مفتاح: قيمة" إلى صفوف */
       var rows = _parseKeyVal(sec.content, secTh.clr);
       var bodyHtml = rows ||
-        '<div style="font-size:.83rem;line-height:1.85;color:rgba(255,255,255,.85)">' +
-        sec.content
-                   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-                   .replace(/\n[-•–*] /g, '\n<span style="color:' + secTh.clr + ';margin-left:4px">◆</span> ')
+        '<div style="font-size:.83rem;line-height:1.85;color:rgba(255,255,255,.85);white-space:pre-line">' +
+        sec.content.replace(/\n[-•–*] /g, '\n<span style="color:' + secTh.clr + ';margin-left:4px">◆</span> ')
                    .replace(/\n(\d+)\. /g, '\n<span style="color:' + secTh.clr + ';font-weight:700;margin-left:4px">$1.</span> ')
-                   .replace(/\n/g, '<br>')
+                   .replace(/</g,'&lt;').replace(/>/g,'&gt;')
         + '</div>';
 
       /* تحديد الأيقونة من العنوان */
