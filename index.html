@@ -1863,33 +1863,21 @@ window.geminiSend = window.geminiSend || function() {};
         <span style="font-size:.68rem;color:var(--txt3)">حاسبة ونصائح وتبويض</span>
         <span style="background:rgba(233,30,99,.15);border:1px solid rgba(233,30,99,.4);color:#e91e63;font-size:.62rem;padding:2px 8px;border-radius:20px;font-weight:700">مجاني دائماً 💕</span>
       </button>
-      <!-- بطاقة متابعة نبضات القلب بالكاميرا rPPG -->
-      <button onclick="goSmartTool('vitals')" class="smart-tool-btn" style="grid-column:1/-1;border-color:rgba(236,64,122,.7);background:linear-gradient(135deg,rgba(236,64,122,.15),rgba(255,64,129,.06));border-width:2px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ec407a,#ff1744,#f06292,#ec407a);background-size:200% 100%;animation:gradShift 2s linear infinite"></div>
-        <div style="display:flex;align-items:center;gap:10px;width:100%">
-          <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(236,64,122,.3),rgba(255,23,68,.2));display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:heartBeat 1.5s ease-in-out infinite">
-            <span style="font-size:1.5rem">❤️</span>
-          </div>
-          <div style="flex:1;text-align:right">
-            <div style="color:#ec407a;font-size:.88rem;font-weight:900">💓 متابعة نبضات القلب</div>
-            <div style="font-size:.66rem;color:var(--txt3);margin-top:2px">إصبع + فلاش خلفي &nbsp;•&nbsp; وجه + كاميرا أمامية</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0">
-            <span style="background:rgba(236,64,122,.2);border:1px solid rgba(236,64,122,.5);color:#ec407a;font-size:.58rem;padding:2px 7px;border-radius:10px;font-weight:800;white-space:nowrap">AI + rPPG</span>
-            <span class="trial-badge" id="trial-badge-vitals" style="font-size:.58rem">مجاني: <b id="tb-vitals">3</b></span>
-          </div>
-        </div>
-        <!-- وصف الطريقتين -->
-        <div style="width:100%;margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <div style="background:rgba(236,64,122,.08);border:1px solid rgba(236,64,122,.25);border-radius:10px;padding:7px 10px;text-align:right">
-            <div style="font-size:.72rem;font-weight:800;color:#f48fb1">👆 طريقة الإصبع</div>
-            <div style="font-size:.6rem;color:var(--txt3);margin-top:2px;line-height:1.5">ضع إصبعك على الكاميرا الخلفية والفلاش — الأدق</div>
-          </div>
-          <div style="background:rgba(236,64,122,.08);border:1px solid rgba(236,64,122,.25);border-radius:10px;padding:7px 10px;text-align:right">
-            <div style="font-size:.72rem;font-weight:800;color:#f48fb1">🤳 طريقة الوجه</div>
-            <div style="font-size:.6rem;color:var(--txt3);margin-top:2px;line-height:1.5">انظر للكاميرا الأمامية — يتابع تغيرات لون الجلد</div>
-          </div>
-        </div>
+      <!-- بطاقة الأحاديث الشريفة -->
+      <button onclick="goPage('hadith-browser')" class="smart-tool-btn" style="border-color:rgba(180,130,50,.7);background:linear-gradient(135deg,rgba(180,130,50,.15),rgba(212,175,55,.06));position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;left:0;height:2px;background:linear-gradient(90deg,#b4822d,#d4af37,#f5d97c,#b4822d);background-size:200% 100%;animation:gradShift 3s linear infinite"></div>
+        <div style="font-size:1.5rem;line-height:1">📚</div>
+        <span style="color:#d4af37;font-size:.85rem;font-weight:900">الأحاديث الشريفة</span>
+        <span style="font-size:.68rem;color:var(--txt3)">كامل الكتب بكامل التفاصيل</span>
+        <span style="background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.4);color:#d4af37;font-size:.62rem;padding:2px 8px;border-radius:20px;font-weight:700">مجاني دائماً ✨</span>
+      </button>
+      <!-- بطاقة الباحث في الحديث الشريف -->
+      <button onclick="goPage('hadith-search')" class="smart-tool-btn" style="border-color:rgba(139,92,246,.6);background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(109,40,217,.06));position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;left:0;height:2px;background:linear-gradient(90deg,#7c3aed,#8b5cf6,#c4b5fd,#7c3aed);background-size:200% 100%;animation:gradShift 3s linear infinite"></div>
+        <div style="font-size:1.5rem;line-height:1">🔎</div>
+        <span style="color:#a78bfa;font-size:.85rem;font-weight:900">باحث الحديث الذكي</span>
+        <span style="font-size:.68rem;color:var(--txt3)">بحث بالكلمة أو العبارة + تحقق بالـ AI</span>
+        <span style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#a78bfa;font-size:.62rem;padding:2px 8px;border-radius:20px;font-weight:700">AI ذكي ✨</span>
       </button>
       <!-- بطاقة القرآن الكريم قراءة + صوت -->
       <button onclick="goPage('quran-reader')" class="smart-tool-btn" style="border-color:rgba(16,185,129,.6);background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(5,150,105,.06));position:relative;overflow:hidden;">
@@ -16879,6 +16867,487 @@ function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qrLoadSurahList);
   else qrLoadSurahList();
 })();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     📚 صفحة الأحاديث الشريفة
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="hadith-browser-page" style="background:var(--bg);padding-bottom:80px;">
+
+  <!-- Header -->
+  <div class="app-header" style="background:linear-gradient(135deg,rgba(180,130,50,.15),rgba(212,175,55,.08));border-bottom:1px solid rgba(212,175,55,.3);">
+    <div class="header-row">
+      <button onclick="goPage('home')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:7px 12px;color:var(--txt2);font-size:.85rem;cursor:pointer;"><i class="fas fa-arrow-right"></i></button>
+      <div style="font-size:1rem;font-weight:900;color:#d4af37;display:flex;align-items:center;gap:8px;"><span>📚</span> الأحاديث الشريفة</div>
+      <div style="width:40px"></div>
+    </div>
+  </div>
+
+  <!-- Book Selector -->
+  <div style="padding:14px 16px 8px;">
+    <div style="background:linear-gradient(135deg,rgba(180,130,50,.1),rgba(212,175,55,.05));border:1px solid rgba(212,175,55,.25);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:.78rem;color:#d4af37;font-weight:800;display:flex;align-items:center;gap:6px;"><i class="fas fa-book-open"></i> اختر الكتاب</div>
+      <select id="hb-book-select" onchange="hbLoadBook(this.value)" style="width:100%;background:rgba(5,14,31,.8);border:1px solid rgba(212,175,55,.4);border-radius:10px;padding:10px 14px;color:var(--txt);font-size:.9rem;font-family:'Tajawal',sans-serif;outline:none;cursor:pointer;">
+        <option value="">— اختر كتاباً —</option>
+        <optgroup label="الكتب التسعة">
+          <option value="bukhari">صحيح البخاري (7277 حديث)</option>
+          <option value="muslim">صحيح مسلم (7459 حديث)</option>
+          <option value="abudawud">سنن أبي داود (5276 حديث)</option>
+          <option value="tirmidhi">جامع الترمذي (4053 حديث)</option>
+          <option value="nasai">سنن النسائي (5768 حديث)</option>
+          <option value="ibnmajah">سنن ابن ماجه (4345 حديث)</option>
+          <option value="ahmed">مسند أحمد (1374 حديث)</option>
+          <option value="malik">موطأ مالك (1985 حديث)</option>
+          <option value="darimi">سنن الدارمي (3406 حديث)</option>
+        </optgroup>
+        <optgroup label="كتب أخرى">
+          <option value="riyad_assalihin">رياض الصالحين</option>
+          <option value="aladab_almufrad">الأدب المفرد</option>
+          <option value="bulugh_almaram">بلوغ المرام</option>
+          <option value="mishkat_almasabih">مشكاة المصابيح</option>
+          <option value="shamail_muhammadiyah">شمائل محمدية</option>
+        </optgroup>
+        <optgroup label="الأربعينيات">
+          <option value="nawawi40">الأربعون النووية</option>
+          <option value="qudsi40">الأحاديث القدسية الأربعون</option>
+          <option value="shahwaliullah40">أربعون شاه ولي الله</option>
+        </optgroup>
+      </select>
+      <!-- Chapter Filter -->
+      <div id="hb-chapter-wrap" style="display:none;">
+        <select id="hb-chapter-select" onchange="hbFilterChapter(this.value)" style="width:100%;background:rgba(5,14,31,.8);border:1px solid rgba(212,175,55,.3);border-radius:10px;padding:9px 14px;color:var(--txt);font-size:.85rem;font-family:'Tajawal',sans-serif;outline:none;cursor:pointer;">
+          <option value="">— كل الأبواب —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Info Bar -->
+  <div id="hb-book-info" style="display:none;padding:0 16px 10px;">
+    <div style="background:linear-gradient(135deg,rgba(180,130,50,.1),rgba(212,175,55,.05));border:1px solid rgba(212,175,55,.2);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div>
+        <div id="hb-book-title" style="font-size:1rem;font-weight:900;color:#d4af37;"></div>
+        <div id="hb-book-author" style="font-size:.72rem;color:var(--txt3);margin-top:2px;"></div>
+      </div>
+      <div id="hb-book-count" style="font-size:.72rem;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.3);color:#d4af37;padding:4px 10px;border-radius:20px;font-weight:800;white-space:nowrap;"></div>
+    </div>
+  </div>
+
+  <!-- Hadiths Container -->
+  <div id="hb-hadiths" style="padding:4px 16px 20px;display:flex;flex-direction:column;gap:10px;"></div>
+
+  <!-- Load More -->
+  <div id="hb-load-more-wrap" style="display:none;padding:0 16px 20px;text-align:center;">
+    <button onclick="hbLoadMore()" style="background:linear-gradient(135deg,rgba(212,175,55,.2),rgba(180,130,50,.15));border:1px solid rgba(212,175,55,.4);border-radius:12px;padding:12px 30px;color:#d4af37;font-size:.85rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;width:100%;max-width:300px;">
+      <i class="fas fa-plus-circle"></i> تحميل المزيد
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div id="hb-loading" style="display:none;text-align:center;padding:40px 16px;">
+    <div style="width:40px;height:40px;border:3px solid rgba(212,175,55,.2);border-top-color:#d4af37;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px;"></div>
+    <div style="color:var(--txt3);font-size:.85rem;">جاري تحميل الأحاديث...</div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="hb-empty" style="text-align:center;padding:60px 20px;">
+    <div style="font-size:4rem;margin-bottom:16px;">📚</div>
+    <div style="font-size:1rem;font-weight:800;color:var(--txt2);margin-bottom:8px;">الأحاديث الشريفة</div>
+    <div style="font-size:.85rem;color:var(--txt3);line-height:1.7;">اختر كتاباً من القائمة أعلاه<br>لعرض الأحاديث</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     🔎 صفحة الباحث في الحديث الشريف
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="hadith-search-page" style="background:var(--bg);padding-bottom:80px;">
+
+  <!-- Header -->
+  <div class="app-header" style="background:linear-gradient(135deg,rgba(109,40,217,.15),rgba(139,92,246,.08));border-bottom:1px solid rgba(139,92,246,.3);">
+    <div class="header-row">
+      <button onclick="goPage('home')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:7px 12px;color:var(--txt2);font-size:.85rem;cursor:pointer;"><i class="fas fa-arrow-right"></i></button>
+      <div style="font-size:1rem;font-weight:900;color:#a78bfa;display:flex;align-items:center;gap:8px;"><span>🔎</span> باحث الحديث الذكي</div>
+      <div style="width:40px"></div>
+    </div>
+  </div>
+
+  <!-- Search Box -->
+  <div style="padding:14px 16px 8px;">
+    <div style="background:linear-gradient(135deg,rgba(109,40,217,.1),rgba(139,92,246,.05));border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:.78rem;color:#a78bfa;font-weight:800;display:flex;align-items:center;gap:6px;"><i class="fas fa-search"></i> ابحث في الأحاديث الشريفة</div>
+      <div style="display:flex;gap:8px;">
+        <input id="hs-input" type="text" placeholder="اكتب كلمة أو عبارة..." onkeydown="if(event.key==='Enter')hsSearch()" style="flex:1;background:rgba(5,14,31,.8);border:1px solid rgba(139,92,246,.4);border-radius:10px;padding:10px 14px;color:var(--txt);font-size:.9rem;font-family:'Tajawal',sans-serif;outline:none;direction:rtl;">
+        <button onclick="hsSearch()" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);border:none;border-radius:10px;padding:10px 16px;color:#fff;font-size:.85rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap;"><i class="fas fa-search"></i></button>
+      </div>
+      <!-- Quick search tags -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <span style="font-size:.7rem;color:var(--txt3);align-self:center;">بحث سريع:</span>
+        <button onclick="hsQuick('النية')" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Tajawal',sans-serif;">النية</button>
+        <button onclick="hsQuick('الصيام')" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Tajawal',sans-serif;">الصيام</button>
+        <button onclick="hsQuick('الصلاة')" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Tajawal',sans-serif;">الصلاة</button>
+        <button onclick="hsQuick('الأكل')" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Tajawal',sans-serif;">الأكل</button>
+        <button onclick="hsQuick('الطب')" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Tajawal',sans-serif;">الطب</button>
+        <button onclick="hsQuick('العلم')" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#a78bfa;font-size:.68rem;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:'Tajawal',sans-serif;">العلم</button>
+      </div>
+      <!-- Book Filter -->
+      <select id="hs-book-filter" style="width:100%;background:rgba(5,14,31,.8);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:8px 12px;color:var(--txt);font-size:.82rem;font-family:'Tajawal',sans-serif;outline:none;cursor:pointer;">
+        <option value="all">🔍 البحث في كل الكتب</option>
+        <option value="bukhari">صحيح البخاري فقط</option>
+        <option value="muslim">صحيح مسلم فقط</option>
+        <option value="abudawud">سنن أبي داود فقط</option>
+        <option value="tirmidhi">جامع الترمذي فقط</option>
+        <option value="nasai">سنن النسائي فقط</option>
+        <option value="ibnmajah">سنن ابن ماجه فقط</option>
+        <option value="nawawi40">الأربعون النووية فقط</option>
+        <option value="riyad_assalihin">رياض الصالحين فقط</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AI Verification Panel -->
+  <div id="hs-ai-panel" style="display:none;padding:0 16px 10px;">
+    <div style="background:linear-gradient(135deg,rgba(109,40,217,.12),rgba(139,92,246,.06));border:1px solid rgba(139,92,246,.3);border-radius:14px;padding:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:.82rem;font-weight:900;color:#a78bfa;display:flex;align-items:center;gap:6px;"><i class="fas fa-robot"></i> تحقق الذكاء الاصطناعي</div>
+        <button onclick="document.getElementById('hs-ai-panel').style.display='none'" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:3px 8px;color:var(--txt3);font-size:.7rem;cursor:pointer;">إغلاق</button>
+      </div>
+      <div id="hs-ai-result" style="font-size:.82rem;color:var(--txt2);line-height:1.8;"></div>
+      <div id="hs-ai-loading" style="display:none;text-align:center;padding:16px;">
+        <div style="width:28px;height:28px;border:2px solid rgba(139,92,246,.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px;"></div>
+        <div style="font-size:.78rem;color:var(--txt3);">يحلل الذكاء الاصطناعي الحديث...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Info -->
+  <div id="hs-results-info" style="display:none;padding:0 16px 8px;">
+    <div style="font-size:.78rem;color:var(--txt3);display:flex;align-items:center;justify-content:space-between;">
+      <span id="hs-results-count"></span>
+      <button onclick="hsVerifyWithAI()" id="hs-ai-btn" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(109,40,217,.15));border:1px solid rgba(139,92,246,.5);border-radius:8px;padding:5px 12px;color:#a78bfa;font-size:.72rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:5px;"><i class="fas fa-robot"></i> تحقق بالـ AI</button>
+    </div>
+  </div>
+
+  <!-- Results Container -->
+  <div id="hs-results" style="padding:4px 16px 20px;display:flex;flex-direction:column;gap:10px;"></div>
+
+  <!-- Loading -->
+  <div id="hs-loading" style="display:none;text-align:center;padding:40px 16px;">
+    <div style="width:40px;height:40px;border:3px solid rgba(139,92,246,.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px;"></div>
+    <div style="color:var(--txt3);font-size:.85rem;">جاري البحث في الأحاديث...</div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="hs-empty" style="text-align:center;padding:60px 20px;">
+    <div style="font-size:4rem;margin-bottom:16px;">🔎</div>
+    <div style="font-size:1rem;font-weight:800;color:var(--txt2);margin-bottom:8px;">باحث الحديث الذكي</div>
+    <div style="font-size:.85rem;color:var(--txt3);line-height:1.7;">ابحث بكلمة أو عبارة<br>سيظهر الحديث مع مصدره وحكمه</div>
+  </div>
+
+  <!-- No Results -->
+  <div id="hs-no-results" style="display:none;text-align:center;padding:50px 20px;">
+    <div style="font-size:3rem;margin-bottom:12px;">😔</div>
+    <div style="font-size:.95rem;font-weight:800;color:var(--txt2);margin-bottom:6px;">لا توجد نتائج</div>
+    <div style="font-size:.8rem;color:var(--txt3);">جرّب كلمة أخرى أو اختر كتاباً مختلفاً</div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   📚 متصفح الأحاديث الشريفة
+══════════════════════════════════════════════════════════ */
+
+var HB_BASE = 'hadith/db/by_book';
+var HB_BOOKS = {
+  bukhari:           { path:'the_9_books/bukhari',          label:'صحيح البخاري' },
+  muslim:            { path:'the_9_books/muslim',           label:'صحيح مسلم' },
+  abudawud:          { path:'the_9_books/abudawud',         label:'سنن أبي داود' },
+  tirmidhi:          { path:'the_9_books/tirmidhi',         label:'جامع الترمذي' },
+  nasai:             { path:'the_9_books/nasai',            label:'سنن النسائي' },
+  ibnmajah:          { path:'the_9_books/ibnmajah',         label:'سنن ابن ماجه' },
+  ahmed:             { path:'the_9_books/ahmed',            label:'مسند أحمد' },
+  malik:             { path:'the_9_books/malik',            label:'موطأ مالك' },
+  darimi:            { path:'the_9_books/darimi',           label:'سنن الدارمي' },
+  riyad_assalihin:   { path:'other_books/riyad_assalihin',  label:'رياض الصالحين' },
+  aladab_almufrad:   { path:'other_books/aladab_almufrad',  label:'الأدب المفرد' },
+  bulugh_almaram:    { path:'other_books/bulugh_almaram',   label:'بلوغ المرام' },
+  mishkat_almasabih: { path:'other_books/mishkat_almasabih',label:'مشكاة المصابيح' },
+  shamail_muhammadiyah:{path:'other_books/shamail_muhammadiyah',label:'شمائل محمدية'},
+  nawawi40:          { path:'forties/nawawi40',             label:'الأربعون النووية' },
+  qudsi40:           { path:'forties/qudsi40',              label:'الأحاديث القدسية الأربعون' },
+  shahwaliullah40:   { path:'forties/shahwaliullah40',       label:'أربعون شاه ولي الله' }
+};
+
+var HB_DATA       = null;
+var HB_FILTERED   = [];
+var HB_PAGE       = 0;
+var HB_PAGE_SIZE  = 20;
+var HB_CUR_BOOK   = '';
+var HB_CUR_CH     = '';
+
+function hbLoadBook(bookKey) {
+  if (!bookKey) return;
+  HB_CUR_BOOK = bookKey;
+  HB_CUR_CH   = '';
+  HB_PAGE     = 0;
+  HB_DATA     = null;
+  HB_FILTERED = [];
+
+  document.getElementById('hb-hadiths').innerHTML = '';
+  document.getElementById('hb-book-info').style.display = 'none';
+  document.getElementById('hb-empty').style.display     = 'none';
+  document.getElementById('hb-load-more-wrap').style.display = 'none';
+  document.getElementById('hb-loading').style.display   = 'block';
+
+  var info = HB_BOOKS[bookKey];
+  if (!info) return;
+  fetch(HB_BASE + '/' + info.path + '.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      HB_DATA     = data;
+      HB_FILTERED = data.hadiths;
+      document.getElementById('hb-loading').style.display = 'none';
+
+      // Book info bar
+      document.getElementById('hb-book-title').textContent  = data.metadata.arabic.title;
+      document.getElementById('hb-book-author').textContent = data.metadata.arabic.author || '';
+      document.getElementById('hb-book-count').textContent  = data.hadiths.length + ' حديث';
+      document.getElementById('hb-book-info').style.display = 'block';
+
+      // Chapters
+      if (data.chapters && data.chapters.length > 1) {
+        var sel = document.getElementById('hb-chapter-select');
+        sel.innerHTML = '<option value="">— كل الأبواب —</option>';
+        data.chapters.forEach(function(c){
+          var opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = 'باب: ' + c.arabic;
+          sel.appendChild(opt);
+        });
+        document.getElementById('hb-chapter-wrap').style.display = 'block';
+      } else {
+        document.getElementById('hb-chapter-wrap').style.display = 'none';
+      }
+
+      hbRenderPage(true);
+    })
+    .catch(function(){
+      document.getElementById('hb-loading').style.display = 'none';
+      showToast('تعذّر تحميل الكتاب');
+    });
+}
+
+function hbFilterChapter(chId) {
+  HB_CUR_CH  = chId;
+  HB_PAGE    = 0;
+  if (!HB_DATA) return;
+  HB_FILTERED = chId ? HB_DATA.hadiths.filter(function(h){ return String(h.chapterId) === String(chId); }) : HB_DATA.hadiths;
+  document.getElementById('hb-book-count').textContent = HB_FILTERED.length + ' حديث';
+  hbRenderPage(true);
+}
+
+function hbRenderPage(reset) {
+  var container = document.getElementById('hb-hadiths');
+  if (reset) container.innerHTML = '';
+  var start = HB_PAGE * HB_PAGE_SIZE;
+  var slice = HB_FILTERED.slice(start, start + HB_PAGE_SIZE);
+  slice.forEach(function(h){ container.appendChild(hbBuildCard(h)); });
+  HB_PAGE++;
+  document.getElementById('hb-load-more-wrap').style.display = (HB_PAGE * HB_PAGE_SIZE < HB_FILTERED.length) ? 'block' : 'none';
+}
+
+function hbLoadMore() { hbRenderPage(false); }
+
+function hbGetChapterName(chId) {
+  if (!HB_DATA || !HB_DATA.chapters) return '';
+  var ch = HB_DATA.chapters.find(function(c){ return c.id === chId; });
+  return ch ? ch.arabic : '';
+}
+
+function hbBuildCard(h) {
+  var bookLabel = HB_BOOKS[HB_CUR_BOOK] ? HB_BOOKS[HB_CUR_BOOK].label : '';
+  var chName    = hbGetChapterName(h.chapterId);
+  var card = document.createElement('div');
+  card.style.cssText = 'background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid rgba(212,175,55,.2);border-radius:14px;padding:14px;';
+
+  var header = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;">';
+  header += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+  header += '<span style="font-size:.68rem;font-weight:800;color:#d4af37;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.25);padding:2px 9px;border-radius:20px;">' + bookLabel + '</span>';
+  if (chName) header += '<span style="font-size:.65rem;color:var(--txt3);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:2px 8px;border-radius:20px;">' + chName + '</span>';
+  header += '</div>';
+  header += '<span style="font-size:.65rem;color:var(--txt3);white-space:nowrap;">رقم: ' + (h.idInBook || h.id) + '</span>';
+  header += '</div>';
+
+  var narrator = (h.english && h.english.narrator) ? '<div style="font-size:.72rem;color:#a78bfa;font-weight:700;margin-bottom:8px;direction:ltr;text-align:left;">' + h.english.narrator + '</div>' : '';
+  var arabic   = '<div style="font-size:.95rem;line-height:2;direction:rtl;text-align:right;font-family:\'Amiri\',\'Tajawal\',serif;color:var(--txt);border-right:3px solid rgba(212,175,55,.4);padding-right:10px;">' + h.arabic + '</div>';
+  var english  = (h.english && h.english.text) ? '<details style="margin-top:10px;"><summary style="font-size:.72rem;color:var(--txt3);cursor:pointer;outline:none;">🌐 الترجمة الإنجليزية</summary><div style="font-size:.78rem;color:var(--txt2);line-height:1.7;margin-top:8px;direction:ltr;text-align:left;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;">' + h.english.text + '</div></details>' : '';
+  var copyBtn  = '<button onclick="hbCopyHadith(this)" data-text="' + h.arabic.replace(/"/g,'&quot;') + '" data-src="' + bookLabel + ' - ' + (h.idInBook||h.id) + '" style="margin-top:10px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25);border-radius:8px;padding:6px 12px;color:#d4af37;font-size:.7rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-copy"></i> نسخ</button>';
+
+  card.innerHTML = header + narrator + arabic + english + copyBtn;
+  return card;
+}
+
+function hbCopyHadith(btn) {
+  var text = btn.getAttribute('data-text') + '\n【' + btn.getAttribute('data-src') + '】';
+  navigator.clipboard.writeText(text).then(function(){ showToast('تم نسخ الحديث 📋'); }).catch(function(){ showToast('فشل النسخ'); });
+}
+
+/* ══════════════════════════════════════════════════════════
+   🔎 الباحث في الحديث الشريف
+══════════════════════════════════════════════════════════ */
+
+var HS_BASE         = 'hadith/db/by_book';
+var HS_ALL_HADITHS  = null;
+var HS_LOAD_PROMISE = null;
+var HS_RESULTS      = [];
+var HS_LAST_QUERY   = '';
+
+var HS_BOOKS_LIST = [
+  { key:'bukhari',  path:'the_9_books/bukhari',  label:'صحيح البخاري' },
+  { key:'muslim',   path:'the_9_books/muslim',   label:'صحيح مسلم' },
+  { key:'abudawud', path:'the_9_books/abudawud', label:'سنن أبي داود' },
+  { key:'tirmidhi', path:'the_9_books/tirmidhi', label:'جامع الترمذي' },
+  { key:'ibnmajah', path:'the_9_books/ibnmajah', label:'سنن ابن ماجه' },
+  { key:'nasai',    path:'the_9_books/nasai',    label:'سنن النسائي' },
+  { key:'ahmed',    path:'the_9_books/ahmed',    label:'مسند أحمد' },
+  { key:'malik',    path:'the_9_books/malik',    label:'موطأ مالك' },
+  { key:'darimi',   path:'the_9_books/darimi',   label:'سنن الدارمي' },
+  { key:'nawawi40', path:'forties/nawawi40',      label:'الأربعون النووية' },
+  { key:'riyad_assalihin', path:'other_books/riyad_assalihin', label:'رياض الصالحين' }
+];
+
+function hsQuick(w) { document.getElementById('hs-input').value = w; hsSearch(); }
+
+function hsSearch() {
+  var q = (document.getElementById('hs-input').value || '').trim();
+  if (q.length < 2) { showToast('اكتب على الأقل حرفين للبحث'); return; }
+  HS_LAST_QUERY = q;
+  HS_RESULTS    = [];
+
+  document.getElementById('hs-results').innerHTML             = '';
+  document.getElementById('hs-results-info').style.display    = 'none';
+  document.getElementById('hs-empty').style.display           = 'none';
+  document.getElementById('hs-no-results').style.display      = 'none';
+  document.getElementById('hs-ai-panel').style.display        = 'none';
+  document.getElementById('hs-loading').style.display         = 'block';
+
+  var bookFilter = document.getElementById('hs-book-filter').value;
+  var toLoad = bookFilter === 'all' ? HS_BOOKS_LIST : HS_BOOKS_LIST.filter(function(b){ return b.key === bookFilter; });
+
+  hsEnsureLoaded(toLoad, function() { hsDoSearch(q, toLoad); });
+}
+
+function hsEnsureLoaded(books, cb) {
+  if (!HS_ALL_HADITHS) HS_ALL_HADITHS = {};
+  var needed = books.filter(function(b){ return !HS_ALL_HADITHS[b.key]; });
+  if (!needed.length) { cb(); return; }
+  var done = 0;
+  needed.forEach(function(b){
+    fetch(HS_BASE + '/' + b.path + '.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        HS_ALL_HADITHS[b.key] = { hadiths: data.hadiths, label: b.label };
+      })
+      .catch(function(){})
+      .finally(function(){ done++; if (done === needed.length) cb(); });
+  });
+}
+
+function hsDoSearch(q, books) {
+  document.getElementById('hs-loading').style.display = 'none';
+  var qn  = hsNorm(q);
+  var res = [];
+  books.forEach(function(b){
+    var bd = HS_ALL_HADITHS[b.key];
+    if (!bd) return;
+    bd.hadiths.forEach(function(h){
+      if (hsNorm(h.arabic).indexOf(qn) !== -1) {
+        res.push({ h:h, bookLabel:bd.label, bookKey:b.key });
+      }
+    });
+  });
+  HS_RESULTS = res;
+  if (!res.length) { document.getElementById('hs-no-results').style.display = 'block'; return; }
+  document.getElementById('hs-results-count').textContent = 'وُجد ' + res.length + ' نتيجة' + (res.length > 100 ? ' — يُعرض أول ١٠٠' : '');
+  document.getElementById('hs-results-info').style.display = 'block';
+  var container = document.getElementById('hs-results');
+  container.innerHTML = '';
+  res.slice(0, 100).forEach(function(item){
+    container.appendChild(hsBuildCard(item.h, item.bookLabel, q));
+  });
+}
+
+function hsBuildCard(h, bookLabel, q) {
+  var card = document.createElement('div');
+  card.style.cssText = 'background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid rgba(139,92,246,.2);border-radius:14px;padding:14px;';
+  var narrator = (h.english && h.english.narrator) ? '<div style="font-size:.72rem;color:#a78bfa;font-weight:700;margin-bottom:6px;direction:ltr;text-align:left;">' + h.english.narrator + '</div>' : '';
+  var highlighted = hsHighlight(h.arabic, q);
+  var arabic = '<div style="font-size:.95rem;line-height:2;direction:rtl;text-align:right;font-family:\'Amiri\',\'Tajawal\',serif;color:var(--txt);border-right:3px solid rgba(139,92,246,.4);padding-right:10px;">' + highlighted + '</div>';
+  var footer = '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:6px;">';
+  footer += '<span style="font-size:.68rem;font-weight:800;color:#a78bfa;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);padding:2px 9px;border-radius:20px;">' + bookLabel + ' — رقم: ' + (h.idInBook||h.id) + '</span>';
+  footer += '<button onclick="hsCopyH(this)" data-text="' + h.arabic.replace(/"/g,'&quot;') + '" data-src="' + bookLabel + ' ' + (h.idInBook||h.id) + '" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:4px 10px;color:#a78bfa;font-size:.68rem;cursor:pointer;font-family:\'Tajawal\',sans-serif;"><i class="fas fa-copy"></i></button>';
+  footer += '</div>';
+  card.innerHTML = narrator + arabic + footer;
+  return card;
+}
+
+function hsCopyH(btn) {
+  var text = btn.getAttribute('data-text') + '\n【' + btn.getAttribute('data-src') + '】';
+  navigator.clipboard.writeText(text).then(function(){ showToast('تم نسخ الحديث 📋'); }).catch(function(){ showToast('فشل النسخ'); });
+}
+
+function hsNorm(s) {
+  return (s||'').replace(/[\u064B-\u065F\u0610-\u061A\u06D6-\u06DC]/g,'')
+                .replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
+}
+
+function hsHighlight(text, q) {
+  var nt = hsNorm(text), nq = hsNorm(q), html = '', i = 0;
+  while (i < text.length) {
+    var idx = nt.indexOf(nq, i);
+    if (idx === -1) { html += escHtml(text.slice(i)); break; }
+    html += escHtml(text.slice(i, idx));
+    html += '<mark style="background:rgba(139,92,246,.3);color:#c4b5fd;border-radius:3px;padding:0 2px;">' + escHtml(text.slice(idx, idx + q.length)) + '</mark>';
+    i = idx + q.length;
+  }
+  return html;
+}
+
+function hsVerifyWithAI() {
+  if (!HS_LAST_QUERY || !HS_RESULTS.length) return;
+  var panel   = document.getElementById('hs-ai-panel');
+  var loading = document.getElementById('hs-ai-loading');
+  var result  = document.getElementById('hs-ai-result');
+  panel.style.display   = 'block';
+  loading.style.display = 'block';
+  result.innerHTML      = '';
+
+  // Prepare sample hadiths for context (first 3)
+  var samples = HS_RESULTS.slice(0,3).map(function(item,i){
+    return (i+1) + '. [' + item.bookLabel + ' - رقم ' + (item.h.idInBook||item.h.id) + ']: ' + item.h.arabic.slice(0,200) + '...';
+  }).join('\n\n');
+
+  var prompt = 'أنت خبير في علم الحديث الشريف وتصنيفه. المستخدم بحث عن: "' + HS_LAST_QUERY + '"\n\nوُجدت ' + HS_RESULTS.length + ' نتيجة في كتب الحديث.\n\nأمثلة من النتائج:\n' + samples + '\n\nاذكر بإيجاز:\n1. صحة الأحاديث المتعلقة بهذا الموضوع (صحيح / حسن / ضعيف / موضوع)\n2. أهم مصادرها ومسانيدها\n3. شرح موجز للمعنى\n\nأجب بالعربية بشكل مختصر ومفيد لا يزيد عن 150 كلمة. استخدم رموزاً تعبيرية للوضوح.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    loading.style.display = 'none';
+    var txt = data.content && data.content[0] ? data.content[0].text : 'تعذّر الحصول على تحليل';
+    result.innerHTML = txt.replace(/\n/g,'<br>');
+  })
+  .catch(function(){
+    loading.style.display = 'none';
+    result.innerHTML = '<span style="color:#f87171;">⚠️ تعذّر الاتصال بالذكاء الاصطناعي</span>';
+  });
+}
 </script>
 
 </body>
