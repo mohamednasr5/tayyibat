@@ -16775,10 +16775,10 @@ function qsSearch() {
 }
 
 function qsEnsureLoaded(cb) {
-  if (QS_ALL_VERSES) { cb(); return; }
-  if (QS_LOAD_PROMISE) { QS_LOAD_PROMISE.then(cb); return; }
+  if (QS_ALL_VERSES && QS_ALL_VERSES.length) { cb(); return; }
+  if (QS_LOAD_PROMISE) { QS_LOAD_PROMISE.then(function(){ cb(); }); return; }
 
-  var loadList = QR_SURAH_LIST.length
+  var loadList = (QR_SURAH_LIST && QR_SURAH_LIST.length)
     ? Promise.resolve(QR_SURAH_LIST)
     : fetch(QR_BASE + '/surah.json').then(function(r){ return r.json(); }).then(function(l){ QR_SURAH_LIST = l; return l; });
 
@@ -16790,6 +16790,7 @@ function qsEnsureLoaded(cb) {
           fetch(QR_BASE + '/surah/surah_' + n + '.json')
             .then(function(r){ return r.json(); })
             .then(function(data){
+              if (!data || !data.verse) return;
               var info = QR_SURAH_LIST[n-1];
               Object.keys(data.verse).forEach(function(key){
                 all.push({ surahNum:n, surahNameAr: info ? info.titleAr : '', surahIdx: data.index,
@@ -17312,41 +17313,57 @@ function hsHighlight(text, q) {
   return html;
 }
 
-function hsVerifyWithAI() {
-  if (!HS_LAST_QUERY || !HS_RESULTS.length) return;
+async function hsVerifyWithAI() {
+  if (!HS_LAST_QUERY) return;
   var panel   = document.getElementById('hs-ai-panel');
   var loading = document.getElementById('hs-ai-loading');
   var result  = document.getElementById('hs-ai-result');
+  if (!panel || !loading || !result) return;
   panel.style.display   = 'block';
   loading.style.display = 'block';
   result.innerHTML      = '';
 
-  // Prepare sample hadiths for context (first 3)
-  var samples = HS_RESULTS.slice(0,3).map(function(item,i){
-    return (i+1) + '. [' + item.bookLabel + ' - رقم ' + (item.h.idInBook||item.h.id) + ']: ' + item.h.arabic.slice(0,200) + '...';
+  var samples = (HS_RESULTS||[]).slice(0,5).map(function(item,i){
+    return (i+1)+'. ['+item.bookLabel+' - رقم '+(item.h.idInBook||item.h.id)+']: '+item.h.arabic.slice(0,250)+(item.h.arabic.length>250?'...':'');
   }).join('\n\n');
 
-  var prompt = 'أنت خبير في علم الحديث الشريف وتصنيفه. المستخدم بحث عن: "' + HS_LAST_QUERY + '"\n\nوُجدت ' + HS_RESULTS.length + ' نتيجة في كتب الحديث.\n\nأمثلة من النتائج:\n' + samples + '\n\nاذكر بإيجاز:\n1. صحة الأحاديث المتعلقة بهذا الموضوع (صحيح / حسن / ضعيف / موضوع)\n2. أهم مصادرها ومسانيدها\n3. شرح موجز للمعنى\n\nأجب بالعربية بشكل مختصر ومفيد لا يزيد عن 150 كلمة. استخدم رموزاً تعبيرية للوضوح.';
+  var sysPrompt = 'أنت عالم حديث متخصص في علم الرجال والجرح والتعديل وتصحيح الأحاديث النبوية الشريفة.';
+  var userMsg   = 'بحث المستخدم عن: "'+HS_LAST_QUERY+'"\n'
+    +(HS_RESULTS&&HS_RESULTS.length?'وُجدت '+HS_RESULTS.length+' نتيجة.\n\nأمثلة:\n'+samples+'\n\n':'لا توجد نتائج مباشرة.\n\n')
+    +'اذكر بإيجاز:\n1. ✅/❌ درجة صحة الأحاديث (صحيح/حسن/ضعيف/موضوع) مع سبب\n2. 📚 أهم المصادر والأسانيد\n3. 📖 شرح موجز للمعنى\n4. ⚠️ أي تنبيهات مهمة\n\nأجب بالعربية لا تتجاوز 200 كلمة.';
 
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    loading.style.display = 'none';
-    var txt = data.content && data.content[0] ? data.content[0].text : 'تعذّر الحصول على تحليل';
-    result.innerHTML = txt.replace(/\n/g,'<br>');
-  })
-  .catch(function(){
-    loading.style.display = 'none';
-    result.innerHTML = '<span style="color:#f87171;">⚠️ تعذّر الاتصال بالذكاء الاصطناعي</span>';
-  });
+  var messages = [{role:'system',content:sysPrompt},{role:'user',content:userMsg}];
+  var aiText = null, aiSource = '';
+
+  // 1. _universalAICall — يشمل CF Worker + LLM7 + Pollinations + OpenRouter + Kepler
+  if (!aiText && typeof _universalAICall === 'function') {
+    try { var r1=await _universalAICall(messages); if(r1&&r1.text&&r1.text.trim().length>20){aiText=r1.text;aiSource=r1.source||'AI';} } catch(e){}
+  }
+  // 2. _tryLLM7
+  if (!aiText && typeof _tryLLM7 === 'function') {
+    try { var r2=await _tryLLM7(messages,0); if(r2&&r2.text&&r2.text.trim().length>20){aiText=r2.text;aiSource=r2.source||'LLM7';} } catch(e){}
+  }
+  // 3. _tryPollinations
+  if (!aiText && typeof _tryPollinations === 'function') {
+    try { var r3=await _tryPollinations(messages,0,0); if(r3&&r3.text&&r3.text.trim().length>20){aiText=r3.text;aiSource=r3.source||'Pollinations';} } catch(e){}
+  }
+  // 4. _tryKepler
+  if (!aiText && typeof _tryKepler === 'function') {
+    try { var r4=await _tryKepler(messages,0); if(r4&&r4.text&&r4.text.trim().length>20){aiText=r4.text;aiSource=r4.source||'Kepler';} } catch(e){}
+  }
+
+  loading.style.display = 'none';
+  if (aiText) {
+    var html = aiText.split(/\n/).map(function(l){
+      l=l.trim(); if(!l) return '';
+      l=l.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+      return '<div style="margin-bottom:5px;">'+l+'</div>';
+    }).join('');
+    result.innerHTML='<div style="font-family:Tajawal,sans-serif;line-height:1.9;direction:rtl;text-align:right;">'+html+'</div>'
+      +'<div style="font-size:.6rem;color:var(--txt3);margin-top:8px;text-align:left;">المصدر: '+aiSource+'</div>';
+  } else {
+    result.innerHTML='<div style="color:#f87171;font-family:Tajawal,sans-serif;font-size:.82rem;">⚠️ تعذّر الاتصال بالذكاء الاصطناعي. تحقق من اتصالك وأعد المحاولة.</div>';
+  }
 }
 </script>
 
