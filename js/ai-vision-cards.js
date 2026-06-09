@@ -869,10 +869,12 @@ async function _toWorkerWithFallback(imgDataUrl, prompt) {
       /* حاول تحويل محتوى "مفتاح: قيمة" إلى صفوف */
       var rows = _parseKeyVal(sec.content, secTh.clr);
       var bodyHtml = rows ||
-        '<div style="font-size:.83rem;line-height:1.85;color:rgba(255,255,255,.85);white-space:pre-line">' +
-        sec.content.replace(/\n[-•–*] /g, '\n<span style="color:' + secTh.clr + ';margin-left:4px">◆</span> ')
+        '<div style="font-size:.83rem;line-height:1.85;color:rgba(255,255,255,.85)">' +
+        sec.content
+                   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                   .replace(/\n[-•–*] /g, '\n<span style="color:' + secTh.clr + ';margin-left:4px">◆</span> ')
                    .replace(/\n(\d+)\. /g, '\n<span style="color:' + secTh.clr + ';font-weight:700;margin-left:4px">$1.</span> ')
-                   .replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                   .replace(/\n/g, '<br>')
         + '</div>';
 
       /* تحديد الأيقونة من العنوان */
