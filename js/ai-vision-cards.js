@@ -108,12 +108,46 @@
     try { localStorage.setItem('tvc2-tts-voice', v); } catch(e) {}
   }
 
-  function _ttsExtractText(htmlStr) {
+
+  /* تنظيف النص للقراءة الصوتية — يزيل الايموجي والرموز والترقيم الزائد */
+  function _ttsCleanForSpeech(raw) {
+    // 1. أزل HTML tags
     var tmp = document.createElement('div');
-    tmp.innerHTML = htmlStr;
-    tmp.querySelectorAll('.tvc2-tts-bar, .tvc2-tts-bar *').forEach(function(n){ n.remove(); });
-    var raw = (tmp.textContent || tmp.innerText || '');
-    return raw.replace(/\s+/g, ' ').trim();
+    tmp.innerHTML = raw;
+    tmp.querySelectorAll('.tvc2-tts-bar,.ai-tts-bar,.tvc2-retry').forEach(function(n){n.remove();});
+    var text = tmp.textContent || tmp.innerText || raw;
+
+    // 2. أزل JSON/code blocks
+    text = text.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`]+`/g, ' ');
+
+    // 3. أزل الايموجي بالكامل (كل Unicode ranges)
+    text = text
+      .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, ' ')
+      .replace(/[\u2600-\u27BF]/g, ' ')
+      .replace(/[\u2300-\u23FF]/g, ' ')
+      .replace(/[\uFE00-\uFE0F]/g, ' ')
+      .replace(/[\u200B-\u200F]/g, ' ');
+
+    // 4. أزل رموز التنسيق والترقيم الزائد
+    text = text
+      .replace(/[*_~`#]/g, ' ')
+      .replace(/[\u2022\u25CF\u25AA\u25BA\u25C6\u25C7\u2605\u2606]/g, ' ')
+      .replace(/[\u25B8\u25B6\u25B7\u2192\u2190\u2191\u2193]/g, ' ')
+      .replace(/[-]{2,}/g, ' ')
+      .replace(/[=]{2,}/g, ' ')
+      .replace(/[{}\[\]<>|\\^]/g, ' ');
+
+    // 5. أزل الرموز غير العربية/الإنجليزية الزائدة
+    text = text.replace(/[!@$%&()\/"]/g, ' ');
+
+    // 6. نظّف المسافات
+    text = text.replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n').trim();
+
+    return text.substring(0, 3000);
+  }
+
+  function _ttsExtractText(htmlStr) {
+    return _ttsCleanForSpeech(htmlStr);
   }
 
   function _ttsBestVoice(gender) {
@@ -668,13 +702,7 @@ async function _toWorkerWithFallback(imgDataUrl, prompt) {
       '<button class="tvc2-retry" style="margin-top:6px" onclick="(' + retryFn.toString() + ')()"><i class="fas fa-camera"></i> تحليل جديد بالكاميرا</button>' : '';
 
     /* ── شريط القراءة الصوتية ── */
-    var _ttsRawText = rawText
-      .replace(/```json|```/g, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/[{}"\[\]]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .substring(0, 3000);
+    var _ttsRawText = _ttsCleanForSpeech(rawText);
     var ttsBar = _ttsBuildBar(_ttsRawText);
 
     return '<div class="tvc2-wrap">' + headerHtml + cardsHtml + ttsBar + retryBtn + '</div>';
