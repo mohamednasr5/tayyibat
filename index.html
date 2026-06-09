@@ -619,8 +619,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);min-
 .ai-msg{padding:12px 14px;border-radius:14px;font-size:.85rem;line-height:1.8;animation:msgIn .3s ease}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .ai-msg.user{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(79,70,229,.08));border:1px solid rgba(124,58,237,.3);color:#c4b5fd;text-align:right;border-radius:14px 14px 4px 14px}
-.ai-msg.assistant{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--txt);border-radius:14px 14px 14px 4px;white-space:pre-wrap;word-wrap:break-word}
+.ai-msg.assistant{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--txt);border-radius:14px 14px 14px 4px;word-wrap:break-word}
 .ai-msg-label{font-size:.65rem;font-weight:700;margin-bottom:6px;opacity:.7;display:flex;align-items:center;gap:5px}
+.ai-tts-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-top:9px;padding:8px 11px;background:rgba(200,150,12,.07);border:1.5px solid rgba(200,150,12,.22);border-radius:11px;direction:rtl}
+.ai-tts-lbl{font-size:.7rem;font-weight:800;color:#c8960c;flex-shrink:0}
+.ai-tts-btns{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.ai-tts-vbtn{padding:4px 11px;border-radius:20px;border:1.5px solid rgba(200,150,12,.35);background:transparent;color:rgba(255,255,255,.55);font-family:Tajawal,sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s}
+.ai-tts-vbtn.ai-tts-vact{background:rgba(200,150,12,.18);border-color:#c8960c;color:#c8960c}
+.ai-tts-play{padding:5px 14px;border-radius:20px;border:none;color:#050e1f;font-family:Tajawal,sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;transition:all .2s;white-space:nowrap}
 .ai-msg.user .ai-msg-label{color:var(--ai-purple2);justify-content:flex-end}
 .ai-msg.assistant .ai-msg-label{color:var(--blue2)}
 .ai-thinking-wrap{display:flex;align-items:center;gap:8px;color:var(--txt2);font-size:.8rem}
@@ -3854,7 +3860,7 @@ async function ptAiAnalyze() {
   if (btn) { btn.disabled=false; btn.innerHTML='<i class="fas fa-robot"></i> 🌸 تحليل ذكي بالـ AI'; }
 
   if (result) {
-    resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + ( typeof formatAIResponse==='function' ? formatAIResponse(result) : result.replace(/\n/g,'<br>') ) + '</div>';
+    resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g,'<br>') + '</div>';
   } else {
     resBox.innerHTML = '<div style="color:#ef5350;padding:10px;text-align:center">❌ تعذّر التحليل — تحققي من الاتصال وحاولي مجدداً</div>';
   }
@@ -9057,40 +9063,86 @@ function generateLocalResponse(q) {
   return '🌿 نظام الطيبات للدكتور ضياء العوضي:\n\n✅ يومياً: أرز، بطاطس، زيت زيتون، عسل، تمر، قهوة تركية.\n✅ أسبوعياً: لحوم حمراء، سمك، حمام، مكسرات، فواكه مسموحة.\n🚫 ممنوع: دجاج، بيض، دقيق، ألبان سائلة، بقوليات، خضار نيئة، غازيات.\n\nاسألني عن أي طعام محدد!';
 }
 
-/* ── formatAIResponse: تحويل رد الذكاء الاصطناعي إلى HTML صحيح ── */
+
+/* ── formatAIResponse: تحويل رد الذكاء الاصطناعي لـ HTML صحيح ── */
 function formatAIResponse(text) {
   if (!text) return '';
-  // إذا كان النص يحتوي على HTML tags فعلية، أعده كما هو (innerHTML سيعرضها)
-  // إذا كان Markdown أو نص عادي، حوّله
-  var hasRealHTML = /<(div|span|p|b|strong|em|ul|ol|li|br|h[1-6]|table|tr|td|th)[^>]*>/i.test(text);
-  if (hasRealHTML) {
-    // نص يحتوي HTML: أعده مباشرة
-    return text;
-  }
-  // نص عادي أو Markdown — حوّله لـ HTML
-  var html = text
-    // عناوين Markdown
-    .replace(/^### (.+)$/gm, '<h4 style="color:#ffd54f;margin:10px 0 4px;font-size:.88rem">$1</h4>')
-    .replace(/^## (.+)$/gm, '<h3 style="color:#80cbc4;margin:12px 0 5px;font-size:.92rem">$1</h3>')
-    .replace(/^# (.+)$/gm, '<h3 style="color:#80cbc4;margin:12px 0 5px;font-size:.95rem;font-weight:900">$1</h3>')
-    // Bold و Italic
+  var hasRealHTML = /<(div|span|p|b|strong|em|ul|ol|li|br|h[1-6])[^>]*>/i.test(text);
+  if (hasRealHTML) return text;
+  return text
+    .replace(/^### (.+)$/gm, '<h4 style="color:#ffd54f;margin:8px 0 3px;font-size:.87rem">$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3 style="color:#80cbc4;margin:10px 0 4px;font-size:.9rem">$1</h3>')
     .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // نقاط القائمة
-    .replace(/^[•\-\*] (.+)$/gm, '<li style="margin:3px 0;padding-right:4px">$1</li>')
-    // سطور جديدة
+    .replace(/^[•\-\*] (.+)$/gm, '<li style="margin:2px 0">$1</li>')
     .replace(/\n/g, '<br>');
-  // لف عناصر القائمة
-  html = html.replace(/(<li[^>]*>.*?<\/li>\s*<br>?)+/g, function(m) {
-    return '<ul style="margin:6px 0;padding-right:18px;list-style:disc">' + m.replace(/<br>/g,'') + '</ul>';
-  });
-  return html;
 }
 
+function _ttsStripHtml(html) {
+  var tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  tmp.querySelectorAll('.tvc2-tts-bar,.ai-tts-bar,.ai-model-badge').forEach(function(n){n.remove();});
+  return (tmp.textContent||tmp.innerText||'').replace(/\s+/g,' ').trim().substring(0,3000);
+}
+function _aiTtsSpeak(btnEl, text) {
+  if (!window.speechSynthesis) { alert('المتصفح لا يدعم القراءة الصوتية'); return; }
+  var speaking = btnEl.dataset.speaking === '1';
+  if (speaking) {
+    window.speechSynthesis.cancel();
+    btnEl.dataset.speaking = '0';
+    btnEl.textContent = '▶ استمع';
+    btnEl.style.background = 'linear-gradient(135deg,#c8960c,#e6a800)';
+    return;
+  }
+  var voice = localStorage.getItem('tvc2-tts-voice') || 'female';
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ar-SA'; utt.rate = 0.9;
+  utt.pitch = (voice === 'female') ? 1.2 : 0.82;
+  function doSpeak() {
+    var voices = window.speechSynthesis.getVoices();
+    var ar = voices.filter(function(v){return v.lang&&v.lang.startsWith('ar');});
+    var best;
+    if (voice==='male') best = ar.find(function(v){return /male|man|ذكر|رجل|محمد|ali/i.test(v.name);})||ar[0];
+    else best = ar.find(function(v){return /female|woman|أنثى|فاطم|نور|sara|nora/i.test(v.name);})||ar.find(function(v){return !/male/i.test(v.name);})||ar[0];
+    if (best) utt.voice = best;
+    btnEl.dataset.speaking = '1'; btnEl.textContent = '⏹ إيقاف';
+    btnEl.style.background = 'linear-gradient(135deg,#ef5350,#e53935)';
+    utt.onend = utt.onerror = function(){ btnEl.dataset.speaking='0'; btnEl.textContent='▶ استمع'; btnEl.style.background='linear-gradient(135deg,#c8960c,#e6a800)'; };
+    window.speechSynthesis.speak(utt);
+  }
+  if (window.speechSynthesis.getVoices().length) doSpeak();
+  else window.speechSynthesis.addEventListener('voiceschanged', function h(){ window.speechSynthesis.removeEventListener('voiceschanged',h); doSpeak(); });
+}
+function _aiTtsVoiceSwitch(v, allBtns, bar) {
+  localStorage.setItem('tvc2-tts-voice', v);
+  bar.querySelectorAll('.ai-tts-vbtn').forEach(function(b){b.classList.remove('ai-tts-vact');});
+  allBtns.forEach(function(b){if(b.dataset.voice===v) b.classList.add('ai-tts-vact');});
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+function _buildAiTtsBar(textContent) {
+  var bar = document.createElement('div');
+  bar.className = 'ai-tts-bar';
+  var curVoice = localStorage.getItem('tvc2-tts-voice') || 'female';
+  bar.innerHTML =
+    '<span class="ai-tts-lbl">🔊 استمع:</span>' +
+    '<div class="ai-tts-btns">' +
+      '<button class="ai-tts-vbtn' + (curVoice==='female'?' ai-tts-vact':'') + '" data-voice="female">👩 امرأة</button>' +
+      '<button class="ai-tts-vbtn' + (curVoice==='male'?' ai-tts-vact':'') + '" data-voice="male">👨 رجل</button>' +
+      '<button class="ai-tts-play" data-speaking="0" style="background:linear-gradient(135deg,#c8960c,#e6a800)">▶ استمع</button>' +
+    '</div>';
+  var vBtns = Array.from(bar.querySelectorAll('.ai-tts-vbtn'));
+  vBtns.forEach(function(b){ b.onclick = function(){ _aiTtsVoiceSwitch(b.dataset.voice, vBtns, bar); }; });
+  bar.querySelector('.ai-tts-play').onclick = function(){ _aiTtsSpeak(this, textContent); };
+  return bar;
+}
 function addAiMsg(role, text) {
   var w = document.getElementById('ai-chat-wrap'), d = document.createElement('div');
   d.className = 'ai-msg ' + role;
-  d.innerHTML = '<div class="ai-msg-label">' + (role === 'user' ? '<i class="fas fa-user"></i> أنت' : '<i class="fas fa-robot"></i> طبيبك الذكي') + '</div><div>' + formatAIResponse(text) + '</div>';
+  d.innerHTML = '<div class="ai-msg-label">' + (role === 'user' ? '<i class="fas fa-user"></i> أنت' : '<i class="fas fa-robot"></i> طبيبك الذكي') + '</div><div class="ai-msg-body">' + (typeof formatAIResponse==='function'?formatAIResponse(text):text) + '</div>';
+  if (role === 'assistant') {
+    var clean = _ttsStripHtml(text);
+    if (clean.length > 5) d.appendChild(_buildAiTtsBar(clean));
+  }
   w.appendChild(d); w.scrollTop = w.scrollHeight;
 }
 function addThink() {
@@ -12125,7 +12177,7 @@ function dreamInterpret() {
     html += '<div><div style="font-size:.92rem;font-weight:900;color:#ce93d8">تفسير الحلم</div>';
     html += '<div style="font-size:.68rem;color:#b39ddb;margin-top:2px">بمنهج ' + ref + '</div></div>';
     html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9">' + (typeof formatAIResponse==='function'?formatAIResponse(res):res) + '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
     html += '<div style="padding:10px 14px 14px;background:rgba(103,58,183,.08);border-top:1px solid rgba(103,58,183,.2)">';
     html += '<div style="font-size:.72rem;color:#b39ddb;line-height:1.6">✨ التفسير للاسترشاد — والرؤيا الصالحة من الله والحلث من الشيطان.</div>';
     html += '</div></div>';
@@ -12185,7 +12237,7 @@ function fakeImageOpenCamera() {
         var resBox = document.getElementById('fi-result');
         if(resBox) {
           resBox.style.display='block';
-          resBox.innerHTML = '<div style="padding:12px;font-size:.83rem;line-height:1.7;color:var(--txt)">'+( typeof formatAIResponse==='function' ? formatAIResponse(result) : result.replace(/\n/g,'<br>') )+'</div>';
+          resBox.innerHTML = '<div style="padding:12px;font-size:.83rem;line-height:1.7;color:var(--txt)">'+result.replace(/\n/g,'<br>')+'</div>';
         }
         if(statusEl) statusEl.querySelector('span').textContent = '✅ تم الكشف';
       }, function(){
@@ -12230,7 +12282,7 @@ function fakeImageAnalyze() {
     html += '<div><div style="font-size:.92rem;font-weight:900;color:#ffc107">تقرير تحليل الصورة</div>';
     html += '<div style="font-size:.68rem;color:#ffcc80;margin-top:2px">كشف التزوير والذكاء الاصطناعي</div></div>';
     html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9">' + (typeof formatAIResponse==='function'?formatAIResponse(res):res) + '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
     html += '</div>';
     resBox.innerHTML = html;
   }).catch(function() {
@@ -12368,7 +12420,7 @@ function hwScanSolve() {
     html += '<div><div style="font-size:.92rem;font-weight:900;color:#64b5f6">الإجابة النموذجية</div>';
     html += '<div style="font-size:.68rem;color:#90caf9;margin-top:2px">' + _hwGrade + ' — ' + _hwSubject + ' — الترم ' + _hwTerm + '</div></div>';
     html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9">' + (typeof formatAIResponse==='function'?formatAIResponse(res):res) + '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:1.9;white-space:pre-line">' + res + '</div>';
     html += '</div>';
     resBox.innerHTML = html;
     resBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -12427,7 +12479,7 @@ function hwOpenCamera() {
           var resBox = document.getElementById('hw-result');
           if(resBox) {
             resBox.style.display='block';
-            resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + ( typeof formatAIResponse==='function' ? formatAIResponse(result) : result.replace(/\n/g,'<br>') ) + '</div>';
+            resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">' + result.replace(/\n/g,'<br>') + '</div>';
           }
           if(statusEl) statusEl.querySelector('span').textContent = '✅ تم الحل — أوقف الكاميرا';
         }, function(){
@@ -14083,7 +14135,7 @@ function palmOpenCamera() {
         var resBox = document.getElementById('palm-result') || document.getElementById('palm-reading-result');
         if(resBox) {
           resBox.style.display='block';
-          resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;direction:rtl;color:var(--txt)">' + ( typeof formatAIResponse==='function' ? formatAIResponse(result) : result.replace(/\n/g,'<br>') ) + '</div>';
+          resBox.innerHTML = '<div style="padding:14px;font-size:.85rem;line-height:1.9;direction:rtl;color:var(--txt)">' + result.replace(/\n/g,'<br>') + '</div>';
         }
         if(statusEl) statusEl.querySelector('span').textContent = '✅ تمت القراءة';
       }, function(){
@@ -14152,7 +14204,7 @@ function palmAnalyze() {
     html += '<div><div style="font-size:.92rem;font-weight:900;color:#ff8a65">قراءة الكف</div>';
     html += '<div style="font-size:.68rem;color:#ffccbc;margin-top:2px">' + (modeLabels[_palmMode] || 'قراءة شاملة') + '</div></div>';
     html += '</div>';
-    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2">' + (typeof formatAIResponse==='function'?formatAIResponse(res):res) + '</div>';
+    html += '<div style="padding:14px;font-size:.85rem;color:var(--txt);line-height:2;white-space:pre-line">' + res + '</div>';
     html += '<div style="padding:10px 14px 14px;background:rgba(255,87,34,.06);border-top:1px solid rgba(255,87,34,.15)">';
     html += '<div style="font-size:.7rem;color:#ffab91;line-height:1.6">🔮 هذه القراءة للترفيه والاستئناس فقط ولا تُعدّ حقيقة علمية مثبتة.</div>';
     html += '</div></div>';
@@ -15161,7 +15213,7 @@ function _fsScan(video, statusTxt){
       window.fsParseAndDisplay(result);
     } else {
       var rb=document.getElementById('fs-result')||document.getElementById('fs-ai-result');
-      if(rb){rb.style.display='block';rb.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">'+( typeof formatAIResponse==='function' ? formatAIResponse(result) : result.replace(/\n/g,'<br>') )+'</div>';}
+      if(rb){rb.style.display='block';rb.innerHTML='<div style="padding:14px;font-size:.85rem;line-height:1.9;color:var(--txt)">'+result.replace(/\n/g,'<br>')+'</div>';}
     }
     setTimeout(function(){ if(_fsRef.stream) _fsIv=setInterval(function(){ _fsScan(video,statusTxt); },4000); },5000);
   }, function(){ _fsAnalyzing=false; if(statusTxt) statusTxt.textContent='⏳ وجّه الكاميرا نحو الطعام...'; });
