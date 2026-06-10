@@ -17,7 +17,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group A\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -31,7 +31,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group A\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -45,7 +45,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group B\nVenue: BMO 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -59,7 +59,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group D\nVenue: SoFi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -73,7 +73,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group C\nVenue: Gill
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -87,7 +87,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group D\nVenue: BC P
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -101,7 +101,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group C\nVenue: MetL
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -115,7 +115,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group B\nVenue: Levi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -129,7 +129,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group E\nVenue: Linc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -143,7 +143,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group E\nVenue: NRG 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -157,7 +157,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group F\nVenue: AT&T
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -171,7 +171,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group F\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -185,7 +185,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group H\nVenue: Hard
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -199,7 +199,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group H\nVenue: Merc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -213,7 +213,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group G\nVenue: SoFi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -227,7 +227,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group G\nVenue: Lume
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -241,7 +241,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group I\nVenue: MetL
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -255,7 +255,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group I\nVenue: Gill
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -269,7 +269,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group J\nVenue: Arro
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -283,7 +283,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group J\nVenue: Levi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -297,7 +297,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group L\nVenue: BMO 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -311,7 +311,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group L\nVenue: AT&T
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -325,7 +325,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group K\nVenue: NRG 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -339,7 +339,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group K\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -353,7 +353,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group A\nVenue: Merc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -367,7 +367,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group B\nVenue: SoFi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -381,7 +381,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group B\nVenue: BC P
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -395,7 +395,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group A\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -409,7 +409,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group C\nVenue: Linc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -423,7 +423,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group C\nVenue: Gill
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -437,7 +437,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group D\nVenue: Levi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -451,7 +451,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group D\nVenue: Lume
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -465,7 +465,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group E\nVenue: BMO 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -479,7 +479,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group E\nVenue: Arro
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -493,7 +493,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group F\nVenue: NRG 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -507,7 +507,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group F\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -521,7 +521,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group H\nVenue: Hard
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -535,7 +535,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group H\nVenue: Merc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -549,7 +549,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group G\nVenue: SoFi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -563,7 +563,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group G\nVenue: BC P
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -577,7 +577,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group I\nVenue: MetL
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -591,7 +591,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group I\nVenue: Linc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -605,7 +605,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group J\nVenue: AT&T
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -619,7 +619,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group J\nVenue: Levi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -633,7 +633,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group L\nVenue: Gill
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -647,7 +647,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group L\nVenue: BMO 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -661,7 +661,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group K\nVenue: NRG 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -675,7 +675,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group K\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -689,7 +689,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group C\nVenue: Hard
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -703,7 +703,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group C\nVenue: Merc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -717,7 +717,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group B\nVenue: BC P
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -731,7 +731,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group B\nVenue: Lume
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -745,7 +745,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group A\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -759,7 +759,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group A\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -773,7 +773,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group E\nVenue: Linc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -787,7 +787,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group E\nVenue: MetL
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -801,7 +801,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group F\nVenue: AT&T
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -815,7 +815,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group F\nVenue: Arro
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -829,7 +829,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group D\nVenue: SoFi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -843,7 +843,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group D\nVenue: Levi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -857,7 +857,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group I\nVenue: Gill
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -871,7 +871,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group I\nVenue: BMO 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -885,7 +885,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group G\nVenue: Lume
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -899,7 +899,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group G\nVenue: BC P
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -913,7 +913,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group H\nVenue: NRG 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -927,7 +927,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group H\nVenue: Esta
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -941,7 +941,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group L\nVenue: MetL
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -955,7 +955,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group L\nVenue: Linc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -969,7 +969,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group J\nVenue: Arro
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -983,7 +983,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group J\nVenue: AT&T
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -997,7 +997,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group K\nVenue: Hard
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1011,7 +1011,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Group Stage\nGroup: Group K\nVenue: Merc
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1025,7 +1025,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: SoFi Stadium, Inglew
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1039,7 +1039,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Gillette Stadium, Fo
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1053,7 +1053,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Estadio BBVA, Guadal
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1067,7 +1067,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: NRG Stadium, Houston
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1081,7 +1081,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: MetLife Stadium, Eas
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1095,7 +1095,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: AT&T Stadium, Arling
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1109,7 +1109,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Estadio Azteca, Mexi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1123,7 +1123,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Mercedes-Benz Stadiu
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1137,7 +1137,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Levi's Stadium, Sant
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1151,7 +1151,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Lumen Field, Seattle
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1165,7 +1165,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: BMO Field, Toronto\n
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1179,7 +1179,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: SoFi Stadium, Inglew
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1193,7 +1193,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: BC Place, Vancouver\
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1207,7 +1207,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Hard Rock Stadium, M
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1221,7 +1221,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: Arrowhead Stadium, K
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1235,7 +1235,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 32\nVenue: AT&T Stadium, Arling
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1249,7 +1249,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: Lincoln Financial Fi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1263,7 +1263,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: NRG Stadium, Houston
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1277,7 +1277,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: MetLife Stadium, Eas
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1291,7 +1291,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: Estadio Azteca, Mexi
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1305,7 +1305,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: AT&T Stadium, Arling
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1319,7 +1319,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: Lumen Field, Seattle
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1333,7 +1333,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: Mercedes-Benz Stadiu
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1347,7 +1347,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Round of 16\nVenue: BC Place, Vancouver\
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1361,7 +1361,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Quarterfinal\nVenue: Gillette Stadium, F
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1375,7 +1375,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Quarterfinal\nVenue: SoFi Stadium, Ingle
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1389,7 +1389,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Quarterfinal\nVenue: Hard Rock Stadium, 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1403,7 +1403,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Quarterfinal\nVenue: Arrowhead Stadium, 
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1417,7 +1417,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Semifinal\nVenue: AT&T Stadium, Arlingto
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1431,7 +1431,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Semifinal\nVenue: Mercedes-Benz Stadium,
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1445,7 +1445,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Third Place\nVenue: Hard Rock Stadium, M
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
@@ -1459,7 +1459,7 @@ DESCRIPTION:FIFA World Cup 2026\nStage: Final\nVenue: MetLife Stadium, East Ruth
 BEGIN:VALARM
 TRIGGER;RELATED=START:PT0S
 ACTION:DISPLAY
-DESCRIPTION:⚽ يبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
+DESCRIPTION:⚽ تبدأ المباراة الآن! تحياتي بمشاهدة ممتعة - مهندس محمد حماد
 END:VALARM
 END:VEVENT
 END:VCALENDAR
