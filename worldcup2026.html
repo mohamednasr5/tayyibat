@@ -411,90 +411,66 @@ function updateApiStatusUI() {
 
 // API 1: football-data.org
 async function fetchApi1() {
+  const PROXY = 'https://taybat-ai.studegy8.workers.dev';
   try {
-    const res = await fetch('https://api.football-data.org/v4/competitions/2000/matches?status=LIVE', {
-      headers: { 'X-Auth-Token': '9b1e9a6ad88b42e4a81b1e1e57834c15' }
-    });
+    const res = await fetch(`${PROXY}/fd/live`);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    let count = 0;
-    for (const m of (data.matches||[])) {
-      const key = `${m.homeTeam.name}|${m.awayTeam.name}`;
-      LIVE_SCORES[key] = {
-        home: m.score.fullTime.home ?? m.score.halfTime.home ?? '?',
-        away: m.score.fullTime.away ?? m.score.halfTime.away ?? '?',
-        minute: m.minute||'', status: m.status, source: 'football-data.org'
-      };
-      count++;
+    for (const m of data.matches) {
+      const key = m.homeTeam.name + m.awayTeam.name;
+      LIVESCORES[key] = { home: m.score.fullTime.home ?? m.score.halfTime.home ?? '?', away: m.score.fullTime.away ?? m.score.halfTime.away ?? '?', minute: m.minute, status: m.status, source: 'football-data.org' };
     }
-    // Also fetch today's scores
-    const today = new Date().toISOString().slice(0,10);
-    const res2 = await fetch(`https://api.football-data.org/v4/competitions/2000/matches?dateFrom=${today}&dateTo=${today}`, {
-      headers: { 'X-Auth-Token': '9b1e9a6ad88b42e4a81b1e1e57834c15' }
-    });
+    const today = new Date().toISOString().slice(0, 10);
+    const res2 = await fetch(`${PROXY}/fd/today?date=${today}`);
     if (res2.ok) {
       const data2 = await res2.json();
-      for (const m of (data2.matches||[])) {
-        const key = `${m.homeTeam.name}|${m.awayTeam.name}`;
-        if (!LIVE_SCORES[key]) {
-          LIVE_SCORES[key] = { home: m.score.fullTime.home, away: m.score.fullTime.away, minute:'', status: m.status, source:'football-data.org' };
-        }
+      for (const m of data2.matches) {
+        const key = m.homeTeam.name + m.awayTeam.name;
+        if (!LIVESCORES[key]) LIVESCORES[key] = { home: m.score.fullTime.home, away: m.score.fullTime.away, minute: null, status: m.status, source: 'football-data.org' };
       }
     }
-    API_STATUS.api1 = 'ok';
-  } catch(e) { API_STATUS.api1 = 'fail'; }
+    APISTATUS.api1 = 'ok';
+  } catch(e) { APISTATUS.api1 = 'fail'; }
 }
 
 // API 2: AllSports API (free, no key needed for some endpoints)
 async function fetchApi2() {
+  const PROXY = 'https://taybat-ai.studegy8.workers.dev';
   try {
-    const today = new Date().toISOString().slice(0,10);
-    // AllSports public endpoint
-    const res = await fetch(`https://allsportsapi.com/api/football/?met=Fixtures&APIkey=sample&from=${today}&to=${today}&leagueId=1228`);
+    const today = new Date().toISOString().slice(0, 10);
+    const res = await fetch(`${PROXY}/allsports?date=${today}`);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
     if (data.success !== 1) throw new Error('no data');
-    for (const m of (data.result||[])) {
-      const key = `${m.event_home_team}|${m.event_away_team}`;
-      if (!LIVE_SCORES[key]) {
-        LIVE_SCORES[key] = {
-          home: m.event_final_result ? m.event_final_result.split(' - ')[0] : null,
-          away: m.event_final_result ? m.event_final_result.split(' - ')[1] : null,
-          minute: m.event_status||'', status: m.event_status, source:'allsports'
-        };
-      }
+    for (const m of data.result) {
+      const key = m['event_home_team'] + m['event_away_team'];
+      if (!LIVESCORES[key]) LIVESCORES[key] = { home: m['event_final_result'] ? m['event_final_result'].split(' - ')[0] : null, away: m['event_final_result'] ? m['event_final_result'].split(' - ')[1] : null, minute: m['event_status'], status: m['event_status'], source: 'allsports' };
     }
-    API_STATUS.api2 = 'ok';
-  } catch(e) { API_STATUS.api2 = 'fail'; }
+    APISTATUS.api2 = 'ok';
+  } catch(e) { APISTATUS.api2 = 'fail'; }
 }
 
 // API 3: Open Football Data / ESPN CDN (live scores for major tournaments)
 async function fetchApi3() {
+  const PROXY = 'https://taybat-ai.studegy8.workers.dev';
   try {
-    // ESPN public scores endpoint (no key needed)
-    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard');
+    const res = await fetch(`${PROXY}/espn`);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    for (const event of (data.events||[])) {
+    for (const event of data.events) {
       const comp = event.competitions?.[0];
       if (!comp) continue;
-      const home = comp.competitors?.find(c=>c.homeAway==='home');
-      const away = comp.competitors?.find(c=>c.homeAway==='away');
-      if (!home||!away) continue;
-      const homeN = home.team?.displayName||'';
-      const awayN = away.team?.displayName||'';
-      const key = `${homeN}|${awayN}`;
-      const statusType = comp.status?.type?.name||'';
-      if (!LIVE_SCORES[key]) {
-        LIVE_SCORES[key] = {
-          home: home.score??null, away: away.score??null,
-          minute: comp.status?.displayClock||'',
-          status: statusType, source:'ESPN'
-        };
-      }
+      const home = comp.competitors?.find(c => c.homeAway === 'home');
+      const away = comp.competitors?.find(c => c.homeAway === 'away');
+      if (!home || !away) continue;
+      const homeN = home.team?.displayName;
+      const awayN = away.team?.displayName;
+      const key = homeN + awayN;
+      const statusType = comp.status?.type?.name;
+      if (!LIVESCORES[key]) LIVESCORES[key] = { home: home.score ?? null, away: away.score ?? null, minute: comp.status?.displayClock, status: statusType, source: 'ESPN' };
     }
-    API_STATUS.api3 = 'ok';
-  } catch(e) { API_STATUS.api3 = 'fail'; }
+    APISTATUS.api3 = 'ok';
+  } catch(e) { APISTATUS.api3 = 'fail'; }
 }
 
 async function fetchLiveScores() {
@@ -506,12 +482,9 @@ async function fetchLiveScores() {
 // DETAILED MATCH EVENTS — multi-API
 // ═══════════════════════════════════════════
 async function fetchMatchDetails(matchId, team1, team2, matchDate) {
-  // Try football-data.org first (best detail)
+  const PROXY = 'https://taybat-ai.studegy8.workers.dev';
   try {
-    const res = await fetch(
-      `https://api.football-data.org/v4/competitions/2000/matches?dateFrom=${matchDate}&dateTo=${matchDate}`,
-      { headers: { 'X-Auth-Token': '9b1e9a6ad88b42e4a81b1e1e57834c15' } }
-    );
+    const res = await fetch(`${PROXY}/fd/today?date=${matchDate}`);
     if (!res.ok) throw new Error('api1 fail');
     const data = await res.json();
     const apiMatch = data.matches?.find(m =>
@@ -521,19 +494,16 @@ async function fetchMatchDetails(matchId, team1, team2, matchDate) {
     );
     if (apiMatch) return { source: 'football-data.org', match: apiMatch, type: 'football-data' };
   } catch(e) {}
-
-  // Try ESPN as fallback
   try {
-    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard`);
+    const res = await fetch(`${PROXY}/espn`);
     if (!res.ok) throw new Error('espn fail');
     const data = await res.json();
     const ev = data.events?.find(e => {
-      const name = e.name?.toLowerCase()||'';
+      const name = e.name?.toLowerCase();
       return name.includes(team1.split(' ')[0].toLowerCase()) || name.includes(team2.split(' ')[0].toLowerCase());
     });
     if (ev) return { source: 'ESPN', match: ev, type: 'espn' };
   } catch(e) {}
-
   return null;
 }
 
