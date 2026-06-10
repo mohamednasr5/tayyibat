@@ -182,7 +182,85 @@
     box-shadow: 0 4px 16px rgba(0,166,81,0.4); z-index: 200;
   }
   .scroll-top.visible { display: flex; }
-</style>
+
+        /* TAYYIBAT BANNER */
+        .tayyibat-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1a0a00 0%, #3d1f00 50%, #1a0a00 100%);
+            border-top: 2px solid #f5a623;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            box-shadow: 0 -4px 20px rgba(245,166,35,0.3);
+            animation: slideUpBanner 0.4s ease-out;
+        }
+        @keyframes slideUpBanner {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .tayyibat-banner-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .tayyibat-banner-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .tayyibat-banner-text strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #f5a623;
+            line-height: 1.3;
+        }
+        .tayyibat-banner-text span {
+            font-size: 11px;
+            color: #c9a714;
+            opacity: 0.85;
+        }
+        .tayyibat-banner-try {
+            background: linear-gradient(135deg, #f5a623, #e08c00);
+            color: #1a0a00;
+            border: none;
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: Cairo, sans-serif;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(245,166,35,0.4);
+        }
+        .tayyibat-banner-close {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(245,166,35,0.3);
+            color: #f5a623;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: Cairo, sans-serif;
+        }
+        .tayyibat-banner-close:hover {
+            background: rgba(245,166,35,0.15);
+        }
+
+        </style>
 </head>
 <body>
 
@@ -741,5 +819,40 @@ async function init() {
 
 init();
 </script>
+
+    <!-- TAYYIBAT SMART BANNER -->
+    <div class="tayyibat-banner" id="tayyibatBanner">
+        <div class="tayyibat-banner-icon">🍽️</div>
+        <div class="tayyibat-banner-text">
+            <strong>هل جربت تطبيق طيبات الذكي؟ ✨</strong>
+            <span>اكتشف وصفات ذكية وتجربة فريدة</span>
+        </div>
+        <a class="tayyibat-banner-try" href="https://tayyibat.online/" target="_blank" rel="noopener">
+            جرّبه 🚀
+        </a>
+        <button class="tayyibat-banner-close" onclick="closeTayyibatBanner()" aria-label="إغلاق">✕</button>
+    </div>
+
+    <script>
+        (function() {
+            const KEY = 'tayyibat_banner_date';
+            const today = new Date().toISOString().slice(0, 10);
+            const lastSeen = localStorage.getItem(KEY);
+            if (lastSeen === today) {
+                document.getElementById('tayyibatBanner').style.display = 'none';
+            }
+        })();
+
+        function closeTayyibatBanner() {
+            const today = new Date().toISOString().slice(0, 10);
+            localStorage.setItem('tayyibat_banner_date', today);
+            const banner = document.getElementById('tayyibatBanner');
+            banner.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            banner.style.transform = 'translateY(100%)';
+            banner.style.opacity = '0';
+            setTimeout(() => banner.style.display = 'none', 300);
+        }
+    </script>
+
 </body>
 </html>
