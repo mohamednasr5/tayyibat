@@ -778,6 +778,14 @@ window.addEventListener('scroll', () => {
 });
 
 async function init() {
+
+  // Unregister any old service workers that may intercept API calls
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => reg.unregister());
+    });
+  }
+
   updateClock();
   setInterval(updateClock, 1000);
   renderAll();        // render immediately with static data
