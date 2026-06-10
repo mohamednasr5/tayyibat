@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ كأس العالم 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0a3d0a 0%, #1a6b1a 50%, #0a3d0a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 36px 28px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .trophy { font-size: 64px; margin-bottom: 12px; }
+  h1 { color: #1a6b1a; font-size: 22px; margin-bottom: 6px; }
+  .subtitle { color: #666; font-size: 14px; margin-bottom: 28px; }
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    background: #f0f8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 24px; font-weight: bold; color: #1a6b1a; }
+  .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 14px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .btn:active { opacity: 0.8; }
+  .btn-gcal {
+    background: linear-gradient(135deg, #4285F4, #1a73e8);
+    color: white;
+  }
+  .btn-apple {
+    background: linear-gradient(135deg, #555, #333);
+    color: white;
+  }
+  .note {
+    background: #e8f5e9;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #2e7d32;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .signature {
+    font-size: 12px;
+    color: #999;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="trophy">⚽🏆</div>
+  <h1>كأس العالم 2026</h1>
+  <p class="subtitle">104 مباراة · تذكير فوري عند كل مباراة</p>
+
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-num">104</div>
+      <div class="stat-label">مباراة</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">🔔</div>
+      <div class="stat-label">تذكير فوري</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">48</div>
+      <div class="stat-label">منتخب</div>
+    </div>
+  </div>
+
+  <a class="btn btn-gcal" href="https://calendar.google.com/calendar/r?cid=https%3A%2F%2Fraw.githubusercontent.com%2Fmohamednasr5%2Ftayyibat%2Fmain%2Fworldcup_2026_with_reminders.ics">
+    📅 إضافة إلى Google Calendar
+  </a>
+
+  <a class="btn btn-apple" href="https://raw.githubusercontent.com/mohamednasr5/tayyibat/main/worldcup_2026_with_reminders.ics">
+    🍎 إضافة إلى Apple Calendar
+  </a>
+
+  <div class="note">
+    ✅ اضغط الزر مرة واحدة فقط — سيفتح التقويم مباشرة ويطلب منك الإضافة
+  </div>
+
+  <div class="signature">
+    تحياتي بمشاهدة ممتعة<br>
+    <b>مهندس محمد حماد</b>
+  </div>
+</div>
+</body>
+</html>
