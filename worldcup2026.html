@@ -260,7 +260,11 @@
             background: rgba(245,166,35,0.15);
         }
 
-        </style>
+        
+.goals-display{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;line-height:1.7;width:100%;display:flex;gap:4px;justify-content:space-between}
+.goal-item{color:var(--gold);font-size:10px}
+.goal-item span{color:var(--muted);font-size:9px}
+</style>
 </head>
 <body>
 
@@ -418,7 +422,7 @@ async function fetchApi1() {
     const data = await res.json();
     for (const m of data.matches) {
       const key = m.homeTeam.name + m.awayTeam.name;
-      LIVESCORES[key] = { home: m.score.fullTime.home ?? m.score.halfTime.home ?? '?', away: m.score.fullTime.away ?? m.score.halfTime.away ?? '?', minute: m.minute, status: m.status, source: 'football-data.org' };
+      LIVE_SCORES[key] = { home: m.score.fullTime.home ?? m.score.halfTime.home ?? '?', away: m.score.fullTime.away ?? m.score.halfTime.away ?? '?', minute: m.minute, status: m.status, source: 'football-data.org', goals: m.goals||[] };
     }
     const today = new Date().toISOString().slice(0, 10);
     const res2 = await fetch(`${PROXY}/fd/today?date=${today}`);
@@ -426,11 +430,11 @@ async function fetchApi1() {
       const data2 = await res2.json();
       for (const m of data2.matches) {
         const key = m.homeTeam.name + m.awayTeam.name;
-        if (!LIVESCORES[key]) LIVESCORES[key] = { home: m.score.fullTime.home, away: m.score.fullTime.away, minute: null, status: m.status, source: 'football-data.org' };
+        if (!LIVE_SCORES[key]) LIVE_SCORES[key] = { home: m.score.fullTime.home, away: m.score.fullTime.away, minute: null, status: m.status, source: 'football-data.org', goals: m.goals||[] };
       }
     }
-    APISTATUS.api1 = 'ok';
-  } catch(e) { APISTATUS.api1 = 'fail'; }
+    API_STATUS.api1 = 'ok';
+  } catch(e) { API_STATUS.api1 = 'fail'; }
 }
 
 // API 2: AllSports API (free, no key needed for some endpoints)
@@ -444,10 +448,10 @@ async function fetchApi2() {
     if (data.success !== 1) throw new Error('no data');
     for (const m of data.result) {
       const key = m['event_home_team'] + m['event_away_team'];
-      if (!LIVESCORES[key]) LIVESCORES[key] = { home: m['event_final_result'] ? m['event_final_result'].split(' - ')[0] : null, away: m['event_final_result'] ? m['event_final_result'].split(' - ')[1] : null, minute: m['event_status'], status: m['event_status'], source: 'allsports' };
+      if (!LIVE_SCORES[key]) LIVE_SCORES[key] = { home: m['event_final_result'] ? m['event_final_result'].split(' - ')[0] : null, away: m['event_final_result'] ? m['event_final_result'].split(' - ')[1] : null, minute: m['event_status'], status: m['event_status'], source: 'allsports' };
     }
-    APISTATUS.api2 = 'ok';
-  } catch(e) { APISTATUS.api2 = 'fail'; }
+    API_STATUS.api2 = 'ok';
+  } catch(e) { API_STATUS.api2 = 'fail'; }
 }
 
 // API 3: Open Football Data / ESPN CDN (live scores for major tournaments)
@@ -467,10 +471,10 @@ async function fetchApi3() {
       const awayN = away.team?.displayName;
       const key = homeN + awayN;
       const statusType = comp.status?.type?.name;
-      if (!LIVESCORES[key]) LIVESCORES[key] = { home: home.score ?? null, away: away.score ?? null, minute: comp.status?.displayClock, status: statusType, source: 'ESPN' };
+      if (!LIVE_SCORES[key]) LIVE_SCORES[key] = { home: home.score ?? null, away: away.score ?? null, minute: comp.status?.displayClock, status: statusType, source: 'ESPN' };
     }
-    APISTATUS.api3 = 'ok';
-  } catch(e) { APISTATUS.api3 = 'fail'; }
+    API_STATUS.api3 = 'ok';
+  } catch(e) { API_STATUS.api3 = 'fail'; }
 }
 
 async function fetchLiveScores() {
@@ -631,19 +635,30 @@ function buildMatchCard(match, inToday=false) {
   const scoreKey2 = `${team2}|${team1}`;
   const liveData = LIVE_SCORES[scoreKey1] || LIVE_SCORES[scoreKey2] || null;
 
-  let scoreHTML='', badgeHTML='';
+  const fmtGoals = (goals, teamName) => (goals||[])
+    .filter(g => (g.team?.name||'').toLowerCase().includes((teamName||'').split(' ')[0].toLowerCase()))
+    .map(g => `<div class="goal-item">⚽ ${g.scorer?.name||'?'} <span>${g.minute||''}'${g.type==='OWN_GOAL'?' og':g.type==='PENALTY'?' pen':''}</span></div>`)
+    .join('');
+
+  let scoreHTML='', badgeHTML='', goalsHTML='';
   if (status==='live') {
     const swapped = LIVE_SCORES[scoreKey2] && !LIVE_SCORES[scoreKey1];
     const h = liveData ? (swapped?liveData.away:liveData.home) : '-';
     const a = liveData ? (swapped?liveData.home:liveData.away) : '-';
     scoreHTML = `<div class="score">${h} - ${a}</div>`;
     badgeHTML = `<div class="live-badge">🔴 مباشر ${liveData?.minute ? liveData.minute+"'" : ''}</div>`;
+    const g = liveData?.goals||[];
+    const t1 = swapped?team2:team1; const t2 = swapped?team1:team2;
+    goalsHTML = `<div class="goals-display"><div style="text-align:right;flex:1">${fmtGoals(g,t1)}</div><div style="text-align:left;flex:1">${fmtGoals(g,t2)}</div></div>`;
   } else if (status==='finished' && liveData && liveData.home !== null) {
     const swapped = LIVE_SCORES[scoreKey2] && !LIVE_SCORES[scoreKey1];
     const h = swapped ? liveData.away : liveData.home;
     const a = swapped ? liveData.home : liveData.away;
     scoreHTML = h!==null ? `<div class="score">${h} - ${a}</div>` : `<div class="score not-started">انتهت</div>`;
     badgeHTML = `<div class="finished-badge">انتهت</div>`;
+    const g = liveData?.goals||[];
+    const t1 = swapped?team2:team1; const t2 = swapped?team1:team2;
+    goalsHTML = `<div class="goals-display"><div style="text-align:right;flex:1">${fmtGoals(g,t1)}</div><div style="text-align:left;flex:1">${fmtGoals(g,t2)}</div></div>`;
   } else if (status==='upcoming') {
     scoreHTML = `<div class="score not-started">${toEgyptTime(start)}</div>`;
     badgeHTML = `<div class="time-badge">${inToday?'لم تبدأ':toEgyptDate(start)}</div>`;
@@ -671,6 +686,7 @@ function buildMatchCard(match, inToday=false) {
         ${team2}
       </div>
     </div>
+    ${goalsHTML ? `<div style="padding:2px 12px 6px;border-top:1px solid rgba(255,255,255,.05);margin-top:4px">${goalsHTML}</div>` : ''}
     <div class="match-footer">📍 ${match.location}</div>
     <div class="details-panel" id="details-${match.id}">
       <div class="details-loading">⏳ جاري جلب التفاصيل من APIs...</div>
