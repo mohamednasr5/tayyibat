@@ -441,17 +441,21 @@ header {
 /* ══ TEAMS ══ */
 .match-teams {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 .team {
   flex: 1;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text);
   line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
 .team-flag-wrap { display: flex; justify-content: center; margin-bottom: 6px; }
 .team-flag-img {
@@ -462,26 +466,56 @@ header {
   border: 1px solid rgba(201,168,76,0.3);
   box-shadow: 0 3px 10px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.4);
   transition: transform 0.2s;
+  display: block;
 }
 .match-card:hover .team-flag-img { transform: scale(1.05); }
-.team-flag-emoji { font-size: 32px; display: block; text-align: center; margin-bottom: 4px; }
+.team-flag-emoji { font-size: 32px; display: block; text-align: center; margin-bottom: 4px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7)); }
+.team-name-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 90px;
+  word-break: break-word;
+}
+/* Goals under team flag */
+.team-scorers {
+  margin-top: 5px;
+  font-size: 9.5px;
+  color: var(--gold);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 100px;
+}
+.team-scorers .scorer-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.scorer-name { color: var(--gold-light); font-weight: 600; }
+.scorer-min  { color: var(--muted); font-size: 8.5px; }
+.scorer-type { font-size: 8px; color: #ff9800; }
 
 .score-box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 80px;
+  min-width: 76px;
+  padding-top: 4px;
 }
 .score {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
   color: var(--gold);
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   line-height: 1;
   font-family: 'Amiri', serif;
-  text-shadow: 0 0 20px rgba(201,168,76,0.4);
+  text-shadow: 0 0 24px rgba(201,168,76,0.5);
 }
-.score.not-started { font-size: 16px; color: var(--green-light); font-family: 'Cairo', sans-serif; }
+.score.not-started { font-size: 15px; color: var(--green-light); font-family: 'Cairo', sans-serif; letter-spacing:0; }
 .vs-text { font-size: 14px; color: var(--muted); font-weight: 700; }
 
 .live-badge {
@@ -540,15 +574,8 @@ header {
 }
 .tv-chip::before { content: '📺'; font-size: 9px; }
 
-/* ══ GOALS DISPLAY ══ */
-.goals-display {
-  font-size: 10px;
-  color: var(--muted);
-  display: flex;
-  gap: 4px;
-  justify-content: space-between;
-  padding: 4px 0;
-}
+/* ══ GOALS DISPLAY (inline under flag, see .team-scorers) ══ */
+.goals-display { display: none; } /* legacy hidden */
 .goal-item { color: var(--gold); font-size: 10px; }
 .goal-item span { color: var(--muted); font-size: 9px; }
 
@@ -883,13 +910,14 @@ footer .pharaoh-line {
   <button class="nav-btn active" onclick="switchTab('today',this)">📅 اليوم</button>
   <button class="nav-btn" onclick="switchTab('matches',this)">⚽ المباريات</button>
   <button class="nav-btn" onclick="switchTab('standings',this)">📊 الترتيب</button>
+  <button class="nav-btn" onclick="switchTab('scorers',this)">⚽ الهدافون</button>
 </nav>
 
 <!-- API STATUS -->
 <div class="api-status-bar" id="apiStatusBar">
   <span class="api-label">مصادر البيانات:</span>
-  <span class="api-badge wait" id="api1status"><span class="api-dot"></span> football-data.org</span>
-  <span class="api-badge wait" id="api2status"><span class="api-dot"></span> api-football</span>
+  <span class="api-badge wait" id="api1status"><span class="api-dot"></span> worldcup26.ir</span>
+  <span class="api-badge wait" id="api2status"><span class="api-dot"></span> allsports</span>
   <span class="api-badge wait" id="api3status"><span class="api-dot"></span> ESPN</span>
 </div>
 
@@ -922,11 +950,18 @@ footer .pharaoh-line {
   </div>
 </div>
 
+<!-- ══ TAB: SCORERS ══ -->
+<div class="tab-section" id="tab-scorers">
+  <div style="padding:14px" id="scorersSection">
+    <div class="standings-loading">⚽ جاري تحميل قائمة الهدافين...</div>
+  </div>
+</div>
+
 <footer>
   <span class="pharaoh-line">𓂀 𓋹 ⚽ 𓋹 𓂀</span>
   تحياتي بمشاهدة ممتعة<br>
   <strong class="gold">مهندس محمد حماد</strong><br>
-  <span style="font-size:10px; color:#3A2808;">البيانات من football-data.org · ESPN · AllSports API</span>
+  <span style="font-size:10px; color:#3A2808;">البيانات من football-data.org · ESPN · AllSports API · الهدافون والترتيب مباشر</span>
 </footer>
 
 <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -1005,12 +1040,12 @@ const EMOJI_MAP = {
 function getFlagImg(name, size=48) {
   const code = FLAG_MAP[name];
   const emoji = EMOJI_MAP[name] || '🏴';
-  if (!code) return `<span style="font-size:${size*0.7}px;display:block;text-align:center;margin-bottom:4px">${emoji}</span>`;
+  if (!code) return `<div class="team-flag-wrap"><span class="team-flag-emoji">${emoji}</span></div>`;
   return `<div class="team-flag-wrap">
-    <img class="team-flag-img" style="width:${size}px;height:${Math.round(size*0.67)}px"
+    <img class="team-flag-img" style="width:${size}px;height:${Math.round(size*0.667)}px"
          src="https://flagcdn.com/w80/${code}.png"
-         onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'" alt="${name}">
-    <span style="display:none;font-size:${size*0.7}px;text-align:center;">${emoji}</span>
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="${name}">
+    <span class="team-flag-emoji" style="display:none">${emoji}</span>
   </div>`;
 }
 
@@ -1061,7 +1096,35 @@ const STAGE_AR={'Group Stage':'دور المجموعات','Round of 32':'دور 
 // ══ LIVE SCORES ══
 const LIVE_SCORES = {};
 const API_STATUS = {api1:'wait',api2:'wait',api3:'wait'};
+let LIVE_SCORES_READY = false;   // ← علم: هل تم جلب النتائج مرة واحدة على الأقل؟
 const PROXY = 'https://taybat-ai.studegy8.workers.dev';
+const WC26_BASE = 'https://worldcup26.ir/get';
+
+// ══ worldcup26.ir helpers ══
+let WC26_GAMES_CACHE = null;
+let WC26_GROUPS_CACHE = null;
+
+async function fetchWC26Games() {
+  if(WC26_GAMES_CACHE) return WC26_GAMES_CACHE;
+  try {
+    const r = await fetch(`${WC26_BASE}/games`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    WC26_GAMES_CACHE = Array.isArray(d) ? d : (d.data || d.games || []);
+    return WC26_GAMES_CACHE;
+  } catch { return []; }
+}
+
+async function fetchWC26Groups() {
+  if(WC26_GROUPS_CACHE) return WC26_GROUPS_CACHE;
+  try {
+    const r = await fetch(`${WC26_BASE}/groups`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    WC26_GROUPS_CACHE = Array.isArray(d) ? d : (d.data || d.groups || []);
+    return WC26_GROUPS_CACHE;
+  } catch { return []; }
+}
 
 function updateApiUI() {
   for(const[k,v]of Object.entries(API_STATUS)) {
@@ -1070,20 +1133,50 @@ function updateApiUI() {
   }
 }
 
+// Smart resolver: maps API team names → our MATCHES canonical key
+function resolveMatchKey(apiHome, apiAway) {
+  const norm = s => (s||'').toLowerCase().replace(/[^a-z]/g,'');
+  const ah=norm(apiHome), ab=norm(apiAway);
+  for(const m of MATCHES) {
+    const [t1,t2]=getTeamNames(m.summary);
+    const n1=norm(t1), n2=norm(t2);
+    if((n1.includes(ah)||ah.includes(n1))&&(n2.includes(ab)||ab.includes(n2))) return {key:t1+t2,swapped:false};
+    if((n1.includes(ab)||ab.includes(n1))&&(n2.includes(ah)||ah.includes(n2))) return {key:t1+t2,swapped:true};
+  }
+  return {key:apiHome+apiAway,swapped:false};
+}
+
 async function fetchApi1() {
   try {
-    const r=await fetch(`${PROXY}/fd/live`);
-    if(!r.ok) throw 0;
-    const d=await r.json();
-    for(const m of d.matches||[]) {
-      const k=m.homeTeam.name+m.awayTeam.name;
-      LIVE_SCORES[k]={home:m.score.fullTime.home??m.score.halfTime.home??'?',away:m.score.fullTime.away??m.score.halfTime.away??'?',minute:m.minute,status:m.status,source:'football-data.org',goals:m.goals||[]};
+    // جلب النتائج من worldcup26.ir (مجاني بدون key)
+    const games = await fetchWC26Games();
+    if(!games.length) throw 0;
+    for(const g of games) {
+      // تحديد أسماء الفرق من الـ API
+      const homeName = g.home_team?.name || g.homeTeam?.name || g.home?.name || '';
+      const awayName = g.away_team?.name || g.awayTeam?.name || g.away?.name || '';
+      if(!homeName || !awayName) continue;
+      const {key, swapped} = resolveMatchKey(homeName, awayName);
+      // استخراج النتيجة
+      const hScore = g.home_score ?? g.home_team?.goals ?? g.score?.home ?? g.result?.home ?? null;
+      const aScore = g.away_score ?? g.away_team?.goals ?? g.score?.away ?? g.result?.away ?? null;
+      // تحديد الحالة
+      const st = (g.status || g.state || '').toLowerCase();
+      const isLive = st.includes('live') || st.includes('progress') || st.includes('playing') || st === '1h' || st === '2h' || st === 'ht';
+      const isFinished = st.includes('finish') || st.includes('ft') || st.includes('end') || st === 'fulltime';
+      if(hScore === null && !isLive && !isFinished) continue;
+      if(!LIVE_SCORES[key] || isLive) {
+        LIVE_SCORES[key] = {
+          home: swapped ? aScore : hScore,
+          away: swapped ? hScore : aScore,
+          minute: g.minute || g.time || null,
+          status: isLive ? 'IN_PLAY' : (isFinished ? 'FINISHED' : 'SCHEDULED'),
+          source: 'worldcup26.ir', goals: []
+        };
+      }
     }
-    const today=new Date().toISOString().slice(0,10);
-    const r2=await fetch(`${PROXY}/fd/today?date=${today}`);
-    if(r2.ok){const d2=await r2.json();for(const m of d2.matches||[]){const k=m.homeTeam.name+m.awayTeam.name;if(!LIVE_SCORES[k])LIVE_SCORES[k]={home:m.score.fullTime.home,away:m.score.fullTime.away,minute:null,status:m.status,source:'football-data.org',goals:m.goals||[]};}}
     API_STATUS.api1='ok';
-  } catch{API_STATUS.api1='fail';}
+  } catch { API_STATUS.api1='fail'; }
 }
 
 async function fetchApi2() {
@@ -1094,32 +1187,141 @@ async function fetchApi2() {
     const d=await r.json();
     if(d.success!==1) throw 0;
     for(const m of d.result||[]) {
-      const k=m['event_home_team']+m['event_away_team'];
-      if(!LIVE_SCORES[k]){const res=m['event_final_result']||'';const[h,a]=(res.split(' - '));LIVE_SCORES[k]={home:h||null,away:a||null,status:m['event_status'],source:'allsports'};}
+      const {key}=resolveMatchKey(m['event_home_team'],m['event_away_team']);
+      if(!LIVE_SCORES[key]){const res=m['event_final_result']||'';const[h,a]=(res.split(' - '));LIVE_SCORES[key]={home:h||null,away:a||null,status:m['event_status'],source:'allsports',goals:[]};}
     }
     API_STATUS.api2='ok';
   } catch{API_STATUS.api2='fail';}
 }
 
+
+// ══ مخزن الأهداف لكل مباراة (مفتاح = نفس LIVE_SCORES key) ══
+const GOAL_EVENTS = {};   // key → [{scorer, team, minute, type}]
+const SCORER_TOTALS = {}; // playerName → {team, goals}
+
+function parseESPNEvents(comp, key, homeTeamName, awayTeamName) {
+  // comp.details أو comp.scoring فيها الأهداف في ESPN
+  const details = comp.details || [];
+  const goals = [];
+  for(const d of details) {
+    const type = (d.type?.text || d.type?.abbreviation || '').toLowerCase();
+    if(!type.includes('goal') && !type.includes('score')) continue;
+    const athleteName = d.athletes?.[0]?.displayName || d.athletes?.[0]?.athlete?.displayName || '';
+    if(!athleteName) continue;
+    const teamId = d.team?.id || '';
+    const homeId = comp.competitors?.find(c=>c.homeAway==='home')?.team?.id || '';
+    const teamName = (teamId && teamId === homeId) ? homeTeamName : awayTeamName;
+    const minute = d.clock?.displayValue || d.period?.number ? `${d.clock?.displayValue||''}` : '';
+    const isOwn = type.includes('own');
+    const isPenalty = type.includes('penalty') || type.includes('pk');
+    goals.push({ scorer: {name: athleteName}, team: {name: teamName}, minute, type: isOwn?'OWN_GOAL': isPenalty?'PENALTY':'REGULAR' });
+    // تحديث إجمالي الهدافين
+    if(!isOwn) {
+      if(!SCORER_TOTALS[athleteName]) SCORER_TOTALS[athleteName] = {team: teamName, goals: 0};
+      SCORER_TOTALS[athleteName].goals++;
+    }
+  }
+  if(goals.length) GOAL_EVENTS[key] = goals;
+}
+
 async function fetchApi3() {
   try {
-    const r=await fetch(`${PROXY}/espn`);
+    const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard',{headers:{'Accept':'application/json'}});
     if(!r.ok) throw 0;
     const d=await r.json();
+    const detailFetches=[];
     for(const ev of d.events||[]) {
       const comp=ev.competitions?.[0];if(!comp)continue;
       const home=comp.competitors?.find(c=>c.homeAway==='home');
       const away=comp.competitors?.find(c=>c.homeAway==='away');
       if(!home||!away)continue;
-      const k=home.team?.displayName+away.team?.displayName;
-      if(!LIVE_SCORES[k])LIVE_SCORES[k]={home:home.score??null,away:away.score??null,minute:comp.status?.displayClock,status:comp.status?.type?.name,source:'ESPN'};
+      const {key}=resolveMatchKey(home.team?.displayName,away.team?.displayName);
+      const isLive=comp.status?.type?.state==='in';
+      const isFinished=comp.status?.type?.state==='post';
+      if(!LIVE_SCORES[key]||isLive) {
+        LIVE_SCORES[key]={home:home.score??null,away:away.score??null,minute:comp.status?.displayClock,status:comp.status?.type?.name,source:'ESPN',goals:[]};
+      }
+      // جلب تفاصيل الأهداف للمباريات المنتهية أو الجارية
+      if((isLive||isFinished) && ev.id) {
+        detailFetches.push({evId:ev.id, key, homeName:home.team?.displayName, awayName:away.team?.displayName});
+      }
     }
+    // جلب تفاصيل كل مباراة بشكل متوازي
+    await Promise.allSettled(detailFetches.map(async({evId,key,homeName,awayName})=>{
+      try{
+        const r2=await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${evId}`,{headers:{'Accept':'application/json'}});
+        if(!r2.ok) return;
+        const d2=await r2.json();
+        const comp2=d2.header?.competitions?.[0] || d2.boxscore?.players?.[0] || null;
+        // نجرب endpoints مختلفة لـ ESPN
+        const details = d2.plays || d2.keyEvents || [];
+        const goals2=[];
+        for(const p of details){
+          const txt=(p.text||p.type?.text||'').toLowerCase();
+          if(!txt.includes('goal')) continue;
+          const name=p.participants?.[0]?.athlete?.displayName||p.athletes?.[0]?.displayName||'';
+          if(!name) continue;
+          const isHome=p.homeScore!==undefined? (p.homeScore > (goals2.filter(g=>g.team?.name===homeName).length)) : true;
+          const teamName = isHome? homeName: awayName;
+          const min = p.clock?.displayValue||p.period?.number?`${p.clock?.displayValue||''}`:'';
+          const isOwn=(txt.includes('own'));
+          const isPen=(txt.includes('penalty')||txt.includes('pk'));
+          goals2.push({scorer:{name},team:{name:teamName},minute:min,type:isOwn?'OWN_GOAL':isPen?'PENALTY':'REGULAR'});
+          if(!isOwn){
+            if(!SCORER_TOTALS[name]) SCORER_TOTALS[name]={team:teamName,goals:0};
+            SCORER_TOTALS[name].goals++;
+          }
+        }
+        // أيضاً جرب scoring section
+        const scoring = d2.scoring || [];
+        for(const period of scoring){
+          for(const sc of period.items||[]){
+            const name=sc.athletes?.[0]?.athlete?.displayName||sc.scoringPlay?.text||'';
+            if(!name) continue;
+            const txt=(sc.type?.text||sc.scoringType?.displayName||'').toLowerCase();
+            const teamId=sc.team?.id||'';
+            const homeTeam=d2.header?.competitions?.[0]?.competitors?.find(c=>c.homeAway==='home');
+            const teamName=(teamId===homeTeam?.team?.id)?homeName:awayName;
+            const min=sc.clock?.displayValue||'';
+            const isOwn=txt.includes('own');
+            const isPen=txt.includes('penalty')||txt.includes('pk');
+            if(!goals2.find(g=>g.scorer.name===name&&g.minute===min)){
+              goals2.push({scorer:{name},team:{name:teamName},minute:min,type:isOwn?'OWN_GOAL':isPen?'PENALTY':'REGULAR'});
+              if(!isOwn){
+                if(!SCORER_TOTALS[name]) SCORER_TOTALS[name]={team:teamName,goals:0};
+                SCORER_TOTALS[name].goals++;
+              }
+            }
+          }
+        }
+        if(goals2.length){
+          GOAL_EVENTS[key]=goals2;
+          if(LIVE_SCORES[key]) LIVE_SCORES[key].goals=goals2;
+        }
+      }catch{}
+    }));
     API_STATUS.api3='ok';
-  } catch{API_STATUS.api3='fail';}
+  } catch{
+    try{
+      const r=await fetch(`${PROXY}/espn`);
+      if(!r.ok) throw 0;
+      const d=await r.json();
+      for(const ev of d.events||[]) {
+        const comp=ev.competitions?.[0];if(!comp)continue;
+        const home=comp.competitors?.find(c=>c.homeAway==='home');
+        const away=comp.competitors?.find(c=>c.homeAway==='away');
+        if(!home||!away)continue;
+        const {key}=resolveMatchKey(home.team?.displayName,away.team?.displayName);
+        if(!LIVE_SCORES[key])LIVE_SCORES[key]={home:home.score??null,away:away.score??null,minute:comp.status?.displayClock,status:comp.status?.type?.name,source:'ESPN',goals:[]};
+      }
+      API_STATUS.api3='ok';
+    }catch{API_STATUS.api3='fail';}
+  }
 }
 
 async function fetchLiveScores() {
   await Promise.allSettled([fetchApi1(),fetchApi2(),fetchApi3()]);
+  LIVE_SCORES_READY = true;
   updateApiUI();
 }
 
@@ -1227,43 +1429,6 @@ function computeStandingsFromResults() {
     else{team1row.d++;team1row.pts++;team2row.d++;team2row.pts++;}
   }
   return groups;
-}
-
-function renderStandings() {
-  const groups = computeStandingsFromResults();
-  let html='';
-  for(const[grpName,rows] of Object.entries(groups)) {
-    const sorted=[...rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
-    html+=`<div class="group-standings">
-      <div class="group-title">🏟️ ${grpName}</div>
-      <table class="standings-table">
-        <thead><tr>
-          <th>#</th><th style="text-align:right;padding-right:8px">المنتخب</th>
-          <th>ل</th><th>ف</th><th>ت</th><th>خ</th>
-          <th>له</th><th>عليه</th><th>الفارق</th>
-          <th style="color:var(--gold-light)">ن</th>
-        </tr></thead>
-        <tbody>`;
-    sorted.forEach((r,i)=>{
-      const gd=r.gf-r.ga;
-      const q=(i<2)?'qualified':'';
-      html+=`<tr class="${q}">
-        <td><span class="rank-num rank-${i<3?i+1:'other'}">${i+1}</span></td>
-        <td><div class="team-cell">${getSmallFlag(r.team)}<span>${r.team}</span></div></td>
-        <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
-        <td>${r.gf}</td><td>${r.ga}</td>
-        <td style="color:${gd>0?'var(--green-light)':gd<0?'#cc5533':'var(--muted)'}">${gd>0?'+':''}${gd}</td>
-        <td class="pts-cell">${r.pts}</td>
-      </tr>`;
-    });
-    html+=`</tbody></table>
-      <div style="font-size:10px;color:var(--muted);margin-top:4px;padding:2px 4px;">
-        <span style="border-right:3px solid var(--green-light);padding-right:4px;margin-right:4px;">يتأهل</span>
-        ل=لعب · ف=فوز · ت=تعادل · خ=خسارة · ن=نقاط
-      </div>
-    </div>`;
-  }
-  document.getElementById('standingsSection').innerHTML = html;
 }
 
 // ══ COUNTDOWN ══
@@ -1391,33 +1556,44 @@ function buildMatchCard(match, inToday=false) {
   const [team1,team2] = getTeamNames(match.summary);
   const flag1 = getFlagImg(team1);
   const flag2 = getFlagImg(team2);
-  const sk1=`${team1}|${team2}`, sk2=`${team2}|${team1}`;
+  const sk1=`${team1}${team2}`, sk2=`${team2}${team1}`;
   const ld = LIVE_SCORES[sk1]||LIVE_SCORES[sk2]||null;
   const swapped = !!LIVE_SCORES[sk2]&&!LIVE_SCORES[sk1];
   const channels = getChannels(match);
 
-  const fmtGoals=(goals,tname)=>(goals||[])
-    .filter(g=>(g.team?.name||'').toLowerCase().includes((tname||'').split(' ')[0].toLowerCase()))
-    .map(g=>`<div class="goal-item">⚽ ${g.scorer?.name||'?'} <span>${g.minute||''}'${g.type==='OWN_GOAL'?' og':g.type==='PENALTY'?' pen':''}</span></div>`)
-    .join('');
+  // Build per-team scorer lines from goals array
+  function buildScorerLines(goals, teamName) {
+    if(!goals || !goals.length) return '';
+    const firstWord = (teamName||'').split(' ')[0].toLowerCase();
+    const filtered = goals.filter(g => (g.team?.name||'').toLowerCase().includes(firstWord));
+    if(!filtered.length) return '';
+    return filtered.map(g => {
+      const icon = g.type==='OWN_GOAL' ? '🔴' : g.type==='PENALTY' ? '🟡' : '⚽';
+      const extra = g.type==='OWN_GOAL' ? ' <span class="scorer-type">(عكسية)</span>' :
+                    g.type==='PENALTY' ? ' <span class="scorer-type">(ج)</span>' : '';
+      const shortName = (g.scorer?.name || '?').split(' ').slice(-1)[0]; // last name
+      return `<div class="scorer-line">${icon} <span class="scorer-name">${shortName}</span> <span class="scorer-min">${g.minute||''}'</span>${extra}</div>`;
+    }).join('');
+  }
 
-  let scoreHTML='', badgeHTML='', goalsHTML='', countdownHTML='';
+  const t1real = swapped ? team2 : team1;
+  const t2real = swapped ? team1 : team2;
+  // جمع الأهداف من كل المصادر المتاحة
+  const goals = (ld?.goals?.length ? ld.goals : null) || GOAL_EVENTS[sk1] || GOAL_EVENTS[sk2] || [];
+  const scorers1 = buildScorerLines(goals, t1real);
+  const scorers2 = buildScorerLines(goals, t2real);
+
+  let scoreHTML='', badgeHTML='', countdownHTML='';
 
   if(status==='live'){
     const h=ld?(swapped?ld.away:ld.home):'-';
     const a=ld?(swapped?ld.home:ld.away):'-';
     scoreHTML=`<div class="score">${h} - ${a}</div>`;
     badgeHTML=`<div class="live-badge">🔴 مباشر ${ld?.minute?ld.minute+"'":''}  </div>`;
-    const g=ld?.goals||[];
-    const t1=swapped?team2:team1,t2=swapped?team1:team2;
-    goalsHTML=`<div class="goals-display"><div style="text-align:right;flex:1">${fmtGoals(g,t1)}</div><div style="text-align:left;flex:1">${fmtGoals(g,t2)}</div></div>`;
   } else if(status==='finished'&&ld&&ld.home!==null&&ld.home!==undefined){
     const h=swapped?ld.away:ld.home, a=swapped?ld.home:ld.away;
     scoreHTML=h!==null?`<div class="score">${h} - ${a}</div>`:`<div class="score not-started">انتهت</div>`;
     badgeHTML=`<div class="finished-badge">انتهت</div>`;
-    const g=ld?.goals||[];
-    const t1=swapped?team2:team1,t2=swapped?team1:team2;
-    goalsHTML=`<div class="goals-display"><div style="text-align:right;flex:1">${fmtGoals(g,t1)}</div><div style="text-align:left;flex:1">${fmtGoals(g,t2)}</div></div>`;
   } else if(status==='upcoming'){
     scoreHTML=`<div class="score not-started">${toEgyptTime(start)}</div>`;
     badgeHTML=`<div class="time-badge">${inToday?'لم تبدأ بعد':toEgyptDate(start)}</div>`;
@@ -1435,11 +1611,18 @@ function buildMatchCard(match, inToday=false) {
       <span class="group-badge">${match.group||''}</span>
     </div>
     <div class="match-teams">
-      <div class="team">${flag1}${team1||match.summary.split(' vs ')[0].trim()}</div>
+      <div class="team">
+        ${flag1}
+        <span class="team-name-text">${team1||match.summary.split(' vs ')[0].trim()}</span>
+        ${scorers1?`<div class="team-scorers">${scorers1}</div>`:''}
+      </div>
       <div class="score-box">${scoreHTML}${badgeHTML}</div>
-      <div class="team">${flag2}${team2||match.summary.split(' vs ')[1]?.trim()||''}</div>
+      <div class="team">
+        ${flag2}
+        <span class="team-name-text">${team2||match.summary.split(' vs ')[1]?.trim()||''}</span>
+        ${scorers2?`<div class="team-scorers">${scorers2}</div>`:''}
+      </div>
     </div>
-    ${goalsHTML?`<div style="padding:2px 8px 4px;border-top:1px solid rgba(201,168,76,0.08);margin-top:4px">${goalsHTML}</div>`:''}
     ${countdownHTML}
     <div class="match-footer">
       <span>📍 ${match.location}</span>
@@ -1528,6 +1711,7 @@ function switchTab(tabName,btn) {
   document.getElementById(`tab-${tabName}`).classList.add('active');
   btn.classList.add('active');
   if(tabName==='standings') renderStandings();
+  if(tabName==='scorers') renderScorers();
   if(tabName==='today') renderToday();
 }
 
@@ -1559,6 +1743,271 @@ window.addEventListener('scroll',()=>{
   document.getElementById('scrollTopBtn').classList.toggle('visible',window.scrollY>300);
 });
 
+// ══ LIVE STANDINGS FROM API ══
+let LIVE_STANDINGS = null;
+let LIVE_SCORERS = null;
+
+async function fetchLiveStandings() {
+  // محاولة أولى: worldcup26.ir (مجاني 100% بدون key)
+  try {
+    const groups = await fetchWC26Groups();
+    if(groups && groups.length) {
+      const built = {};
+      for(const g of groups) {
+        const grpName = g.name || g.group || g.group_name || '';
+        const teams = g.teams || g.standings || g.table || [];
+        if(!grpName || !teams.length) continue;
+        const mapped = teams.map(t => ({
+          team:   t.team?.name || t.name || t.team_name || '',
+          played: t.played ?? t.played_games ?? t.mp ?? 0,
+          w:      t.won   ?? t.wins   ?? t.w ?? 0,
+          d:      t.draw  ?? t.draws  ?? t.d ?? 0,
+          l:      t.lost  ?? t.losses ?? t.l ?? 0,
+          gf:     t.goals_for    ?? t.gf ?? t.goalsFor    ?? 0,
+          ga:     t.goals_against ?? t.ga ?? t.goalsAgainst ?? 0,
+          pts:    t.points ?? t.pts ?? 0,
+        })).filter(t => t.team);
+        if(mapped.length) built[grpName] = mapped;
+      }
+      if(Object.keys(built).length) {
+        LIVE_STANDINGS = built;
+        return 'wc26';
+      }
+    }
+  } catch{}
+  // محاولة ثانية: Worker (football-data.org)
+  try {
+    const r = await fetch(`${PROXY}/fd/standings`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    if(d.standings) {
+      LIVE_STANDINGS = {};
+      for(const s of d.standings) {
+        const grpName = s.group ? s.group.replace('GROUP_','Group ') : null;
+        if(!grpName || s.type !== 'TOTAL') continue;
+        LIVE_STANDINGS[grpName] = s.table.map(row=>({
+          team: row.team.name, played: row.playedGames,
+          w: row.won, d: row.draw, l: row.lost,
+          gf: row.goalsFor, ga: row.goalsAgainst, pts: row.points
+        }));
+      }
+      return 'fd';
+    }
+  } catch{}
+  return false;
+}
+
+async function fetchLiveScorers() {
+  // محاولة أولى: worldcup26.ir/get/games — نحسب الهدافين من بيانات المباريات
+  try {
+    const games = await fetchWC26Games();
+    if(games && games.length) {
+      const scorerMap = {};
+      for(const g of games) {
+        const allGoals = [
+          ...(g.home_scorers || g.home_team?.scorers || []).map(s => ({...s, teamName: g.home_team?.name || g.home?.name || ''})),
+          ...(g.away_scorers || g.away_team?.scorers || []).map(s => ({...s, teamName: g.away_team?.name || g.away?.name || ''})),
+          ...(g.goals || []).map(s => ({...s, teamName: s.team?.name || ''})),
+        ];
+        for(const sc of allGoals) {
+          const name = sc.name || sc.player?.name || sc.scorer?.name || sc.player_name || '';
+          if(!name) continue;
+          const team = sc.teamName || sc.team?.name || '';
+          if(!scorerMap[name]) scorerMap[name] = {player:{name}, team:{name:team}, goals:0, playedMatches:0};
+          scorerMap[name].goals += (sc.goals || 1);
+        }
+      }
+      const scorers = Object.values(scorerMap).sort((a,b) => b.goals - a.goals);
+      if(scorers.length) { LIVE_SCORERS = scorers; return true; }
+    }
+  } catch{}
+  // محاولة ثانية: Worker (football-data.org)
+  try {
+    const r = await fetch(`${PROXY}/fd/scorers`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    if(d.scorers && d.scorers.length) {
+      LIVE_SCORERS = d.scorers;
+      return true;
+    }
+  } catch{}
+  return false;
+}
+
+// ══ RENDER STANDINGS ══
+async function renderStandings() {
+  const section = document.getElementById('standingsSection');
+  section.innerHTML = '<div class="standings-loading">𓂀 جاري جلب الترتيب...</div>';
+
+  // إذا لم تكتمل LIVE_SCORES بعد، اجلبها الآن
+  if(!LIVE_SCORES_READY) {
+    await fetchLiveScores();
+  }
+
+  // حاول أولاً worldcup26.ir للحصول على ترتيب حي
+  const gotLive = await fetchLiveStandings();
+
+  let groups;
+  let sourceLabel;
+
+  if(gotLive && LIVE_STANDINGS && Object.keys(LIVE_STANDINGS).length) {
+    groups = LIVE_STANDINGS;
+    sourceLabel = gotLive === 'wc26'
+      ? '📡 المصدر: worldcup26.ir (مباشر)'
+      : '📡 المصدر: football-data.org (مباشر)';
+  } else {
+    // احسب الترتيب من نتائج المباريات المجلوبة
+    groups = computeStandingsFromResults();
+    const hasResults = Object.values(groups).some(g=>g.some(t=>t.played>0));
+    sourceLabel = hasResults
+      ? '📡 محسوب من نتائج المباريات'
+      : '📡 البطولة لم تبدأ بعد — الترتيب الأولي';
+  }
+
+  let html = `<div style="font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px">${sourceLabel}</div>`;
+  for(const[grpName,rows] of Object.entries(groups)) {
+    const sorted=[...rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+    html+=`<div class="group-standings">
+      <div class="group-title">🏟️ ${grpName}</div>
+      <table class="standings-table">
+        <thead><tr>
+          <th>#</th><th style="text-align:right;padding-right:8px">المنتخب</th>
+          <th>ل</th><th>ف</th><th>ت</th><th>خ</th>
+          <th>له</th><th>عليه</th><th>الفارق</th>
+          <th style="color:var(--gold-light)">ن</th>
+        </tr></thead>
+        <tbody>`;
+    sorted.forEach((r,i)=>{
+      const gd=r.gf-r.ga;
+      const q=(i<2)?'qualified':'';
+      html+=`<tr class="${q}">
+        <td><span class="rank-num rank-${i<3?i+1:'other'}">${i+1}</span></td>
+        <td><div class="team-cell">${getSmallFlag(r.team)}<span>${r.team}</span></div></td>
+        <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+        <td>${r.gf}</td><td>${r.ga}</td>
+        <td style="color:${gd>0?'var(--green-light)':gd<0?'#cc5533':'var(--muted)'}">${gd>0?'+':''}${gd}</td>
+        <td class="pts-cell">${r.pts}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;padding:2px 4px;">
+        <span style="border-right:3px solid var(--green-light);padding-right:4px;margin-right:4px;">يتأهل</span>
+        ل=لعب · ف=فوز · ت=تعادل · خ=خسارة · ن=نقاط
+      </div>
+    </div>`;
+  }
+  section.innerHTML = html;
+}
+
+// ══ RENDER SCORERS ══
+async function renderScorers() {
+  const section = document.getElementById('scorersSection');
+  section.innerHTML = '<div class="standings-loading">⚽ جاري جلب الهدافين...</div>';
+
+  if(!LIVE_SCORES_READY) await fetchLiveScores();
+
+  // المصدر ١: SCORER_TOTALS المجمّعة من ESPN events (الأدق)
+  let finalScorers = [];
+  if(Object.keys(SCORER_TOTALS).length) {
+    finalScorers = Object.entries(SCORER_TOTALS)
+      .map(([name,data]) => ({player:{name}, team:{name:data.team}, goals:data.goals}))
+      .sort((a,b) => b.goals - a.goals);
+  }
+
+  // المصدر ٢: GOAL_EVENTS إذا SCORER_TOTALS فاضية
+  if(!finalScorers.length) {
+    const scorerMap = {};
+    for(const [key, goals] of Object.entries(GOAL_EVENTS)) {
+      for(const g of goals) {
+        if(g.type === 'OWN_GOAL') continue;
+        const name = g.scorer?.name || '';
+        if(!name) continue;
+        const team = g.team?.name || '';
+        if(!scorerMap[name]) scorerMap[name] = {player:{name}, team:{name:team}, goals:0};
+        scorerMap[name].goals++;
+      }
+    }
+    finalScorers = Object.values(scorerMap).sort((a,b) => b.goals - a.goals);
+  }
+
+  // المصدر ٣: LIVE_SCORES.goals (football-data.org)
+  if(!finalScorers.length) {
+    const gotLive = await fetchLiveScorers();
+    if(gotLive && LIVE_SCORERS?.length) {
+      finalScorers = LIVE_SCORERS;
+    }
+  }
+
+  // المصدر ٤: احسب من LIVE_SCORES محلياً
+  if(!finalScorers.length) {
+    const scorerMap = {};
+    for(const m of MATCHES) {
+      const [t1,t2] = getTeamNames(m.summary);
+      const k1=t1+t2, k2=t2+t1;
+      const ld = LIVE_SCORES[k1] || LIVE_SCORES[k2];
+      if(!ld?.goals?.length) continue;
+      for(const g of ld.goals) {
+        const name = g.scorer?.name || g.player?.name || '';
+        if(!name || g.type === 'OWN_GOAL') continue;
+        const team = g.team?.name || '';
+        if(!scorerMap[name]) scorerMap[name] = {player:{name}, team:{name:team}, goals:0};
+        scorerMap[name].goals++;
+      }
+    }
+    finalScorers = Object.values(scorerMap).sort((a,b) => b.goals - a.goals);
+  }
+
+  if(!finalScorers.length) {
+    section.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted)">
+      <div style="font-size:40px;margin-bottom:12px">⚽</div>
+      <div style="font-size:14px;color:var(--gold)">لا توجد أهداف مسجلة بعد</div>
+      <div style="font-size:12px;margin-top:8px">ستظهر قائمة الهدافين فور تسجيل أول هدف</div>
+    </div>`;
+    return;
+  }
+
+  let html = `<div style="font-size:10px;color:var(--muted);text-align:center;padding:4px 0 12px">⚽ الهدافون — كأس العالم 2026</div>
+  <table class="standings-table" style="width:100%">
+    <thead><tr>
+      <th>#</th>
+      <th style="text-align:right;padding-right:8px">اللاعب</th>
+      <th style="text-align:right;padding-right:8px">المنتخب</th>
+      <th style="color:var(--gold-light)">⚽</th>
+    </tr></thead>
+    <tbody>`;
+  finalScorers.slice(0,25).forEach((s,i)=>{
+    const goals = s.goals ?? 0;
+    const playerName = s.player?.name ?? s.name ?? '—';
+    const teamName = s.team?.name ?? '—';
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    // شريط مرئي بعدد الأهداف
+    const maxGoals = finalScorers[0]?.goals || 1;
+    const pct = Math.round((goals/maxGoals)*100);
+    html+=`<tr>
+      <td style="width:32px"><span class="rank-num rank-${i<3?i+1:'other'}">${i+1}</span></td>
+      <td style="text-align:right;padding-right:8px">
+        <div style="font-weight:700;color:var(--text);font-size:13px">${medal} ${playerName}</div>
+      </td>
+      <td style="text-align:right;padding-right:8px">
+        <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+          ${getSmallFlag(teamName)}
+          <span style="font-size:10px;color:var(--muted)">${teamName}</span>
+        </div>
+      </td>
+      <td style="text-align:center;min-width:80px">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+          <div style="background:var(--card-border);border-radius:4px;height:6px;width:50px;overflow:hidden">
+            <div style="background:var(--gold);height:100%;width:${pct}%;border-radius:4px"></div>
+          </div>
+          <span style="font-size:20px;font-weight:900;color:var(--gold);font-family:'Amiri',serif;min-width:20px">${goals}</span>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  section.innerHTML = html;
+}
+
 // ══ INIT ══
 async function init() {
   if('serviceWorker'in navigator){
@@ -1571,6 +2020,10 @@ async function init() {
   await fetchLiveScores();
   renderToday();
   renderAll();
+  // بعد اكتمال الجلب، إذا كان تبويب الترتيب أو الهدافين مفتوحاً أعد رسمه
+  const openTab = document.querySelector('.tab-section.active')?.id;
+  if(openTab === 'tab-standings') renderStandings();
+  if(openTab === 'tab-scorers') renderScorers();
 
   setInterval(async()=>{
     await fetchLiveScores();
