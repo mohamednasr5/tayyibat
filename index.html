@@ -1,4 +1,4 @@
-<!DOCTYPE html>ؤ
+<!DOCTYPE html>
 <html lang="ar" dir="rtl" prefix="og: https://ogp.me/ns#">
 <head>
 <meta charset="UTF-8">
@@ -1895,6 +1895,76 @@ window.geminiSend = window.geminiSend || function() {};
         <span style="font-size:.68rem;color:var(--txt3)">ابحث بأي كلمة أو جملة</span>
         <span style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:#fbbf24;font-size:.62rem;padding:2px 8px;border-radius:20px;font-weight:700">مجاني دائماً ✨</span>
       </button>
+      <!-- بطاقة كأس العالم 2026 -->
+      <button onclick="window.open('https://mohamednasr5.github.io/wcap2026','_blank')" class="smart-tool-btn" id="wc2026-tool-card" style="grid-column:1/-1;border-color:rgba(255,200,0,.7);background:linear-gradient(135deg,rgba(13,27,62,.95),rgba(26,10,62,.95),rgba(45,10,46,.95));border-width:2px;position:relative;overflow:hidden;padding:14px 12px;">
+        <!-- شريط متحرك علوي -->
+        <div style="position:absolute;top:0;right:0;left:0;height:3px;background:linear-gradient(90deg,#ffd700,#ff8c00,#ff4444,#a855f7,#3b82f6,#ffd700);background-size:300% 100%;animation:gradShift 2s linear infinite"></div>
+        <!-- نجوم خلفية -->
+        <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+          <div style="position:absolute;width:3px;height:3px;border-radius:50%;background:#ffd700;top:20%;left:10%;animation:twk 2.1s ease-in-out infinite;opacity:.7"></div>
+          <div style="position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;top:60%;left:25%;animation:twk 3s ease-in-out infinite .5s;opacity:.5"></div>
+          <div style="position:absolute;width:2px;height:2px;border-radius:50%;background:#ff8c00;top:30%;left:85%;animation:twk 2.5s ease-in-out infinite 1s;opacity:.6"></div>
+          <div style="position:absolute;width:3px;height:3px;border-radius:50%;background:#a855f7;top:70%;left:75%;animation:twk 1.8s ease-in-out infinite .3s;opacity:.6"></div>
+          <div style="position:absolute;width:2px;height:2px;border-radius:50%;background:#ffd700;top:50%;left:50%;animation:twk 2.8s ease-in-out infinite .8s;opacity:.5"></div>
+        </div>
+        <style>@keyframes twk{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.8)}}</style>
+        <!-- محتوى البطاقة -->
+        <div style="display:flex;align-items:center;gap:12px;width:100%;position:relative;z-index:2;">
+          <!-- الكأس المتحرك -->
+          <div style="font-size:2.2rem;filter:drop-shadow(0 0 12px rgba(255,200,0,.9));animation:trophyBob 2s ease-in-out infinite;flex-shrink:0;">🏆</div>
+          <style>@keyframes trophyBob{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.12) rotate(3deg)}}</style>
+          <!-- النصوص -->
+          <div style="flex:1;text-align:right;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+              <span style="font-size:.95rem;font-weight:900;background:linear-gradient(135deg,#ffd700,#ff8c00,#ff4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">⚽ كأس العالم 2026</span>
+              <span style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;font-size:.6rem;font-weight:900;padding:2px 8px;border-radius:20px;-webkit-text-fill-color:#0a0e1a;">FIFA WORLD CUP</span>
+            </div>
+            <div style="font-size:.7rem;color:rgba(255,255,255,.6);margin-bottom:6px;">🇺🇸 الولايات المتحدة &nbsp;🇨🇦 كندا &nbsp;🇲🇽 المكسيك — 48 منتخباً</div>
+            <!-- عداد تنازلي مصغر -->
+            <div style="display:flex;gap:6px;align-items:center;" id="wc-mini-cd">
+              <div style="background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);border-radius:8px;padding:3px 8px;text-align:center;">
+                <span style="font-size:.8rem;font-weight:900;color:#ffd700;" id="wc-d">--</span>
+                <span style="font-size:.55rem;color:rgba(255,255,255,.4);display:block;line-height:1;">يوم</span>
+              </div>
+              <div style="background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);border-radius:8px;padding:3px 8px;text-align:center;">
+                <span style="font-size:.8rem;font-weight:900;color:#ff8c00;" id="wc-h">--</span>
+                <span style="font-size:.55rem;color:rgba(255,255,255,.4);display:block;line-height:1;">ساعة</span>
+              </div>
+              <div style="background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);border-radius:8px;padding:3px 8px;text-align:center;">
+                <span style="font-size:.8rem;font-weight:900;color:#ff4444;" id="wc-m">--</span>
+                <span style="font-size:.55rem;color:rgba(255,255,255,.4);display:block;line-height:1;">دقيقة</span>
+              </div>
+              <div style="background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);border-radius:8px;padding:3px 8px;text-align:center;">
+                <span style="font-size:.8rem;font-weight:900;color:#a855f7;" id="wc-s">--</span>
+                <span style="font-size:.55rem;color:rgba(255,255,255,.4);display:block;line-height:1;">ثانية</span>
+              </div>
+            </div>
+          </div>
+          <!-- سهم الانتقال -->
+          <div style="font-size:1.3rem;color:rgba(255,200,0,.8);flex-shrink:0;animation:arrowPulse 1.5s ease-in-out infinite;">←</div>
+          <style>@keyframes arrowPulse{0%,100%{transform:translateX(0);opacity:.6}50%{transform:translateX(-5px);opacity:1}}</style>
+        </div>
+        <!-- شريط سفلي -->
+        <div style="position:absolute;bottom:0;right:0;left:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,200,0,.5),transparent);animation:scanLine 2s linear infinite"></div>
+        <style>@keyframes scanLine{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+      </button>
+      <script>
+        (function(){
+          function wcUpdateCD(){
+            var t=new Date('2026-06-11T00:00:00Z')-new Date();
+            if(t<=0){['wc-d','wc-h','wc-m','wc-s'].forEach(function(i){var el=document.getElementById(i);if(el)el.textContent='00';});return;}
+            var d=Math.floor(t/864e5),h=Math.floor((t%864e5)/36e5),m=Math.floor((t%36e5)/6e4),s=Math.floor((t%6e4)/1e3);
+            var el;
+            el=document.getElementById('wc-d');if(el)el.textContent=String(d).padStart(2,'0');
+            el=document.getElementById('wc-h');if(el)el.textContent=String(h).padStart(2,'0');
+            el=document.getElementById('wc-m');if(el)el.textContent=String(m).padStart(2,'0');
+            el=document.getElementById('wc-s');if(el)el.textContent=String(s).padStart(2,'0');
+          }
+          wcUpdateCD();
+          setInterval(wcUpdateCD,1000);
+        })();
+      </script>
+
       <button onclick="goSmartTool('emergency')" class="smart-tool-btn" style="grid-column:1/-1;border-color:rgba(244,67,54,.8);background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(229,57,53,.1));border-width:2px;">
         <i class="fas fa-ambulance" style="font-size:1.4rem;color:#f44336"></i>
         <span style="color:#f44336;font-size:.95rem;font-weight:900">🚨 الطوارئ السريعة</span>
