@@ -1,0 +1,2649 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ كأس العالم 2026 - النسخة الفرعونية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-dark: #8B6914;
+  --papyrus: #1A1208;
+  --papyrus-mid: #221A0A;
+  --papyrus-light: #2E2210;
+  --hieroglyph: #3D2E08;
+  --red-live: #CC3300;
+  --green: #2D6A4F;
+  --green-light: #52B788;
+  --nile: #0A2D4A;
+  --lapis: #1E3A5F;
+  --text: #F5E6C8;
+  --muted: #9A8060;
+  --card-bg: #1C1408;
+  --card-border: #4A3510;
+  --border-gold: #6B4E1A;
+  --scarab: #2A4A2A;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--papyrus);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ══ ANIMATED BACKGROUND ══ */
+.bg-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.bg-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(30,58,95,0.08) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,168,76,0.015) 40px, rgba(201,168,76,0.015) 41px),
+    repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(201,168,76,0.015) 40px, rgba(201,168,76,0.015) 41px);
+}
+
+/* Tomb wall effect */
+.bg-pattern::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(201,168,76,0.04) 79px, rgba(201,168,76,0.04) 80px),
+    repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(201,168,76,0.04) 79px, rgba(201,168,76,0.04) 80px);
+}
+
+/* Hieroglyphic floating symbols - GLOWING TOMB STYLE */
+.hiero-float {
+  position: fixed;
+  pointer-events: none;
+  animation: floatHiero linear infinite;
+  z-index: 0;
+  font-family: serif;
+  will-change: transform, opacity;
+}
+@keyframes floatHiero {
+  0%   { transform: translateY(110vh) rotate(0deg) scale(0.8);   opacity: 0; }
+  5%   { opacity: 1; }
+  50%  { transform: translateY(50vh)  rotate(180deg) scale(1.1); }
+  95%  { opacity: 1; }
+  100% { transform: translateY(-10vh) rotate(360deg) scale(0.8); opacity: 0; }
+}
+@keyframes hieroglyph-glow {
+  0%,100% { text-shadow: 0 0 6px currentColor, 0 0 12px currentColor; filter: brightness(1); }
+  50%     { text-shadow: 0 0 14px currentColor, 0 0 28px currentColor, 0 0 50px currentColor; filter: brightness(1.8); }
+}
+.hiero-float { animation: floatHiero linear infinite, hieroglyph-glow ease-in-out infinite; }
+
+/* ══ ANIMATED BALL ══ */
+.ball-orbit {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.ball-svg {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  animation: ballFly 18s linear infinite;
+  opacity: 0.12;
+  filter: drop-shadow(0 0 8px rgba(201,168,76,0.5));
+}
+@keyframes ballFly {
+  0%   { top: 10%; left: -5%; transform: rotate(0deg); }
+  20%  { top: 70%; left: 25%; transform: rotate(144deg); }
+  40%  { top: 20%; left: 55%; transform: rotate(288deg); }
+  60%  { top: 80%; left: 80%; transform: rotate(432deg); }
+  80%  { top: 40%; left: 110%; transform: rotate(576deg); }
+  100% { top: 10%; left: -5%; transform: rotate(720deg); }
+}
+.ball-svg2 {
+  position: absolute;
+  width: 24px; height: 24px;
+  animation: ballFly2 25s linear infinite 8s;
+  opacity: 0.08;
+}
+@keyframes ballFly2 {
+  0%   { top: 90%; left: 110%; transform: rotate(0deg); }
+  25%  { top: 30%; left: 70%; transform: rotate(180deg); }
+  50%  { top: 60%; left: 20%; transform: rotate(360deg); }
+  75%  { top: 10%; left: 50%; transform: rotate(540deg); }
+  100% { top: 90%; left: 110%; transform: rotate(720deg); }
+}
+
+/* ══ HEADER ══ */
+header {
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(180deg, #0D0900 0%, #1A1005 40%, #221508 100%);
+  border-bottom: 2px solid;
+  border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header-pyramid {
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0.04;
+}
+
+.header-inner {
+  position: relative;
+  text-align: center;
+  padding: 20px 16px 16px;
+}
+
+.header-ankh {
+  font-size: 32px;
+  display: block;
+  animation: ankh-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(201,168,76,0.6));
+  margin-bottom: 4px;
+}
+@keyframes ankh-pulse {
+  0%,100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(201,168,76,0.4)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 20px rgba(232,201,106,0.8)); }
+}
+
+.header-title {
+  font-family: 'Amiri', serif;
+  font-size: 26px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  text-shadow: none;
+  animation: shimmer-text 4s linear infinite;
+  background-size: 200% auto;
+}
+@keyframes shimmer-text {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.header-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.header-clock {
+  font-size: 13px;
+  color: var(--gold-light);
+  margin-top: 6px;
+  font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Gold ornament divider */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px 0;
+  justify-content: center;
+}
+.ornament-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dark), var(--gold), var(--gold-dark), transparent);
+  max-width: 120px;
+}
+.ornament-sym {
+  color: var(--gold);
+  font-size: 16px;
+  animation: spin-slow 8s linear infinite;
+}
+@keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* ══ TABS NAVIGATION ══ */
+.main-nav {
+  display: flex;
+  background: #110C04;
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.main-nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  flex: 0 0 auto;
+  padding: 12px 20px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+  position: relative;
+}
+.nav-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  background: linear-gradient(180deg, transparent, rgba(201,168,76,0.06));
+}
+.nav-btn:hover { color: var(--gold-light); }
+
+/* ══ FILTER BAR ══ */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 14px;
+  scrollbar-width: none;
+  background: #0D0900;
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 106px;
+  z-index: 40;
+}
+
+/* ══ RED CARD STYLES ══ */
+.red-card-zone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.red-card-single {
+  display: inline-block;
+  animation: redCardAppear 0.5s cubic-bezier(.175,.885,.32,1.275) both;
+  filter: drop-shadow(0 0 6px rgba(204,51,0,0.8));
+}
+@keyframes redCardAppear {
+  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+  70%  { transform: scale(1.15) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.red-card-player {
+  font-size: 9px;
+  color: #ff6644;
+  text-align: center;
+  font-weight: 700;
+  max-width: 80px;
+  line-height: 1.1;
+}
+
+/* ══ MULTI RED CARD 3D SVG ══ */
+.multi-red-scene {
+  perspective: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 5px;
+}
+.multi-red-card {
+  animation: multiCardSpin3D 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(204,51,0,0.9));
+  transform-style: preserve-3d;
+}
+.multi-red-card:nth-child(1) { animation-delay: 0s; }
+.multi-red-card:nth-child(2) { animation-delay: 0.2s; }
+.multi-red-card:nth-child(3) { animation-delay: 0.4s; }
+@keyframes multiCardSpin3D {
+  0%   { transform: rotateY(0deg) rotateX(0deg) scale(1); }
+  20%  { transform: rotateY(-30deg) rotateX(10deg) scale(1.1); }
+  50%  { transform: rotateY(15deg) rotateX(-5deg) scale(0.95); filter: drop-shadow(0 6px 20px rgba(255,0,0,1)); }
+  80%  { transform: rotateY(-10deg) rotateX(8deg) scale(1.05); }
+  100% { transform: rotateY(0deg) rotateX(0deg) scale(1); }
+}
+
+/* ══ GOAL FLASH ANIMATION ══ */
+@keyframes goalFlash {
+  0%,100% { background: linear-gradient(135deg,#1C1408,#221A0A,#1C1408); }
+  15%     { background: linear-gradient(135deg,#1a2e0a,#2d5010,#1a2e0a); box-shadow: 0 0 30px rgba(82,183,136,0.5); }
+  30%     { background: linear-gradient(135deg,#1C1408,#221A0A,#1C1408); }
+  45%     { background: linear-gradient(135deg,#1a2e0a,#2d5010,#1a2e0a); box-shadow: 0 0 30px rgba(82,183,136,0.5); }
+}
+.match-card.goal-flash {
+  animation: goalFlash 1.2s ease-in-out, pharaoh-pulse 2.5s infinite 1.2s;
+  border-color: var(--green-light) !important;
+}
+.goal-notification {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg,#1a4a1a,#2d8a2d);
+  border: 1.5px solid var(--green-light);
+  color: var(--green-light);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  animation: goalNotifPop 3s ease-in-out forwards;
+  pointer-events: none;
+  z-index: 5;
+  font-family: 'Cairo',sans-serif;
+}
+@keyframes goalNotifPop {
+  0%   { transform: translateX(-50%) scale(0) translateY(-10px); opacity:0; }
+  10%  { transform: translateX(-50%) scale(1.1) translateY(0); opacity:1; }
+  20%  { transform: translateX(-50%) scale(1) translateY(0); opacity:1; }
+  80%  { transform: translateX(-50%) scale(1) translateY(0); opacity:1; }
+  100% { transform: translateX(-50%) scale(0.8) translateY(-8px); opacity:0; }
+}
+
+/* ══ LIVE PULSE DOT ══ */
+.live-dot-score {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: #ff4444;
+  border-radius: 50%;
+  animation: liveDotPulse 1s infinite;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+@keyframes liveDotPulse {
+  0%,100% { transform: scale(1); opacity:1; box-shadow: 0 0 0 0 rgba(255,68,68,0.7); }
+  50% { transform: scale(1.3); opacity:0.8; box-shadow: 0 0 0 5px rgba(255,68,68,0); }
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-family: 'Cairo', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s;
+}
+.filter-btn.active {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #0D0900;
+  font-weight: 700;
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(201,168,76,0.3);
+}
+
+/* ══ SECTION WRAPPER ══ */
+.tab-section { display: none; }
+.tab-section.active { display: block; }
+
+/* ══ API STATUS ══ */
+.api-status-bar {
+  display: flex;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #080602;
+  border-bottom: 1px solid var(--card-border);
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 10px;
+}
+.api-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.api-badge.ok   { background: #0d2010; color: #52B788; border: 1px solid #1a4a20; }
+.api-badge.fail { background: #2a0a0a; color: #f44336; border: 1px solid #4a1010; }
+.api-badge.wait { background: #1a1508; color: #C9A84C; border: 1px solid #3a2e08; }
+.api-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.api-label { color: var(--muted); font-size: 10px; }
+
+/* ══ TODAY SECTION ══ */
+.today-section {
+  background: linear-gradient(180deg, #110C04 0%, #1A1208 100%);
+  border-bottom: 1px solid var(--card-border);
+  padding: 14px 14px 18px;
+}
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+.section-title::before {
+  content: '';
+  width: 3px;
+  height: 18px;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold-dark));
+  border-radius: 2px;
+}
+.no-today {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+/* ══ MATCH CARD ══ */
+.match-card {
+  background: linear-gradient(135deg, #1C1408 0%, #221A0A 50%, #1C1408 100%);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 14px 16px 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.match-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.match-card:hover {
+  border-color: var(--gold-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201,168,76,0.12);
+}
+.match-card:hover::before { opacity: 1; }
+
+.match-card.live {
+  border-color: var(--red-live);
+  animation: pharaoh-pulse 2.5s infinite;
+}
+@keyframes pharaoh-pulse {
+  0%,100% { border-color: var(--red-live); box-shadow: 0 0 0 0 rgba(204,51,0,0); }
+  50% { border-color: #FF5533; box-shadow: 0 0 20px 4px rgba(204,51,0,0.25); }
+}
+
+.match-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+.stage-badge {
+  background: linear-gradient(135deg, #2A1C06, #3D2A0A);
+  border: 1px solid var(--gold-dark);
+  color: var(--gold);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.group-badge {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ══ COUNTDOWN ══ */
+.countdown-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+.countdown-unit {
+  background: rgba(201,168,76,0.1);
+  border: 1px solid var(--gold-dark);
+  border-radius: 8px;
+  padding: 4px 8px;
+  text-align: center;
+  min-width: 44px;
+}
+.countdown-num {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--gold);
+  display: block;
+  line-height: 1;
+  font-family: 'Amiri', serif;
+}
+.countdown-lbl {
+  font-size: 9px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+.countdown-expired { color: var(--green-light); font-size: 12px; text-align: center; padding: 6px 0; }
+
+/* ══ TEAMS ══ */
+.match-teams {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+.team {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.team-flag-wrap { display: flex; justify-content: center; margin-bottom: 6px; }
+.team-flag-img {
+  width: 48px;
+  height: 32px;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid rgba(201,168,76,0.3);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.4);
+  transition: transform 0.2s;
+  display: block;
+}
+.match-card:hover .team-flag-img { transform: scale(1.05); }
+.team-flag-emoji { font-size: 32px; display: block; text-align: center; margin-bottom: 4px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7)); }
+.team-name-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 90px;
+  word-break: break-word;
+}
+/* Goals under team flag */
+.team-scorers {
+  margin-top: 5px;
+  font-size: 9.5px;
+  color: var(--gold);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 100px;
+}
+.team-scorers .scorer-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.scorer-name { color: var(--gold-light); font-weight: 600; }
+.scorer-min  { color: var(--muted); font-size: 8.5px; }
+.scorer-type { font-size: 8px; color: #ff9800; }
+
+.score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 76px;
+  padding-top: 4px;
+}
+.score {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 4px;
+  line-height: 1;
+  font-family: 'Amiri', serif;
+  text-shadow: 0 0 24px rgba(201,168,76,0.5);
+}
+.score.not-started { font-size: 15px; color: var(--green-light); font-family: 'Cairo', sans-serif; letter-spacing:0; }
+.vs-text { font-size: 14px; color: var(--muted); font-weight: 700; }
+
+.live-badge {
+  background: var(--red-live);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 4px;
+  animation: blink 1.2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+.finished-badge {
+  background: rgba(255,255,255,0.06);
+  color: #777;
+  font-size: 9px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 4px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.time-badge { color: var(--green-light); font-size: 13px; font-weight: 700; margin-top: 4px; }
+
+.match-footer {
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px solid rgba(201,168,76,0.1);
+  padding-top: 8px;
+}
+
+/* ══ TV CHANNELS ══ */
+.tv-channels {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tv-chip {
+  background: linear-gradient(135deg, #0D2A1A, #1A4A2A);
+  border: 1px solid #2D6A4F;
+  color: var(--green-light);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.tv-chip::before { content: '📺'; font-size: 9px; }
+
+/* ══ GOALS DISPLAY (inline under flag, see .team-scorers) ══ */
+.goals-display { display: none; } /* legacy hidden */
+.goal-item { color: var(--gold); font-size: 10px; }
+.goal-item span { color: var(--muted); font-size: 9px; }
+
+/* ══ DETAILS PANEL ══ */
+.details-panel {
+  display: none;
+  background: #110C04;
+  border-top: 1px solid var(--card-border);
+  margin-top: 12px;
+  padding-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  border-radius: 0 0 12px 12px;
+}
+.details-panel.open { display: block; }
+
+.event-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+}
+.event-min { color: var(--gold); font-weight: 700; min-width: 30px; }
+
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: 11px;
+}
+.stats-bar-wrap {
+  flex: 1;
+  background: #1A1408;
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+.stats-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--green-light);
+}
+.stats-bar.home {
+  float: right;
+  background: var(--gold);
+}
+.stats-label { color: var(--muted); font-size: 10px; min-width: 70px; text-align: center; }
+.stats-val { color: var(--text); font-weight: 700; min-width: 24px; text-align: center; }
+
+.detail-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.dtab {
+  background: #1A1408;
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-family: 'Cairo', sans-serif;
+  cursor: pointer;
+}
+.dtab.active {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #0D0900;
+  font-weight: 700;
+  border-color: var(--gold);
+}
+.dtab-content { display: none; }
+.dtab-content.open { display: block; }
+.api-source-tag { font-size: 9px; color: #3A2808; margin-top: 8px; padding: 4px 0; border-top: 1px solid rgba(201,168,76,0.1); }
+
+/* ══ ALL MATCHES ══ */
+.all-section { padding: 14px; }
+.stage-group { margin-bottom: 28px; }
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid;
+  border-image: linear-gradient(90deg, var(--gold-dark), transparent) 1;
+}
+.stage-icon { font-size: 22px; }
+.stage-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--gold);
+  font-family: 'Amiri', serif;
+}
+.stage-count { color: var(--muted); font-size: 12px; }
+
+/* ══ STANDINGS TABLE ══ */
+.standings-section { padding: 14px; }
+.group-standings { margin-bottom: 24px; }
+.group-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #1A1208, #221A0A);
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+}
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  font-size: 12px;
+}
+.standings-table th {
+  background: linear-gradient(135deg, #2A1E06, #3D2A08);
+  color: var(--gold);
+  padding: 8px 6px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--gold-dark);
+}
+.standings-table th:first-child { text-align: right; padding-right: 10px; }
+.standings-table td {
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,168,76,0.06);
+  color: var(--text);
+}
+.standings-table td:first-child { text-align: right; }
+.standings-table tr:last-child td { border-bottom: none; }
+.standings-table tr:hover td { background: rgba(201,168,76,0.04); }
+.rank-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+.rank-1 { background: var(--gold); color: #0D0900; }
+.rank-2 { background: #C0C0C0; color: #0D0900; }
+.rank-3 { background: #CD7F32; color: #0D0900; }
+.rank-other { background: var(--hieroglyph); color: var(--muted); border: 1px solid var(--card-border); }
+.qualified { border-right: 3px solid var(--green-light); }
+.pts-cell { color: var(--gold); font-weight: 900; font-size: 14px; }
+.team-cell { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.small-flag {
+  width: 24px;
+  height: 16px;
+  border-radius: 3px;
+  object-fit: cover;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+.standings-loading { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+/* ══ SCROLL TOP ══ */
+.scroll-top {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #0D0900;
+  border: none;
+  border-radius: 50%;
+  width: 46px; height: 46px;
+  font-size: 20px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+  z-index: 200;
+  font-weight: 900;
+}
+.scroll-top.visible { display: flex; }
+
+/* ══ FOOTER ══ */
+footer {
+  text-align: center;
+  padding: 24px 16px 40px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--card-border);
+  line-height: 2.2;
+  position: relative;
+  z-index: 2;
+}
+footer .gold { color: var(--gold); }
+footer .pharaoh-line {
+  font-size: 20px;
+  letter-spacing: 12px;
+  opacity: 0.4;
+  display: block;
+  margin: 8px 0;
+}
+
+/* ══ TAYYIBAT BANNER ══ */
+.tayyibat-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, #1a0a00 0%, #3d1f00 50%, #1a0a00 100%);
+  border-top: 2px solid #f5a623;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  box-shadow: 0 -4px 20px rgba(245,166,35,0.3);
+}
+.tayyibat-banner-try {
+  background: linear-gradient(135deg, #f5a623, #e08c00);
+  color: #1a0a00;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Cairo', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.tayyibat-banner-close {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(245,166,35,0.3);
+  color: #f5a623;
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Cairo', sans-serif;
+}
+.tayyibat-banner-text strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f5a623;
+}
+.tayyibat-banner-text span { font-size: 11px; color: #c9a714; opacity: 0.85; }
+
+/* ══ EMPTY STATE ══ */
+.pharaoh-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.pharaoh-empty .eye { font-size: 48px; opacity: 0.3; display: block; margin-bottom: 10px; }
+
+/* ══ ANIMATED BALL SVG ══ */
+.animated-ball {
+  width: 36px; height: 36px;
+}
+</style>
+</head>
+<body>
+
+<!-- Glowing Pharaonic Background -->
+<div class="bg-pattern"></div>
+<!-- Glowing hieroglyphs rising like tomb spirits -->
+<div class="hiero-float" style="left:3%;font-size:34px;color:#C9A84C;animation-duration:22s,4.1s;animation-delay:0s,0s;">𓂀</div>
+<div class="hiero-float" style="left:10%;font-size:20px;color:#E8C96A;animation-duration:31s,3.7s;animation-delay:3s,1s;">𓃭</div>
+<div class="hiero-float" style="left:18%;font-size:28px;color:#C9A84C;animation-duration:26s,5.2s;animation-delay:7s,2s;">𓆙</div>
+<div class="hiero-float" style="left:25%;font-size:16px;color:#8B6914;animation-duration:38s,3.0s;animation-delay:1s,0.5s;">𓋴</div>
+<div class="hiero-float" style="left:33%;font-size:30px;color:#E8C96A;animation-duration:20s,4.8s;animation-delay:11s,1.5s;">𓂧</div>
+<div class="hiero-float" style="left:42%;font-size:22px;color:#C9A84C;animation-duration:29s,3.3s;animation-delay:5s,0.8s;">𓊃</div>
+<div class="hiero-float" style="left:50%;font-size:36px;color:#8B6914;animation-duration:34s,6.0s;animation-delay:14s,3s;">𓋹</div>
+<div class="hiero-float" style="left:58%;font-size:18px;color:#E8C96A;animation-duration:24s,4.4s;animation-delay:2s,2.2s;">𓁿</div>
+<div class="hiero-float" style="left:66%;font-size:26px;color:#C9A84C;animation-duration:41s,3.8s;animation-delay:9s,1.1s;">𓃀</div>
+<div class="hiero-float" style="left:73%;font-size:32px;color:#8B6914;animation-duration:27s,5.5s;animation-delay:6s,0.3s;">𓆣</div>
+<div class="hiero-float" style="left:81%;font-size:19px;color:#E8C96A;animation-duration:33s,4.0s;animation-delay:16s,2.7s;">𓂸</div>
+<div class="hiero-float" style="left:88%;font-size:30px;color:#C9A84C;animation-duration:21s,4.6s;animation-delay:4s,1.8s;">𓅓</div>
+<div class="hiero-float" style="left:95%;font-size:24px;color:#8B6914;animation-duration:36s,3.5s;animation-delay:12s,0.6s;">𓆑</div>
+<!-- Second wave offset -->
+<div class="hiero-float" style="left:7%;font-size:15px;color:#C9A84C;animation-duration:45s,5.0s;animation-delay:18s,3.5s;">𓇋</div>
+<div class="hiero-float" style="left:47%;font-size:38px;color:#E8C96A;animation-duration:28s,4.2s;animation-delay:20s,0.9s;">𓀭</div>
+<div class="hiero-float" style="left:62%;font-size:21px;color:#C9A84C;animation-duration:32s,3.9s;animation-delay:8s,2.4s;">𓊹</div>
+
+<!-- Animated Ball -->
+<div class="ball-orbit">
+  <svg class="ball-svg" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="18" cy="18" r="17" fill="#C9A84C" stroke="#8B6914" stroke-width="1.5"/>
+    <circle cx="18" cy="18" r="17" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.5"/>
+    <polygon points="18,6 20,14 28,14 22,19 24,27 18,22 12,27 14,19 8,14 16,14" fill="rgba(0,0,0,0.4)"/>
+    <circle cx="18" cy="18" r="6" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+  </svg>
+  <svg class="ball-svg ball-svg2" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="18" cy="18" r="17" fill="#E8C96A" stroke="#C9A84C" stroke-width="1.5"/>
+    <polygon points="18,6 20,14 28,14 22,19 24,27 18,22 12,27 14,19 8,14 16,14" fill="rgba(0,0,0,0.35)"/>
+  </svg>
+</div>
+
+<!-- HEADER -->
+<header>
+  <svg class="header-pyramid" viewBox="0 0 400 80" preserveAspectRatio="none">
+    <polygon points="200,0 0,80 400,80" fill="white"/>
+  </svg>
+  <div class="header-inner">
+    <span class="header-ankh">𓋹</span>
+    <h1 class="header-title">🏆 كأس العالم FIFA 2026 🏆</h1>
+    <div class="header-sub">104 مباراة · 48 منتخب · USA · Canada · Mexico</div>
+    <div class="header-clock" id="headerClock"></div>
+  </div>
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <span class="ornament-sym">✦</span>
+    <div class="ornament-line" style="max-width:40px;"></div>
+    <span style="color:var(--gold);font-size:12px;">⚽</span>
+    <div class="ornament-line" style="max-width:40px;"></div>
+    <span class="ornament-sym" style="animation-direction:reverse">✦</span>
+    <div class="ornament-line"></div>
+  </div>
+</header>
+
+<!-- MAIN NAV -->
+<nav class="main-nav" id="mainNav">
+  <button class="nav-btn active" onclick="switchTab('today',this)">📅 اليوم</button>
+  <button class="nav-btn" onclick="switchTab('matches',this)">⚽ المباريات</button>
+  <button class="nav-btn" onclick="switchTab('standings',this)">📊 الترتيب</button>
+  <button class="nav-btn" onclick="switchTab('scorers',this)">⚽ الهدافون</button>
+</nav>
+
+<!-- API STATUS -->
+<div id="apiStatusBar" style="display:none">
+  <span id="api1status"></span><span id="api2status"></span><span id="api3status"></span>
+</div>
+
+<!-- ══ TAB: TODAY ══ -->
+<div class="tab-section active" id="tab-today">
+  <div class="today-section">
+    <div class="section-title">مباريات اليوم</div>
+    <div id="todayMatches"><div class="no-today">⏳ جاري التحميل...</div></div>
+  </div>
+</div>
+
+<!-- ══ TAB: MATCHES ══ -->
+<div class="tab-section" id="tab-matches">
+  <!-- SEARCH BAR -->
+  <div id="searchBarWrap" style="background:linear-gradient(180deg,#0D0900 0%,#110C04 100%);padding:10px 14px 8px;border-bottom:1px solid var(--card-border);position:sticky;top:46px;z-index:45;">
+    <div style="position:relative;display:flex;align-items:center;">
+      <span style="position:absolute;right:12px;font-size:16px;color:var(--gold);pointer-events:none;z-index:2;">🔍</span>
+      <input type="text" id="matchSearchInput" placeholder="ابحث: مصر، egypt، egy، البرازيل، fra..." oninput="onSearchInput(this.value)" autocomplete="off" style="width:100%;background:#1C1408;border:1.5px solid var(--card-border);border-radius:24px;padding:9px 40px 9px 40px;font-family:'Cairo',sans-serif;font-size:13px;color:var(--text);outline:none;direction:rtl;transition:border-color .25s,box-shadow .25s;" onfocus="this.style.borderColor='var(--gold)';this.style.boxShadow='0 0 0 3px rgba(201,168,76,0.15)'" onblur="this.style.borderColor='var(--card-border)';this.style.boxShadow='none'">
+      <button id="searchClearBtn" onclick="clearSearch()" style="position:absolute;left:10px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;display:none;line-height:1;padding:2px 4px;border-radius:50%;" title="مسح">✕</button>
+    </div>
+    <div id="searchResultsMeta" style="font-size:11px;color:var(--muted);margin-top:5px;text-align:center;min-height:16px;"></div>
+  </div>
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="filterMatches('all',event)">🌍 الكل</button>
+    <button class="filter-btn" onclick="filterMatches('Group Stage',event)">دور المجموعات</button>
+    <button class="filter-btn" onclick="filterMatches('Round of 32',event)">دور الـ32</button>
+    <button class="filter-btn" onclick="filterMatches('Round of 16',event)">دور الـ16</button>
+    <button class="filter-btn" onclick="filterMatches('Quarterfinal',event)">ربع النهائي</button>
+    <button class="filter-btn" onclick="filterMatches('Semifinal',event)">نصف النهائي</button>
+    <button class="filter-btn" onclick="filterMatches('Final',event)">النهائي 🏆</button>
+  </div>
+  <div class="all-section" id="allSection"></div>
+</div>
+
+<!-- ══ TAB: STANDINGS ══ -->
+<div class="tab-section" id="tab-standings">
+  <div class="standings-section" id="standingsSection">
+    <div class="standings-loading">𓂀 جاري تحميل جداول الترتيب من API...</div>
+  </div>
+</div>
+
+<!-- ══ TAB: SCORERS ══ -->
+<div class="tab-section" id="tab-scorers">
+  <div style="padding:14px" id="scorersSection">
+    <div class="standings-loading">⚽ جاري تحميل قائمة الهدافين...</div>
+  </div>
+</div>
+
+<footer>
+  <span class="pharaoh-line">𓂀 𓋹 ⚽ 𓋹 𓂀</span>
+  تحياتي بمشاهدة ممتعة<br>
+  <strong class="gold">مهندس محمد حماد</strong><br>
+
+</footer>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- TAYYIBAT BANNER -->
+<div class="tayyibat-banner" id="tayyibatBanner">
+  <div style="font-size:26px;flex-shrink:0">🍽️</div>
+  <div class="tayyibat-banner-text" style="flex:1;min-width:0">
+    <strong>هل جربت تطبيق طيبات الذكي؟ ✨</strong>
+    <span>اكتشف وصفات ذكية وتجربة فريدة</span>
+  </div>
+  <a class="tayyibat-banner-try" href="https://tayyibat.online/" target="_blank" rel="noopener">جرّبه 🚀</a>
+  <button class="tayyibat-banner-close" onclick="closeTayyibatBanner()">✕</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// MATCH DATA
+// ══════════════════════════════════════════════════════
+const MATCHES = [{"id":0,"summary":"🇲🇽 Mexico vs 🇿🇦 South Africa","dtstart":"20260611T190000Z","location":"Estadio Azteca, Mexico City","stage":"Group Stage","group":"Group A"},{"id":1,"summary":"🇰🇷 South Korea vs 🇨🇿 Czech Republic","dtstart":"20260612T020000Z","location":"Estadio Akron, Zapopan","stage":"Group Stage","group":"Group A"},{"id":2,"summary":"🇨🇦 Canada vs 🇧🇦 Bosnia and Herzegovina","dtstart":"20260612T190000Z","location":"BMO Field, Toronto","stage":"Group Stage","group":"Group B"},{"id":3,"summary":"🇺🇸 United States vs 🇵🇾 Paraguay","dtstart":"20260613T010000Z","location":"SoFi Stadium, Inglewood","stage":"Group Stage","group":"Group D"},{"id":4,"summary":"🇭🇹 Haiti vs 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland","dtstart":"20260614T010000Z","location":"Gillette Stadium, Foxborough","stage":"Group Stage","group":"Group C"},{"id":5,"summary":"🇦🇺 Australia vs 🇹🇷 Turkey","dtstart":"20260614T040000Z","location":"BC Place, Vancouver","stage":"Group Stage","group":"Group D"},{"id":6,"summary":"🇧🇷 Brazil vs 🇲🇦 Morocco","dtstart":"20260613T220000Z","location":"MetLife Stadium, East Rutherford","stage":"Group Stage","group":"Group C"},{"id":7,"summary":"🇶🇦 Qatar vs 🇨🇭 Switzerland","dtstart":"20260613T190000Z","location":"Levi's Stadium, Santa Clara","stage":"Group Stage","group":"Group B"},{"id":8,"summary":"🇨🇮 Ivory Coast vs 🇪🇨 Ecuador","dtstart":"20260614T230000Z","location":"Lincoln Financial Field, Philadelphia","stage":"Group Stage","group":"Group E"},{"id":9,"summary":"🇩🇪 Germany vs 🇨🇼 Curaçao","dtstart":"20260614T170000Z","location":"NRG Stadium, Houston","stage":"Group Stage","group":"Group E"},{"id":10,"summary":"🇳🇱 Netherlands vs 🇯🇵 Japan","dtstart":"20260614T200000Z","location":"AT&T Stadium, Arlington","stage":"Group Stage","group":"Group F"},{"id":11,"summary":"🇸🇪 Sweden vs 🇹🇳 Tunisia","dtstart":"20260615T020000Z","location":"Estadio BBVA, Guadalupe","stage":"Group Stage","group":"Group F"},{"id":12,"summary":"🇸🇦 Saudi Arabia vs 🇺🇾 Uruguay","dtstart":"20260615T220000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Group Stage","group":"Group H"},{"id":13,"summary":"🇪🇸 Spain vs 🇨🇻 Cape Verde","dtstart":"20260615T160000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Group Stage","group":"Group H"},{"id":14,"summary":"🇮🇷 Iran vs 🇳🇿 New Zealand","dtstart":"20260616T010000Z","location":"SoFi Stadium, Inglewood","stage":"Group Stage","group":"Group G"},{"id":15,"summary":"🇧🇪 Belgium vs 🇪🇬 Egypt","dtstart":"20260615T190000Z","location":"Lumen Field, Seattle","stage":"Group Stage","group":"Group G"},{"id":16,"summary":"🇫🇷 France vs 🇸🇳 Senegal","dtstart":"20260616T190000Z","location":"MetLife Stadium, East Rutherford","stage":"Group Stage","group":"Group I"},{"id":17,"summary":"🇮🇶 Iraq vs 🇳🇴 Norway","dtstart":"20260616T220000Z","location":"Gillette Stadium, Foxborough","stage":"Group Stage","group":"Group I"},{"id":18,"summary":"🇦🇷 Argentina vs 🇩🇿 Algeria","dtstart":"20260617T010000Z","location":"Arrowhead Stadium, Kansas City","stage":"Group Stage","group":"Group J"},{"id":19,"summary":"🇦🇹 Austria vs 🇯🇴 Jordan","dtstart":"20260617T040000Z","location":"Levi's Stadium, Santa Clara","stage":"Group Stage","group":"Group J"},{"id":20,"summary":"🇬🇭 Ghana vs 🇵🇦 Panama","dtstart":"20260617T230000Z","location":"BMO Field, Toronto","stage":"Group Stage","group":"Group L"},{"id":21,"summary":"🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇭🇷 Croatia","dtstart":"20260617T200000Z","location":"AT&T Stadium, Arlington","stage":"Group Stage","group":"Group L"},{"id":22,"summary":"🇵🇹 Portugal vs 🇨🇩 DR Congo","dtstart":"20260617T170000Z","location":"NRG Stadium, Houston","stage":"Group Stage","group":"Group K"},{"id":23,"summary":"🇺🇿 Uzbekistan vs 🇨🇴 Colombia","dtstart":"20260618T020000Z","location":"Estadio Azteca, Mexico City","stage":"Group Stage","group":"Group K"},{"id":24,"summary":"🇨🇿 Czech Republic vs 🇿🇦 South Africa","dtstart":"20260618T160000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Group Stage","group":"Group A"},{"id":25,"summary":"🇨🇭 Switzerland vs 🇧🇦 Bosnia and Herzegovina","dtstart":"20260618T190000Z","location":"SoFi Stadium, Inglewood","stage":"Group Stage","group":"Group B"},{"id":26,"summary":"🇨🇦 Canada vs 🇶🇦 Qatar","dtstart":"20260618T220000Z","location":"BC Place, Vancouver","stage":"Group Stage","group":"Group B"},{"id":27,"summary":"🇲🇽 Mexico vs 🇰🇷 South Korea","dtstart":"20260619T010000Z","location":"Estadio Akron, Zapopan","stage":"Group Stage","group":"Group A"},{"id":28,"summary":"🇧🇷 Brazil vs 🇭🇹 Haiti","dtstart":"20260620T003000Z","location":"Lincoln Financial Field, Philadelphia","stage":"Group Stage","group":"Group C"},{"id":29,"summary":"🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇲🇦 Morocco","dtstart":"20260619T220000Z","location":"Gillette Stadium, Foxborough","stage":"Group Stage","group":"Group C"},{"id":30,"summary":"🇹🇷 Turkey vs 🇵🇾 Paraguay","dtstart":"20260620T030000Z","location":"Levi's Stadium, Santa Clara","stage":"Group Stage","group":"Group D"},{"id":31,"summary":"🇺🇸 United States vs 🇦🇺 Australia","dtstart":"20260619T190000Z","location":"Lumen Field, Seattle","stage":"Group Stage","group":"Group D"},{"id":32,"summary":"🇩🇪 Germany vs 🇨🇮 Ivory Coast","dtstart":"20260620T200000Z","location":"BMO Field, Toronto","stage":"Group Stage","group":"Group E"},{"id":33,"summary":"🇪🇨 Ecuador vs 🇨🇼 Curaçao","dtstart":"20260621T000000Z","location":"Arrowhead Stadium, Kansas City","stage":"Group Stage","group":"Group E"},{"id":34,"summary":"🇳🇱 Netherlands vs 🇸🇪 Sweden","dtstart":"20260620T170000Z","location":"NRG Stadium, Houston","stage":"Group Stage","group":"Group F"},{"id":35,"summary":"🇹🇳 Tunisia vs 🇯🇵 Japan","dtstart":"20260621T040000Z","location":"Estadio BBVA, Guadalupe","stage":"Group Stage","group":"Group F"},{"id":36,"summary":"🇺🇾 Uruguay vs 🇨🇻 Cape Verde","dtstart":"20260621T220000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Group Stage","group":"Group H"},{"id":37,"summary":"🇪🇸 Spain vs 🇸🇦 Saudi Arabia","dtstart":"20260621T160000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Group Stage","group":"Group H"},{"id":38,"summary":"🇧🇪 Belgium vs 🇮🇷 Iran","dtstart":"20260621T190000Z","location":"SoFi Stadium, Inglewood","stage":"Group Stage","group":"Group G"},{"id":39,"summary":"🇳🇿 New Zealand vs 🇪🇬 Egypt","dtstart":"20260622T010000Z","location":"BC Place, Vancouver","stage":"Group Stage","group":"Group G"},{"id":40,"summary":"🇳🇴 Norway vs 🇸🇳 Senegal","dtstart":"20260623T000000Z","location":"MetLife Stadium, East Rutherford","stage":"Group Stage","group":"Group I"},{"id":41,"summary":"🇫🇷 France vs 🇮🇶 Iraq","dtstart":"20260622T210000Z","location":"Lincoln Financial Field, Philadelphia","stage":"Group Stage","group":"Group I"},{"id":42,"summary":"🇦🇷 Argentina vs 🇦🇹 Austria","dtstart":"20260622T170000Z","location":"AT&T Stadium, Arlington","stage":"Group Stage","group":"Group J"},{"id":43,"summary":"🇯🇴 Jordan vs 🇩🇿 Algeria","dtstart":"20260623T030000Z","location":"Levi's Stadium, Santa Clara","stage":"Group Stage","group":"Group J"},{"id":44,"summary":"🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇬🇭 Ghana","dtstart":"20260623T200000Z","location":"Gillette Stadium, Foxborough","stage":"Group Stage","group":"Group L"},{"id":45,"summary":"🇵🇦 Panama vs 🇭🇷 Croatia","dtstart":"20260623T230000Z","location":"BMO Field, Toronto","stage":"Group Stage","group":"Group L"},{"id":46,"summary":"🇵🇹 Portugal vs 🇺🇿 Uzbekistan","dtstart":"20260623T170000Z","location":"NRG Stadium, Houston","stage":"Group Stage","group":"Group K"},{"id":47,"summary":"🇨🇴 Colombia vs 🇨🇩 DR Congo","dtstart":"20260624T020000Z","location":"Estadio Akron, Zapopan","stage":"Group Stage","group":"Group K"},{"id":48,"summary":"🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇧🇷 Brazil","dtstart":"20260624T220000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Group Stage","group":"Group C"},{"id":49,"summary":"🇲🇦 Morocco vs 🇭🇹 Haiti","dtstart":"20260624T220000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Group Stage","group":"Group C"},{"id":50,"summary":"🇨🇭 Switzerland vs 🇨🇦 Canada","dtstart":"20260624T190000Z","location":"BC Place, Vancouver","stage":"Group Stage","group":"Group B"},{"id":51,"summary":"🇧🇦 Bosnia and Herzegovina vs 🇶🇦 Qatar","dtstart":"20260624T190000Z","location":"Lumen Field, Seattle","stage":"Group Stage","group":"Group B"},{"id":52,"summary":"🇨🇿 Czech Republic vs 🇲🇽 Mexico","dtstart":"20260625T010000Z","location":"Estadio Azteca, Mexico City","stage":"Group Stage","group":"Group A"},{"id":53,"summary":"🇿🇦 South Africa vs 🇰🇷 South Korea","dtstart":"20260625T010000Z","location":"Estadio BBVA, Guadalupe","stage":"Group Stage","group":"Group A"},{"id":54,"summary":"🇨🇼 Curaçao vs 🇨🇮 Ivory Coast","dtstart":"20260625T200000Z","location":"Lincoln Financial Field, Philadelphia","stage":"Group Stage","group":"Group E"},{"id":55,"summary":"🇪🇨 Ecuador vs 🇩🇪 Germany","dtstart":"20260625T200000Z","location":"MetLife Stadium, East Rutherford","stage":"Group Stage","group":"Group E"},{"id":56,"summary":"🇯🇵 Japan vs 🇸🇪 Sweden","dtstart":"20260625T230000Z","location":"AT&T Stadium, Arlington","stage":"Group Stage","group":"Group F"},{"id":57,"summary":"🇹🇳 Tunisia vs 🇳🇱 Netherlands","dtstart":"20260625T230000Z","location":"Arrowhead Stadium, Kansas City","stage":"Group Stage","group":"Group F"},{"id":58,"summary":"🇹🇷 Turkey vs 🇺🇸 United States","dtstart":"20260626T020000Z","location":"SoFi Stadium, Inglewood","stage":"Group Stage","group":"Group D"},{"id":59,"summary":"🇵🇾 Paraguay vs 🇦🇺 Australia","dtstart":"20260626T020000Z","location":"Levi's Stadium, Santa Clara","stage":"Group Stage","group":"Group D"},{"id":60,"summary":"🇳🇴 Norway vs 🇫🇷 France","dtstart":"20260626T190000Z","location":"Gillette Stadium, Foxborough","stage":"Group Stage","group":"Group I"},{"id":61,"summary":"🇸🇳 Senegal vs 🇮🇶 Iraq","dtstart":"20260626T190000Z","location":"BMO Field, Toronto","stage":"Group Stage","group":"Group I"},{"id":62,"summary":"🇪🇬 Egypt vs 🇮🇷 Iran","dtstart":"20260627T030000Z","location":"Lumen Field, Seattle","stage":"Group Stage","group":"Group G"},{"id":63,"summary":"🇳🇿 New Zealand vs 🇧🇪 Belgium","dtstart":"20260627T030000Z","location":"BC Place, Vancouver","stage":"Group Stage","group":"Group G"},{"id":64,"summary":"🇨🇻 Cape Verde vs 🇸🇦 Saudi Arabia","dtstart":"20260627T000000Z","location":"NRG Stadium, Houston","stage":"Group Stage","group":"Group H"},{"id":65,"summary":"🇺🇾 Uruguay vs 🇪🇸 Spain","dtstart":"20260627T000000Z","location":"Estadio Akron, Zapopan","stage":"Group Stage","group":"Group H"},{"id":66,"summary":"🇵🇦 Panama vs 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England","dtstart":"20260627T210000Z","location":"MetLife Stadium, East Rutherford","stage":"Group Stage","group":"Group L"},{"id":67,"summary":"🇭🇷 Croatia vs 🇬🇭 Ghana","dtstart":"20260627T210000Z","location":"Lincoln Financial Field, Philadelphia","stage":"Group Stage","group":"Group L"},{"id":68,"summary":"🇩🇿 Algeria vs 🇦🇹 Austria","dtstart":"20260628T020000Z","location":"Arrowhead Stadium, Kansas City","stage":"Group Stage","group":"Group J"},{"id":69,"summary":"🇯🇴 Jordan vs 🇦🇷 Argentina","dtstart":"20260628T020000Z","location":"AT&T Stadium, Arlington","stage":"Group Stage","group":"Group J"},{"id":70,"summary":"🇨🇴 Colombia vs 🇵🇹 Portugal","dtstart":"20260627T233000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Group Stage","group":"Group K"},{"id":71,"summary":"🇨🇩 DR Congo vs 🇺🇿 Uzbekistan","dtstart":"20260627T233000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Group Stage","group":"Group K"},{"id":72,"summary":"⚽ Runner-up Group A vs ⚽ Runner-up Group B","dtstart":"20260628T190000Z","location":"SoFi Stadium, Inglewood","stage":"Round of 32","group":""},{"id":73,"summary":"⚽ Winner Group E vs ⚽ 3rd Group A/B/C","dtstart":"20260629T203000Z","location":"Gillette Stadium, Foxborough","stage":"Round of 32","group":""},{"id":74,"summary":"⚽ Winner Group F vs ⚽ Runner-up Group C","dtstart":"20260630T010000Z","location":"Estadio BBVA, Guadalupe","stage":"Round of 32","group":""},{"id":75,"summary":"⚽ Winner Group C vs ⚽ Runner-up Group F","dtstart":"20260629T170000Z","location":"NRG Stadium, Houston","stage":"Round of 32","group":""},{"id":76,"summary":"⚽ Winner Group I vs ⚽ 3rd Group C/D/F","dtstart":"20260630T210000Z","location":"MetLife Stadium, East Rutherford","stage":"Round of 32","group":""},{"id":77,"summary":"⚽ Runner-up Group E vs ⚽ Runner-up Group I","dtstart":"20260630T170000Z","location":"AT&T Stadium, Arlington","stage":"Round of 32","group":""},{"id":78,"summary":"⚽ Winner Group A vs ⚽ 3rd Group C/E/F","dtstart":"20260701T010000Z","location":"Estadio Azteca, Mexico City","stage":"Round of 32","group":""},{"id":79,"summary":"⚽ Winner Group L vs ⚽ 3rd Group E/H/I","dtstart":"20260701T160000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Round of 32","group":""},{"id":80,"summary":"⚽ Winner Group D vs ⚽ 3rd Group B/E/F","dtstart":"20260702T000000Z","location":"Levi's Stadium, Santa Clara","stage":"Round of 32","group":""},{"id":81,"summary":"⚽ Winner Group G vs ⚽ 3rd Group A/E/H","dtstart":"20260701T200000Z","location":"Lumen Field, Seattle","stage":"Round of 32","group":""},{"id":82,"summary":"⚽ Runner-up Group K vs ⚽ Runner-up Group L","dtstart":"20260702T230000Z","location":"BMO Field, Toronto","stage":"Round of 32","group":""},{"id":83,"summary":"⚽ Winner Group H vs ⚽ Runner-up Group J","dtstart":"20260702T190000Z","location":"SoFi Stadium, Inglewood","stage":"Round of 32","group":""},{"id":84,"summary":"⚽ Winner Group B vs ⚽ 3rd Group E/F/G","dtstart":"20260703T030000Z","location":"BC Place, Vancouver","stage":"Round of 32","group":""},{"id":85,"summary":"⚽ Winner Group J vs ⚽ Runner-up Group H","dtstart":"20260703T220000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Round of 32","group":""},{"id":86,"summary":"⚽ Winner Group K vs ⚽ 3rd Group D/E/I","dtstart":"20260704T013000Z","location":"Arrowhead Stadium, Kansas City","stage":"Round of 32","group":""},{"id":87,"summary":"⚽ Runner-up Group D vs ⚽ Runner-up Group G","dtstart":"20260703T180000Z","location":"AT&T Stadium, Arlington","stage":"Round of 32","group":""},{"id":88,"summary":"⚽ Winner Match 74 vs ⚽ Winner Match 77","dtstart":"20260704T210000Z","location":"Lincoln Financial Field, Philadelphia","stage":"Round of 16","group":""},{"id":89,"summary":"⚽ Winner Match 73 vs ⚽ Winner Match 75","dtstart":"20260704T170000Z","location":"NRG Stadium, Houston","stage":"Round of 16","group":""},{"id":90,"summary":"⚽ Winner Match 76 vs ⚽ Winner Match 78","dtstart":"20260705T200000Z","location":"MetLife Stadium, East Rutherford","stage":"Round of 16","group":""},{"id":91,"summary":"⚽ Winner Match 79 vs ⚽ Winner Match 80","dtstart":"20260706T000000Z","location":"Estadio Azteca, Mexico City","stage":"Round of 16","group":""},{"id":92,"summary":"⚽ Winner Match 83 vs ⚽ Winner Match 84","dtstart":"20260706T190000Z","location":"AT&T Stadium, Arlington","stage":"Round of 16","group":""},{"id":93,"summary":"⚽ Winner Match 81 vs ⚽ Winner Match 82","dtstart":"20260707T000000Z","location":"Lumen Field, Seattle","stage":"Round of 16","group":""},{"id":94,"summary":"⚽ Winner Match 86 vs ⚽ Winner Match 88","dtstart":"20260707T160000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Round of 16","group":""},{"id":95,"summary":"⚽ Winner Match 85 vs ⚽ Winner Match 87","dtstart":"20260707T200000Z","location":"BC Place, Vancouver","stage":"Round of 16","group":""},{"id":96,"summary":"⚽ Winner Match 89 vs ⚽ Winner Match 90","dtstart":"20260709T200000Z","location":"Gillette Stadium, Foxborough","stage":"Quarterfinal","group":""},{"id":97,"summary":"⚽ Winner Match 93 vs ⚽ Winner Match 94","dtstart":"20260710T190000Z","location":"SoFi Stadium, Inglewood","stage":"Quarterfinal","group":""},{"id":98,"summary":"⚽ Winner Match 91 vs ⚽ Winner Match 92","dtstart":"20260711T210000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Quarterfinal","group":""},{"id":99,"summary":"⚽ Winner Match 95 vs ⚽ Winner Match 96","dtstart":"20260712T010000Z","location":"Arrowhead Stadium, Kansas City","stage":"Quarterfinal","group":""},{"id":100,"summary":"⚽ Winner Match 97 vs ⚽ Winner Match 98","dtstart":"20260714T190000Z","location":"AT&T Stadium, Arlington","stage":"Semifinal","group":""},{"id":101,"summary":"⚽ Winner Match 99 vs ⚽ Winner Match 100","dtstart":"20260715T190000Z","location":"Mercedes-Benz Stadium, Atlanta","stage":"Semifinal","group":""},{"id":102,"summary":"⚽ Loser Match 101 vs ⚽ Loser Match 102","dtstart":"20260718T210000Z","location":"Hard Rock Stadium, Miami Gardens","stage":"Third Place","group":""},{"id":103,"summary":"⚽ Winner Match 101 vs ⚽ Winner Match 102","dtstart":"20260719T190000Z","location":"MetLife Stadium, East Rutherford","stage":"Final","group":""}];
+
+// ══ TV CHANNELS DATA (Arab broadcasting channels per match relevance) ══
+const TV_CHANNELS = {
+  'default': ['beIN Sports HD 1', 'beIN Sports HD 2'],
+  'Egypt': ['القاهرة الرياضية', 'المحور الرياضية', 'beIN Sports'],
+  'Saudi Arabia': ['السعودية الرياضية 1', 'beIN Sports HD 1'],
+  'Morocco': ['الأولى المغربية', 'beIN Sports HD 1'],
+  'Algeria': ['الجزائرية الرياضية', 'beIN Sports HD 1'],
+  'Iraq': ['العراقية الرياضية', 'beIN Sports HD 1'],
+  'Jordan': ['الأردنية الرياضية', 'beIN Sports HD 1'],
+  'Qatar': ['قطر TV', 'beIN Sports HD 1'],
+  'Tunisia': ['الوطنية 1', 'beIN Sports HD 1'],
+  'final': ['beIN Sports HD 1', 'beIN Sports HD 2', 'القاهرة الرياضية', 'السعودية الرياضية 1', 'الجزائرية الرياضية'],
+};
+
+function getChannels(match) {
+  const summary = match.summary;
+  if (match.stage === 'Final') return TV_CHANNELS['final'];
+  const arabTeams = ['Egypt','Saudi Arabia','Morocco','Algeria','Iraq','Jordan','Qatar','Tunisia'];
+  for (const team of arabTeams) {
+    if (summary.includes(team)) return TV_CHANNELS[team];
+  }
+  return TV_CHANNELS['default'];
+}
+
+// ══ FLAGS ══
+const FLAG_MAP = {
+  'Mexico':'mx','South Africa':'za','South Korea':'kr','Czech Republic':'cz',
+  'Canada':'ca','Bosnia and Herzegovina':'ba','United States':'us','Paraguay':'py',
+  'Haiti':'ht','Scotland':'gb-sct','Australia':'au','Turkey':'tr',
+  'Brazil':'br','Morocco':'ma','Qatar':'qa','Switzerland':'ch',
+  'Ivory Coast':'ci','Ecuador':'ec','Germany':'de','Curaçao':'cw',
+  'Netherlands':'nl','Japan':'jp','Sweden':'se','Tunisia':'tn',
+  'Saudi Arabia':'sa','Uruguay':'uy','Spain':'es','Cape Verde':'cv',
+  'Iran':'ir','New Zealand':'nz','Belgium':'be','Egypt':'eg',
+  'France':'fr','Senegal':'sn','Iraq':'iq','Norway':'no',
+  'Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo',
+  'Ghana':'gh','Panama':'pa','England':'gb-eng','Croatia':'hr',
+  'Portugal':'pt','DR Congo':'cd','Uzbekistan':'uz','Colombia':'co',
+};
+const EMOJI_MAP = {
+  'Mexico':'🇲🇽','South Africa':'🇿🇦','South Korea':'🇰🇷','Czech Republic':'🇨🇿',
+  'Canada':'🇨🇦','Bosnia and Herzegovina':'🇧🇦','United States':'🇺🇸','Paraguay':'🇵🇾',
+  'Haiti':'🇭🇹','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Australia':'🇦🇺','Turkey':'🇹🇷',
+  'Brazil':'🇧🇷','Morocco':'🇲🇦','Qatar':'🇶🇦','Switzerland':'🇨🇭',
+  'Ivory Coast':'🇨🇮','Ecuador':'🇪🇨','Germany':'🇩🇪','Curaçao':'🇨🇼',
+  'Netherlands':'🇳🇱','Japan':'🇯🇵','Sweden':'🇸🇪','Tunisia':'🇹🇳',
+  'Saudi Arabia':'🇸🇦','Uruguay':'🇺🇾','Spain':'🇪🇸','Cape Verde':'🇨🇻',
+  'Iran':'🇮🇷','New Zealand':'🇳🇿','Belgium':'🇧🇪','Egypt':'🇪🇬',
+  'France':'🇫🇷','Senegal':'🇸🇳','Iraq':'🇮🇶','Norway':'🇳🇴',
+  'Argentina':'🇦🇷','Algeria':'🇩🇿','Austria':'🇦🇹','Jordan':'🇯🇴',
+  'Ghana':'🇬🇭','Panama':'🇵🇦','England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷',
+  'Portugal':'🇵🇹','DR Congo':'🇨🇩','Uzbekistan':'🇺🇿','Colombia':'🇨🇴',
+};
+
+function getFlagImg(name, size=48) {
+  const code = FLAG_MAP[name];
+  const emoji = EMOJI_MAP[name] || '🏴';
+  if (!code) return `<div class="team-flag-wrap"><span class="team-flag-emoji">${emoji}</span></div>`;
+  return `<div class="team-flag-wrap">
+    <img class="team-flag-img" style="width:${size}px;height:${Math.round(size*0.667)}px"
+         src="https://flagcdn.com/w80/${code}.png"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="${name}">
+    <span class="team-flag-emoji" style="display:none">${emoji}</span>
+  </div>`;
+}
+
+function getSmallFlag(name) {
+  const code = FLAG_MAP[name];
+  const emoji = EMOJI_MAP[name] || '🏴';
+  if (!code) return `<span style="font-size:16px">${emoji}</span>`;
+  return `<img class="small-flag" src="https://flagcdn.com/w40/${code}.png" 
+    onerror="this.style.display='none'" alt="${name}">`;
+}
+
+// ══ HELPERS ══
+function parseUTC(s) {
+  return new Date(`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}T${s.slice(9,11)}:${s.slice(11,13)}:${s.slice(13,15)}Z`);
+}
+function toEgyptTime(d) {
+  return d.toLocaleTimeString('ar-EG',{timeZone:'Africa/Cairo',hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function toEgyptDate(d) {
+  return d.toLocaleDateString('ar-EG',{timeZone:'Africa/Cairo',weekday:'long',day:'numeric',month:'long'});
+}
+function nowEgypt() {
+  return new Date(new Date().toLocaleString('en-US',{timeZone:'Africa/Cairo'}));
+}
+function isTodayEgypt(d) {
+  const now = nowEgypt();
+  const e = new Date(d.toLocaleString('en-US',{timeZone:'Africa/Cairo'}));
+  return e.getFullYear()===now.getFullYear()&&e.getMonth()===now.getMonth()&&e.getDate()===now.getDate();
+}
+function getMatchStatus(m) {
+  const s = parseUTC(m.dtstart);
+  const e = new Date(s.getTime()+2*3600000);
+  const n = new Date();
+  if (n<s) return 'upcoming';
+  if (n>=s&&n<=e) return 'live';
+  return 'finished';
+}
+function getTeamNames(summary) {
+  const clean = summary.replace(/[\u{1F1E6}-\u{1F1FF}\u{E0000}-\u{E007F}⚽]+/gu,'').replace(/🏴[^vs]*/g,'').replace(/\s+/g,' ').trim();
+  const p = clean.split(' vs ');
+  return [p[0]?.trim()||'', p[1]?.trim()||''];
+}
+
+const STAGE_ICONS={'Group Stage':'🏟️','Round of 32':'⚔️','Round of 16':'⚡','Quarterfinal':'🔰','Semifinal':'🔥','Third Place':'🥉','Final':'🏆'};
+const STAGE_ORDER=['Group Stage','Round of 32','Round of 16','Quarterfinal','Semifinal','Third Place','Final'];
+const STAGE_AR={'Group Stage':'دور المجموعات','Round of 32':'دور الـ 32','Round of 16':'دور الـ 16','Quarterfinal':'ربع النهائي','Semifinal':'نصف النهائي','Third Place':'المركز الثالث','Final':'النهائي 🏆'};
+
+// ══ LIVE SCORES ══
+const LIVE_SCORES = {};
+const API_STATUS = {api1:'wait',api2:'wait',api3:'wait'};
+let LIVE_SCORES_READY = false;   // ← علم: هل تم جلب النتائج مرة واحدة على الأقل؟
+const PROXY = 'https://taybat-ai.studegy8.workers.dev';
+const WC26_BASE = 'https://worldcup26.ir/get';
+
+// ══ worldcup26.ir helpers ══
+let WC26_GAMES_CACHE = null;
+let WC26_GROUPS_CACHE = null;
+
+async function fetchWC26Games() {
+  if(WC26_GAMES_CACHE) return WC26_GAMES_CACHE;
+  try {
+    const r = await fetch(`${WC26_BASE}/games`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    WC26_GAMES_CACHE = Array.isArray(d) ? d : (d.data || d.games || []);
+    return WC26_GAMES_CACHE;
+  } catch { return []; }
+}
+
+async function fetchWC26Groups() {
+  if(WC26_GROUPS_CACHE) return WC26_GROUPS_CACHE;
+  try {
+    const r = await fetch(`${WC26_BASE}/groups`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    WC26_GROUPS_CACHE = Array.isArray(d) ? d : (d.data || d.groups || []);
+    return WC26_GROUPS_CACHE;
+  } catch { return []; }
+}
+
+function updateApiUI() {
+  for(const[k,v]of Object.entries(API_STATUS)) {
+    const el=document.getElementById(`${k}status`);
+    if(el) el.className=`api-badge ${v}`;
+  }
+}
+
+// Smart resolver: maps API team names → our MATCHES canonical key
+function resolveMatchKey(apiHome, apiAway) {
+  const norm = s => (s||'').toLowerCase().replace(/[^a-z]/g,'');
+  const ah=norm(apiHome), ab=norm(apiAway);
+  for(const m of MATCHES) {
+    const [t1,t2]=getTeamNames(m.summary);
+    const n1=norm(t1), n2=norm(t2);
+    if((n1.includes(ah)||ah.includes(n1))&&(n2.includes(ab)||ab.includes(n2))) return {key:t1+t2,swapped:false};
+    if((n1.includes(ab)||ab.includes(n1))&&(n2.includes(ah)||ah.includes(n2))) return {key:t1+t2,swapped:true};
+  }
+  return {key:apiHome+apiAway,swapped:false};
+}
+
+// ══ مخزن البطاقات الحمراء ══
+const RED_CARDS = {}; // key → [{team, player, minute}]
+
+// ══ مخزن النتائج السابقة لرصد الأهداف الجديدة ══
+const PREV_SCORES = {}; // key → {home, away}
+
+function storeRedCards(key, homeCards, awayCards) {
+  const all = [
+    ...(homeCards||[]).map(c=>({...c,side:'home'})),
+    ...(awayCards||[]).map(c=>({...c,side:'away'}))
+  ];
+  if(all.length) RED_CARDS[key] = all;
+}
+
+async function fetchApi1() {
+  try {
+    const games = await fetchWC26Games();
+    if(!games.length) throw 0;
+    for(const g of games) {
+      const homeName = g.home_team?.name || g.homeTeam?.name || g.home?.name || '';
+      const awayName = g.away_team?.name || g.awayTeam?.name || g.away?.name || '';
+      if(!homeName || !awayName) continue;
+      const {key, swapped} = resolveMatchKey(homeName, awayName);
+      const hScore = g.home_score ?? g.home_team?.goals ?? g.score?.home ?? g.result?.home ?? null;
+      const aScore = g.away_score ?? g.away_team?.goals ?? g.score?.away ?? g.result?.away ?? null;
+      const st = (g.status || g.state || '').toLowerCase();
+      const isLive = st.includes('live') || st.includes('progress') || st.includes('playing') || st === '1h' || st === '2h' || st === 'ht';
+      const isFinished = st.includes('finish') || st.includes('ft') || st.includes('end') || st === 'fulltime';
+      if(hScore === null && !isLive && !isFinished) continue;
+
+      // استخراج البطاقات الحمراء
+      const homeRC = (g.home_team?.red_cards || g.home?.red_cards || []).map(p=>({player:p?.name||p||'',minute:p?.minute||''}));
+      const awayRC = (g.away_team?.red_cards || g.away?.red_cards || []).map(p=>({player:p?.name||p||'',minute:p?.minute||''}));
+      if(homeRC.length || awayRC.length) storeRedCards(key, homeRC, awayRC);
+
+      // رصد الأهداف الجديدة لحظة وقوعها
+      const prevH = PREV_SCORES[key]?.home;
+      const prevA = PREV_SCORES[key]?.away;
+      const newH = swapped ? aScore : hScore;
+      const newA = swapped ? hScore : aScore;
+      if(prevH !== undefined && (newH > prevH || newA > prevA)) {
+        triggerGoalFlash(key, newH, newA, prevH, prevA);
+      }
+      PREV_SCORES[key] = {home: newH, away: newA};
+
+      if(!LIVE_SCORES[key] || isLive) {
+        LIVE_SCORES[key] = {
+          home: newH, away: newA,
+          minute: g.minute || g.time || null,
+          status: isLive ? 'IN_PLAY' : (isFinished ? 'FINISHED' : 'SCHEDULED'),
+          source: 'worldcup26.ir', goals: []
+        };
+      }
+    }
+    API_STATUS.api1='ok';
+  } catch { API_STATUS.api1='fail'; }
+}
+
+async function fetchApi2() {
+  try {
+    const today=new Date().toISOString().slice(0,10);
+    const r=await fetch(`${PROXY}/allsports?date=${today}`);
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    if(d.success!==1) throw 0;
+    for(const m of d.result||[]) {
+      const {key}=resolveMatchKey(m['event_home_team'],m['event_away_team']);
+      if(!LIVE_SCORES[key]){const res=m['event_final_result']||'';const[h,a]=(res.split(' - '));LIVE_SCORES[key]={home:h||null,away:a||null,status:m['event_status'],source:'allsports',goals:[]};}
+    }
+    API_STATUS.api2='ok';
+  } catch{API_STATUS.api2='fail';}
+}
+
+
+// ══ مخزن الأهداف لكل مباراة (مفتاح = نفس LIVE_SCORES key) ══
+const GOAL_EVENTS = {};   // key → [{scorer, team, minute, type}]
+const SCORER_TOTALS = {}; // playerName → {team, goals}
+
+function parseESPNEvents(comp, key, homeTeamName, awayTeamName) {
+  // comp.details أو comp.scoring فيها الأهداف في ESPN
+  const details = comp.details || [];
+  const goals = [];
+  for(const d of details) {
+    const type = (d.type?.text || d.type?.abbreviation || '').toLowerCase();
+    if(!type.includes('goal') && !type.includes('score')) continue;
+    const athleteName = d.athletes?.[0]?.displayName || d.athletes?.[0]?.athlete?.displayName || '';
+    if(!athleteName) continue;
+    const teamId = d.team?.id || '';
+    const homeId = comp.competitors?.find(c=>c.homeAway==='home')?.team?.id || '';
+    const teamName = (teamId && teamId === homeId) ? homeTeamName : awayTeamName;
+    const minute = d.clock?.displayValue || d.period?.number ? `${d.clock?.displayValue||''}` : '';
+    const isOwn = type.includes('own');
+    const isPenalty = type.includes('penalty') || type.includes('pk');
+    goals.push({ scorer: {name: athleteName}, team: {name: teamName}, minute, type: isOwn?'OWN_GOAL': isPenalty?'PENALTY':'REGULAR' });
+    // تحديث إجمالي الهدافين
+    if(!isOwn) {
+      if(!SCORER_TOTALS[athleteName]) SCORER_TOTALS[athleteName] = {team: teamName, goals: 0};
+      SCORER_TOTALS[athleteName].goals++;
+    }
+  }
+  if(goals.length) GOAL_EVENTS[key] = goals;
+}
+
+async function fetchApi3() {
+  try {
+    const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard',{headers:{'Accept':'application/json'}});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const detailFetches=[];
+    for(const ev of d.events||[]) {
+      const comp=ev.competitions?.[0];if(!comp)continue;
+      const home=comp.competitors?.find(c=>c.homeAway==='home');
+      const away=comp.competitors?.find(c=>c.homeAway==='away');
+      if(!home||!away)continue;
+      const {key}=resolveMatchKey(home.team?.displayName,away.team?.displayName);
+      const isLive=comp.status?.type?.state==='in';
+      const isFinished=comp.status?.type?.state==='post';
+      if(!LIVE_SCORES[key]||isLive) {
+        LIVE_SCORES[key]={home:home.score??null,away:away.score??null,minute:comp.status?.displayClock,status:comp.status?.type?.name,source:'ESPN',goals:[]};
+      }
+      // جلب تفاصيل الأهداف للمباريات المنتهية أو الجارية
+      if((isLive||isFinished) && ev.id) {
+        detailFetches.push({evId:ev.id, key, homeName:home.team?.displayName, awayName:away.team?.displayName});
+      }
+    }
+    // جلب تفاصيل كل مباراة بشكل متوازي
+    await Promise.allSettled(detailFetches.map(async({evId,key,homeName,awayName})=>{
+      try{
+        const r2=await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${evId}`,{headers:{'Accept':'application/json'}});
+        if(!r2.ok) return;
+        const d2=await r2.json();
+        const comp2=d2.header?.competitions?.[0] || d2.boxscore?.players?.[0] || null;
+        // نجرب endpoints مختلفة لـ ESPN
+        const details = d2.plays || d2.keyEvents || [];
+        const goals2=[];
+        for(const p of details){
+          const txt=(p.text||p.type?.text||'').toLowerCase();
+          if(!txt.includes('goal')) continue;
+          const name=p.participants?.[0]?.athlete?.displayName||p.athletes?.[0]?.displayName||'';
+          if(!name) continue;
+          const isHome=p.homeScore!==undefined? (p.homeScore > (goals2.filter(g=>g.team?.name===homeName).length)) : true;
+          const teamName = isHome? homeName: awayName;
+          const min = p.clock?.displayValue||p.period?.number?`${p.clock?.displayValue||''}`:'';
+          const isOwn=(txt.includes('own'));
+          const isPen=(txt.includes('penalty')||txt.includes('pk'));
+          goals2.push({scorer:{name},team:{name:teamName},minute:min,type:isOwn?'OWN_GOAL':isPen?'PENALTY':'REGULAR'});
+          if(!isOwn){
+            if(!SCORER_TOTALS[name]) SCORER_TOTALS[name]={team:teamName,goals:0};
+            SCORER_TOTALS[name].goals++;
+          }
+        }
+        // أيضاً جرب scoring section
+        const scoring = d2.scoring || [];
+        for(const period of scoring){
+          for(const sc of period.items||[]){
+            const name=sc.athletes?.[0]?.athlete?.displayName||sc.scoringPlay?.text||'';
+            if(!name) continue;
+            const txt=(sc.type?.text||sc.scoringType?.displayName||'').toLowerCase();
+            const teamId=sc.team?.id||'';
+            const homeTeam=d2.header?.competitions?.[0]?.competitors?.find(c=>c.homeAway==='home');
+            const teamName=(teamId===homeTeam?.team?.id)?homeName:awayName;
+            const min=sc.clock?.displayValue||'';
+            const isOwn=txt.includes('own');
+            const isPen=txt.includes('penalty')||txt.includes('pk');
+            if(!goals2.find(g=>g.scorer.name===name&&g.minute===min)){
+              goals2.push({scorer:{name},team:{name:teamName},minute:min,type:isOwn?'OWN_GOAL':isPen?'PENALTY':'REGULAR'});
+              if(!isOwn){
+                if(!SCORER_TOTALS[name]) SCORER_TOTALS[name]={team:teamName,goals:0};
+                SCORER_TOTALS[name].goals++;
+              }
+            }
+          }
+        }
+        if(goals2.length){
+          GOAL_EVENTS[key]=goals2;
+          if(LIVE_SCORES[key]) LIVE_SCORES[key].goals=goals2;
+        }
+      }catch{}
+    }));
+    API_STATUS.api3='ok';
+  } catch{
+    try{
+      const r=await fetch(`${PROXY}/espn`);
+      if(!r.ok) throw 0;
+      const d=await r.json();
+      for(const ev of d.events||[]) {
+        const comp=ev.competitions?.[0];if(!comp)continue;
+        const home=comp.competitors?.find(c=>c.homeAway==='home');
+        const away=comp.competitors?.find(c=>c.homeAway==='away');
+        if(!home||!away)continue;
+        const {key}=resolveMatchKey(home.team?.displayName,away.team?.displayName);
+        if(!LIVE_SCORES[key])LIVE_SCORES[key]={home:home.score??null,away:away.score??null,minute:comp.status?.displayClock,status:comp.status?.type?.name,source:'ESPN',goals:[]};
+      }
+      API_STATUS.api3='ok';
+    }catch{API_STATUS.api3='fail';}
+  }
+}
+
+async function fetchLiveScores() {
+  await Promise.allSettled([fetchApi1(),fetchApi2(),fetchApi3()]);
+  LIVE_SCORES_READY = true;
+  updateApiUI();
+}
+
+// ══ STANDINGS DATA (static fallback + live attempt) ══
+const STATIC_GROUPS = {
+  'Group A': [
+    {team:'Mexico',  played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'South Korea',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Czech Republic',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'South Africa',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group B': [
+    {team:'Canada',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Switzerland',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Qatar',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Bosnia and Herzegovina',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group C': [
+    {team:'Brazil',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Morocco',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Scotland',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Haiti',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group D': [
+    {team:'United States',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Turkey',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Australia',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Paraguay',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group E': [
+    {team:'Germany',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Ivory Coast',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Ecuador',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Curaçao',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group F': [
+    {team:'Netherlands',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Japan',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Sweden',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Tunisia',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group G': [
+    {team:'Belgium',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Egypt',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Iran',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'New Zealand',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group H': [
+    {team:'Spain',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Saudi Arabia',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Uruguay',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Cape Verde',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group I': [
+    {team:'France',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Senegal',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Norway',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Iraq',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group J': [
+    {team:'Argentina',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Austria',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Algeria',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Jordan',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group K': [
+    {team:'Portugal',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Colombia',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Uzbekistan',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'DR Congo',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+  'Group L': [
+    {team:'England',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Croatia',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Ghana',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+    {team:'Panama',played:0,w:0,d:0,l:0,gf:0,ga:0,pts:0},
+  ],
+};
+
+// Compute standings from finished matches in LIVE_SCORES
+function computeStandingsFromResults() {
+  const groups = JSON.parse(JSON.stringify(STATIC_GROUPS));
+  for(const m of MATCHES) {
+    if(m.stage!=='Group Stage') continue;
+    const status = getMatchStatus(m);
+    if(status==='upcoming') continue;
+    const [t1,t2] = getTeamNames(m.summary);
+    const k1=t1+t2, k2=t2+t1;
+    const data = LIVE_SCORES[k1]||LIVE_SCORES[k2];
+    if(!data||data.home===null||data.home===undefined) continue;
+    let h=parseInt(data.home), a=parseInt(data.away);
+    if(isNaN(h)||isNaN(a)) continue;
+    const swapped = !!LIVE_SCORES[k2]&&!LIVE_SCORES[k1];
+    if(swapped){[h,a]=[a,h];}
+    const grp=m.group;
+    if(!groups[grp]) continue;
+    const team1row=groups[grp].find(r=>r.team===t1);
+    const team2row=groups[grp].find(r=>r.team===t2);
+    if(!team1row||!team2row) continue;
+    team1row.played++; team2row.played++;
+    team1row.gf+=h; team1row.ga+=a;
+    team2row.gf+=a; team2row.ga+=h;
+    if(h>a){team1row.w++;team1row.pts+=3;team2row.l++;}
+    else if(a>h){team2row.w++;team2row.pts+=3;team1row.l++;}
+    else{team1row.d++;team1row.pts++;team2row.d++;team2row.pts++;}
+  }
+  return groups;
+}
+
+// ══ COUNTDOWN ══
+const countdownTimers = {};
+function startCountdown(matchId, startTime) {
+  const el = document.getElementById(`cd-${matchId}`);
+  if(!el) return;
+  if(countdownTimers[matchId]) clearInterval(countdownTimers[matchId]);
+  function update() {
+    const diff = startTime - new Date();
+    if(diff<=0){el.innerHTML=`<div class="countdown-expired">🟢 انطلقت المباراة!</div>`;clearInterval(countdownTimers[matchId]);return;}
+    const days=Math.floor(diff/86400000);
+    const hours=Math.floor((diff%86400000)/3600000);
+    const mins=Math.floor((diff%3600000)/60000);
+    const secs=Math.floor((diff%60000)/1000);
+    el.innerHTML=`<div class="countdown-wrap">
+      ${days>0?`<div class="countdown-unit"><span class="countdown-num">${days}</span><span class="countdown-lbl">يوم</span></div>`:''}
+      <div class="countdown-unit"><span class="countdown-num">${String(hours).padStart(2,'0')}</span><span class="countdown-lbl">ساعة</span></div>
+      <div class="countdown-unit"><span class="countdown-num">${String(mins).padStart(2,'0')}</span><span class="countdown-lbl">دقيقة</span></div>
+      <div class="countdown-unit"><span class="countdown-num">${String(secs).padStart(2,'0')}</span><span class="countdown-lbl">ثانية</span></div>
+    </div>`;
+  }
+  update();
+  countdownTimers[matchId]=setInterval(update,1000);
+}
+
+// ══ MATCH DETAILS ══
+async function fetchMatchDetails(id,team1,team2,matchDate) {
+  try{
+    const r=await fetch(`${PROXY}/fd/today?date=${matchDate}`);
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const am=d.matches?.find(m=>
+      m.homeTeam.name.toLowerCase().includes(team1.split(' ')[0].toLowerCase())||
+      m.awayTeam.name.toLowerCase().includes(team1.split(' ')[0].toLowerCase())||
+      m.homeTeam.name.toLowerCase().includes(team2.split(' ')[0].toLowerCase())
+    );
+    if(am)return{source:'football-data.org',match:am,type:'football-data'};
+  }catch{}
+  try{
+    const r=await fetch(`${PROXY}/espn`);
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const ev=d.events?.find(e=>{const n=e.name?.toLowerCase();return n.includes(team1.split(' ')[0].toLowerCase())||n.includes(team2.split(' ')[0].toLowerCase());});
+    if(ev)return{source:'ESPN',match:ev,type:'espn'};
+  }catch{}
+  return null;
+}
+
+function renderDetailsHTML(result) {
+  if(!result)return`<div style="text-align:center;padding:10px;color:var(--muted);font-size:12px">لا توجد بيانات متاحة</div>`;
+  if(result.type==='football-data'){
+    const m=result.match;
+    const h=m.score.fullTime.home??'-', a=m.score.fullTime.away??'-';
+    const hh=m.score.halfTime.home??'-', ha=m.score.halfTime.away??'-';
+    let statsHTML='';
+    if(m.statistics?.length){
+      statsHTML=`<div style="margin:10px 0 6px;font-size:11px;color:var(--muted)">📊 الإحصائيات</div>`;
+      for(const s of m.statistics.slice(0,6)){
+        const hv=s.home||0,av=s.away||0,tot=(hv+av)||1,hPct=Math.round(hv/tot*100);
+        statsHTML+=`<div class="stats-row">
+          <span class="stats-val">${hv}</span>
+          <div class="stats-bar-wrap"><div class="stats-bar home" style="width:${hPct}%"></div></div>
+          <span class="stats-label" style="font-size:9px">${s.type||''}</span>
+          <div class="stats-bar-wrap"><div class="stats-bar" style="width:${100-hPct}%"></div></div>
+          <span class="stats-val">${av}</span>
+        </div>`;
+      }
+    }
+    const goalsHTML=m.goals?.length
+      ?`<div style="font-size:11px;color:var(--muted);margin:8px 0 4px">⚽ الأهداف</div>`+m.goals.map(g=>`
+        <div class="event-item">
+          <span class="event-min">${g.minute}'</span>
+          <span style="font-size:16px">⚽</span>
+          <span style="color:var(--text)">${g.scorer?.name||'—'} <span style="color:var(--muted);font-size:10px">(${g.team?.name||''})</span>
+          ${g.type==='OWN_GOAL'?'<span style="color:#f44;font-size:9px"> (عكسية)</span>':''}
+          ${g.type==='PENALTY'?'<span style="color:#ff9800;font-size:9px"> (ركلة جزاء)</span>':''}
+          </span></div>`).join('')
+      :`<div style="color:var(--muted);text-align:center;font-size:12px;padding:6px 0">لا توجد أهداف مسجلة</div>`;
+    const bookings=m.bookings||[];
+    const cardsHTML=bookings.length
+      ?`<div style="font-size:11px;color:var(--muted);margin:8px 0 4px">🟨 البطاقات</div>`+bookings.map(b=>`
+        <div class="event-item">
+          <span class="event-min">${b.minute}'</span>
+          <span style="font-size:16px">${b.card==='YELLOW_CARD'?'🟨':'🟥'}</span>
+          <span style="color:var(--text)">${b.player?.name||'—'} <span style="color:var(--muted);font-size:10px">(${b.team?.name||''})</span></span>
+        </div>`).join('')
+      :'';
+    return`<div class="detail-tabs">
+      <button class="dtab active" onclick="switchDetailTab(this,'tab-ev-${m.id}')">الأحداث</button>
+      ${statsHTML?`<button class="dtab" onclick="switchDetailTab(this,'tab-st-${m.id}')">إحصائيات</button>`:''}
+    </div>
+    <div style="display:flex;justify-content:space-around;padding:8px 0;border-bottom:1px solid var(--card-border);margin-bottom:8px">
+      <div style="text-align:center"><div style="font-size:10px;color:var(--muted)">الشوط الأول</div><div style="font-size:15px;color:var(--gold);font-weight:700">${hh} - ${ha}</div></div>
+      <div style="text-align:center"><div style="font-size:10px;color:var(--muted)">النتيجة</div><div style="font-size:22px;color:var(--gold);font-weight:900;font-family:'Amiri',serif">${h} - ${a}</div></div>
+    </div>
+    <div class="dtab-content open" id="tab-ev-${m.id}">${goalsHTML}${cardsHTML}</div>
+    ${statsHTML?`<div class="dtab-content" id="tab-st-${m.id}">${statsHTML}</div>`:''}
+    <div class="api-source-tag">📡 المصدر: ${result.source}</div>`;
+  }
+  if(result.type==='espn'){
+    const comp=result.match.competitions?.[0];
+    const home=comp?.competitors?.find(c=>c.homeAway==='home');
+    const away=comp?.competitors?.find(c=>c.homeAway==='away');
+    return`<div style="text-align:center;padding:10px 0">
+      <div style="font-size:24px;color:var(--gold);font-weight:900;font-family:'Amiri',serif">${home?.score??'-'} - ${away?.score??'-'}</div>
+      <div style="font-size:12px;color:var(--green-light)">${comp?.status?.displayClock||comp?.status?.type?.shortDetail||''}</div>
+    </div><div class="api-source-tag">📡 المصدر: ${result.source}</div>`;
+  }
+  return`<div style="text-align:center;padding:10px;color:var(--muted)">لا توجد بيانات</div>`;
+}
+
+function switchDetailTab(btn,tabId) {
+  const panel=btn.closest('.details-panel');
+  panel.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  panel.querySelectorAll('.dtab-content').forEach(c=>c.classList.remove('open'));
+  btn.classList.add('active');
+  const t=document.getElementById(tabId);if(t)t.classList.add('open');
+}
+
+// ══ SVG بطاقة حمراء واحدة ══
+function svgRedCard(width=28, height=38) {
+  return `<svg width="${width}" height="${height}" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="rcg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ff3300"/>
+        <stop offset="50%" stop-color="#cc2200"/>
+        <stop offset="100%" stop-color="#880e00"/>
+      </linearGradient>
+      <filter id="rcglow">
+        <feGaussianBlur stdDeviation="1.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <rect x="1" y="1" width="26" height="36" rx="3" ry="3" fill="url(#rcg)" filter="url(#rcglow)" stroke="#ff6644" stroke-width="0.8"/>
+    <rect x="3" y="3" width="22" height="16" rx="2" fill="rgba(255,255,255,0.08)"/>
+    <line x1="6" y1="22" x2="22" y2="22" stroke="rgba(255,100,68,0.4)" stroke-width="0.8"/>
+    <line x1="6" y1="27" x2="22" y2="27" stroke="rgba(255,100,68,0.4)" stroke-width="0.8"/>
+    <line x1="6" y1="32" x2="16" y2="32" stroke="rgba(255,100,68,0.4)" stroke-width="0.8"/>
+  </svg>`;
+}
+
+// ══ رصد الأهداف الجديدة وتشغيل Animation ══
+function triggerGoalFlash(key, newH, newA, prevH, prevA) {
+  // ابحث عن بطاقات المباراة المرتبطة بهذا الـ key
+  for(const m of MATCHES) {
+    const [t1,t2] = getTeamNames(m.summary);
+    const sk1=`${t1}${t2}`, sk2=`${t2}${t1}`;
+    if(sk1 !== key && sk2 !== key) continue;
+    const card = document.getElementById(`card-${m.id}`);
+    if(!card) continue;
+    // أضف animation
+    card.classList.remove('goal-flash');
+    void card.offsetWidth; // reflow
+    card.classList.add('goal-flash');
+    card.style.position = 'relative';
+    // إزالة الإشعارات القديمة
+    card.querySelectorAll('.goal-notification').forEach(n=>n.remove());
+    // أضف إشعار الهدف
+    const scorer = newH > prevH ? t1 : t2;
+    const notif = document.createElement('div');
+    notif.className = 'goal-notification';
+    notif.textContent = `⚽ هدف! ${scorer}`;
+    card.appendChild(notif);
+    setTimeout(()=>{ notif.remove(); card.classList.remove('goal-flash'); }, 4000);
+    break;
+  }
+}
+
+// ══ بناء عرض البطاقات الحمراء ══
+function buildRedCardZone(redCards, teamName, swapped, side) {
+  if(!redCards || !redCards.length) return '';
+  const realSide = swapped ? (side==='home'?'away':'home') : side;
+  const cards = redCards.filter(c=>c.side===realSide);
+  if(!cards.length) return '';
+
+  if(cards.length === 1) {
+    return `<div class="red-card-zone">
+      <div class="red-card-single" title="${cards[0].player||''}${cards[0].minute?` (${cards[0].minute}')`:''}">${svgRedCard(22,30)}</div>
+      ${cards[0].player?`<div class="red-card-player">${cards[0].player.split(' ').slice(-1)[0]}</div>`:''}
+    </div>`;
+  }
+
+  // أكثر من بطاقة: 3D animation
+  const cardsSvg = cards.slice(0,3).map((_,i)=>`
+    <div class="multi-red-card" style="animation-delay:${i*0.25}s" title="${cards[i]?.player||''}">${svgRedCard(20,28)}</div>
+  `).join('');
+  const extra = cards.length > 3 ? `<span style="color:#ff4444;font-size:11px;font-weight:900">+${cards.length-3}</span>` : '';
+  return `<div class="red-card-zone">
+    <div class="multi-red-scene">${cardsSvg}${extra}</div>
+    <div class="red-card-player" style="color:#ff3300;font-size:10px;font-weight:900">${cards.length} طرد!</div>
+  </div>`;
+}
+
+// ══ BUILD MATCH CARD ══
+function buildMatchCard(match, inToday=false) {
+  const status = getMatchStatus(match);
+  const start = parseUTC(match.dtstart);
+  const [team1,team2] = getTeamNames(match.summary);
+  const flag1 = getFlagImg(team1);
+  const flag2 = getFlagImg(team2);
+  const sk1=`${team1}${team2}`, sk2=`${team2}${team1}`;
+  const ld = LIVE_SCORES[sk1]||LIVE_SCORES[sk2]||null;
+  const swapped = !!LIVE_SCORES[sk2]&&!LIVE_SCORES[sk1];
+  const channels = getChannels(match);
+
+  // البطاقات الحمراء
+  const rcKey = RED_CARDS[sk1] ? sk1 : (RED_CARDS[sk2] ? sk2 : null);
+  const redCardsData = rcKey ? RED_CARDS[rcKey] : [];
+
+  // Build per-team scorer lines from goals array
+  function buildScorerLines(goals, teamName) {
+    if(!goals || !goals.length) return '';
+    const firstWord = (teamName||'').split(' ')[0].toLowerCase();
+    const filtered = goals.filter(g => (g.team?.name||'').toLowerCase().includes(firstWord));
+    if(!filtered.length) return '';
+    return filtered.map(g => {
+      const icon = g.type==='OWN_GOAL' ? '🔴' : g.type==='PENALTY' ? '🟡' : '⚽';
+      const extra = g.type==='OWN_GOAL' ? ' <span class="scorer-type">(عكسية)</span>' :
+                    g.type==='PENALTY' ? ' <span class="scorer-type">(ج)</span>' : '';
+      const shortName = (g.scorer?.name || '?').split(' ').slice(-1)[0];
+      return `<div class="scorer-line">${icon} <span class="scorer-name">${shortName}</span> <span class="scorer-min">${g.minute||''}'</span>${extra}</div>`;
+    }).join('');
+  }
+
+  const t1real = swapped ? team2 : team1;
+  const t2real = swapped ? team1 : team2;
+  const goals = (ld?.goals?.length ? ld.goals : null) || GOAL_EVENTS[sk1] || GOAL_EVENTS[sk2] || [];
+  const scorers1 = buildScorerLines(goals, t1real);
+  const scorers2 = buildScorerLines(goals, t2real);
+
+  // بناء عرض البطاقات الحمراء لكل فريق
+  const rc1 = buildRedCardZone(redCardsData, t1real, swapped, 'home');
+  const rc2 = buildRedCardZone(redCardsData, t2real, swapped, 'away');
+
+  let scoreHTML='', badgeHTML='', countdownHTML='';
+
+  if(status==='live'){
+    const h=ld?(swapped?ld.away:ld.home):'-';
+    const a=ld?(swapped?ld.home:ld.away):'-';
+    scoreHTML=`<div class="score">${h} - ${a}</div>`;
+    const minLabel = ld?.minute ? `${ld.minute}'` : '';
+    badgeHTML=`<div class="live-badge">🔴 مباشر ${minLabel}<span class="live-dot-score"></span></div>`;
+  } else if(status==='finished'&&ld&&ld.home!==null&&ld.home!==undefined){
+    const h=swapped?ld.away:ld.home, a=swapped?ld.home:ld.away;
+    scoreHTML=h!==null?`<div class="score">${h} - ${a}</div>`:`<div class="score not-started">انتهت</div>`;
+    badgeHTML=`<div class="finished-badge">انتهت</div>`;
+  } else if(status==='upcoming'){
+    scoreHTML=`<div class="score not-started">${toEgyptTime(start)}</div>`;
+    badgeHTML=`<div class="time-badge">${inToday?'لم تبدأ بعد':toEgyptDate(start)}</div>`;
+    countdownHTML=`<div id="cd-${match.id}" style="margin:6px 0"></div>`;
+  } else {
+    scoreHTML=`<div class="score not-started">انتهت</div>`;
+    badgeHTML=`<div class="finished-badge">انتهت</div>`;
+  }
+
+  const tvHTML=channels.map(ch=>`<span class="tv-chip">${ch}</span>`).join('');
+  const isLiveNow = status==='live';
+
+  return`<div class="match-card ${isLiveNow?'live':''}" id="card-${match.id}" onclick="toggleDetails(${match.id})" style="position:relative">
+    <div class="match-meta">
+      <span class="stage-badge">${STAGE_AR[match.stage]||match.stage}</span>
+      <span class="group-badge">${match.group||''}</span>
+    </div>
+    <div class="match-teams">
+      <div class="team">
+        ${flag1}
+        <span class="team-name-text">${team1||match.summary.split(' vs ')[0].trim()}</span>
+        ${scorers1?`<div class="team-scorers">${scorers1}</div>`:''}
+        ${rc1}
+      </div>
+      <div class="score-box">${scoreHTML}${badgeHTML}</div>
+      <div class="team">
+        ${flag2}
+        <span class="team-name-text">${team2||match.summary.split(' vs ')[1]?.trim()||''}</span>
+        ${scorers2?`<div class="team-scorers">${scorers2}</div>`:''}
+        ${rc2}
+      </div>
+    </div>
+    ${countdownHTML}
+    <div class="match-footer">
+      <span>📍 ${match.location}</span>
+    </div>
+    ${channels.length?`<div class="tv-channels">${tvHTML}</div>`:''}
+    <div class="details-panel" id="details-${match.id}">
+      <div style="padding:8px;text-align:center;color:var(--muted);font-size:11px">⏳ جاري جلب التفاصيل...</div>
+    </div>
+  </div>`;
+}
+
+
+async function toggleDetails(id) {
+  const panel=document.getElementById(`details-${id}`);
+  if(panel.classList.contains('open')){panel.classList.remove('open');return;}
+  panel.classList.add('open');
+  const match=MATCHES.find(m=>m.id===id);
+  const status=getMatchStatus(match);
+  const [t1,t2]=getTeamNames(match.summary);
+  const matchDate=parseUTC(match.dtstart).toISOString().slice(0,10);
+  if(status==='upcoming'){
+    const s=parseUTC(match.dtstart);
+    panel.innerHTML=`<div style="text-align:center;padding:12px;color:var(--green-light)">
+      ⏰ تبدأ الساعة ${toEgyptTime(s)} بتوقيت القاهرة<br>
+      <span style="font-size:11px;color:var(--muted)">${toEgyptDate(s)}</span>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted)">سيتم جلب التفاصيل لحظة بلحظة فور انطلاق المباراة</div>
+    </div>`;
+    return;
+  }
+  panel.innerHTML=`<div style="text-align:center;padding:10px;color:var(--muted)">⏳ جاري الجلب من APIs...</div>`;
+  const result=await fetchMatchDetails(id,t1,t2,matchDate);
+  panel.innerHTML=renderDetailsHTML(result);
+}
+
+// ══ RENDER ══
+let currentFilter='all';
+
+function filterMatches(stage,e) {
+  if (currentSearchTeam) { clearSearch(); }
+  currentFilter=stage;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  if(e) e.target.classList.add('active');
+  renderAll();
+}
+
+function renderToday() {
+  const todayM=MATCHES.filter(m=>isTodayEgypt(parseUTC(m.dtstart)));
+  const c=document.getElementById('todayMatches');
+  if(!todayM.length){c.innerHTML='<div class="no-today">لا توجد مباريات اليوم 📅</div>';return;}
+  c.innerHTML=todayM.map(m=>buildMatchCard(m,true)).join('');
+  todayM.forEach(m=>{
+    const status=getMatchStatus(m);
+    if(status==='upcoming') startCountdown(m.id,parseUTC(m.dtstart));
+  });
+}
+
+function renderAll() {
+  const c=document.getElementById('allSection');
+  const filtered=currentFilter==='all'?MATCHES:MATCHES.filter(m=>m.stage===currentFilter);
+  const grouped={};
+  for(const m of filtered){if(!grouped[m.stage])grouped[m.stage]=[];grouped[m.stage].push(m);}
+  let html='';
+  for(const stage of STAGE_ORDER){
+    if(!grouped[stage])continue;
+    html+=`<div class="stage-group">
+      <div class="stage-header">
+        <span class="stage-icon">${STAGE_ICONS[stage]||'⚽'}</span>
+        <span class="stage-name">${STAGE_AR[stage]||stage}</span>
+        <span class="stage-count">(${grouped[stage].length} مباراة)</span>
+      </div>
+      ${grouped[stage].map(m=>buildMatchCard(m)).join('')}
+    </div>`;
+  }
+  c.innerHTML=html;
+  // Start countdowns for upcoming matches
+  for(const stage of STAGE_ORDER){
+    if(!grouped[stage])continue;
+    for(const m of grouped[stage]){
+      if(getMatchStatus(m)==='upcoming') startCountdown(m.id,parseUTC(m.dtstart));
+    }
+  }
+}
+
+// ══ TAB SWITCHING ══
+function switchTab(tabName,btn) {
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+  btn.classList.add('active');
+  if(tabName==='standings') renderStandings();
+  if(tabName==='scorers') renderScorers();
+  if(tabName==='today') renderToday();
+}
+
+// ══ CLOCK ══
+function updateClock() {
+  const now=new Date().toLocaleString('ar-EG',{
+    timeZone:'Africa/Cairo',weekday:'long',day:'numeric',month:'long',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true
+  });
+  document.getElementById('headerClock').textContent=now;
+}
+
+// ══ TAYYIBAT BANNER ══
+(function(){
+  const KEY='tayyibat_banner_date';
+  const today=new Date().toISOString().slice(0,10);
+  try{if(localStorage.getItem(KEY)===today){document.getElementById('tayyibatBanner').style.display='none';}}catch{}
+})();
+function closeTayyibatBanner(){
+  const today=new Date().toISOString().slice(0,10);
+  try{localStorage.setItem('tayyibat_banner_date',today);}catch{}
+  const b=document.getElementById('tayyibatBanner');
+  b.style.transition='transform 0.3s,opacity 0.3s';
+  b.style.transform='translateY(100%)';b.style.opacity='0';
+  setTimeout(()=>b.style.display='none',300);
+}
+
+window.addEventListener('scroll',()=>{
+  document.getElementById('scrollTopBtn').classList.toggle('visible',window.scrollY>300);
+});
+
+// ══ LIVE STANDINGS FROM API ══
+let LIVE_STANDINGS = null;
+let LIVE_SCORERS = null;
+
+async function fetchLiveStandings() {
+  // محاولة أولى: worldcup26.ir (مجاني 100% بدون key)
+  try {
+    const groups = await fetchWC26Groups();
+    if(groups && groups.length) {
+      const built = {};
+      for(const g of groups) {
+        const grpName = g.name || g.group || g.group_name || '';
+        const teams = g.teams || g.standings || g.table || [];
+        if(!grpName || !teams.length) continue;
+        const mapped = teams.map(t => ({
+          team:   t.team?.name || t.name || t.team_name || '',
+          played: t.played ?? t.played_games ?? t.mp ?? 0,
+          w:      t.won   ?? t.wins   ?? t.w ?? 0,
+          d:      t.draw  ?? t.draws  ?? t.d ?? 0,
+          l:      t.lost  ?? t.losses ?? t.l ?? 0,
+          gf:     t.goals_for    ?? t.gf ?? t.goalsFor    ?? 0,
+          ga:     t.goals_against ?? t.ga ?? t.goalsAgainst ?? 0,
+          pts:    t.points ?? t.pts ?? 0,
+        })).filter(t => t.team);
+        if(mapped.length) built[grpName] = mapped;
+      }
+      if(Object.keys(built).length) {
+        LIVE_STANDINGS = built;
+        return 'wc26';
+      }
+    }
+  } catch{}
+  // محاولة ثانية: Worker (football-data.org)
+  try {
+    const r = await fetch(`${PROXY}/fd/standings`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    if(d.standings) {
+      LIVE_STANDINGS = {};
+      for(const s of d.standings) {
+        const grpName = s.group ? s.group.replace('GROUP_','Group ') : null;
+        if(!grpName || s.type !== 'TOTAL') continue;
+        LIVE_STANDINGS[grpName] = s.table.map(row=>({
+          team: row.team.name, played: row.playedGames,
+          w: row.won, d: row.draw, l: row.lost,
+          gf: row.goalsFor, ga: row.goalsAgainst, pts: row.points
+        }));
+      }
+      return 'fd';
+    }
+  } catch{}
+  return false;
+}
+
+async function fetchLiveScorers() {
+  // محاولة أولى: worldcup26.ir/get/games — نحسب الهدافين من بيانات المباريات
+  try {
+    const games = await fetchWC26Games();
+    if(games && games.length) {
+      const scorerMap = {};
+      for(const g of games) {
+        const allGoals = [
+          ...(g.home_scorers || g.home_team?.scorers || []).map(s => ({...s, teamName: g.home_team?.name || g.home?.name || ''})),
+          ...(g.away_scorers || g.away_team?.scorers || []).map(s => ({...s, teamName: g.away_team?.name || g.away?.name || ''})),
+          ...(g.goals || []).map(s => ({...s, teamName: s.team?.name || ''})),
+        ];
+        for(const sc of allGoals) {
+          const name = sc.name || sc.player?.name || sc.scorer?.name || sc.player_name || '';
+          if(!name) continue;
+          const team = sc.teamName || sc.team?.name || '';
+          if(!scorerMap[name]) scorerMap[name] = {player:{name}, team:{name:team}, goals:0, playedMatches:0};
+          scorerMap[name].goals += (sc.goals || 1);
+        }
+      }
+      const scorers = Object.values(scorerMap).sort((a,b) => b.goals - a.goals);
+      if(scorers.length) { LIVE_SCORERS = scorers; return true; }
+    }
+  } catch{}
+  // محاولة ثانية: Worker (football-data.org)
+  try {
+    const r = await fetch(`${PROXY}/fd/scorers`);
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    if(d.scorers && d.scorers.length) {
+      LIVE_SCORERS = d.scorers;
+      return true;
+    }
+  } catch{}
+  return false;
+}
+
+// ══ RENDER STANDINGS ══
+async function renderStandings() {
+  const section = document.getElementById('standingsSection');
+  section.innerHTML = '<div class="standings-loading">𓂀 جاري جلب الترتيب...</div>';
+
+  // إذا لم تكتمل LIVE_SCORES بعد، اجلبها الآن
+  if(!LIVE_SCORES_READY) {
+    await fetchLiveScores();
+  }
+
+  // حاول أولاً worldcup26.ir للحصول على ترتيب حي
+  const gotLive = await fetchLiveStandings();
+
+  let groups;
+  let sourceLabel;
+
+  if(gotLive && LIVE_STANDINGS && Object.keys(LIVE_STANDINGS).length) {
+    groups = LIVE_STANDINGS;
+    sourceLabel = gotLive === 'wc26'
+      ? '📡 المصدر: worldcup26.ir (مباشر)'
+      : '📡 المصدر: football-data.org (مباشر)';
+  } else {
+    // احسب الترتيب من نتائج المباريات المجلوبة
+    groups = computeStandingsFromResults();
+    const hasResults = Object.values(groups).some(g=>g.some(t=>t.played>0));
+    sourceLabel = hasResults
+      ? '📡 محسوب من نتائج المباريات'
+      : '📡 البطولة لم تبدأ بعد — الترتيب الأولي';
+  }
+
+  let html = `<div style="font-size:10px;color:var(--muted);text-align:center;padding:4px 0 8px">${sourceLabel}</div>`;
+  for(const[grpName,rows] of Object.entries(groups)) {
+    const sorted=[...rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+    html+=`<div class="group-standings">
+      <div class="group-title">🏟️ ${grpName}</div>
+      <table class="standings-table">
+        <thead><tr>
+          <th>#</th><th style="text-align:right;padding-right:8px">المنتخب</th>
+          <th>ل</th><th>ف</th><th>ت</th><th>خ</th>
+          <th>له</th><th>عليه</th><th>الفارق</th>
+          <th style="color:var(--gold-light)">ن</th>
+        </tr></thead>
+        <tbody>`;
+    sorted.forEach((r,i)=>{
+      const gd=r.gf-r.ga;
+      const q=(i<2)?'qualified':'';
+      html+=`<tr class="${q}">
+        <td><span class="rank-num rank-${i<3?i+1:'other'}">${i+1}</span></td>
+        <td><div class="team-cell">${getSmallFlag(r.team)}<span>${r.team}</span></div></td>
+        <td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+        <td>${r.gf}</td><td>${r.ga}</td>
+        <td style="color:${gd>0?'var(--green-light)':gd<0?'#cc5533':'var(--muted)'}">${gd>0?'+':''}${gd}</td>
+        <td class="pts-cell">${r.pts}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;padding:2px 4px;">
+        <span style="border-right:3px solid var(--green-light);padding-right:4px;margin-right:4px;">يتأهل</span>
+        ل=لعب · ف=فوز · ت=تعادل · خ=خسارة · ن=نقاط
+      </div>
+    </div>`;
+  }
+  section.innerHTML = html;
+}
+
+// ══ RENDER SCORERS ══
+async function renderScorers() {
+  const section = document.getElementById('scorersSection');
+  section.innerHTML = '<div class="standings-loading">⚽ جاري جلب الهدافين...</div>';
+
+  if(!LIVE_SCORES_READY) await fetchLiveScores();
+
+  // المصدر ١: SCORER_TOTALS المجمّعة من ESPN events (الأدق)
+  let finalScorers = [];
+  if(Object.keys(SCORER_TOTALS).length) {
+    finalScorers = Object.entries(SCORER_TOTALS)
+      .map(([name,data]) => ({player:{name}, team:{name:data.team}, goals:data.goals}))
+      .sort((a,b) => b.goals - a.goals);
+  }
+
+  // المصدر ٢: GOAL_EVENTS إذا SCORER_TOTALS فاضية
+  if(!finalScorers.length) {
+    const scorerMap = {};
+    for(const [key, goals] of Object.entries(GOAL_EVENTS)) {
+      for(const g of goals) {
+        if(g.type === 'OWN_GOAL') continue;
+        const name = g.scorer?.name || '';
+        if(!name) continue;
+        const team = g.team?.name || '';
+        if(!scorerMap[name]) scorerMap[name] = {player:{name}, team:{name:team}, goals:0};
+        scorerMap[name].goals++;
+      }
+    }
+    finalScorers = Object.values(scorerMap).sort((a,b) => b.goals - a.goals);
+  }
+
+  // المصدر ٣: LIVE_SCORES.goals (football-data.org)
+  if(!finalScorers.length) {
+    const gotLive = await fetchLiveScorers();
+    if(gotLive && LIVE_SCORERS?.length) {
+      finalScorers = LIVE_SCORERS;
+    }
+  }
+
+  // المصدر ٤: احسب من LIVE_SCORES محلياً
+  if(!finalScorers.length) {
+    const scorerMap = {};
+    for(const m of MATCHES) {
+      const [t1,t2] = getTeamNames(m.summary);
+      const k1=t1+t2, k2=t2+t1;
+      const ld = LIVE_SCORES[k1] || LIVE_SCORES[k2];
+      if(!ld?.goals?.length) continue;
+      for(const g of ld.goals) {
+        const name = g.scorer?.name || g.player?.name || '';
+        if(!name || g.type === 'OWN_GOAL') continue;
+        const team = g.team?.name || '';
+        if(!scorerMap[name]) scorerMap[name] = {player:{name}, team:{name:team}, goals:0};
+        scorerMap[name].goals++;
+      }
+    }
+    finalScorers = Object.values(scorerMap).sort((a,b) => b.goals - a.goals);
+  }
+
+  if(!finalScorers.length) {
+    section.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted)">
+      <div style="font-size:40px;margin-bottom:12px">⚽</div>
+      <div style="font-size:14px;color:var(--gold)">لا توجد أهداف مسجلة بعد</div>
+      <div style="font-size:12px;margin-top:8px">ستظهر قائمة الهدافين فور تسجيل أول هدف</div>
+    </div>`;
+    return;
+  }
+
+  let html = `<div style="font-size:10px;color:var(--muted);text-align:center;padding:4px 0 12px">⚽ الهدافون — كأس العالم 2026</div>
+  <table class="standings-table" style="width:100%">
+    <thead><tr>
+      <th>#</th>
+      <th style="text-align:right;padding-right:8px">اللاعب</th>
+      <th style="text-align:right;padding-right:8px">المنتخب</th>
+      <th style="color:var(--gold-light)">⚽</th>
+    </tr></thead>
+    <tbody>`;
+  finalScorers.slice(0,25).forEach((s,i)=>{
+    const goals = s.goals ?? 0;
+    const playerName = s.player?.name ?? s.name ?? '—';
+    const teamName = s.team?.name ?? '—';
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    // شريط مرئي بعدد الأهداف
+    const maxGoals = finalScorers[0]?.goals || 1;
+    const pct = Math.round((goals/maxGoals)*100);
+    html+=`<tr>
+      <td style="width:32px"><span class="rank-num rank-${i<3?i+1:'other'}">${i+1}</span></td>
+      <td style="text-align:right;padding-right:8px">
+        <div style="font-weight:700;color:var(--text);font-size:13px">${medal} ${playerName}</div>
+      </td>
+      <td style="text-align:right;padding-right:8px">
+        <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+          ${getSmallFlag(teamName)}
+          <span style="font-size:10px;color:var(--muted)">${teamName}</span>
+        </div>
+      </td>
+      <td style="text-align:center;min-width:80px">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+          <div style="background:var(--card-border);border-radius:4px;height:6px;width:50px;overflow:hidden">
+            <div style="background:var(--gold);height:100%;width:${pct}%;border-radius:4px"></div>
+          </div>
+          <span style="font-size:20px;font-weight:900;color:var(--gold);font-family:'Amiri',serif;min-width:20px">${goals}</span>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  section.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// SMART SEARCH ENGINE
+// ══════════════════════════════════════════════
+
+// قاموس المرادفات الشامل لكل المنتخبات
+const TEAM_ALIASES = {
+  'Egypt': [
+    'egypt','مصر','منتخب مصر','الفراعنة','egy','eg','ماتشات مصر','مباريات مصر',
+    'مصري','المنتخب المصري','الفرعون','فراعنة','ماتشات مصر','مباراة مصر',
+    'team egypt','egyptian'
+  ],
+  'Saudi Arabia': [
+    'saudi arabia','saudi','المملكة العربية السعودية','السعودية','الأخضر',
+    'المنتخب السعودي','الأخضر السعودي','ksa','sar','sa','سعودي',
+    'منتخب السعودية','مباريات السعودية','ماتشات السعودية'
+  ],
+  'Morocco': [
+    'morocco','المغرب','المنتخب المغربي','أسود الأطلس','الأطلس','mar','ma',
+    'مغرب','مغربي','منتخب المغرب','مباريات المغرب'
+  ],
+  'Algeria': [
+    'algeria','الجزائر','المنتخب الجزائري','المحاربون','المحاربون الشجعان','alg','dz',
+    'جزائر','جزائري','منتخب الجزائر','مباريات الجزائر','الخضر'
+  ],
+  'Tunisia': [
+    'tunisia','تونس','المنتخب التونسي','نسور قرطاج','tun','tn',
+    'تونسي','منتخب تونس','مباريات تونس','نسور قرطاج'
+  ],
+  'Iraq': [
+    'iraq','العراق','المنتخب العراقي','أسود الرافدين','irq','iq',
+    'عراق','عراقي','منتخب العراق','مباريات العراق'
+  ],
+  'Jordan': [
+    'jordan','الأردن','المنتخب الأردني','النشامى','jor','jo',
+    'أردن','أردني','منتخب الأردن','مباريات الأردن'
+  ],
+  'Qatar': [
+    'qatar','قطر','المنتخب القطري','أبطال العالم','qat','qa',
+    'قطري','منتخب قطر','مباريات قطر'
+  ],
+  'Brazil': [
+    'brazil','البرازيل','السيليساو','السيلسياو','سيليساو','bra','br',
+    'برازيل','برازيلي','منتخب البرازيل','مباريات البرازيل','brasil',
+    'الكانارينيو','أبطال العالم'
+  ],
+  'Argentina': [
+    'argentina','الأرجنتين','التانغو','التنغو','arg','ar',
+    'أرجنتين','أرجنتيني','منتخب الأرجنتين','مباريات الأرجنتين',
+    'الآلبيسيليستي','لاسيليستي'
+  ],
+  'France': [
+    'france','فرنسا','الديوك','المنتخب الفرنسي','fra','fr',
+    'فرنسا','فرنسي','منتخب فرنسا','مباريات فرنسا','الغالية'
+  ],
+  'Germany': [
+    'germany','ألمانيا','المنشار','الماكينة','ger','de','deu',
+    'ألماني','منتخب ألمانيا','مباريات ألمانيا','deutschland'
+  ],
+  'Spain': [
+    'spain','إسبانيا','اسبانيا','الماتادور','الماتادور','esp','es',
+    'اسباني','إسباني','منتخب إسبانيا','مباريات إسبانيا','لاروخا'
+  ],
+  'Portugal': [
+    'portugal','البرتغال','المحاربون','por','pt',
+    'برتغالي','منتخب البرتغال','مباريات البرتغال'
+  ],
+  'England': [
+    'england','إنجلترا','انجلترا','الأسود الثلاثة','الثلاثة أسود','eng','gb-eng',
+    'إنجليزي','منتخب إنجلترا','مباريات إنجلترا','three lions'
+  ],
+  'Netherlands': [
+    'netherlands','هولندا','البرتقاليون','ned','nl','holland',
+    'هولندي','منتخب هولندا','مباريات هولندا'
+  ],
+  'Belgium': [
+    'belgium','بلجيكا','الشياطين الحمر','bel','be',
+    'بلجيكي','منتخب بلجيكا','مباريات بلجيكا'
+  ],
+  'United States': [
+    'united states','usa','الولايات المتحدة','أمريكا','المنتخب الأمريكي','us',
+    'أمريكي','منتخب أمريكا','مباريات أمريكا','الولايات المتحدة الأمريكية'
+  ],
+  'Mexico': [
+    'mexico','المكسيك','ال تري','tri','mex','mx',
+    'مكسيكي','منتخب المكسيك','مباريات المكسيك','méjico'
+  ],
+  'Canada': [
+    'canada','كندا','القيقب','can','ca',
+    'كندي','منتخب كندا','مباريات كندا'
+  ],
+  'Japan': [
+    'japan','اليابان','الساموراي','الساموراي الأزرق','jpn','jp',
+    'ياباني','منتخب اليابان','مباريات اليابان','samurai blue'
+  ],
+  'South Korea': [
+    'south korea','كوريا الجنوبية','الأسيويون','kor','kr','korea',
+    'كوري','منتخب كوريا','مباريات كوريا','كوريا'
+  ],
+  'Australia': [
+    'australia','أستراليا','الساروس','aus','au','الكنغر',
+    'أسترالي','منتخب أستراليا','مباريات أستراليا','socceroos'
+  ],
+  'Switzerland': [
+    'switzerland','سويسرا','الصليب الأحمر','sui','ch',
+    'سويسري','منتخب سويسرا','مباريات سويسرا'
+  ],
+  'Croatia': [
+    'croatia','كرواتيا','الشطرنج','cro','hr',
+    'كرواتي','منتخب كرواتيا','مباريات كرواتيا'
+  ],
+  'Uruguay': [
+    'uruguay','أوروغواي','الأوروغواي','اروغواي','uru','uy',
+    'أوروغوياني','منتخب أوروغواي','مباريات أوروغواي'
+  ],
+  'Colombia': [
+    'colombia','كولومبيا','col','co',
+    'كولومبي','منتخب كولومبيا','مباريات كولومبيا'
+  ],
+  'Iran': [
+    'iran','إيران','ايران','فارسي','irn','ir',
+    'إيراني','منتخب إيران','مباريات إيران'
+  ],
+  'Senegal': [
+    'senegal','السنغال','أسود التيرانغا','sen','sn',
+    'سنغالي','منتخب السنغال','مباريات السنغال'
+  ],
+  'Norway': [
+    'norway','النرويج','nor','no',
+    'نرويجي','منتخب النرويج','مباريات النرويج'
+  ],
+  'Sweden': [
+    'sweden','السويد','الفايكينغ','swe','se',
+    'سويدي','منتخب السويد','مباريات السويد'
+  ],
+  'Austria': [
+    'austria','النمسا','aut','at',
+    'نمساوي','منتخب النمسا','مباريات النمسا'
+  ],
+  'Scotland': [
+    'scotland','اسكتلندا','إسكتلندا','sco','gb-sct',
+    'اسكتلندي','منتخب اسكتلندا','مباريات اسكتلندا'
+  ],
+  'Turkey': [
+    'turkey','تركيا','tur','tr',
+    'تركي','منتخب تركيا','مباريات تركيا','türkiye'
+  ],
+  'Ghana': [
+    'ghana','غانا','النجوم السود','gha','gh',
+    'غاني','منتخب غانا','مباريات غانا'
+  ],
+  'Ecuador': [
+    'ecuador','الإكوادور','اكوادور','ecu','ec',
+    'إكوادوري','منتخب الإكوادور','مباريات الإكوادور'
+  ],
+  'Panama': [
+    'panama','بنما','pan','pa',
+    'بنمي','منتخب بنما','مباريات بنما'
+  ],
+  'Paraguay': [
+    'paraguay','باراغواي','بارغواي','par','py',
+    'باراغواياني','منتخب باراغواي','مباريات باراغواي'
+  ],
+  'Bolivia': [
+    'bolivia','بوليفيا','bol','bo',
+    'بوليفي','منتخب بوليفيا'
+  ],
+  'Haiti': [
+    'haiti','هايتي','هاييتي','hai','ht',
+    'هايتي','منتخب هايتي','مباريات هايتي'
+  ],
+  'DR Congo': [
+    'dr congo','الكونغو','كونغو','cod','cd','congo',
+    'كونغولي','منتخب الكونغو','مباريات الكونغو'
+  ],
+  'South Africa': [
+    'south africa','جنوب أفريقيا','جنوب افريقيا','rsa','za','bafana',
+    'جنوب أفريقي','منتخب جنوب أفريقيا','مباريات جنوب أفريقيا'
+  ],
+  'Cape Verde': [
+    'cape verde','الرأس الأخضر','رأس الأخضر','cpv','cv',
+    'رأس الأخضر','منتخب الرأس الأخضر','مباريات الرأس الأخضر'
+  ],
+  'New Zealand': [
+    'new zealand','نيوزيلندا','نيوزلندا','nzl','nz','all whites',
+    'نيوزيلندي','منتخب نيوزيلندا','مباريات نيوزيلندا'
+  ],
+  'Uzbekistan': [
+    'uzbekistan','أوزبكستان','ازبكستان','uzb','uz',
+    'أوزبكي','منتخب أوزبكستان','مباريات أوزبكستان'
+  ],
+  'Ivory Coast': [
+    'ivory coast','ساحل العاج','أفيال','civ','ci','côte d\'ivoire',
+    'ساحل العاج','منتخب ساحل العاج','مباريات ساحل العاج'
+  ],
+  'Bosnia and Herzegovina': [
+    'bosnia','البوسنة','بوسنة','bih','ba',
+    'بوسني','منتخب البوسنة','مباريات البوسنة'
+  ],
+  'Curaçao': [
+    'curaçao','curacao','كوراساو','كوراساو','cur','cw',
+    'منتخب كوراساو','مباريات كوراساو'
+  ],
+};
+
+// دالة: ابحث عن اسم الفريق من نص البحث
+function resolveTeamFromQuery(q) {
+  if (!q || !q.trim()) return null;
+  const query = q.trim().toLowerCase().replace(/[؟?!،,]+/g,'');
+  for (const [team, aliases] of Object.entries(TEAM_ALIASES)) {
+    for (const alias of aliases) {
+      if (query === alias.toLowerCase() ||
+          query.includes(alias.toLowerCase()) ||
+          alias.toLowerCase().includes(query)) {
+        return team;
+      }
+    }
+    // تحقق من الاسم الأصلي للفريق
+    if (query.includes(team.toLowerCase()) || team.toLowerCase().includes(query)) {
+      return team;
+    }
+  }
+  return null;
+}
+
+// حالة البحث الحالية
+let currentSearchTeam = null;
+
+function onSearchInput(val) {
+  const clearBtn = document.getElementById('searchClearBtn');
+  const meta = document.getElementById('searchResultsMeta');
+  clearBtn.style.display = val.trim() ? 'block' : 'none';
+
+  if (!val.trim()) {
+    currentSearchTeam = null;
+    meta.textContent = '';
+    renderAll();
+    return;
+  }
+
+  const team = resolveTeamFromQuery(val);
+  currentSearchTeam = team;
+
+  if (team) {
+    const emoji = EMOJI_MAP[team] || '🏳️';
+    const count = MATCHES.filter(m => m.summary.includes(team)).length;
+    meta.innerHTML = `${emoji} <span style="color:var(--gold);font-weight:700">${team}</span> — ${count} مباراة`;
+    renderSearchResults(team);
+  } else {
+    meta.innerHTML = `<span style="color:#cc5533">⚠️ لا نتائج لـ "${val.trim()}" — جرب: مصر، egypt، egy، البرازيل...</span>`;
+    renderSearchResults(null);
+  }
+}
+
+function clearSearch() {
+  const input = document.getElementById('matchSearchInput');
+  input.value = '';
+  onSearchInput('');
+  input.focus();
+}
+
+function renderSearchResults(team) {
+  const section = document.getElementById('allSection');
+  if (!team) {
+    renderAll();
+    return;
+  }
+
+  const matches = MATCHES.filter(m => m.summary.includes(team));
+  if (!matches.length) {
+    section.innerHTML = `<div class="pharaoh-empty">
+      <span class="eye">𓂀</span>
+      <div style="font-size:15px;color:var(--gold)">لا توجد مباريات لهذا المنتخب</div>
+    </div>`;
+    return;
+  }
+
+  // رتّب المباريات حسب التاريخ
+  const sorted = [...matches].sort((a,b) => a.dtstart.localeCompare(b.dtstart));
+  
+  const emoji = EMOJI_MAP[team] || '🏳️';
+  let html = `
+    <div style="text-align:center;padding:14px 14px 4px;">
+      <div style="font-size:28px;margin-bottom:4px">${emoji}</div>
+      <div style="font-size:16px;font-weight:900;color:var(--gold);font-family:'Amiri',serif;">${team}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">${sorted.length} مباريات في كأس العالم 2026</div>
+    </div>
+    <div style="padding:0 14px 14px;">
+  `;
+
+  for (const m of sorted) {
+    const dt = parseUTC(m.dtstart);
+    const isToday = isTodayEgypt(dt);
+    html += buildMatchCard(m, isToday);
+  }
+
+  html += `</div>`;
+  section.innerHTML = html;
+  attachCountdowns();
+}
+
+// إضافة عداد تنازلي بعد الرندر
+function attachCountdowns() {
+  document.querySelectorAll('.countdown-wrap[data-ts]').forEach(el => {
+    const ts = parseInt(el.dataset.ts);
+    if (!ts) return;
+    function update() {
+      const diff = ts - Date.now();
+      if (diff <= 0) { el.innerHTML = `<div class="countdown-expired">⏱️ بدأت المباراة</div>`; return; }
+      const d = Math.floor(diff/86400000);
+      const h = Math.floor((diff%86400000)/3600000);
+      const mi = Math.floor((diff%3600000)/60000);
+      const s = Math.floor((diff%60000)/1000);
+      el.innerHTML = [
+        d?`<div class="countdown-unit"><span class="countdown-num">${d}</span><span class="countdown-lbl">يوم</span></div>`:'',
+        `<div class="countdown-unit"><span class="countdown-num">${String(h).padStart(2,'0')}</span><span class="countdown-lbl">ساعة</span></div>`,
+        `<div class="countdown-unit"><span class="countdown-num">${String(mi).padStart(2,'0')}</span><span class="countdown-lbl">دقيقة</span></div>`,
+        `<div class="countdown-unit"><span class="countdown-num">${String(s).padStart(2,'0')}</span><span class="countdown-lbl">ثانية</span></div>`,
+      ].join('');
+    }
+    update();
+    setInterval(update, 1000);
+  });
+}
+
+// ══ INIT ══
+async function init() {
+  if('serviceWorker'in navigator){
+    navigator.serviceWorker.getRegistrations().then(r=>r.forEach(reg=>reg.unregister()));
+  }
+  updateClock();
+  setInterval(updateClock,1000);
+  renderToday();
+  renderAll();
+  await fetchLiveScores();
+  renderToday();
+  renderAll();
+  const openTab = document.querySelector('.tab-section.active')?.id;
+  if(openTab === 'tab-standings') renderStandings();
+  if(openTab === 'tab-scorers') renderScorers();
+
+  // ══ SMART LIVE UPDATER ══
+  // كل 15 ثانية إذا في مباريات حية، وإلا كل 45 ثانية
+  let pollCount = 0;
+  async function liveUpdateCycle() {
+    const hasLive = MATCHES.some(m => getMatchStatus(m) === 'live');
+    const interval = hasLive ? 15000 : 45000;
+    await fetchLiveScores();
+    renderToday();
+
+    // تحديث البطاقات الحية لحظياً بدون إعادة رسم كل شيء
+    document.querySelectorAll('.match-card.live').forEach(card => {
+      const id = parseInt(card.id.replace('card-',''));
+      const m = MATCHES.find(m => m.id === id);
+      if(!m) return;
+      // احفظ حالة panel المفتوحة
+      const panelOpen = card.querySelector('.details-panel.open');
+      const panelHTML = panelOpen ? panelOpen.innerHTML : null;
+      const wrap = document.createElement('div');
+      wrap.innerHTML = buildMatchCard(m, isTodayEgypt(parseUTC(m.dtstart)));
+      const newCard = wrap.firstElementChild;
+      if(panelHTML) {
+        const newPanel = newCard.querySelector('.details-panel');
+        if(newPanel) { newPanel.innerHTML = panelHTML; newPanel.classList.add('open'); }
+      }
+      card.replaceWith(newCard);
+      startCountdown(m.id, parseUTC(m.dtstart));
+    });
+
+    // تحديث الكروت التي انتهت حديثاً
+    document.querySelectorAll('.match-card:not(.live)').forEach(card => {
+      const id = parseInt(card.id.replace('card-',''));
+      const m = MATCHES.find(m => m.id === id);
+      if(!m) return;
+      const status = getMatchStatus(m);
+      if(status === 'finished') {
+        const sk1=`${getTeamNames(m.summary)[0]}${getTeamNames(m.summary)[1]}`;
+        const sk2=`${getTeamNames(m.summary)[1]}${getTeamNames(m.summary)[0]}`;
+        const ld = LIVE_SCORES[sk1]||LIVE_SCORES[sk2]||null;
+        // لو النتيجة جديدة (ما كانت موجودة قبل)، أعد رسم البطاقة
+        const hasScore = ld?.home !== null && ld?.home !== undefined;
+        const cardHasScore = card.querySelector('.score:not(.not-started)');
+        if(hasScore && !cardHasScore) {
+          const wrap = document.createElement('div');
+          wrap.innerHTML = buildMatchCard(m, isTodayEgypt(parseUTC(m.dtstart)));
+          card.replaceWith(wrap.firstElementChild);
+        }
+      }
+    });
+
+    // إذا كان المستخدم في تبويب البحث، حدّث نتائج البحث الحية
+    if(currentSearchTeam) {
+      const sec = document.getElementById('allSection');
+      sec.querySelectorAll('.match-card.live').forEach(card => {
+        const id = parseInt(card.id.replace('card-',''));
+        const m = MATCHES.find(m => m.id === id);
+        if(!m) return;
+        const wrap = document.createElement('div');
+        wrap.innerHTML = buildMatchCard(m, isTodayEgypt(parseUTC(m.dtstart)));
+        card.replaceWith(wrap.firstElementChild);
+      });
+    }
+
+    const activeTab = document.querySelector('.tab-section.active')?.id;
+    if(activeTab === 'tab-standings') renderStandings();
+
+    pollCount++;
+    setTimeout(liveUpdateCycle, interval);
+  }
+
+  setTimeout(liveUpdateCycle, 15000);
+}
+
+init();
+</script>
+</body>
+</html>
